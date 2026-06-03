@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CalPERS & CalSTRS Pension Calculator</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root{--navy:#0a1f3c;--navy-mid:#12305a;--gold:#b8832a;--gold-light:#d4a84b;--gold-pale:#f5e8d0;--cream:#f7f5f1;--white:#fff;--gray-100:#f0ede8;--gray-200:#ddd9d2;--gray-400:#9a9590;--gray-700:#36332e;--calpers-blue:#1a4a7a;--calstrs-green:#1a5c3a;--calstrs-green-light:#e8f4ee;--red:#c0392b;--green:#27ae60;--shadow:0 2px 16px rgba(10,31,60,.09);}
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--gray-700);min-height:100vh;}
+    .topbar{background:#060f1e;padding:8px 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:2px solid var(--gold);}
+    .topbar-logo{font-family:'Cormorant Garamond',serif;font-size:13px;color:rgba(255,255,255,0.6);letter-spacing:0.06em;}
+    .topbar-logo span{color:var(--gold-light);}
+    .topbar-close{background:none;border:1px solid rgba(255,255,255,0.18);color:rgba(255,255,255,0.5);padding:5px 14px;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.2s;}
+    .topbar-close:hover{border-color:var(--gold);color:var(--gold);}
+    .header{background:var(--navy);color:white;padding:0;border-bottom:4px solid var(--gold);position:relative;overflow:hidden;}
+    .header::before{content:'';position:absolute;top:-40px;right:-40px;width:320px;height:320px;border-radius:50%;background:rgba(184,131,42,.06);pointer-events:none;}
+    .header-inner{max-width:980px;margin:auto;padding:28px 24px 24px;display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:16px;}
+    .header h1{font-family:'Cormorant Garamond',serif;font-size:1.9rem;font-weight:700;color:white;line-height:1.15;}
+    .header h1 .gold{color:var(--gold-light);}
+    .header-sub{font-size:.8rem;font-weight:300;color:rgba(255,255,255,.5);letter-spacing:.06em;text-transform:uppercase;margin-top:4px;}
+    .system-toggle{display:flex;border-radius:8px;overflow:hidden;border:1.5px solid rgba(255,255,255,.15);}
+    .sys-btn{padding:9px 22px;font-family:'DM Sans',sans-serif;font-size:.82rem;font-weight:600;letter-spacing:.05em;text-transform:uppercase;cursor:pointer;border:none;background:rgba(255,255,255,.07);color:rgba(255,255,255,.55);transition:all .18s;}
+    .sys-btn.active-calpers{background:var(--calpers-blue);color:white;}
+    .sys-btn.active-calstrs{background:var(--calstrs-green);color:white;}
+    .sys-btn:hover{background:rgba(255,255,255,.14);color:white;}
+    .main{max-width:980px;margin:28px auto;padding:0 20px;display:grid;grid-template-columns:360px 1fr;gap:24px;align-items:start;}
+    .card{background:var(--white);border-radius:10px;box-shadow:var(--shadow);padding:24px 20px;}
+    .card-title{font-family:'Cormorant Garamond',serif;font-size:1.05rem;font-weight:700;color:var(--navy);border-bottom:2px solid var(--gold);padding-bottom:8px;margin-bottom:16px;}
+    label{display:block;font-weight:600;font-size:.78rem;letter-spacing:.07em;text-transform:uppercase;color:var(--navy);margin-top:14px;margin-bottom:4px;}
+    label:first-child{margin-top:0;}
+    select,input[type=number],input[type=text]{width:100%;padding:8px 10px;border:1.5px solid var(--gray-200);border-radius:6px;font-size:.9rem;font-family:'DM Sans',sans-serif;color:var(--gray-700);background:var(--gray-100);transition:border-color .18s,box-shadow .18s;-webkit-appearance:none;}
+    select:focus,input:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px rgba(184,131,42,.14);background:white;}
+    .plan-info{border-radius:7px;padding:12px 14px;margin-top:12px;font-size:.8rem;line-height:1.6;}
+    .plan-info.calpers{background:var(--navy);}
+    .plan-info.calstrs{background:var(--calstrs-green);}
+    .plan-info .pi-row{display:flex;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,.1);padding:3px 0;}
+    .plan-info .pi-row:last-child{border-bottom:none;}
+    .plan-info .pi-label{color:rgba(255,255,255,.55);}
+    .plan-info .pi-val{font-weight:600;color:var(--gold-light);}
+    .age-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px;}
+    .age-label{font-size:.72rem;color:var(--gray-400);font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px;}
+    .calc-btn{width:100%;margin-top:18px;padding:12px 0;background:var(--navy);color:white;border:none;border-radius:7px;font-family:'DM Sans',sans-serif;font-size:.92rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;transition:background .18s,transform .1s;border-bottom:3px solid var(--gold);}
+    .calc-btn:hover{background:var(--calpers-blue);transform:translateY(-1px);}
+    .calc-btn.calstrs-mode:hover{background:var(--calstrs-green);}
+    .results-panel{display:flex;flex-direction:column;gap:18px;}
+    .empty-state{color:var(--gray-400);font-size:.9rem;text-align:center;padding:36px 16px;}
+    .empty-state .icon{font-size:2.2rem;margin-bottom:10px;}
+    .result-card{background:var(--white);border-radius:10px;box-shadow:var(--shadow);overflow:hidden;border-left:5px solid var(--navy);}
+    .result-card.best{border-left-color:var(--gold);}
+    .result-card.best-calstrs{border-left-color:var(--calstrs-green);}
+    .result-header{background:var(--navy);color:white;padding:10px 18px;display:flex;justify-content:space-between;align-items:center;}
+    .result-card.best .result-header{background:var(--gold);}
+    .result-card.best-calstrs .result-header{background:var(--calstrs-green);}
+    .result-header .opt-label{font-family:'Cormorant Garamond',serif;font-size:1rem;font-weight:700;}
+    .result-header .opt-age{font-size:.76rem;opacity:.75;text-transform:uppercase;letter-spacing:.08em;}
+    .result-card.best .result-header .opt-label,.result-card.best .result-header .opt-age{color:var(--navy);}
+    .best-badge{background:rgba(255,255,255,.22);color:white;font-size:.66rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;padding:2px 8px;border-radius:20px;}
+    .result-card.best .best-badge{background:var(--navy);color:var(--gold-light);}
+    .result-body{padding:12px 18px;display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+    .stat-box{text-align:center;padding:9px 5px;background:var(--gray-100);border-radius:6px;}
+    .stat-box .stat-val{font-family:'Cormorant Garamond',serif;font-size:1.18rem;font-weight:700;color:var(--navy);}
+    .stat-box .stat-lbl{font-size:.67rem;color:var(--gray-400);text-transform:uppercase;letter-spacing:.06em;margin-top:2px;}
+    .result-details{padding:0 18px 13px;display:grid;grid-template-columns:1fr 1fr;gap:4px;font-size:.79rem;}
+    .detail-row{display:flex;justify-content:space-between;padding:2px 0;}
+    .detail-row .dk{color:var(--gray-400);}
+    .detail-row .dv{font-weight:600;color:var(--gray-700);}
+    .detail-row.highlight .dv{color:var(--gold);}
+    .detail-row.career-factor .dv{color:var(--calstrs-green);font-weight:700;}
+    .penalty-row .dv{color:var(--red);}
+    .sys-badge{display:inline-block;font-size:.67rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;padding:2px 7px;border-radius:4px;margin-bottom:7px;}
+    .sys-badge.calpers{background:#e0eaf5;color:var(--calpers-blue);}
+    .sys-badge.calstrs{background:var(--calstrs-green-light);color:var(--calstrs-green);}
+    .gap-section{max-width:980px;margin:0 auto 40px;padding:0 20px;}
+    .gap-header-card{background:var(--navy);border-radius:10px 10px 0 0;padding:18px 26px 14px;border-bottom:3px solid var(--gold);}
+    .gap-header-card h2{font-family:'Cormorant Garamond',serif;color:white;font-size:1.2rem;font-weight:700;}
+    .gap-header-card p{color:rgba(255,255,255,.55);font-size:.8rem;margin-top:3px;line-height:1.5;}
+    .gap-inputs-row{background:white;padding:16px 26px;display:grid;grid-template-columns:repeat(2,1fr);gap:18px;box-shadow:var(--shadow);}
+    .gap-inputs-row label{margin-top:0;}
+    .gap-input-group{display:flex;flex-direction:column;}
+    .gap-hint{font-size:.72rem;color:var(--gray-400);margin-top:4px;line-height:1.4;}
+    .asset-header-row{display:grid;grid-template-columns:1.6fr 1.2fr 1.2fr 0.8fr 0.8fr 36px;gap:8px;margin-bottom:5px;padding:0 2px;}
+    .asset-col-label{font-size:.67rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--gray-400);}
+    .gap-empty{background:white;border-radius:0 0 10px 10px;padding:28px;text-align:center;color:var(--gray-400);font-size:.86rem;box-shadow:var(--shadow);}
+    .inflation-bar{background:var(--navy);padding:12px 26px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;}
+    .report-bar{background:var(--navy);border-radius:10px;padding:18px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;border-bottom:4px solid var(--gold);}
+    .note-strip{font-size:.76rem;color:var(--gray-400);padding:6px 11px;background:var(--gray-100);border-radius:5px;border-left:3px solid var(--gold);line-height:1.5;margin-top:9px;}
+    .warn-strip{font-size:.76rem;background:#fff3cd;color:#7a5800;padding:6px 11px;border-radius:5px;border-left:3px solid #c49a2a;margin-top:7px;line-height:1.5;}
+    @media(max-width:760px){.main{grid-template-columns:1fr;}.result-body{grid-template-columns:1fr 1fr;}.result-details{grid-template-columns:1fr;}.gap-inputs-row{grid-template-columns:1fr;}}
+  </style>
+</head>
+<body>
+<div class="topbar">
+  <span class="topbar-logo">Edwards <span>&amp;</span> Associates — Client Portal</span>
+  <button class="topbar-close" onclick="if(window.parent&&window.parent.closeTool)window.parent.closeTool();else window.close();">&#x2715; Close Tool</button>
+</div>
+<div class="header">
+  <div class="header-inner">
+    <div>
+      <h1>CalPERS <span class="gold">&amp;</span> CalSTRS<br>Pension Calculator</h1>
+      <div class="header-sub">Retirement Benefit Comparison &amp; Income Gap Analysis &middot; Edwards Financial &amp; Associates</div>
+    </div>
+    <div class="system-toggle">
+      <button class="sys-btn active-calpers" id="btnCalPERS" onclick="switchSystem('calpers')">CalPERS</button>
+      <button class="sys-btn" id="btnCalSTRS" onclick="switchSystem('calstrs')">CalSTRS</button>
+    </div>
+  </div>
+</div>
+<div class="main">
+  <div>
+    <div class="card">
+      <div class="card-title" id="inputCardTitle">Plan &amp; Member Info</div>
+      <label>System &amp; Tier</label>
+      <select id="plan" onchange="updatePlanInfo()">
+        <optgroup label="── CalPERS Miscellaneous Classic ──">
+          <option value="CPERS_MISC_2at55">CalPERS Misc Classic – 2% at 55 (pre-2011)</option>
+          <option value="CPERS_MISC_2at60" selected>CalPERS Misc Classic – 2% at 60 (2011–2012)</option>
+        </optgroup>
+        <optgroup label="── CalPERS Miscellaneous PEPRA ──">
+          <option value="CPERS_MISC_2at62">CalPERS Misc PEPRA – 2% at 62 (2013+)</option>
+        </optgroup>
+        <optgroup label="── CalPERS Safety Classic ──">
+          <option value="CPERS_SAFE_3at50">CalPERS Safety Classic – 3% at 50 (Local)</option>
+          <option value="CPERS_SAFE_25at55">CalPERS Safety Classic – 2.5% at 55 (State A)</option>
+          <option value="CPERS_SAFE_2at55">CalPERS Safety Classic – 2% at 55 (State B)</option>
+        </optgroup>
+        <optgroup label="── CalPERS Safety PEPRA ──">
+          <option value="CPERS_SAFE_2at57">CalPERS Safety PEPRA – 2% at 57 (2013+)</option>
+        </optgroup>
+        <optgroup label="── CalSTRS ──">
+          <option value="CSTRS_2at60">CalSTRS DB – 2% at 60 (pre-2013)</option>
+          <option value="CSTRS_2at62">CalSTRS DB – 2% at 62 (2013+, PEPRA)</option>
+        </optgroup>
+      </select>
+      <div class="plan-info calpers" id="planInfo"></div>
+      <label>Career Start Age</label>
+      <input type="number" id="startAge" value="28" min="18" max="60"/>
+      <label>Final Average Compensation ($)</label>
+      <input type="number" id="salary" value="90000" min="1"/>
+      <div class="note-strip" id="facNote" style="margin-top:6px;"></div>
+      <div id="careerFactorNote" style="display:none;" class="note-strip"><strong style="color:var(--calstrs-green);">Career Factor:</strong> If you have &ge;30 years of service credit (2% at 60 only), a 0.2% bonus is added to your age factor, up to a maximum of 2.4%.</div>
+      <label>Retirement Age Scenarios (up to 5)</label>
+      <div class="age-grid">
+        <div><div class="age-label">Option 1</div><input type="number" id="retire0" value="55"/></div>
+        <div><div class="age-label">Option 2</div><input type="number" id="retire1" value="57"/></div>
+        <div><div class="age-label">Option 3</div><input type="number" id="retire2" value="60"/></div>
+        <div><div class="age-label">Option 4</div><input type="number" id="retire3" value="62"/></div>
+        <div><div class="age-label">Option 5</div><input type="number" id="retire4" value="65"/></div>
+      </div>
+    </div>
+    <div class="card" style="margin-top:18px;">
+      <div class="card-title">Beneficiary &amp; Survivor Option</div>
+      <label>Retirement Payment Option</label>
+      <select id="survivor" onchange="toggleSurvivorInputs()">
+        <option value="unmod" data-system="calpers">Unmodified – Highest benefit, no ongoing survivor</option>
+        <option value="opt2" data-system="calpers">Option 2 / 2W – 100% to beneficiary</option>
+        <option value="opt3" data-system="calpers">Option 3 / 3W – 50% to beneficiary</option>
+        <option value="opt1" data-system="calpers">Option 1 – Return of contributions lump sum</option>
+        <option value="opt4_custom" data-system="calpers">Option 4 – Custom % to beneficiary</option>
+        <option value="member_only" data-system="calstrs">Member-Only – Highest benefit, no ongoing survivor</option>
+        <option value="cstrs_opt1" data-system="calstrs">Option 1 – 100% joint &amp; survivor annuity</option>
+        <option value="cstrs_opt2" data-system="calstrs">Option 2 – 50% joint &amp; survivor annuity</option>
+        <option value="cstrs_opt3" data-system="calstrs">Option 3 – Guaranteed 60-month period</option>
+      </select>
+      <div id="ageBasedInputs" style="display:none;">
+        <label>Member Age at Retirement</label><input type="number" id="memberAgeOpt" value="60"/>
+        <label>Beneficiary Age</label><input type="number" id="beneficiaryAge" value="58"/>
+        <div class="note-strip">Reduction is actuarially calculated based on age difference.</div>
+      </div>
+      <div id="opt4Inputs" style="display:none;">
+        <label>Survivor % of Your Benefit (1–100)</label><input type="number" id="customSurvivorPct" value="75" min="1" max="100"/>
+        <label>Estimated Reduction to Your Benefit %</label><input type="number" id="customReductionPct" value="8" min="0" max="40"/>
+      </div>
+      <div id="survivorContinuanceNote" class="note-strip" style="margin-top:10px;display:none;"><strong>Survivor Continuance (employer-paid):</strong> State &amp; school CalPERS members receive this automatically — 25% of unmodified allowance if you contribute to Social Security, 50% if you do not.</div>
+      <button class="calc-btn" id="calcBtn" onclick="calculatePension()">Compare Retirement Scenarios</button>
+    </div>
+  </div>
+  <div class="results-panel" id="resultsPanel">
+    <div class="card empty-state"><div class="icon">📊</div><div>Select your system and tier, enter your information, and click <strong>Compare</strong> to see your benefit projections.</div></div>
+  </div>
+</div>
+<div class="gap-section" id="gapSection" style="display:none;">
+  <div class="gap-header-card"><h2>Pension Gap &amp; Capital Needed</h2><p>Select a retirement scenario to see how much additional capital is needed to cover the income gap — for life.</p></div>
+  <div class="gap-inputs-row">
+    <div class="gap-input-group"><label>Select Retirement Scenario</label><select id="gapScenarioPicker" onchange="renderGapAnalysis()"><option value="">— Choose a scenario —</option></select><div class="gap-hint">Populated from your comparison above.</div></div>
+    <div class="gap-input-group"><label>Target Return Rate (%)</label><input type="number" id="gapRate" value="5" min="1" max="15" step="0.25" oninput="renderGapAnalysis()"/><div class="gap-hint">5% = perpetual income, principal intact.</div></div>
+  </div>
+  <div class="inflation-bar">
+    <div style="display:flex;align-items:center;gap:12px;">
+      <label style="display:flex;align-items:center;gap:9px;cursor:pointer;margin:0;text-transform:none;letter-spacing:0;font-size:.84rem;color:white;font-weight:600;">
+        <div style="position:relative;width:46px;height:24px;flex-shrink:0;"><input type="checkbox" id="inflationToggle" onchange="toggleInflation()" style="opacity:0;width:0;height:0;position:absolute;"/><span id="inflationTrack" style="position:absolute;inset:0;background:rgba(255,255,255,.2);border-radius:24px;transition:background .2s;"></span><span id="inflationThumb" style="position:absolute;top:3px;left:3px;width:18px;height:18px;background:white;border-radius:50%;transition:transform .2s;box-shadow:0 1px 4px rgba(0,0,0,.3);"></span></div>
+        Inflation-Adjusted View
+      </label>
+      <span style="font-size:.74rem;color:rgba(255,255,255,.4);">Projects salary growth, COLA impact, and real purchasing power</span>
+    </div>
+    <div id="inflationBadge" style="font-size:.69rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;padding:4px 12px;border-radius:20px;background:rgba(255,255,255,.12);color:rgba(255,255,255,.45);">Nominal Mode</div>
+  </div>
+  <div id="inflationInputs" style="display:none;background:#eef2f8;padding:14px 26px;border-bottom:2px solid var(--gold);">
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:18px;">
+      <div class="gap-input-group"><label style="color:var(--navy);">Inflation Rate (%)</label><input type="number" id="inflationRate" value="3" min="0" max="15" step="0.25" oninput="renderGapAnalysis()"/><div class="gap-hint">CPI long-term avg ~3%.</div></div>
+      <div class="gap-input-group"><label style="color:var(--navy);">Annual Salary Growth (%)</label><input type="number" id="salaryGrowth" value="2.5" min="0" max="15" step="0.25" oninput="renderGapAnalysis()"/></div>
+      <div class="gap-input-group"><label style="color:var(--navy);">COLA Rate for Projection (%)</label><input type="number" id="colaRate" value="2" min="0" max="3" step="0.25" oninput="renderGapAnalysis()"/></div>
+    </div>
+  </div>
+  <div style="background:white;padding:18px 26px;border-top:1px solid var(--gray-200);">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:10px;">
+      <div><div style="font-weight:600;font-size:.8rem;letter-spacing:.05em;text-transform:uppercase;color:var(--navy);">Existing Assets</div><div style="font-size:.73rem;color:var(--gray-400);margin-top:2px;">Enter each account — tool projects value at retirement date.</div></div>
+      <button onclick="addAssetRow()" style="background:var(--navy);color:white;border:none;border-radius:6px;padding:7px 14px;font-size:.78rem;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;border-bottom:2px solid var(--gold);letter-spacing:.05em;text-transform:uppercase;">+ Add Asset</button>
+    </div>
+    <div class="asset-header-row"><div class="asset-col-label">Account / Asset</div><div class="asset-col-label">Balance ($)</div><div class="asset-col-label">Annual Contrib ($)</div><div class="asset-col-label">ROR (%)</div><div class="asset-col-label">Yrs to Retire</div><div></div></div>
+    <div id="assetRows"></div>
+    <div id="assetTotalsRow" style="display:none;margin-top:10px;background:var(--navy);border-radius:7px;padding:10px 14px;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
+      <div style="font-size:.73rem;color:rgba(255,255,255,.55);text-transform:uppercase;letter-spacing:.06em;">Total Today</div>
+      <div id="assetTotalToday" style="font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-weight:700;color:white;">$0</div>
+      <div style="color:var(--gold-light);font-size:1rem;">→</div>
+      <div style="font-size:.73rem;color:rgba(255,255,255,.55);text-transform:uppercase;letter-spacing:.06em;">Projected at Retirement</div>
+      <div id="assetTotalProjected" style="font-family:'Cormorant Garamond',serif;font-size:1.2rem;font-weight:700;color:var(--gold-light);">$0</div>
+    </div>
+  </div>
+  <div id="gapResultsContainer"><div class="gap-empty">Select a retirement scenario above to see the gap analysis.</div></div>
+</div>
+<div id="reportButtonBar" style="display:none;max-width:980px;margin:0 auto 40px;padding:0 20px;">
+  <div class="report-bar">
+    <div><div style="font-family:'Cormorant Garamond',serif;font-size:1.05rem;font-weight:700;color:white;">Generate a Client Report</div><div style="font-size:.78rem;color:rgba(255,255,255,.55);margin-top:3px;">Exports pension scenarios, gap analysis, and key considerations as a print-ready HTML file.</div></div>
+    <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end;">
+      <div><label style="font-size:.69rem;text-transform:uppercase;letter-spacing:.06em;color:rgba(255,255,255,.45);display:block;margin-bottom:4px;font-weight:600;">Client Name</label><input type="text" id="clientName" placeholder="e.g. Maria Hernandez" style="padding:7px 10px;border:1.5px solid rgba(255,255,255,.18);border-radius:6px;background:rgba(255,255,255,.08);color:white;font-family:'DM Sans',sans-serif;font-size:.84rem;width:190px;"/></div>
+      <button onclick="generateReport()" style="padding:9px 20px;background:var(--gold);color:var(--navy);border:none;border-radius:7px;font-family:'DM Sans',sans-serif;font-size:.86rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;cursor:pointer;border-bottom:3px solid #8a6012;">⬇ Download Report</button>
+    </div>
+  </div>
+</div>
+<script>
+const PLANS={
+  CPERS_MISC_2at55:{system:'calpers',label:'CalPERS Misc Classic – 2% at 55',minAge:50,maxBenefitAge:63,facMonths:12,cola:'2% compounding',pepra:false,survivorContinuance:true,careerFactor:false,getMultiplier(a,y){return cpers_misc_55_factor(a)*y/100;}},
+  CPERS_MISC_2at60:{system:'calpers',label:'CalPERS Misc Classic – 2% at 60',minAge:50,maxBenefitAge:63,facMonths:12,cola:'2% compounding',pepra:false,survivorContinuance:true,careerFactor:false,getMultiplier(a,y){return cpers_misc_60_factor(a)*y/100;}},
+  CPERS_MISC_2at62:{system:'calpers',label:'CalPERS Misc PEPRA – 2% at 62',minAge:52,maxBenefitAge:67,facMonths:36,cola:'2% compounding',pepra:true,survivorContinuance:true,careerFactor:false,getMultiplier(a,y){return cpers_misc_62_factor(a)*y/100;}},
+  CPERS_SAFE_3at50:{system:'calpers',label:'CalPERS Safety Classic – 3% at 50',minAge:50,maxBenefitAge:55,facMonths:12,cola:'2–3% (agency contract)',pepra:false,survivorContinuance:true,careerFactor:false,getMultiplier(a,y){return 3.0*y/100;}},
+  CPERS_SAFE_25at55:{system:'calpers',label:'CalPERS Safety Classic – 2.5% at 55',minAge:50,maxBenefitAge:55,facMonths:12,cola:'2% compounding',pepra:false,survivorContinuance:true,careerFactor:false,getMultiplier(a,y){const c=Math.min(Math.max(a,50),55);const t={50:2.0,51:2.1,52:2.2,53:2.3,54:2.4,55:2.5};return(t[c]||2.5)*y/100;}},
+  CPERS_SAFE_2at55:{system:'calpers',label:'CalPERS Safety Classic – 2% at 55',minAge:50,maxBenefitAge:63,facMonths:12,cola:'2% compounding',pepra:false,survivorContinuance:true,careerFactor:false,getMultiplier(a,y){return cpers_misc_55_factor(a)*y/100;}},
+  CPERS_SAFE_2at57:{system:'calpers',label:'CalPERS Safety PEPRA – 2% at 57',minAge:50,maxBenefitAge:57,facMonths:36,cola:'2% compounding',pepra:true,survivorContinuance:true,careerFactor:false,getMultiplier(a,y){const c=Math.min(Math.max(a,50),57);const t={50:1.426,51:1.492,52:1.564,53:1.641,54:1.725,55:1.817,56:1.917,57:2.000};return(t[c]||2.0)*y/100;}},
+  CSTRS_2at60:{system:'calstrs',label:'CalSTRS DB – 2% at 60 (pre-2013)',minAge:50,minAgeNote:'50 (30+ yrs) / 55 (5+ yrs)',maxBenefitAge:63,facMonths:12,cola:'2% simple (of initial benefit)',pepra:false,survivorContinuance:false,careerFactor:true,getMultiplier(a,y){let f=cstrs_60_factor(a);if(y>=30)f=Math.min(f+0.2,2.4);return f*y/100;}},
+  CSTRS_2at62:{system:'calstrs',label:'CalSTRS DB – 2% at 62 (PEPRA 2013+)',minAge:55,maxBenefitAge:65,facMonths:36,cola:'2% simple (of initial benefit)',pepra:true,survivorContinuance:false,careerFactor:false,getMultiplier(a,y){return cstrs_62_factor(a)*y/100;}}
+};
+function cpers_misc_55_factor(a){const c=Math.min(Math.max(a,50),63);const t={50:1.460,51:1.552,52:1.650,53:1.758,54:1.874,55:2.000,56:2.134,57:2.272,58:2.418,59:2.418,60:2.418,61:2.418,62:2.418,63:2.418};return t[Math.round(c)]||2.418;}
+function cpers_misc_60_factor(a){const c=Math.min(Math.max(a,50),63);const t={50:1.092,51:1.156,52:1.224,53:1.296,54:1.376,55:1.460,56:1.552,57:1.650,58:1.758,59:1.874,60:2.000,61:2.134,62:2.272,63:2.418};return t[Math.round(c)]||2.418;}
+function cpers_misc_62_factor(a){const c=Math.min(Math.max(a,52),67);const t={52:1.000,53:1.100,54:1.200,55:1.300,56:1.400,57:1.500,58:1.600,59:1.700,60:1.800,61:1.900,62:2.000,63:2.100,64:2.200,65:2.300,66:2.400,67:2.500};return t[Math.round(c)]||2.500;}
+function cstrs_60_factor(a){const c=Math.min(Math.max(a,50),63);const t={50:1.092,51:1.156,52:1.224,53:1.296,54:1.376,55:1.460,56:1.552,57:1.650,58:1.758,59:1.874,60:2.000,61:2.134,62:2.272,63:2.418};return t[Math.round(c)]||2.418;}
+function cstrs_62_factor(a){const c=Math.min(Math.max(a,55),65);const t={55:1.160,56:1.280,57:1.400,58:1.520,59:1.640,60:1.760,61:1.880,62:2.000,63:2.080,64:2.160,65:2.400};return t[Math.round(c)]||2.400;}
+function estimateSurvivorReduction(mA,bA,pct){const diff=bA-mA;const base=Math.max(0.04,Math.min(0.16,0.08+diff*0.005));return base*pct;}
+let _currentSystem='calpers';
+function switchSystem(sys){
+  _currentSystem=sys;
+  document.getElementById('btnCalPERS').className='sys-btn'+(sys==='calpers'?' active-calpers':'');
+  document.getElementById('btnCalSTRS').className='sys-btn'+(sys==='calstrs'?' active-calstrs':'');
+  const sel=document.getElementById('plan');
+  for(let i=0;i<sel.options.length;i++){const p=PLANS[sel.options[i].value];if(p&&p.system===sys){sel.selectedIndex=i;break;}}
+  const surv=document.getElementById('survivor');
+  for(let i=0;i<surv.options.length;i++){const os=surv.options[i].getAttribute('data-system');surv.options[i].style.display=(!os||os===sys)?'':'none';}
+  for(let i=0;i<surv.options.length;i++){if(surv.options[i].style.display!=='none'){surv.selectedIndex=i;break;}}
+  document.getElementById('calcBtn').className='calc-btn'+(sys==='calstrs'?' calstrs-mode':'');
+  updatePlanInfo();toggleSurvivorInputs();
+}
+function updatePlanInfo(){
+  const pk=document.getElementById('plan').value;const plan=PLANS[pk];if(!plan)return;
+  _currentSystem=plan.system;
+  const box=document.getElementById('planInfo');box.className='plan-info '+plan.system;
+  const minAD=plan.minAgeNote||plan.minAge;
+  const cap=plan.pepra?(plan.system==='calpers'?'$155,081 (SS) / $186,096 (non-SS)':'50% of normal cost'):(plan.system==='calpers'?'$350,000 (IRC 401(a)(17))':'None');
+  box.innerHTML=`<div class="pi-row"><span class="pi-label">Min Retirement Age</span><span class="pi-val">${minAD}</span></div><div class="pi-row"><span class="pi-label">Max Benefit Age</span><span class="pi-val">${plan.maxBenefitAge}</span></div><div class="pi-row"><span class="pi-label">Final Comp (FAC)</span><span class="pi-val">Best ${plan.facMonths} Months</span></div><div class="pi-row"><span class="pi-label">COLA</span><span class="pi-val">${plan.cola}</span></div><div class="pi-row"><span class="pi-label">PEPRA</span><span class="pi-val">${plan.pepra?'Yes':'No'}</span></div><div class="pi-row"><span class="pi-label">Career Factor</span><span class="pi-val">${plan.careerFactor?'+0.2% (≥30 yrs, max 2.4%)':'N/A'}</span></div>`;
+  document.getElementById('facNote').textContent=plan.facMonths===36?'PEPRA: FAC = average of highest 36 consecutive months.':'FAC = highest single 12-month period of your career.';
+  document.getElementById('careerFactorNote').style.display=plan.careerFactor?'block':'none';
+  document.getElementById('survivorContinuanceNote').style.display=plan.survivorContinuance?'block':'none';
+  const surv=document.getElementById('survivor');
+  for(let i=0;i<surv.options.length;i++){const os=surv.options[i].getAttribute('data-system');surv.options[i].style.display=(!os||os===plan.system)?'':'none';}
+  for(let i=0;i<surv.options.length;i++){if(surv.options[i].style.display!=='none'){surv.selectedIndex=i;break;}}
+  toggleSurvivorInputs();
+}
+function toggleSurvivorInputs(){
+  const v=document.getElementById('survivor').value;
+  const ab=['opt2','opt3','cstrs_opt1','cstrs_opt2'];
+  document.getElementById('ageBasedInputs').style.display=ab.includes(v)?'block':'none';
+  document.getElementById('opt4Inputs').style.display=v==='opt4_custom'?'block':'none';
+}
+let _lastResults=null,_lastSalary=0,_lastPlanKey='',_assetCount=0;
+const ASSET_PLACEHOLDERS=['457(b) Deferred Comp','403(b)','IRA / Roth IRA','Annuity / FIA','IUL Cash Value','Brokerage Account','Savings / HYSA','Real Estate Equity','529 / Other'];
+function calculatePension(){
+  const pk=document.getElementById('plan').value;const plan=PLANS[pk];
+  const startAge=parseInt(document.getElementById('startAge').value)||25;
+  const salary=parseFloat(document.getElementById('salary').value)||0;
+  const sv=document.getElementById('survivor').value;
+  const retireAges=[0,1,2,3,4].map(i=>parseInt(document.getElementById('retire'+i).value)).filter(v=>!isNaN(v)&&v>0);
+  let survivorReductionFn,survivorPct,survivorLabel;
+  if(sv==='unmod'||sv==='member_only'){survivorReductionFn=()=>0;survivorPct=0;survivorLabel=sv==='unmod'?'Unmodified – no ongoing survivor':'Member-only – no ongoing survivor';}
+  else if(sv==='opt2'||sv==='cstrs_opt1'){const mA=parseInt(document.getElementById('memberAgeOpt').value)||60;const bA=parseInt(document.getElementById('beneficiaryAge').value)||58;const red=estimateSurvivorReduction(mA,bA,1.0);survivorReductionFn=()=>red;survivorPct=1.0;survivorLabel=`${sv==='opt2'?'Option 2':'Option 1 CalSTRS'} – 100% survivor (~${(red*100).toFixed(1)}% reduction)`;}
+  else if(sv==='opt3'||sv==='cstrs_opt2'){const mA=parseInt(document.getElementById('memberAgeOpt').value)||60;const bA=parseInt(document.getElementById('beneficiaryAge').value)||58;const red=estimateSurvivorReduction(mA,bA,0.5);survivorReductionFn=()=>red;survivorPct=0.5;survivorLabel=`${sv==='opt3'?'Option 3':'Option 2 CalSTRS'} – 50% survivor (~${(red*100).toFixed(1)}% reduction)`;}
+  else if(sv==='opt1'){survivorReductionFn=()=>0.01;survivorPct=0;survivorLabel='Option 1 – Return of contributions lump sum';}
+  else if(sv==='cstrs_opt3'){survivorReductionFn=()=>0.015;survivorPct=0;survivorLabel='Option 3 – Guaranteed 60-month period';}
+  else{const pct=parseFloat(document.getElementById('customSurvivorPct').value)/100||0.75;const red=parseFloat(document.getElementById('customReductionPct').value)/100||0.08;survivorReductionFn=()=>red;survivorPct=pct;survivorLabel=`Option 4 Custom – ${(pct*100).toFixed(0)}% survivor`;}
+  const results=[];
+  retireAges.forEach((ra,idx)=>{
+    const years=Math.max(0,ra-startAge);const ca=Math.min(ra,plan.maxBenefitAge);
+    const rawM=plan.getMultiplier(ca,years);const rawA=rawM*salary;
+    const sr=survivorReductionFn(ra);const ab=rawA*(1-sr);const mb=ab/12;
+    const saA=ab*survivorPct;const saM=saA/12;const pct=salary>0?(ab/salary)*100:0;
+    const bMin=ra<plan.minAge;const cMax=ra>plan.maxBenefitAge;
+    const cfA=plan.careerFactor&&years>=30;
+    results.push({idx,retireAge:ra,years,rawMultiplier:rawM,rawAnnual:rawA,annualBenefit:ab,monthlyBenefit:mb,survivorAnnual:saA,survivorMonthly:saM,pctOfSalary:pct,survivorReduction:sr,belowMinAge:bMin,cappedAtMax:cMax,survivorPct,careerFactorApplied:cfA});
+  });
+  const bestIdx=results.reduce((b,r,i)=>r.annualBenefit>results[b].annualBenefit?i:b,0);
+  const panel=document.getElementById('resultsPanel');panel.innerHTML='';
+  const sc=document.createElement('div');sc.className='card';
+  const sbc=plan.system==='calstrs'?'calstrs':'calpers';const sbt=plan.system==='calstrs'?'CalSTRS':'CalPERS';
+  sc.innerHTML=`<div class="card-title">Comparison Summary</div><span class="sys-badge ${sbc}">${sbt}</span><div style="font-size:.8rem;color:var(--gray-400);margin-bottom:10px;">${plan.label} · ${survivorLabel}</div><div style="display:flex;gap:7px;flex-wrap:wrap;">${results.map((r,i)=>`<div style="flex:1;min-width:80px;background:${i===bestIdx?'var(--navy)':'var(--gray-100)'};color:${i===bestIdx?'white':'var(--gray-700)'};border-radius:7px;padding:10px 6px;text-align:center;"><div style="font-size:.68rem;text-transform:uppercase;letter-spacing:.07em;opacity:.7;">Age ${r.retireAge}</div><div style="font-family:'Cormorant Garamond',serif;font-size:1.15rem;font-weight:700;margin:3px 0;color:${i===bestIdx?'var(--gold-light)':'var(--navy)'}">$${Math.round(r.monthlyBenefit).toLocaleString()}/mo</div><div style="font-size:.72rem;opacity:.75;">${r.pctOfSalary.toFixed(1)}% of salary</div></div>`).join('')}</div>`;
+  panel.appendChild(sc);
+  results.forEach((r,i)=>{
+    const isBest=i===bestIdx;const card=document.createElement('div');
+    const bc=isBest?(plan.system==='calstrs'?' best-calstrs':' best'):'';card.className='result-card'+bc;
+    const wH=r.belowMinAge?`<div class="warn-strip">⚠ Age ${r.retireAge} is below this plan's minimum retirement age of ${plan.minAge}.</div>`:r.cappedAtMax?`<div class="warn-strip">ℹ Age ${r.retireAge} exceeds the maximum benefit age of ${plan.maxBenefitAge}.</div>`:'';
+    const cfR=plan.careerFactor?`<div class="detail-row career-factor"><span class="dk">Career Factor</span><span class="dv">${r.careerFactorApplied?'✓ +0.2% applied':'< 30 yrs — N/A'}</span></div>`:'';
+    const hBg=isBest?(plan.system==='calstrs'?'var(--calstrs-green)':'var(--gold)'):'var(--navy)';
+    const hTc=isBest&&plan.system==='calpers'?'var(--navy)':'white';
+    card.innerHTML=`<div class="result-header" style="background:${hBg};color:${hTc};"><div><div class="opt-label">Option ${r.idx+1} — Retire at Age ${r.retireAge}</div><div class="opt-age">${r.years} Years of Service</div></div>${isBest?'<span class="best-badge">Highest Benefit</span>':''}</div>${wH?`<div style="padding:0 18px;">${wH}</div>`:''}<div class="result-body"><div class="stat-box"><div class="stat-val">$${Math.round(r.monthlyBenefit).toLocaleString()}</div><div class="stat-lbl">Monthly Benefit</div></div><div class="stat-box"><div class="stat-val">$${Math.round(r.annualBenefit).toLocaleString()}</div><div class="stat-lbl">Annual Benefit</div></div><div class="stat-box"><div class="stat-val">${r.pctOfSalary.toFixed(1)}%</div><div class="stat-lbl">% of Salary</div></div></div><div class="result-details"><div class="detail-row"><span class="dk">Age Factor / Year</span><span class="dv">${((r.rawMultiplier/r.years)*100).toFixed(3)}%</span></div><div class="detail-row"><span class="dk">Total Benefit Factor</span><span class="dv">${(r.rawMultiplier*100).toFixed(2)}%</span></div><div class="detail-row"><span class="dk">Before Survivor Adj.</span><span class="dv">$${Math.round(r.rawAnnual).toLocaleString()}/yr</span></div><div class="detail-row ${r.survivorReduction>0?'penalty-row':''}"><span class="dk">Survivor Reduction</span><span class="dv">${r.survivorReduction>0?'-'+(r.survivorReduction*100).toFixed(1)+'%':'None'}</span></div><div class="detail-row highlight"><span class="dk">Survivor Monthly</span><span class="dv">${r.survivorPct>0?'$'+Math.round(r.survivorMonthly).toLocaleString()+'/mo':'None'}</span></div>${cfR}<div class="detail-row"><span class="dk">COLA Protection</span><span class="dv">${plan.cola}</span></div><div class="detail-row"><span class="dk">FAC Period</span><span class="dv">Best ${plan.facMonths} Months</span></div></div>`;
+    panel.appendChild(card);
+  });
+  _lastResults=results;_lastSalary=salary;_lastPlanKey=pk;
+  populateGapPicker(results,salary);
+  document.getElementById('reportButtonBar').style.display='block';
+  const cc=document.createElement('div');cc.className='card';cc.innerHTML=`<div class="card-title">Benefit Comparison Chart</div><canvas id="barChart" height="200"></canvas>`;panel.appendChild(cc);
+  const ctx=document.getElementById('barChart').getContext('2d');
+  if(window._calc_chart)window._calc_chart.destroy();
+  const bC=plan.system==='calstrs'?'rgba(26,92,58,.80)':'rgba(10,31,60,.78)';const gC='rgba(184,131,42,.82)';
+  window._calc_chart=new Chart(ctx,{type:'bar',data:{labels:results.map(r=>`Age ${r.retireAge}`),datasets:[{label:'Your Annual Benefit',data:results.map(r=>Math.round(r.annualBenefit)),backgroundColor:results.map((_,i)=>i===bestIdx?gC:bC),borderColor:results.map((_,i)=>i===bestIdx?'#b8832a':(plan.system==='calstrs'?'#1a5c3a':'#0a1f3c')),borderWidth:2,borderRadius:5},{label:'Survivor Annual Benefit',data:results.map(r=>Math.round(r.survivorAnnual)),backgroundColor:'rgba(26,74,122,.28)',borderColor:'rgba(26,74,122,.6)',borderWidth:2,borderRadius:5}]},options:{responsive:true,plugins:{legend:{position:'top',labels:{font:{family:"'DM Sans',sans-serif",size:11}}},tooltip:{callbacks:{label:c=>`${c.dataset.label}: $${c.parsed.y.toLocaleString()}`}}},scales:{y:{beginAtZero:true,ticks:{callback:v=>'$'+v.toLocaleString(),font:{family:"'DM Sans',sans-serif"}}},x:{ticks:{font:{family:"'DM Sans',sans-serif"}}}}}});
+}
+function toggleInflation(){
+  const on=document.getElementById('inflationToggle').checked;
+  document.getElementById('inflationInputs').style.display=on?'block':'none';
+  document.getElementById('inflationTrack').style.background=on?'var(--gold)':'rgba(255,255,255,.2)';
+  document.getElementById('inflationThumb').style.transform=on?'translateX(22px)':'translateX(0)';
+  document.getElementById('inflationBadge').style.background=on?'rgba(184,131,42,.25)':'rgba(255,255,255,.12)';
+  document.getElementById('inflationBadge').style.color=on?'var(--gold-light)':'rgba(255,255,255,.45)';
+  document.getElementById('inflationBadge').textContent=on?'Inflation-Adjusted':'Nominal Mode';
+  renderGapAnalysis();
+}
+function getInflationParams(){const on=document.getElementById('inflationToggle').checked;if(!on)return{on:false,inflation:0,salaryGrowth:0,cola:0};return{on:true,inflation:parseFloat(document.getElementById('inflationRate').value)/100||0.03,salaryGrowth:parseFloat(document.getElementById('salaryGrowth').value)/100||0.025,cola:parseFloat(document.getElementById('colaRate').value)/100||0.02};}
+function addAssetRow(name='',balance='',contrib='',ror='6',years=''){
+  _assetCount++;const id=_assetCount;const ph=ASSET_PLACEHOLDERS[(id-1)%ASSET_PLACEHOLDERS.length];
+  const row=document.createElement('div');row.id=`assetRow_${id}`;row.style.cssText='display:grid;grid-template-columns:1.6fr 1.2fr 1.2fr 0.8fr 0.8fr 36px;gap:7px;margin-bottom:7px;align-items:center;';
+  const inp='padding:7px 9px;border:1.5px solid var(--gray-200);border-radius:6px;font-size:.8rem;font-family:"DM Sans",sans-serif;background:var(--gray-100);width:100%;';
+  row.innerHTML=`<input type="text" placeholder="${ph}" value="${name}" style="${inp}" oninput="updateAssetTotals()"/><input type="number" placeholder="0" value="${balance}" min="0" style="${inp}" oninput="updateAssetTotals()"/><input type="number" placeholder="0" value="${contrib}" min="0" style="${inp}" oninput="updateAssetTotals()"/><input type="number" placeholder="6" value="${ror}" min="0" max="30" step="0.25" style="${inp}" oninput="updateAssetTotals()"/><input type="number" placeholder="15" value="${years}" min="0" max="50" style="${inp}" oninput="updateAssetTotals()"/><button onclick="removeAssetRow(${id})" style="background:#fce4ec;color:#c0392b;border:none;border-radius:6px;width:36px;height:36px;font-size:1rem;cursor:pointer;font-weight:700;display:flex;align-items:center;justify-content:center;">×</button>`;
+  document.getElementById('assetRows').appendChild(row);updateAssetTotals();
+}
+function removeAssetRow(id){const r=document.getElementById(`assetRow_${id}`);if(r)r.remove();updateAssetTotals();renderGapAnalysis();}
+function getAssets(infl){infl=infl||{on:false,inflation:0};const rows=document.getElementById('assetRows').querySelectorAll('[id^="assetRow_"]');const assets=[];rows.forEach(row=>{const inp=row.querySelectorAll('input');const name=inp[0].value.trim()||'Asset';const balance=parseFloat(inp[1].value)||0;const contrib=parseFloat(inp[2].value)||0;const ror=parseFloat(inp[3].value)/100||0.06;const years=parseFloat(inp[4].value)||0;const fvL=balance*Math.pow(1+ror,years);const fvC=ror>0?contrib*((Math.pow(1+ror,years)-1)/ror):contrib*years;const proj=fvL+fvC;const rR=infl.on?((1+ror)/(1+infl.inflation)-1):ror;const fvLR=balance*Math.pow(1+rR,years);const fvCR=rR>0?contrib*((Math.pow(1+rR,years)-1)/rR):contrib*years;const rP=infl.on?fvLR+fvCR:proj;assets.push({name,balance,contrib,ror,realRor:rR,years,projected:proj,realProjected:rP});});return assets;}
+function updateAssetTotals(){const infl=getInflationParams();const assets=getAssets(infl);const tr=document.getElementById('assetTotalsRow');if(assets.length===0){tr.style.display='none';renderGapAnalysis();return;}const tT=assets.reduce((s,a)=>s+a.balance,0);const tP=infl.on?assets.reduce((s,a)=>s+a.realProjected,0):assets.reduce((s,a)=>s+a.projected,0);tr.style.display='flex';document.getElementById('assetTotalToday').textContent='$'+Math.round(tT).toLocaleString();document.getElementById('assetTotalProjected').textContent='$'+Math.round(tP).toLocaleString();renderGapAnalysis();}
+function populateGapPicker(results,salary){const p=document.getElementById('gapScenarioPicker');p.innerHTML=`<option value="">— Choose a scenario —</option>`;results.forEach((r,i)=>{p.innerHTML+=`<option value="${i}">Option ${i+1} — Age ${r.retireAge} (${r.years} yrs) · $${Math.round(r.monthlyBenefit).toLocaleString()}/mo</option>`;});document.getElementById('gapSection').style.display='block';document.getElementById('gapSection').scrollIntoView({behavior:'smooth',block:'start'});document.getElementById('gapResultsContainer').innerHTML=`<div class="gap-empty">Select a retirement scenario above to see the gap analysis.</div>`;}
+function renderGapAnalysis(){
+  const idx=document.getElementById('gapScenarioPicker').value;if(idx===''||!_lastResults)return;
+  const r=_lastResults[parseInt(idx)];const infl=getInflationParams();const rate=parseFloat(document.getElementById('gapRate').value)/100||0.05;
+  const mult=1/rate;const startAge=parseInt(document.getElementById('startAge').value)||25;const ytr=Math.max(0,r.retireAge-startAge);const plan=PLANS[_lastPlanKey];const nomSal=_lastSalary;
+  const futureSal=infl.on?nomSal*Math.pow(1+infl.salaryGrowth,ytr):nomSal;
+  let futurePen=r.annualBenefit;if(infl.on){const rm=plan.getMultiplier(Math.min(r.retireAge,plan.maxBenefitAge),r.years);futurePen=rm*futureSal*(1-r.survivorReduction);}
+  const salG=infl.on?futureSal:nomSal;const penG=infl.on?futurePen:r.annualBenefit;
+  const annGap=Math.max(0,salG-penG);const monGap=annGap/12;const capNeed=annGap*mult;const capToday=infl.on?capNeed/Math.pow(1+infl.inflation,ytr):capNeed;
+  const assets=getAssets(infl);const tPA=assets.reduce((s,a)=>s+a.projected,0);const tRA=infl.on?assets.reduce((s,a)=>s+a.realProjected,0):tPA;
+  const aVC=infl.on?tRA:tPA;const cVA=infl.on?capToday:capNeed;const remG=Math.max(0,cVA-aVC);const covPct=cVA>0?Math.min(100,(aVC/cVA)*100):100;
+  const con=document.getElementById('gapResultsContainer');
+  if(annGap===0){con.innerHTML=`<div style="background:white;border-radius:0 0 10px 10px;padding:32px;text-align:center;box-shadow:var(--shadow);"><div style="font-size:2rem;">✅</div><div style="font-family:'Cormorant Garamond',serif;font-size:1.1rem;color:var(--green);font-weight:700;margin-top:10px;">No Gap — Pension Fully Replaces Salary</div></div>`;return;}
+  const assetHTML=assets.length>0?`<div style="margin-top:13px;background:var(--gray-100);border-radius:7px;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;"><div><div style="font-size:.66rem;text-transform:uppercase;letter-spacing:.06em;color:var(--gray-400);">Projected Assets</div><div style="font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-weight:700;color:var(--green);">$${Math.round(aVC).toLocaleString()}</div></div><div style="font-size:1.3rem;color:var(--gray-400);">→</div><div style="text-align:right;"><div style="font-size:.66rem;text-transform:uppercase;letter-spacing:.06em;color:var(--gray-400);">Still Need to Fund</div><div style="font-family:'Cormorant Garamond',serif;font-size:1.15rem;font-weight:700;color:${remG>0?'var(--red)':'var(--green)'};">${remG>0?'-$'+Math.round(remG).toLocaleString():'✓ Fully Covered'}</div></div></div>`:'';
+  con.innerHTML=`<div style="background:white;border-radius:0 0 10px 10px;box-shadow:var(--shadow);overflow:hidden;"><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:0;border-bottom:1px solid var(--gray-200);"><div style="padding:16px;text-align:center;border-right:1px solid var(--gray-200);"><div style="font-size:.66rem;text-transform:uppercase;letter-spacing:.07em;color:var(--gray-400);margin-bottom:4px;">${infl.on?'Future Salary':'Current Salary'}</div><div style="font-family:'Cormorant Garamond',serif;font-size:1.4rem;font-weight:700;color:var(--navy);">$${Math.round(salG).toLocaleString()}</div></div><div style="padding:16px;text-align:center;border-right:1px solid var(--gray-200);"><div style="font-size:.66rem;text-transform:uppercase;letter-spacing:.07em;color:var(--gray-400);margin-bottom:4px;">Pension at Age ${r.retireAge}</div><div style="font-family:'Cormorant Garamond',serif;font-size:1.4rem;font-weight:700;color:var(--calpers-blue);">$${Math.round(penG).toLocaleString()}</div></div><div style="padding:16px;text-align:center;background:#fff5f5;"><div style="font-size:.66rem;text-transform:uppercase;letter-spacing:.07em;color:var(--red);margin-bottom:4px;">Annual Gap</div><div style="font-family:'Cormorant Garamond',serif;font-size:1.4rem;font-weight:700;color:var(--red);">-$${Math.round(annGap).toLocaleString()}</div><div style="font-size:.71rem;color:var(--red);margin-top:2px;">-$${Math.round(monGap).toLocaleString()} / month</div></div></div><div style="padding:18px 24px 14px;"><div style="background:var(--navy);border-radius:8px;padding:12px 16px;display:flex;align-items:center;justify-content:center;gap:9px;flex-wrap:wrap;text-align:center;margin-bottom:12px;"><div><div style="font-size:.63rem;color:rgba(255,255,255,.45);text-transform:uppercase;letter-spacing:.06em;">Annual Gap</div><div style="font-family:'Cormorant Garamond',serif;font-size:1.1rem;color:white;font-weight:700;">$${Math.round(annGap).toLocaleString()}</div></div><div style="color:var(--gold-light);font-size:1.2rem;">÷</div><div><div style="font-size:.63rem;color:rgba(255,255,255,.45);text-transform:uppercase;letter-spacing:.06em;">Return Rate</div><div style="font-family:'Cormorant Garamond',serif;font-size:1.1rem;color:white;font-weight:700;">${(rate*100).toFixed(2)}%</div></div><div style="color:var(--gold-light);font-size:1.2rem;">=</div><div><div style="font-size:.63rem;color:rgba(255,255,255,.45);text-transform:uppercase;letter-spacing:.06em;">Capital Needed</div><div style="font-family:'Cormorant Garamond',serif;font-size:1.3rem;color:var(--gold-light);font-weight:700;">$${Math.round(capNeed).toLocaleString()}</div></div></div>${assetHTML}<div style="margin-top:14px;"><div style="display:flex;justify-content:space-between;font-size:.74rem;color:var(--gray-400);margin-bottom:4px;"><span>Gap Coverage</span><span style="font-weight:700;color:${covPct>=100?'var(--green)':covPct>60?'var(--gold)':'var(--red)'};">${covPct.toFixed(0)}% funded</span></div><div style="background:var(--gray-200);border-radius:20px;height:8px;overflow:hidden;"><div style="height:100%;width:${Math.min(covPct,100).toFixed(0)}%;background:${covPct>=100?'var(--green)':covPct>60?'var(--gold)':'var(--red)'};border-radius:20px;transition:width .5s;"></div></div></div></div><div style="background:var(--gray-100);border-top:1px solid var(--gray-200);padding:12px 24px;font-size:.78rem;color:var(--gray-700);line-height:1.7;">To generate <strong>$${Math.round(monGap).toLocaleString()}/month</strong> in perpetual supplemental income, your client needs <strong>$${Math.round(capNeed).toLocaleString()}</strong> earning <strong>${(rate*100).toFixed(2)}%</strong>. <span style="color:var(--gray-400);">Solutions: annuity income rider, FIA, IUL distributions, 457(b)/403(b), premium finance.</span></div></div>`;
+}
+function generateReport() {
+  if (!_lastResults || !_lastSalary) { alert('Please run the pension comparison first.'); return; }
+  const clientName = document.getElementById('clientName').value.trim() || 'Client';
+  const plan       = PLANS[_lastPlanKey];
+  const salary     = _lastSalary;
+  const results    = _lastResults;
+  const infl       = getInflationParams();
+  const gapIdx     = document.getElementById('gapScenarioPicker').value;
+  const gapRate    = parseFloat(document.getElementById('gapRate').value) / 100 || 0.05;
+  const assets     = getAssets(infl);
+  const today      = new Date().toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' });
+  const bestIdx    = results.reduce((b,r,i) => r.annualBenefit > results[b].annualBenefit ? i : b, 0);
+  const sysName    = plan.system === 'calstrs' ? 'CalSTRS' : 'CalPERS';
+  const accentColor = plan.system === 'calstrs' ? '#1a5c3a' : '#1a4a7a';
+  const survivorSel = document.getElementById('survivor');
+  const survivorLabel = survivorSel.options[survivorSel.selectedIndex].text;
+
+  const scenarioRows = results.map((r,i) => `
+    <tr${i===bestIdx?' class="best-row"':''}>
+      <td><strong>Option ${i+1}</strong>${i===bestIdx?' <span class="best-tag">Best</span>':''}</td>
+      <td>${r.retireAge}</td><td>${r.years}</td>
+      <td>${((r.rawMultiplier/r.years)*100).toFixed(3)}%</td>
+      <td>${(r.rawMultiplier*100).toFixed(2)}%</td>
+      <td>$${Math.round(r.annualBenefit).toLocaleString()}</td>
+      <td>$${Math.round(r.monthlyBenefit).toLocaleString()}</td>
+      <td>$${Math.round(r.survivorMonthly).toLocaleString()}</td>
+      <td>${r.pctOfSalary.toFixed(1)}%</td>
+    </tr>`).join('');
+
+  const reportHTML = `<!DOCTYPE html>
+<html><head><meta charset="UTF-8">
+<title>${sysName} Retirement Report — ${clientName}</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',Arial,sans-serif;color:#2d2d2d;background:white;font-size:10pt;line-height:1.5;}
+.cover{background:#0a1f3c;color:white;padding:44px 50px 32px;border-bottom:5px solid #b8832a;}
+.cover h1{font-family:'Cormorant Garamond',serif;font-size:1.9rem;font-weight:700;margin-top:28px;line-height:1.2;}
+.cover-sys{display:inline-block;background:${accentColor};color:white;font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;padding:3px 12px;border-radius:4px;margin-top:14px;}
+.cover-meta{margin-top:14px;font-size:0.83rem;color:rgba(255,255,255,0.6);line-height:2;}
+.cover-meta strong{color:white;}
+.cover-disclaimer{margin-top:20px;font-size:0.72rem;color:rgba(255,255,255,0.35);line-height:1.6;border-top:1px solid rgba(255,255,255,0.1);padding-top:12px;}
+.rpt-section{padding:26px 50px;border-bottom:1px solid #ddd9d2;}
+.rpt-section-title{font-family:'Cormorant Garamond',serif;font-size:1.05rem;font-weight:700;color:#0a1f3c;padding-bottom:7px;border-bottom:2px solid #b8832a;margin-bottom:14px;}
+.rpt-infobar{display:flex;gap:0;border:1px solid #ddd9d2;border-radius:6px;overflow:hidden;margin-bottom:14px;flex-wrap:wrap;}
+.rpt-ib-item{flex:1;min-width:110px;padding:11px 14px;border-right:1px solid #ddd9d2;}
+.rpt-ib-item:last-child{border-right:none;}
+.rpt-ib-label{font-size:0.66rem;text-transform:uppercase;letter-spacing:0.06em;color:#9a9590;margin-bottom:2px;}
+.rpt-ib-val{font-family:'Cormorant Garamond',serif;font-size:1rem;font-weight:700;color:#0a1f3c;}
+.rpt-table{width:100%;border-collapse:collapse;font-size:0.8rem;margin-bottom:14px;}
+.rpt-table th{background:#0a1f3c;color:white;padding:7px 9px;text-align:left;font-weight:600;font-size:0.69rem;letter-spacing:0.05em;text-transform:uppercase;}
+.rpt-table td{padding:7px 9px;border-bottom:1px solid #ddd9d2;}
+.rpt-table tr:nth-child(even) td{background:#f7f5f1;}
+.rpt-table tr.best-row td{background:#fffbf0;border-left:3px solid #b8832a;}
+.best-tag{background:#b8832a;color:white;font-size:0.62rem;font-weight:700;text-transform:uppercase;padding:1px 5px;border-radius:10px;margin-left:3px;}
+.no-print{background:#0a1f3c;padding:12px 50px;display:flex;align-items:center;justify-content:space-between;}
+.rpt-footer{background:#f0ede8;padding:16px 50px;font-size:0.7rem;color:#9a9590;line-height:1.7;border-top:2px solid #ddd9d2;}
+@media print{.no-print{display:none;}body{-webkit-print-color-adjust:exact;print-color-adjust:exact;}}
+</style></head><body>
+<div class="no-print">
+  <span style="color:rgba(255,255,255,0.6);font-size:0.83rem;">To save as PDF: Click Print → Change destination → Save as PDF</span>
+  <button onclick="window.print()" style="background:#b8832a;color:#0a1f3c;border:none;border-radius:6px;padding:9px 20px;font-weight:700;font-size:0.86rem;cursor:pointer;">Print / Save as PDF</button>
+</div>
+<div class="cover">
+  <div style="font-family:'Cormorant Garamond',serif;font-size:1.3rem;color:white;">${sysName} <span style="color:#d4a84b;">Retirement Analysis</span></div>
+  <h1>Retirement Income &amp; Gap Analysis Report</h1>
+  <div class="cover-sys">${plan.label}</div>
+  <div class="cover-meta">
+    <strong>Prepared for:</strong> ${clientName}<br>
+    <strong>Plan / Tier:</strong> ${plan.label}<br>
+    <strong>Current FAC:</strong> $${Math.round(salary).toLocaleString()}/year<br>
+    <strong>Survivor Option:</strong> ${survivorLabel}<br>
+    <strong>Report Date:</strong> ${today}<br>
+    <strong>Prepared by:</strong> Edwards Financial &amp; Associates
+  </div>
+  <div class="cover-disclaimer">This report is for educational and planning purposes only. Benefit projections are estimates based on ${sysName}'s published plan formulas. Actual benefits are determined by ${sysName} at retirement. Not a guarantee of future benefits. Not investment, tax, or legal advice.</div>
+</div>
+<div class="rpt-section">
+  <div class="rpt-section-title">Plan Overview</div>
+  <div class="rpt-infobar">
+    <div class="rpt-ib-item"><div class="rpt-ib-label">System</div><div class="rpt-ib-val">${sysName}</div></div>
+    <div class="rpt-ib-item"><div class="rpt-ib-label">Min Retire Age</div><div class="rpt-ib-val">${plan.minAgeNote || plan.minAge}</div></div>
+    <div class="rpt-ib-item"><div class="rpt-ib-label">Max Benefit Age</div><div class="rpt-ib-val">${plan.maxBenefitAge}</div></div>
+    <div class="rpt-ib-item"><div class="rpt-ib-label">FAC Period</div><div class="rpt-ib-val">Best ${plan.facMonths} Months</div></div>
+    <div class="rpt-ib-item"><div class="rpt-ib-label">COLA</div><div class="rpt-ib-val">${plan.cola}</div></div>
+  </div>
+</div>
+<div class="rpt-section">
+  <div class="rpt-section-title">Retirement Scenario Comparison</div>
+  <p style="font-size:0.8rem;color:#9a9590;margin-bottom:12px;">Based on FAC of <strong>$${Math.round(salary).toLocaleString()}</strong> · ${survivorLabel}</p>
+  <table class="rpt-table">
+    <thead><tr><th>Scenario</th><th>Retire Age</th><th>Yrs Service</th><th>Factor/Yr</th><th>Total Factor</th><th>Annual Benefit</th><th>Monthly Benefit</th><th>Survivor Monthly</th><th>% of Salary</th></tr></thead>
+    <tbody>${scenarioRows}</tbody>
+  </table>
+</div>
+<div class="rpt-footer">
+  <strong>Edwards Financial &amp; Associates</strong> · Prepared ${today}<br>
+  Data sourced from ${sysName}'s official publications and benefit factor tables. For educational purposes only. Not financial, tax, or legal advice.<br>
+  CalPERS: 888-225-7377 · calpers.ca.gov &nbsp;|&nbsp; CalSTRS: 800-228-5453 · calstrs.com
+</div>
+</body></html>`;
+
+  const blob = new Blob([reportHTML], { type: 'text/html;charset=utf-8' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href     = url;
+  a.download = sysName + '_Report_' + clientName.replace(/\s+/g,'_') + '_' + new Date().toISOString().slice(0,10) + '.html';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 5000);
+}
+updatePlanInfo();toggleSurvivorInputs();
+</script>
+</body>
+</html>
