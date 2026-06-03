@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>CalPERS & CalSTRS Reference Ledger — Edwards Financial & Associates</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root{--navy:#0a1f3c;--navy-mid:#12305a;--gold:#b8832a;--gold-light:#d4a84b;--gold-pale:#faf0dc;--cream:#f7f5f1;--white:#fff;--gray-50:#fafaf8;--gray-100:#f0ede8;--gray-200:#ddd9d2;--gray-400:#9a9590;--gray-700:#36332e;--calpers-blue:#1a4a7a;--calpers-light:#e8f0f8;--calstrs-green:#1a5c3a;--calstrs-light:#e8f4ee;--red:#c0392b;--green:#27ae60;--shadow:0 3px 20px rgba(10,31,60,.09);}
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--gray-700);min-height:100vh;}
+    .topbar{background:#060f1e;padding:8px 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:2px solid var(--gold);}
+    .topbar-logo{font-family:'Cormorant Garamond',serif;font-size:13px;color:rgba(255,255,255,0.6);letter-spacing:.06em;}
+    .topbar-logo span{color:var(--gold-light);}
+    .topbar-close{background:none;border:1px solid rgba(255,255,255,.18);color:rgba(255,255,255,.5);padding:5px 14px;font-size:10px;letter-spacing:.15em;text-transform:uppercase;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s;}
+    .topbar-close:hover{border-color:var(--gold);color:var(--gold);}
+    .header{background:var(--navy);border-bottom:4px solid var(--gold);padding:0;}
+    .header-inner{max-width:1100px;margin:auto;padding:24px 24px 20px;display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:12px;}
+    .header h1{font-family:'Cormorant Garamond',serif;font-size:1.85rem;color:white;font-weight:700;line-height:1.15;}
+    .header h1 .amp{color:var(--gold-light);}
+    .header-sub{color:rgba(255,255,255,.5);font-size:.78rem;margin-top:4px;letter-spacing:.06em;text-transform:uppercase;}
+    .sys-pills{display:flex;gap:7px;flex-wrap:wrap;}
+    .sys-pill{display:inline-block;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;padding:4px 13px;border-radius:20px;}
+    .pill-calpers{background:var(--calpers-blue);color:white;}
+    .pill-calstrs{background:var(--calstrs-green);color:white;}
+    .tab-bar{background:var(--navy-mid);display:flex;overflow-x:auto;border-bottom:3px solid var(--gold);scrollbar-width:none;}
+    .tab-bar::-webkit-scrollbar{display:none;}
+    .tab-btn{padding:12px 18px;color:rgba(255,255,255,.55);font-size:.76rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;border:none;background:none;white-space:nowrap;font-family:'DM Sans',sans-serif;border-bottom:3px solid transparent;margin-bottom:-3px;transition:color .18s,border-color .18s;}
+    .tab-btn:hover{color:rgba(255,255,255,.88);}
+    .tab-btn.active{color:var(--gold-light);border-bottom-color:var(--gold-light);}
+    .tab-content{display:none;max-width:1100px;margin:26px auto 50px;padding:0 20px;}
+    .tab-content.active{display:block;}
+    .section-title{font-family:'Cormorant Garamond',serif;font-size:1.4rem;color:var(--navy);font-weight:700;margin-bottom:5px;}
+    .section-sub{color:var(--gray-400);font-size:.82rem;margin-bottom:20px;line-height:1.55;}
+    .card{background:white;border-radius:10px;box-shadow:var(--shadow);padding:20px 24px;margin-bottom:20px;}
+    .card-title{font-family:'Cormorant Garamond',serif;font-size:1.02rem;color:var(--navy);font-weight:700;padding-bottom:8px;border-bottom:2px solid var(--gold);margin-bottom:14px;}
+    .sys-bar{border-radius:8px;padding:12px 16px;display:flex;align-items:center;gap:11px;margin-bottom:12px;}
+    .sys-bar.calpers{background:var(--calpers-blue);}
+    .sys-bar.calstrs{background:var(--calstrs-green);}
+    .sys-bar .sb-name{font-family:'Cormorant Garamond',serif;font-size:1.05rem;font-weight:700;color:white;}
+    .sys-bar .sb-sub{font-size:.74rem;color:rgba(255,255,255,.6);letter-spacing:.05em;text-transform:uppercase;}
+    .comp-grid{display:grid;gap:0;border-radius:8px;overflow:hidden;border:1px solid var(--gray-200);font-size:.8rem;}
+    .comp-grid-4{grid-template-columns:180px repeat(3,1fr);}
+    .cg-head{background:var(--navy);color:white;padding:8px 11px;font-weight:700;font-size:.71rem;text-transform:uppercase;letter-spacing:.06em;text-align:center;border-right:1px solid rgba(255,255,255,.1);}
+    .cg-head.row-lbl{text-align:left;background:var(--navy-mid);}
+    .cg-head.calpers-col{background:var(--calpers-blue);}
+    .cg-head.calstrs-col{background:var(--calstrs-green);}
+    .cg-head.pepra-col{background:#1a5c4a;}
+    .cg-row-lbl{background:var(--gray-100);padding:8px 11px;font-weight:600;font-size:.74rem;color:var(--navy);border-right:1px solid var(--gray-200);border-bottom:1px solid var(--gray-200);display:flex;align-items:center;}
+    .cg-cell{padding:8px 11px;border-right:1px solid var(--gray-200);border-bottom:1px solid var(--gray-200);text-align:center;font-size:.78rem;color:var(--gray-700);line-height:1.4;}
+    .cg-cell.calpers-bg{background:var(--calpers-light);}
+    .cg-cell.calstrs-bg{background:var(--calstrs-light);}
+    .cg-cell.pepra-bg{background:#f0faf6;}
+    .cg-cell strong{color:var(--navy);}
+    .mult-wrap{overflow-x:auto;}
+    .mult-table{width:100%;border-collapse:collapse;font-size:.77rem;}
+    .mult-table th{background:var(--navy);color:white;padding:6px 8px;font-weight:600;text-align:center;white-space:nowrap;font-size:.71rem;letter-spacing:.04em;}
+    .mult-table th.calpers-th{background:var(--calpers-blue);}
+    .mult-table th.calstrs-th{background:var(--calstrs-green);}
+    .mult-table th.pepra-th{background:#1a5c4a;}
+    .mult-table th.row-head{text-align:left;background:var(--navy-mid);min-width:110px;}
+    .mult-table td{padding:5px 8px;border-bottom:1px solid var(--gray-200);text-align:center;color:var(--gray-700);}
+    .mult-table td.row-head{font-weight:700;text-align:left;color:var(--navy);background:var(--gray-100);}
+    .mult-table tr:hover td{background:#f0f4fa;}
+    .mult-table tr:hover td.row-head{background:var(--gray-200);}
+    .mult-table td.highlight{font-weight:700;color:var(--gold);}
+    .mult-table td.calstrs-highlight{font-weight:700;color:var(--calstrs-green);}
+    .survivor-card{border-radius:8px;overflow:hidden;border:1px solid var(--gray-200);margin-bottom:12px;}
+    .sc-header{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:var(--navy);color:white;flex-wrap:wrap;gap:7px;}
+    .sc-header.calpers-hdr{background:var(--calpers-blue);}
+    .sc-header.calstrs-hdr{background:var(--calstrs-green);}
+    .sc-name{font-family:'Cormorant Garamond',serif;font-size:.97rem;font-weight:700;}
+    .sc-tag{font-size:.67rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;padding:2px 9px;border-radius:20px;background:var(--gold);color:var(--navy);}
+    .sc-body{padding:12px 16px;background:white;display:grid;grid-template-columns:repeat(3,1fr);gap:10px;font-size:.8rem;}
+    .sc-field .sf-label{font-size:.66rem;text-transform:uppercase;letter-spacing:.06em;color:var(--gray-400);margin-bottom:2px;}
+    .sc-field .sf-val{font-weight:500;color:var(--navy);line-height:1.4;}
+    .sf-val.red{color:var(--red);}
+    .sf-val.green{color:var(--green);}
+    .sf-val.gold{color:var(--gold);}
+    .sc-note{padding:8px 16px;background:var(--gray-100);font-size:.73rem;color:var(--gray-400);line-height:1.5;border-top:1px solid var(--gray-200);}
+    .cola-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;}
+    .cola-card{background:white;border-radius:8px;border:1px solid var(--gray-200);overflow:hidden;}
+    .cola-card-head{padding:9px 14px;font-size:.71rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:white;}
+    .cola-card-head.calpers{background:var(--calpers-blue);}
+    .cola-card-head.calstrs{background:var(--calstrs-green);}
+    .cola-card-body{padding:13px 15px;}
+    .cola-rate{font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:700;color:var(--navy);line-height:1;}
+    .cola-rate-sub{font-size:.73rem;color:var(--gray-400);margin-top:4px;line-height:1.5;}
+    .cola-detail{margin-top:9px;font-size:.78rem;color:var(--gray-700);line-height:1.6;}
+    .callout{border-left:4px solid var(--gold);background:var(--gold-pale);padding:10px 14px;border-radius:0 6px 6px 0;font-size:.8rem;color:var(--gray-700);line-height:1.6;margin-bottom:12px;}
+    .callout strong{color:var(--navy);}
+    .callout.red-box{border-left-color:var(--red);background:#fff5f5;}
+    .callout.green-box{border-left-color:var(--green);background:#f0faf5;}
+    .callout.calpers-box{border-left-color:var(--calpers-blue);background:var(--calpers-light);}
+    .callout.calstrs-box{border-left-color:var(--calstrs-green);background:var(--calstrs-light);}
+    .info-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+    .info-item{background:white;border-radius:8px;border-left:4px solid var(--gold);padding:12px 14px;font-size:.8rem;}
+    .info-item.calpers-item{border-left-color:var(--calpers-blue);}
+    .info-item.calstrs-item{border-left-color:var(--calstrs-green);}
+    .info-item .it-title{font-weight:700;color:var(--navy);font-size:.84rem;margin-bottom:5px;}
+    .info-item .it-body{color:var(--gray-700);line-height:1.6;}
+    .pepra-box{background:var(--navy);color:white;border-radius:10px;padding:20px 24px;margin-bottom:18px;}
+    .pepra-box h3{font-family:'Cormorant Garamond',serif;font-size:1.1rem;color:var(--gold-light);margin-bottom:8px;}
+    .pepra-box p{font-size:.84rem;line-height:1.7;color:rgba(255,255,255,.82);margin-bottom:7px;}
+    .pepra-box strong{color:white;}
+    .pepra-pillars{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px;}
+    .pepra-pillar{background:rgba(255,255,255,.07);border-radius:7px;padding:12px;border-top:3px solid var(--gold);}
+    .pp-title{font-size:.71rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--gold-light);margin-bottom:4px;}
+    .pp-body{font-size:.78rem;color:rgba(255,255,255,.72);line-height:1.5;}
+    .diff-row{display:grid;grid-template-columns:1fr 1fr;gap:13px;margin-bottom:13px;}
+    .diff-card{border-radius:8px;overflow:hidden;border:1px solid var(--gray-200);}
+    .diff-head{padding:8px 14px;font-size:.71rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:white;}
+    .diff-head.calpers{background:var(--calpers-blue);}
+    .diff-head.calstrs{background:var(--calstrs-green);}
+    .diff-body{padding:11px 15px;background:white;font-size:.8rem;color:var(--gray-700);line-height:1.65;}
+    .contrib-table{width:100%;border-collapse:collapse;font-size:.8rem;}
+    .contrib-table th{padding:7px 11px;text-align:left;font-weight:700;font-size:.71rem;text-transform:uppercase;letter-spacing:.05em;color:white;}
+    .contrib-table th.calpers-th{background:var(--calpers-blue);}
+    .contrib-table th.calstrs-th{background:var(--calstrs-green);}
+    .contrib-table td{padding:7px 11px;border-bottom:1px solid var(--gray-200);}
+    .contrib-table tr:nth-child(even) td{background:var(--gray-50);}
+    .cite-bar{background:var(--gray-100);border-top:1px solid var(--gray-200);padding:12px 20px;font-size:.7rem;color:var(--gray-400);line-height:1.8;max-width:1100px;margin:0 auto 36px;border-radius:0 0 8px 8px;}
+    .cite-bar strong{color:var(--gray-700);}
+    @media(max-width:720px){.cola-grid{grid-template-columns:1fr;}.info-grid{grid-template-columns:1fr;}.pepra-pillars{grid-template-columns:1fr;}.diff-row{grid-template-columns:1fr;}.sc-body{grid-template-columns:1fr 1fr;}.comp-grid-4{grid-template-columns:110px repeat(3,1fr);font-size:.72rem;}}
+  </style>
+</head>
+<body>
+<div class="topbar">
+  <span class="topbar-logo">Edwards <span>&amp;</span> Associates — Client Portal</span>
+  <button class="topbar-close" onclick="if(window.parent&&window.parent.closeTool)window.parent.closeTool();else window.close();">&#x2715; Close Tool</button>
+</div>
+<div class="header">
+  <div class="header-inner">
+    <div><h1>CalPERS <span class="amp">&amp;</span> CalSTRS<br>Reference Ledger</h1><div class="header-sub">California Public Pension Systems · Advisor Reference Guide · Edwards Financial &amp; Associates</div></div>
+    <div class="sys-pills"><span class="sys-pill pill-calpers">CalPERS</span><span class="sys-pill pill-calstrs">CalSTRS</span></div>
+  </div>
+</div>
+<div class="tab-bar">
+  <button class="tab-btn active" onclick="showTab('overview',this)">📋 System Overview</button>
+  <button class="tab-btn" onclick="showTab('multipliers',this)">✕ Benefit Factors</button>
+  <button class="tab-btn" onclick="showTab('pepra',this)">⚖️ Classic vs. PEPRA</button>
+  <button class="tab-btn" onclick="showTab('survivor',this)">👤 Survivor Options</button>
+  <button class="tab-btn" onclick="showTab('cola',this)">📈 COLA</button>
+  <button class="tab-btn" onclick="showTab('contributions',this)">💵 Contributions</button>
+  <button class="tab-btn" onclick="showTab('planning',this)">🧠 Planning &amp; Tax</button>
+</div>
+
+<!-- OVERVIEW -->
+<div class="tab-content active" id="tab-overview">
+  <div class="section-title">CalPERS &amp; CalSTRS — System Overview</div>
+  <div class="section-sub">Two of the largest public pension systems in the United States. Both are defined benefit plans — lifetime income guaranteed by the fund. Understanding which system and tier determines everything about the benefit calculation.</div>
+  <div class="card">
+    <div class="card-title">Side-by-Side System Comparison</div>
+    <div style="overflow-x:auto;">
+      <div class="comp-grid comp-grid-4">
+        <div class="cg-head row-lbl">Feature</div><div class="cg-head calpers-col">CalPERS</div><div class="cg-head calstrs-col">CalSTRS (2% at 60)</div><div class="cg-head pepra-col">CalSTRS (2% at 62)</div>
+        <div class="cg-row-lbl">Who It Covers</div><div class="cg-cell calpers-bg">State, school &amp; public agency employees; not certificated K-12 teachers</div><div class="cg-cell calstrs-bg">Certificated K-12 educators, community college faculty, hired on/before Dec 31, 2012</div><div class="cg-cell pepra-bg">Certificated K-12 educators hired on/after Jan 1, 2013</div>
+        <div class="cg-row-lbl">Benefit Formula</div><div class="cg-cell calpers-bg">Age Factor × Years of Service × Final Compensation</div><div class="cg-cell calstrs-bg">Age Factor × Service Credit × Final Compensation</div><div class="cg-cell pepra-bg">Age Factor × Service Credit × Final Compensation</div>
+        <div class="cg-row-lbl">Named Age Factor</div><div class="cg-cell calpers-bg"><strong>Varies by tier</strong> (2% at 55 / 60 / 62)</div><div class="cg-cell calstrs-bg"><strong>2% at age 60</strong></div><div class="cg-cell pepra-bg"><strong>2% at age 62</strong></div>
+        <div class="cg-row-lbl">Max Factor</div><div class="cg-cell calpers-bg">2.418% (Misc Classic) / 2.5% (PEPRA)</div><div class="cg-cell calstrs-bg"><strong>2.418% at 63+</strong> (2.4% w/ career factor)</div><div class="cg-cell pepra-bg"><strong>2.4% at 65+</strong></div>
+        <div class="cg-row-lbl">Career Factor Boost</div><div class="cg-cell calpers-bg">None</div><div class="cg-cell calstrs-bg"><strong>+0.2% with ≥30 yrs, max 2.4%</strong></div><div class="cg-cell pepra-bg"><strong>Not available</strong></div>
+        <div class="cg-row-lbl">Final Comp (Classic)</div><div class="cg-cell calpers-bg">Highest 12 consecutive months</div><div class="cg-cell calstrs-bg">Highest 12 consecutive months</div><div class="cg-cell pepra-bg"><strong>Highest 36 months</strong></div>
+        <div class="cg-row-lbl">Min Retirement Age</div><div class="cg-cell calpers-bg">50 (Classic Misc) / 52 (PEPRA Misc)</div><div class="cg-cell calstrs-bg">50 (30+ yrs) / 55 (5+ yrs)</div><div class="cg-cell pepra-bg"><strong>55</strong></div>
+        <div class="cg-row-lbl">COLA Type</div><div class="cg-cell calpers-bg"><strong>2% compounding</strong> (most agencies)</div><div class="cg-cell calstrs-bg"><strong>2% simple</strong> (of original benefit)</div><div class="cg-cell pepra-bg"><strong>2% simple</strong> (of original benefit)</div>
+        <div class="cg-row-lbl">Purchasing Power Floor</div><div class="cg-cell calpers-bg">PPPA</div><div class="cg-cell calstrs-bg">SBMA (85% of initial benefit)</div><div class="cg-cell pepra-bg">SBMA (85% of initial benefit)</div>
+        <div class="cg-row-lbl">Survivor Continuance</div><div class="cg-cell calpers-bg"><strong>Yes</strong> — employer-paid; 25% or 50% of unmodified allowance</div><div class="cg-cell calstrs-bg">Options at retirement only; no employer-paid continuance</div><div class="cg-cell pepra-bg">Options at retirement only</div>
+        <div class="cg-row-lbl">Social Security</div><div class="cg-cell calpers-bg">Varies — some participate, others do not</div><div class="cg-cell calstrs-bg">Most do <strong>not</strong> participate in SS</div><div class="cg-cell pepra-bg">Most do <strong>not</strong> participate in SS</div>
+        <div class="cg-row-lbl">Total Assets (2025)</div><div class="cg-cell calpers-bg"><strong>~$599.5B</strong></div><div class="cg-cell calstrs-bg"><strong>~$340B+</strong></div><div class="cg-cell pepra-bg">Shared fund</div>
+        <div class="cg-row-lbl">Funded Status</div><div class="cg-cell calpers-bg"><strong>~83.7%</strong></div><div class="cg-cell calstrs-bg"><strong>~75.9%</strong> (2024)</div><div class="cg-cell pepra-bg">Shared fund</div>
+      </div>
+    </div>
+  </div>
+  <div class="callout"><strong>How to identify a client's tier:</strong> For CalPERS members, check myCalPERS or their Annual Member Statement — it lists the retirement formula explicitly. For CalSTRS, check the Retirement Progress Report in myCalSTRS.</div>
+</div>
+
+<!-- BENEFIT FACTORS -->
+<div class="tab-content" id="tab-multipliers">
+  <div class="section-title">Benefit Factor Tables</div>
+  <div class="section-sub">The age factor (per-year multiplier) increases with retirement age. Monthly benefit = Age Factor% × Years of Service × Final Average Compensation.</div>
+  <div class="callout"><strong>How to read:</strong> Find the retirement age, read the per-year factor, multiply by years of service. Example: CalPERS 2% at 60, age 58, 25 years → 1.758% × 25 = <strong>43.95% of FAC annually</strong>.</div>
+  <div class="card">
+    <div class="sys-bar calpers"><div><div class="sb-name">CalPERS Miscellaneous Classic — 2% at 55</div><div class="sb-sub">Pre-Jan 15, 2011 · Min age 50 · FAC: Best 12 months</div></div></div>
+    <div class="mult-wrap"><table class="mult-table"><thead><tr><th class="row-head">Row</th><th class="calpers-th">50</th><th class="calpers-th">51</th><th class="calpers-th">52</th><th class="calpers-th">53</th><th class="calpers-th">54</th><th class="calpers-th" style="background:#b8832a;">55★</th><th class="calpers-th">56</th><th class="calpers-th">57</th><th class="calpers-th">58+</th></tr></thead><tbody><tr><td class="row-head">Factor / Yr</td><td>1.460%</td><td>1.552%</td><td>1.650%</td><td>1.758%</td><td>1.874%</td><td class="highlight">2.000%</td><td>2.134%</td><td>2.272%</td><td>2.418%</td></tr><tr><td class="row-head">30-Yr Benefit</td><td>43.80%</td><td>46.56%</td><td>49.50%</td><td>52.74%</td><td>56.22%</td><td class="highlight">60.00%</td><td>64.02%</td><td>68.16%</td><td>72.54%</td></tr></tbody></table></div>
+  </div>
+  <div class="card">
+    <div class="sys-bar calpers"><div><div class="sb-name">CalPERS Miscellaneous Classic — 2% at 60</div><div class="sb-sub">Jan 15, 2011 – Dec 31, 2012 · Min age 50 · FAC: Best 12 months</div></div></div>
+    <div class="mult-wrap"><table class="mult-table"><thead><tr><th class="row-head">Row</th><th class="calpers-th">50</th><th class="calpers-th">51</th><th class="calpers-th">52</th><th class="calpers-th">53</th><th class="calpers-th">54</th><th class="calpers-th">55</th><th class="calpers-th">56</th><th class="calpers-th">57</th><th class="calpers-th">58</th><th class="calpers-th">59</th><th class="calpers-th" style="background:#b8832a;">60★</th><th class="calpers-th">61</th><th class="calpers-th">62</th><th class="calpers-th">63+</th></tr></thead><tbody><tr><td class="row-head">Factor / Yr</td><td>1.092%</td><td>1.156%</td><td>1.224%</td><td>1.296%</td><td>1.376%</td><td>1.460%</td><td>1.552%</td><td>1.650%</td><td>1.758%</td><td>1.874%</td><td class="highlight">2.000%</td><td>2.134%</td><td>2.272%</td><td>2.418%</td></tr><tr><td class="row-head">30-Yr Benefit</td><td>32.76%</td><td>34.68%</td><td>36.72%</td><td>38.88%</td><td>41.28%</td><td>43.80%</td><td>46.56%</td><td>49.50%</td><td>52.74%</td><td>56.22%</td><td class="highlight">60.00%</td><td>64.02%</td><td>68.16%</td><td>72.54%</td></tr></tbody></table></div>
+  </div>
+  <div class="card">
+    <div class="sys-bar" style="background:#1a5c4a;"><div><div class="sb-name">CalPERS Miscellaneous PEPRA — 2% at 62</div><div class="sb-sub">On/after Jan 1, 2013 · Min age 52 · FAC: Best 36 months · Max age 67</div></div></div>
+    <div class="mult-wrap"><table class="mult-table"><thead><tr><th class="row-head">Row</th><th class="pepra-th">52</th><th class="pepra-th">53</th><th class="pepra-th">54</th><th class="pepra-th">55</th><th class="pepra-th">56</th><th class="pepra-th">57</th><th class="pepra-th">58</th><th class="pepra-th">59</th><th class="pepra-th">60</th><th class="pepra-th">61</th><th class="pepra-th" style="background:#b8832a;">62★</th><th class="pepra-th">63</th><th class="pepra-th">64</th><th class="pepra-th">65</th><th class="pepra-th">66</th><th class="pepra-th">67</th></tr></thead><tbody><tr><td class="row-head">Factor / Yr</td><td>1.000%</td><td>1.100%</td><td>1.200%</td><td>1.300%</td><td>1.400%</td><td>1.500%</td><td>1.600%</td><td>1.700%</td><td>1.800%</td><td>1.900%</td><td class="highlight">2.000%</td><td>2.100%</td><td>2.200%</td><td>2.300%</td><td>2.400%</td><td>2.500%</td></tr><tr><td class="row-head">30-Yr Benefit</td><td>30.0%</td><td>33.0%</td><td>36.0%</td><td>39.0%</td><td>42.0%</td><td>45.0%</td><td>48.0%</td><td>51.0%</td><td>54.0%</td><td>57.0%</td><td class="highlight">60.0%</td><td>63.0%</td><td>66.0%</td><td>69.0%</td><td>72.0%</td><td>75.0%</td></tr></tbody></table></div>
+  </div>
+  <div class="card">
+    <div class="sys-bar calstrs"><div><div class="sb-name">CalSTRS DB Program — 2% at 60 (pre-2013)</div><div class="sb-sub">Hired on/before Dec 31, 2012 · FAC: Best 12 months · Career factor available</div></div></div>
+    <div class="mult-wrap"><table class="mult-table"><thead><tr><th class="row-head">Row</th><th class="calstrs-th">50</th><th class="calstrs-th">51</th><th class="calstrs-th">52</th><th class="calstrs-th">53</th><th class="calstrs-th">54</th><th class="calstrs-th">55</th><th class="calstrs-th">56</th><th class="calstrs-th">57</th><th class="calstrs-th">58</th><th class="calstrs-th">59</th><th class="calstrs-th" style="background:#b8832a;">60★</th><th class="calstrs-th">61</th><th class="calstrs-th">62</th><th class="calstrs-th">63+</th></tr></thead><tbody><tr><td class="row-head">Factor / Yr</td><td>1.092%</td><td>1.156%</td><td>1.224%</td><td>1.296%</td><td>1.376%</td><td>1.460%</td><td>1.552%</td><td>1.650%</td><td>1.758%</td><td>1.874%</td><td class="calstrs-highlight">2.000%</td><td>2.134%</td><td>2.272%</td><td>2.418%</td></tr><tr><td class="row-head">w/ Career Factor†</td><td>1.292%</td><td>1.356%</td><td>1.424%</td><td>1.496%</td><td>1.576%</td><td>1.660%</td><td>1.752%</td><td>1.850%</td><td>1.958%</td><td>2.074%</td><td class="calstrs-highlight">2.200%</td><td>2.334%</td><td>2.400%</td><td>2.400%</td></tr><tr><td class="row-head">30-Yr + Career Factor</td><td>38.76%</td><td>40.68%</td><td>42.72%</td><td>44.88%</td><td>47.28%</td><td>49.80%</td><td>52.56%</td><td>55.50%</td><td>58.74%</td><td>62.22%</td><td class="calstrs-highlight">66.00%</td><td>70.02%</td><td>72.00%</td><td>72.00%</td></tr></tbody></table></div>
+    <div style="font-size:.72rem;color:var(--gray-400);margin-top:6px;">† Career factor (+0.2%) available only to 2% at 60 members with ≥30 years — capped at 2.4%.</div>
+  </div>
+  <div class="card">
+    <div class="sys-bar" style="background:#1a5c4a;"><div><div class="sb-name">CalSTRS DB Program — 2% at 62 (PEPRA 2013+)</div><div class="sb-sub">Hired on/after Jan 1, 2013 · Min age 55 · FAC: Best 36 months · No career factor</div></div></div>
+    <div class="mult-wrap"><table class="mult-table"><thead><tr><th class="row-head">Row</th><th class="pepra-th">55</th><th class="pepra-th">56</th><th class="pepra-th">57</th><th class="pepra-th">58</th><th class="pepra-th">59</th><th class="pepra-th">60</th><th class="pepra-th">61</th><th class="pepra-th" style="background:#b8832a;">62★</th><th class="pepra-th">63</th><th class="pepra-th">64</th><th class="pepra-th">65+</th></tr></thead><tbody><tr><td class="row-head">Factor / Yr</td><td>1.160%</td><td>1.280%</td><td>1.400%</td><td>1.520%</td><td>1.640%</td><td>1.760%</td><td>1.880%</td><td class="calstrs-highlight">2.000%</td><td>2.080%</td><td>2.160%</td><td>2.400%</td></tr><tr><td class="row-head">30-Yr Benefit</td><td>34.80%</td><td>38.40%</td><td>42.00%</td><td>45.60%</td><td>49.20%</td><td>52.80%</td><td>56.40%</td><td class="calstrs-highlight">60.00%</td><td>62.40%</td><td>64.80%</td><td>72.00%</td></tr></tbody></table></div>
+  </div>
+</div>
+
+<!-- PEPRA -->
+<div class="tab-content" id="tab-pepra">
+  <div class="section-title">Classic vs. PEPRA</div>
+  <div class="section-sub">The Public Employees' Pension Reform Act of 2013 fundamentally restructured California's public pension systems for new hires effective January 1, 2013.</div>
+  <div class="pepra-box">
+    <h3>What is PEPRA?</h3>
+    <p>PEPRA (Public Employees' Pension Reform Act) was enacted to address rising pension costs. Any employee who became a "new member" of a public retirement system on or after January 1, 2013 is subject to PEPRA. At CalPERS, PEPRA general members are in the <strong>2% at 62</strong> tier. At CalSTRS, they're in the <strong>CalSTRS 2% at 62</strong> structure.</p>
+    <div class="pepra-pillars">
+      <div class="pepra-pillar"><div class="pp-title">Higher Min. Retirement Age</div><div class="pp-body">CalPERS misc: <strong>52</strong> (vs. 50 Classic). CalSTRS: <strong>55</strong> (vs. 50/55 depending on service).</div></div>
+      <div class="pepra-pillar"><div class="pp-title">Lower / Later Peak Factor</div><div class="pp-body">CalPERS PEPRA max: <strong>2.5% at 67</strong>. CalSTRS PEPRA max: <strong>2.4% at 65</strong>. Classic tops out earlier.</div></div>
+      <div class="pepra-pillar"><div class="pp-title">36-Month FAC</div><div class="pp-body">PEPRA uses highest average over <strong>36 consecutive months</strong> vs. best 12 months for Classic.</div></div>
+      <div class="pepra-pillar"><div class="pp-title">50/50 Cost Sharing</div><div class="pp-body">PEPRA members must pay <strong>50% of the normal cost</strong> of their pension annually.</div></div>
+      <div class="pepra-pillar"><div class="pp-title">Compensation Cap</div><div class="pp-body">2025: <strong>$155,081</strong> (SS) / <strong>$186,096</strong> (non-SS). Classic cap: $350,000.</div></div>
+      <div class="pepra-pillar"><div class="pp-title">Anti-Spiking Rules</div><div class="pp-body">Overtime, terminal pay &amp; unused vacation <strong>excluded</strong> from pensionable compensation.</div></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">Who Is Classic vs. PEPRA</div>
+    <div class="callout green-box"><strong>Classic Member:</strong> An employee who was already a member of a California public retirement system before January 1, 2013, or who had a break in service of less than 6 months before joining a new public agency.</div>
+    <div class="callout red-box"><strong>New Member (PEPRA):</strong> Anyone who joined a California public retirement system for the first time on or after January 1, 2013, or who had a break in service of more than 6 months.</div>
+    <div class="callout"><strong>Reciprocity:</strong> A Classic member who moves between California public employers within 180 days retains Classic status. Critical retention talking point for clients considering leaving public employment.</div>
+  </div>
+  <div class="card">
+    <div class="card-title">Key Differences Side-by-Side</div>
+    <div class="diff-row">
+      <div class="diff-card"><div class="diff-head calpers">CalPERS Classic 2% at 60 (Misc)</div><div class="diff-body"><strong>Age factor at 55:</strong> 1.460% / yr<br><strong>Age factor at 60:</strong> 2.000% / yr<br><strong>Peak factor:</strong> 2.418% at age 63+<br><strong>Min retirement age:</strong> 50<br><strong>FAC:</strong> Best 12 months<br><strong>Comp cap:</strong> $350,000<br><strong>30-yr benefit at 60:</strong> 60.00% of FAC</div></div>
+      <div class="diff-card"><div class="diff-head" style="background:#1a5c4a;">CalPERS PEPRA 2% at 62 (Misc)</div><div class="diff-body"><strong>Age factor at 55:</strong> 1.300% / yr<br><strong>Age factor at 62:</strong> 2.000% / yr<br><strong>Peak factor:</strong> 2.500% at age 67<br><strong>Min retirement age:</strong> 52<br><strong>FAC:</strong> Best 36 months<br><strong>Comp cap:</strong> $155K–$186K<br><strong>30-yr benefit at 62:</strong> 60.00% of FAC</div></div>
+    </div>
+    <div class="diff-row">
+      <div class="diff-card"><div class="diff-head calstrs">CalSTRS 2% at 60 (Classic)</div><div class="diff-body"><strong>Age factor at 55:</strong> 1.460% / yr<br><strong>Age factor at 60:</strong> 2.000% / yr<br><strong>Career factor:</strong> +0.2% with ≥30 yrs (max 2.4%)<br><strong>Min retirement age:</strong> 50 (30+ yrs) / 55 (5+ yrs)<br><strong>FAC:</strong> Best 12 months<br><strong>30-yr + career factor at 60:</strong> 66.00% of FAC</div></div>
+      <div class="diff-card"><div class="diff-head" style="background:#1a5c4a;">CalSTRS 2% at 62 (PEPRA)</div><div class="diff-body"><strong>Age factor at 55:</strong> 1.160% / yr<br><strong>Age factor at 62:</strong> 2.000% / yr<br><strong>Career factor:</strong> Not available<br><strong>Min retirement age:</strong> 55<br><strong>FAC:</strong> Best 36 months<br><strong>30-yr benefit at 62:</strong> 60.00% of FAC</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- SURVIVOR -->
+<div class="tab-content" id="tab-survivor">
+  <div class="section-title">Survivor &amp; Beneficiary Options</div>
+  <div class="section-sub">Elected at retirement. Generally irrevocable. This decision affects the member's monthly income for life and their survivor's income.</div>
+  <div class="callout red-box"><strong>⚠️ This decision is permanent.</strong> For CalPERS Options 2, 3, and 4 and CalSTRS Options 1 and 2, you generally cannot change your beneficiary after retirement. The reduction to your allowance remains in effect for life even if your beneficiary predeceases you (unless the W pop-up is elected — CalPERS only).</div>
+  <div style="margin-bottom:7px;"><div class="sys-bar calpers" style="border-radius:8px 8px 0 0;"><div class="sb-name">CalPERS Retirement Payment Options</div></div></div>
+  <div class="survivor-card"><div class="sc-header"><div class="sc-name">Unmodified Allowance</div><div class="sc-tag">Highest Benefit</div></div><div class="sc-body"><div class="sc-field"><div class="sf-label">Member Benefit</div><div class="sf-val green">100% — no reduction</div></div><div class="sc-field"><div class="sf-label">Ongoing Survivor Benefit</div><div class="sf-val red">None — benefit stops at member's death</div></div><div class="sc-field"><div class="sf-label">Survivor Continuance (separate)</div><div class="sf-val">Employer-paid 25% or 50% still applies if contracted</div></div></div></div>
+  <div class="survivor-card"><div class="sc-header"><div class="sc-name">Option 2 / 2W — 100% to Beneficiary</div><div class="sc-tag">Full Survivor</div></div><div class="sc-body"><div class="sc-field"><div class="sf-label">Member Benefit</div><div class="sf-val gold">Largest reduction — actuarially based on age difference</div></div><div class="sc-field"><div class="sf-label">Beneficiary Receives</div><div class="sf-val green"><strong>100%</strong> of member's reduced allowance for life</div></div><div class="sc-field"><div class="sf-label">2W Pop-Up</div><div class="sf-val gold">Benefit restores to unmodified if beneficiary predeceases member</div></div></div><div class="sc-note">Always recommend 2W over plain Option 2.</div></div>
+  <div class="survivor-card"><div class="sc-header"><div class="sc-name">Option 3 / 3W — 50% to Beneficiary</div><div class="sc-tag">Half Survivor</div></div><div class="sc-body"><div class="sc-field"><div class="sf-label">Member Benefit</div><div class="sf-val gold">Moderate reduction — smaller than Option 2</div></div><div class="sc-field"><div class="sf-label">Beneficiary Receives</div><div class="sf-val"><strong>50%</strong> of member's reduced allowance for life</div></div><div class="sc-field"><div class="sf-label">3W Pop-Up</div><div class="sf-val gold">Same pop-up provision as 2W</div></div></div></div>
+  <div style="margin-top:20px;margin-bottom:7px;"><div class="sys-bar calstrs" style="border-radius:8px 8px 0 0;"><div class="sb-name">CalSTRS Retirement Payment Options</div></div></div>
+  <div class="survivor-card"><div class="sc-header calstrs-hdr"><div class="sc-name">Member-Only Benefit</div><div class="sc-tag">Highest Benefit</div></div><div class="sc-body"><div class="sc-field"><div class="sf-label">Member Benefit</div><div class="sf-val green">100% — no reduction</div></div><div class="sc-field"><div class="sf-label">Ongoing Survivor Benefit</div><div class="sf-val red">None — benefit stops at member's death</div></div><div class="sc-field"><div class="sf-label">One-Time Death Benefit</div><div class="sf-val">$7,288 (Coverage A or B)</div></div></div></div>
+  <div class="survivor-card"><div class="sc-header calstrs-hdr"><div class="sc-name">Option 1 — 100% Joint &amp; Survivor Annuity</div><div class="sc-tag">Full Survivor</div></div><div class="sc-body"><div class="sc-field"><div class="sf-label">Member Benefit</div><div class="sf-val gold">Largest reduction — actuarially based on age difference</div></div><div class="sc-field"><div class="sf-label">Beneficiary Receives</div><div class="sf-val green"><strong>100%</strong> of member's reduced monthly benefit for life</div></div><div class="sc-field"><div class="sf-label">Pop-Up</div><div class="sf-val red">No pop-up — CalSTRS has no pop-up provision</div></div></div></div>
+  <div class="callout" style="margin-top:14px;"><strong>Key difference:</strong> CalPERS offers the W (pop-up) provision — if the beneficiary dies first, the member's benefit restores to the unmodified amount. <strong>CalSTRS has no pop-up provision.</strong> This makes the IUL and annuity gap-fill conversation especially important for CalSTRS clients electing survivor options.</div>
+</div>
+
+<!-- COLA -->
+<div class="tab-content" id="tab-cola">
+  <div class="section-title">COLA — Cost-of-Living Adjustments</div>
+  <div class="section-sub">Both systems provide annual COLAs, but they work very differently. This is one of the most important and most overlooked planning considerations.</div>
+  <div class="cola-grid">
+    <div class="cola-card"><div class="cola-card-head calpers">CalPERS COLA</div><div class="cola-card-body"><div class="cola-rate">2%</div><div class="cola-rate-sub">Compounding · Applied to the prior year's adjusted benefit</div><div class="cola-detail"><strong>How it works:</strong> Each May 1, CalPERS applies the COLA to the current benefit — not the original. Year 1: +$120 on $6,000. Year 20: +$160+ on $8,000+. Over 20 years, a $6,000 benefit grows to ~$8,926.<br><br><strong>When it starts:</strong> May 1 of the second calendar year after retirement.<br><br><strong>PPPA Backstop:</strong> Protects retirees when accumulated COLA falls short of CPI inflation.</div></div></div>
+    <div class="cola-card"><div class="cola-card-head calstrs">CalSTRS COLA</div><div class="cola-card-body"><div class="cola-rate">2%</div><div class="cola-rate-sub">Simple · Applied to the original (initial) benefit — not compounding</div><div class="cola-detail"><strong>How it works:</strong> CalSTRS adds a fixed 2% of the original starting benefit each year. Year 1: +$120. Year 20: still +$120. After 20 years the benefit is $8,400 — vs. $8,926 with compounding CalPERS COLA.<br><br><strong>When it starts:</strong> September 1 after the first anniversary of retirement.<br><br><strong>SBMA Backstop:</strong> Pays a separate quarterly check when purchasing power falls below 85% of the original benefit.</div></div></div>
+  </div>
+  <div class="card">
+    <div class="card-title">The Compounding vs. Simple COLA Gap — Why It Matters</div>
+    <div class="callout red-box"><strong>The single biggest long-term income risk for CalSTRS clients:</strong> Simple COLA means the same fixed dollar increase every year. Over a 25-year retirement on a $6,000/month pension, the difference between 2% simple and 2% compounding is <strong>~$843/month</strong> by year 25.</div>
+    <div class="mult-wrap"><table class="mult-table"><thead><tr><th class="row-head">Year of Retirement</th><th class="calpers-th">CalPERS (2% Compounding)</th><th class="calstrs-th">CalSTRS (2% Simple)</th><th style="background:#c0392b;">Annual Difference</th></tr></thead><tbody>
+      <tr><td class="row-head">Starting Benefit</td><td>$6,000/mo</td><td>$6,000/mo</td><td>$0</td></tr>
+      <tr><td class="row-head">Year 5</td><td>$6,624/mo</td><td>$6,600/mo</td><td>$24/mo</td></tr>
+      <tr><td class="row-head">Year 10</td><td>$7,314/mo</td><td>$7,200/mo</td><td>$114/mo</td></tr>
+      <tr><td class="row-head">Year 15</td><td>$8,075/mo</td><td>$7,800/mo</td><td>$275/mo</td></tr>
+      <tr><td class="row-head">Year 20</td><td>$8,916/mo</td><td>$8,400/mo</td><td>$516/mo</td></tr>
+      <tr><td class="row-head">Year 25</td><td>$9,843/mo</td><td>$9,000/mo</td><td class="highlight">$843/mo</td></tr>
+      <tr><td class="row-head">Year 30</td><td>$10,867/mo</td><td>$9,600/mo</td><td class="highlight">$1,267/mo</td></tr>
+    </tbody></table></div>
+  </div>
+  <div class="card">
+    <div class="card-title">Social Security Fairness Act (January 2024)</div>
+    <div class="callout green-box"><strong>WEP and GPO have been eliminated.</strong> The Social Security Fairness Act, signed January 2024, repealed the Windfall Elimination Provision (WEP) and Government Pension Offset (GPO). CalPERS and CalSTRS members who previously had SS benefits reduced should contact SSA directly — benefits may be restored retroactively from January 2024.</div>
+  </div>
+</div>
+
+<!-- CONTRIBUTIONS -->
+<div class="tab-content" id="tab-contributions">
+  <div class="section-title">Contribution Rates — 2025–26</div>
+  <div class="section-sub">Contribution rates are set annually by each system's board. Member contributions are deducted from payroll pre-tax.</div>
+  <div class="card">
+    <div class="sys-bar calpers" style="border-radius:6px;"><div class="sb-name">CalPERS Member Contribution Rates</div></div>
+    <table class="contrib-table"><thead><tr><th class="calpers-th">Tier</th><th class="calpers-th">Member Contribution</th><th class="calpers-th">Notes</th></tr></thead><tbody>
+      <tr><td><strong>Misc Classic (2% at 55 / 60)</strong></td><td>Varies by agency (~6–8%)</td><td>Set through bargaining; rate can be picked up by employer</td></tr>
+      <tr><td><strong>Misc PEPRA (2% at 62)</strong></td><td>50% of normal cost (adjusted annually)</td><td>2025: approx. 7–9% for most agencies</td></tr>
+      <tr><td><strong>Safety Classic (3% @ 50 / Local)</strong></td><td>Actuarially determined</td><td>Varies by bargaining unit agreement</td></tr>
+      <tr><td><strong>Safety PEPRA (2% @ 57)</strong></td><td>50% of normal cost</td><td>Adjusted annually by CalPERS board</td></tr>
+      <tr><td><strong>PEPRA Compensation Cap</strong></td><td colspan="2">$155,081 (SS participants) / $186,096 (non-SS) — 2025</td></tr>
+    </tbody></table>
+  </div>
+  <div class="card">
+    <div class="sys-bar calstrs" style="border-radius:6px;"><div class="sb-name">CalSTRS Contribution Rates — FY 2025–26</div></div>
+    <table class="contrib-table"><thead><tr><th class="calstrs-th">Contributor</th><th class="calstrs-th">DB Program Rate</th><th class="calstrs-th">Notes</th></tr></thead><tbody>
+      <tr><td><strong>Member (2% at 60 — Classic)</strong></td><td><strong>10.205%</strong> of creditable earnings</td><td>Withheld via payroll deduction</td></tr>
+      <tr><td><strong>Member (2% at 62 — PEPRA)</strong></td><td>50% of normal cost (adjusted annually)</td><td>Members notified annually</td></tr>
+      <tr><td><strong>Employer (School District)</strong></td><td><strong>19.10%</strong> of creditable earnings</td><td>Board may adjust ±1%/yr up to 20.25% max</td></tr>
+      <tr><td><strong>State of California</strong></td><td><strong>10.828%</strong> of member earnings</td><td>Adjustable ≤0.50% per year under Funding Plan</td></tr>
+    </tbody></table>
+    <div class="callout calstrs-box" style="margin-top:12px;"><strong>CalSTRS DBS (Defined Benefit Supplement):</strong> A separate account funded by excess employer contributions. At retirement, members can receive it as a lump sum, annuity, or combination. This is a hidden asset many members don't know about until retirement counseling.</div>
+  </div>
+  <div class="card">
+    <div class="card-title">2025 Supplemental Plan Limits</div>
+    <div class="info-grid">
+      <div class="info-item calpers-item"><div class="it-title">CalPERS — 457(b) Deferred Compensation</div><div class="it-body">Most CalPERS-covered employers offer a 457(b). Key advantages: no 10% early withdrawal penalty, pre-tax contributions, flexible distribution. <strong>2025 limit: $23,500 / $31,000 (50+) / $34,750 (60–63)</strong>.</div></div>
+      <div class="info-item calstrs-item"><div class="it-title">CalSTRS — 403(b) and 457(b)</div><div class="it-body">K-12 educators typically have access to a 403(b) TSA through their school district. FIA and fixed annuities are common 403(b) vehicles. Many districts also offer a 457(b). Both limits are <strong>independent</strong> — max both simultaneously.</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- PLANNING -->
+<div class="tab-content" id="tab-planning">
+  <div class="section-title">Planning Considerations &amp; Tax Facts</div>
+  <div class="section-sub">Critical items for client conversations, needs analysis, and supplemental income positioning around CalPERS and CalSTRS pensions.</div>
+  <div class="card">
+    <div class="card-title">Taxation of Benefits</div>
+    <div class="info-grid">
+      <div class="info-item"><div class="it-title">Federal Income Tax — Both Systems</div><div class="it-body">CalPERS and CalSTRS pension benefits are fully taxable as ordinary income at the federal level. A Form 1099-R is issued annually. Most member contributions were made pre-tax — meaning virtually the entire benefit is taxable.</div></div>
+      <div class="info-item"><div class="it-title">California State Income Tax</div><div class="it-body">California taxes CalPERS and CalSTRS benefits as ordinary income. <strong>There is no pension exclusion in California.</strong> CA's top marginal rate is 13.3%. For a client receiving $96,000/yr, effective CA tax can easily be 8–10%.</div></div>
+      <div class="info-item"><div class="it-title">No FICA on Pension Benefits</div><div class="it-body">Neither CalPERS nor CalSTRS pension payments are subject to FICA (Social Security or Medicare) taxes after retirement — a meaningful net-income advantage vs. earned wages.</div></div>
+      <div class="info-item"><div class="it-title">Withholding Setup at Retirement</div><div class="it-body">Both systems allow members to set federal and California withholding at retirement. Advise clients to work with their tax advisor — under-withholding leads to penalties; over-withholding reduces available cash flow.</div></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">Pension Gap — Planning Opportunity</div>
+    <div class="callout"><strong>The income gap is the planning conversation.</strong> Most CalPERS and CalSTRS members retire at 50–70% of their pre-retirement salary. The gap between pension income and final compensation — adjusted for inflation over a 20–30 year retirement — is the primary financial planning opportunity.</div>
+    <div class="info-grid">
+      <div class="info-item calpers-item"><div class="it-title">CalPERS Gap Solutions</div><div class="it-body">• <strong>457(b) deferred comp</strong> — no early withdrawal penalty<br>• <strong>Fixed indexed annuity (FIA)</strong> — income rider fills the gap<br>• <strong>IUL</strong> — tax-free supplemental income, death benefit<br>• <strong>Premium finance</strong> — large IUL with leverage for high-income members<br>• <strong>Roth conversion</strong> — tax diversification</div></div>
+      <div class="info-item calstrs-item"><div class="it-title">CalSTRS Gap Solutions</div><div class="it-body">• <strong>403(b) TSA</strong> — primary accumulation vehicle; FIA inside 403(b)<br>• <strong>457(b)</strong> — independent limit from 403(b)<br>• <strong>IUL</strong> — fills COLA gap; simple COLA erosion creates ongoing need<br>• <strong>FIA with income rider</strong> — addresses simple COLA gap<br>• <strong>DBS lump sum</strong> — seed capital for supplemental strategy</div></div>
+    </div>
+    <div class="callout red-box" style="margin-top:12px;"><strong>CalSTRS-specific urgency:</strong> Simple COLA means every year the pension replaces a slightly smaller share of real income. By year 20 in a 3% inflation environment, a $6,000/month pension has the purchasing power of ~$3,600 in today's dollars. This gap compounds annually.</div>
+  </div>
+  <div class="card">
+    <div class="card-title">System Contact &amp; Key Resources</div>
+    <div class="diff-row">
+      <div class="diff-card"><div class="diff-head calpers">CalPERS</div><div class="diff-body" style="line-height:2;"><strong>Member Services:</strong> 888-225-7377<br><strong>Website:</strong> calpers.ca.gov<br><strong>Member Portal:</strong> my.calpers.ca.gov<br><strong>Key publications:</strong> PUB 1 (Planning Your Service Retirement)</div></div>
+      <div class="diff-card"><div class="diff-head calstrs">CalSTRS</div><div class="diff-body" style="line-height:2;"><strong>Member Services:</strong> 800-228-5453<br><strong>Website:</strong> calstrs.com<br><strong>Member Portal:</strong> mycalstrs.com<br><strong>Key publications:</strong> Member Handbook 2025</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="cite-bar"><strong>Sources:</strong> CalPERS benefit factor tables (calpers.ca.gov) · CalSTRS age factors (calstrs.com) · CalSTRS contributions FY 2025–26 · SS Fairness Act: Public Law 118-310 (January 2025). For advisor reference only — not financial, tax, or legal advice. Verify current details at calpers.ca.gov or calstrs.com.</div>
+
+<script>
+function showTab(id, btn) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  btn.classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+</script>
+</body>
+</html>
