@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Client Portal — Edwards Financial & Associates</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --ink: #0d1e3a;
+    --parchment: #f7f4ef;
+    --gold: #b8972e;
+    --gold-light: #d4af5a;
+    --gold-muted: #8a6e22;
+    --warm-gray: #6b6560;
+    --rule: #d6cfc4;
+    --white: #ffffff;
+  }
+  html, body { height: 100%; }
+  body {
+    font-family: 'Montserrat', sans-serif;
+    background: var(--parchment);
+    color: var(--ink);
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(ellipse at 70% 30%, rgba(13,30,58,0.06) 0%, transparent 60%);
+    pointer-events: none;
+  }
+
+  nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 28px 60px;
+    border-bottom: 1px solid var(--rule);
+    position: relative;
+    z-index: 1;
+    background: rgba(247,244,239,0.95);
+  }
+  .nav-logo {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 20px; font-weight: 500;
+    letter-spacing: 0.08em;
+    color: var(--ink); text-decoration: none;
+  }
+  .nav-logo span { color: var(--gold); }
+  .nav-back {
+    font-size: 10px; font-weight: 500;
+    letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--warm-gray); text-decoration: none;
+    transition: color 0.3s;
+  }
+  .nav-back:hover { color: var(--gold); }
+
+  main {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .login-wrapper {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    max-width: 900px;
+    width: 100%;
+    border: 1px solid var(--rule);
+    box-shadow: 0 20px 60px rgba(13,30,58,0.08);
+  }
+
+  .login-left {
+    background: var(--ink);
+    padding: 60px 50px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  .login-left::before {
+    content: '';
+    position: absolute;
+    pointer-events: none;
+  }
+  .left-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 9px; font-weight: 600;
+    letter-spacing: 0.25em; text-transform: uppercase;
+    color: var(--gold);
+    border: 1px solid rgba(184,151,46,0.35);
+    padding: 6px 14px;
+    margin-bottom: 40px;
+    width: fit-content;
+  }
+  .left-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 38px; font-weight: 300;
+    color: var(--white);
+    line-height: 1.15;
+    margin-bottom: 20px;
+  }
+  .left-title em { font-style: italic; color: var(--gold-light); }
+  .left-desc {
+    font-size: 11px;
+    color: rgba(255,255,255,0.4);
+    line-height: 1.8;
+    margin-bottom: 40px;
+  }
+  .feature-list { list-style: none; }
+  .feature-list li {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 10px;
+    color: rgba(255,255,255,0.5);
+    margin-bottom: 14px;
+    letter-spacing: 0.05em;
+  }
+  .feature-list li::before {
+    content: '◈';
+    color: var(--gold);
+    font-size: 8px;
+    flex-shrink: 0;
+  }
+  .left-footer {
+    font-size: 9px;
+    color: rgba(255,255,255,0.2);
+    letter-spacing: 0.1em;
+    margin-top: 40px;
+  }
+
+  .login-right {
+    background: var(--white);
+    padding: 60px 50px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .form-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 26px; font-weight: 400;
+    color: var(--ink);
+    margin-bottom: 8px;
+  }
+  .form-sub {
+    font-size: 11px;
+    color: var(--warm-gray);
+    margin-bottom: 36px;
+    line-height: 1.6;
+  }
+
+  .form-group { margin-bottom: 20px; }
+  label {
+    display: block;
+    font-size: 9px; font-weight: 600;
+    letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--warm-gray);
+    margin-bottom: 8px;
+  }
+  input {
+    width: 100%;
+    background: var(--parchment);
+    border: 1px solid var(--rule);
+    color: var(--ink);
+    font-family: 'Montserrat', sans-serif;
+    font-size: 13px; padding: 13px 16px;
+    outline: none;
+    transition: border-color 0.3s;
+    -webkit-appearance: none;
+  }
+  input:focus { border-color: var(--gold); background: var(--white); }
+  input::placeholder { color: rgba(107,101,96,0.4); }
+
+  .btn-primary {
+    width: 100%;
+    background: var(--ink);
+    color: var(--white);
+    font-family: 'Montserrat', sans-serif;
+    font-size: 10px; font-weight: 600;
+    letter-spacing: 0.2em; text-transform: uppercase;
+    padding: 15px;
+    border: none; cursor: pointer;
+    transition: background 0.3s;
+    margin-top: 8px;
+  }
+  .btn-primary:hover { background: var(--gold-muted); }
+  .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  .message {
+    padding: 11px 14px;
+    font-size: 11px;
+    margin-bottom: 16px;
+    display: none;
+  }
+  .message.error { background: rgba(192,57,43,0.08); border: 1px solid rgba(192,57,43,0.25); color: #c0392b; }
+  .message.success { background: rgba(39,174,96,0.08); border: 1px solid rgba(39,174,96,0.25); color: #27ae60; }
+  .message.show { display: block; }
+
+  .form-footer {
+    margin-top: 20px;
+    text-align: center;
+    font-size: 11px;
+    color: var(--warm-gray);
+  }
+  .form-footer a { color: var(--gold); text-decoration: none; }
+
+  footer {
+    padding: 24px 60px;
+    border-top: 1px solid var(--rule);
+    display: flex;
+    justify-content: space-between;
+    position: relative; z-index: 1;
+  }
+  footer p { font-size: 9px; letter-spacing: 0.12em; color: var(--warm-gray); }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">Edwards <span>&</span> Associates</a>
+  <a href="index.html" class="nav-back">← Back to Main Site</a>
+</nav>
+
+<main>
+  <div class="login-wrapper">
+    <div class="login-left">
+      <div>
+        <div class="left-badge">Client Portal</div>
+        <h1 class="left-title">Your<br><em>Financial</em><br>Dashboard</h1>
+        <p class="left-desc">Secure access to your personalized retirement plan, portfolio snapshot, and planning progress.</p>
+        <ul class="feature-list">
+          <li>Retirement income & gap analysis</li>
+          <li>Tax-free vs. taxable portfolio breakdown</li>
+          <li>Estate & legacy planning goals</li>
+          <li>Action items from your advisor</li>
+          <li>Secure document access</li>
+        </ul>
+      </div>
+      <div class="left-footer">Secured by 256-bit encryption &nbsp;·&nbsp; Edwards Financial & Associates</div>
+    </div>
+
+    <div class="login-right">
+      <div class="form-title">Welcome Back</div>
+      <p class="form-sub">Sign in to view your personalized financial dashboard.</p>
+
+      <div class="message" id="login-msg"></div>
+
+      <div class="form-group">
+        <label>Email Address</label>
+        <input type="email" id="email" placeholder="your@email.com" autocomplete="email">
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="password" placeholder="••••••••" autocomplete="current-password">
+      </div>
+
+      <button class="btn-primary" onclick="handleLogin(this)">Sign In to My Portal</button>
+
+      <div class="form-footer">
+        <p>Forgot password? <a href="#" onclick="handleReset()">Reset via email</a></p>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <p>© 2025 Edwards Financial & Associates. All rights reserved.</p>
+  <p>Client Access Only — Not a Partner Portal</p>
+</footer>
+
+<script>
+  const SUPABASE_URL = 'https://rybnzvlogmbjlgdziswj.supabase.co';
+  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ5Ym56dmxvZ21iamxnZHppc3dqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0NjE3MjgsImV4cCI6MjA5NjAzNzcyOH0.m7oH-z4yI1AbchocncJU2TB7SawyijiXsTbcz3slwn0';
+  const { createClient } = supabase;
+  const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  function showMsg(type, text) {
+    const el = document.getElementById('login-msg');
+    el.className = 'message ' + type + ' show';
+    el.textContent = text;
+  }
+
+  async function handleLogin(btn) {
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value;
+    if (!email || !password) return showMsg('error', 'Please enter your email and password.');
+
+    btn.disabled = true; btn.textContent = 'Signing in...';
+
+    const { data, error } = await sb.auth.signInWithPassword({ email, password });
+
+    if (error) {
+      showMsg('error', error.message);
+      btn.disabled = false; btn.textContent = 'Sign In to My Portal';
+      return;
+    }
+
+    // Verify they are a client (not a partner)
+    const { data: profile } = await sb.from('client_profiles').select('id').eq('email', email).single();
+    if (!profile) {
+      await sb.auth.signOut();
+      showMsg('error', 'No client profile found. Please contact your advisor.');
+      btn.disabled = false; btn.textContent = 'Sign In to My Portal';
+      return;
+    }
+
+    window.location.href = 'portal-client-dashboard.html';
+  }
+
+  async function handleReset() {
+    const email = document.getElementById('email').value.trim();
+    if (!email) return showMsg('error', 'Enter your email address above first.');
+    const { error } = await sb.auth.resetPasswordForEmail(email);
+    if (error) return showMsg('error', error.message);
+    showMsg('success', 'Password reset email sent. Check your inbox.');
+  }
+
+  sb.auth.getSession().then(({ data: { session } }) => {
+    if (session) window.location.href = 'portal-client-dashboard.html';
+  });
+</script>
+</body>
+</html>

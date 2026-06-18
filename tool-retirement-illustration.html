@@ -1,0 +1,1130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Retirement Illustration | Edwards Financial &amp; Associates</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#0D1F3C; --navy-2:#13294f; --navy-soft:#1c3a66;
+    --gold:#C9A84C; --gold-soft:#e6d49a;
+    --ivory:#F7F4EC; --ivory-2:#efe9da;
+    --ink:#1a2332; --muted:#6b7587; --line:#d9d2c2;
+    --good:#2f7d5b; --bad:#b14a3b; --white:#ffffff;
+    --shadow:0 18px 50px -20px rgba(13,31,60,.45);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{-webkit-text-size-adjust:100%}
+  body{font-family:'Montserrat',system-ui,sans-serif;
+    background:radial-gradient(1200px 600px at 50% -10%, rgba(13,31,60,.06), transparent 60%), var(--ivory);
+    color:var(--ink);line-height:1.5;min-height:100vh;}
+  .wrap{max-width:1180px;margin:0 auto;padding:28px 20px 80px}
+
+  /* Brand */
+  .brand{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:22px}
+  .brand-id{display:flex;align-items:center;gap:14px}
+  .crest{width:46px;height:46px;border-radius:50%;background:var(--navy);border:1.5px solid var(--gold);
+    display:grid;place-items:center;color:var(--gold);font-family:'Cormorant Garamond',serif;font-weight:700;font-size:22px;flex:none}
+  .brand-name{font-family:'Cormorant Garamond',serif;font-size:25px;font-weight:600;color:var(--navy);letter-spacing:.3px;line-height:1.05}
+  .brand-tag{font-size:10.5px;letter-spacing:3.5px;text-transform:uppercase;color:var(--gold);font-weight:600}
+
+  .stepper{display:flex;align-items:center;gap:8px}
+  .step{display:flex;align-items:center;gap:8px;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);font-weight:600}
+  .step .dot{width:24px;height:24px;border-radius:50%;border:1.5px solid var(--line);display:grid;place-items:center;font-size:11px;color:var(--muted);background:var(--white)}
+  .step.active .dot{background:var(--navy);border-color:var(--navy);color:var(--gold)}
+  .step.done .dot{background:var(--gold);border-color:var(--gold);color:var(--navy)}
+  .step.active span,.step.done span{color:var(--navy)}
+  .step .bar{width:26px;height:1.5px;background:var(--line)}
+  @media(max-width:680px){.step span{display:none}.step .bar{width:14px}}
+
+  .screen{display:none;animation:fade .4s ease}
+  .screen.on{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+  /* Screen 1 */
+  .ready-hero{text-align:center;padding:54px 16px 30px}
+  .eyebrow{font-size:11px;letter-spacing:4px;text-transform:uppercase;color:var(--gold);font-weight:600;margin-bottom:18px}
+  .ready-q{font-family:'Cormorant Garamond',serif;font-weight:600;color:var(--navy);font-size:clamp(30px,5vw,52px);line-height:1.08;max-width:760px;margin:0 auto}
+  .ready-sub{color:var(--muted);font-size:15px;max-width:520px;margin:18px auto 0;font-weight:400}
+  .scale{display:flex;justify-content:center;flex-wrap:wrap;gap:12px;margin:46px auto 14px;max-width:760px}
+  .pip{width:60px;height:60px;border-radius:50%;border:1.5px solid var(--line);background:var(--white);color:var(--navy);
+    font-weight:600;font-size:19px;cursor:pointer;transition:.18s;display:grid;place-items:center;box-shadow:0 4px 14px -8px rgba(13,31,60,.3)}
+  .pip:hover{transform:translateY(-3px);border-color:var(--gold)}
+  .pip.sel{background:var(--navy);color:var(--gold);border-color:var(--navy);transform:translateY(-3px);box-shadow:var(--shadow)}
+  .scale-ends{display:flex;justify-content:space-between;max-width:760px;margin:0 auto;color:var(--muted);font-size:12px;letter-spacing:.5px;text-transform:uppercase;font-weight:500}
+  @media(max-width:680px){.pip{width:46px;height:46px;font-size:16px}}
+
+  /* Cards */
+  .card{background:var(--white);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);overflow:hidden}
+  .card-head{background:var(--navy);color:var(--white);padding:18px 26px;display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap}
+  .card-head h2{font-family:'Cormorant Garamond',serif;font-weight:600;font-size:27px;letter-spacing:.4px}
+  .card-head .hint{color:var(--gold-soft);font-size:12px;font-weight:400}
+  .card-body{padding:26px}
+
+  /* Assumptions */
+  .grid{display:grid;gap:20px 26px}
+  .g3{grid-template-columns:repeat(3,1fr)}
+  .g4{grid-template-columns:repeat(4,1fr)}
+  @media(max-width:780px){.g3,.g4{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:460px){.g3,.g4{grid-template-columns:1fr}}
+  .field label{display:block;font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:var(--muted);font-weight:600;margin-bottom:6px}
+  .field label.accent{color:var(--gold)}
+  .field input[type=text],.field input[type=number]{width:100%;border:none;border-bottom:1.5px solid var(--line);
+    background:transparent;font-family:'Montserrat';font-size:18px;font-weight:600;color:var(--navy);padding:6px 2px;outline:none;transition:.15s}
+  .field input:focus{border-color:var(--gold)}
+  .field .suffix{font-size:13px;color:var(--muted);font-weight:500}
+  .state-select{margin-top:9px;width:100%;border:1px solid var(--line);border-radius:8px;padding:7px 9px;
+    font-family:'Montserrat';font-size:13px;font-weight:600;color:var(--navy);background:var(--white);outline:none;cursor:pointer}
+  .state-select:focus{border-color:var(--gold)}
+  .state-lbl{display:block;font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);font-weight:600;margin-top:9px}
+
+  /* editable summary field with pencil */
+  .efield{display:flex;align-items:flex-end;gap:8px}
+  .efield .val{flex:1;font-size:18px;font-weight:600;color:var(--navy);border-bottom:1.5px solid var(--line);padding:6px 2px;min-height:33px}
+  .efield .val .sub{display:block;font-size:10px;color:var(--muted);font-weight:500;letter-spacing:.3px;text-transform:none}
+  .pencil{flex:none;width:30px;height:30px;border-radius:50%;border:1px solid var(--line);background:var(--white);
+    cursor:pointer;display:grid;place-items:center;transition:.15s;color:var(--navy)}
+  .pencil:hover{background:var(--navy);color:var(--gold);border-color:var(--navy)}
+  .pencil svg{width:14px;height:14px}
+
+  .divider{height:1px;background:var(--line);margin:26px 0}
+  .toggle{display:inline-flex;align-items:center;gap:7px;font-size:12px;color:var(--muted);font-weight:500;cursor:pointer;user-select:none;margin-top:8px}
+  .toggle input{accent-color:var(--gold);width:15px;height:15px}
+
+  .lifestyle{background:var(--ivory);border-radius:12px;padding:18px 20px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;margin-top:8px}
+  .lifestyle .big{font-size:26px;font-weight:700;color:var(--navy)}
+  .lifestyle .lbl{font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:var(--muted);font-weight:600}
+  .lifestyle .formula{font-size:11px;color:var(--muted);font-style:italic}
+
+  /* Buttons */
+  .actions{display:flex;justify-content:space-between;gap:12px;margin-top:26px;flex-wrap:wrap}
+  .btn{font-family:'Montserrat';font-weight:600;font-size:13px;letter-spacing:.6px;padding:13px 26px;border-radius:10px;
+    cursor:pointer;border:1.5px solid var(--navy);transition:.16s;text-transform:uppercase}
+  .btn-primary{background:var(--navy);color:var(--gold);border-color:var(--navy)}
+  .btn-primary:hover{background:var(--navy-2)}
+  .btn-ghost{background:transparent;color:var(--navy)}
+  .btn-ghost:hover{background:var(--ivory-2)}
+  .btn:disabled{opacity:.4;cursor:not-allowed}
+
+  /* ---------- Modal ---------- */
+  .overlay{position:fixed;inset:0;background:rgba(13,31,60,.45);backdrop-filter:blur(2px);
+    display:none;align-items:flex-start;justify-content:center;padding:40px 16px;z-index:50;overflow-y:auto}
+  .overlay.on{display:flex}
+  .modal{background:var(--white);border-radius:16px;box-shadow:0 30px 80px -20px rgba(0,0,0,.5);
+    width:100%;max-width:820px;animation:pop .22s ease}
+  @keyframes pop{from{opacity:0;transform:translateY(14px) scale(.98)}to{opacity:1;transform:none}}
+  .modal-head{display:flex;align-items:center;justify-content:space-between;padding:18px 22px;border-bottom:1px solid var(--ivory-2)}
+  .modal-head h3{font-family:'Cormorant Garamond',serif;font-size:23px;font-weight:600;color:var(--navy)}
+  .modal-head .x{border:none;background:none;font-size:24px;color:var(--muted);cursor:pointer;line-height:1;padding:4px}
+  .modal-head .x:hover{color:var(--navy)}
+  .modal-body{padding:20px 22px;max-height:62vh;overflow-y:auto}
+  .modal-foot{display:flex;align-items:center;justify-content:space-between;padding:16px 22px;border-top:1px solid var(--ivory-2)}
+  .add-btn{display:inline-flex;align-items:center;gap:9px;border:none;background:none;cursor:pointer;color:var(--navy);font-family:'Montserrat';font-weight:600;font-size:13px}
+  .add-btn .plus{width:30px;height:30px;border-radius:50%;background:var(--gold);color:var(--navy);display:grid;place-items:center;font-size:20px;font-weight:700;line-height:1}
+  .save-btn{background:var(--navy);color:var(--gold);border:none;border-radius:10px;padding:11px 22px;font-family:'Montserrat';
+    font-weight:600;font-size:13px;letter-spacing:.5px;cursor:pointer;display:inline-flex;align-items:center;gap:8px;text-transform:uppercase}
+  .save-btn:hover{background:var(--navy-2)}
+
+  /* list table inside modal */
+  .ltable{width:100%}
+  .lthead,.ltrow{display:grid;gap:8px;align-items:center}
+  .lthead{font-size:10.5px;letter-spacing:.8px;text-transform:uppercase;color:var(--muted);font-weight:700;padding:0 4px 8px;border-bottom:1px solid var(--ivory-2)}
+  .ltrow{padding:10px 4px;border-bottom:1px solid var(--ivory)}
+  .ltrow input,.ltrow select{width:100%;border:1px solid var(--line);border-radius:7px;padding:7px 8px;font-family:'Montserrat';
+    font-size:13px;font-weight:500;color:var(--navy);background:var(--white);outline:none}
+  .ltrow input:focus,.ltrow select:focus{border-color:var(--gold)}
+  .ltrow .del{border:none;background:none;cursor:pointer;color:var(--muted);font-size:16px;justify-self:center}
+  .ltrow .del:hover{color:var(--bad)}
+  .sw{position:relative;width:38px;height:20px;justify-self:center;cursor:pointer}
+  .sw input{opacity:0;width:0;height:0;position:absolute}
+  .sw .track{position:absolute;inset:0;background:var(--line);border-radius:20px;transition:.18s}
+  .sw .knob{position:absolute;top:2px;left:2px;width:16px;height:16px;background:#fff;border-radius:50%;transition:.18s}
+  .sw input:checked + .track{background:var(--gold)}
+  .sw input:checked + .track + .knob{transform:translateX(18px)}
+  .empty{text-align:center;color:var(--muted);font-size:13px;padding:24px 0;font-style:italic}
+
+  /* tax + inflation utilities */
+  .util-row{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:11px 4px;border-bottom:1px solid var(--ivory)}
+  .util-row label{font-weight:600;color:var(--navy);font-size:14px}
+  .util-row .accent{color:var(--gold)}
+  .util-row input,.util-row select{border:none;border-bottom:1.5px solid var(--line);text-align:right;font-family:'Montserrat';
+    font-weight:600;font-size:16px;color:var(--navy);background:transparent;outline:none;padding:4px 2px;min-width:160px}
+  .util-row input:focus,.util-row select:focus{border-color:var(--gold)}
+  .checkrow{display:flex;gap:18px;flex-wrap:wrap;font-size:13px;color:var(--ink);padding:8px 4px}
+  .checkrow b{color:var(--navy)}
+  .checkrow label{display:inline-flex;align-items:center;gap:6px;font-weight:500;cursor:pointer}
+  .checkrow input{accent-color:var(--gold)}
+  .result-box{background:var(--ivory);border-radius:12px;padding:16px 18px;margin-top:16px;display:none}
+  .result-box.on{display:block}
+  .result-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;text-align:center}
+  .result-grid .rb-lbl{font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);font-weight:600}
+  .result-grid .rb-val{font-size:22px;font-weight:700;color:var(--navy);margin-top:3px}
+
+  .infl-list{max-height:300px;overflow-y:auto;border:1px solid var(--ivory-2);border-radius:10px}
+  .infl-row{display:grid;grid-template-columns:1fr 1fr;padding:9px 14px;font-size:13.5px;cursor:pointer;border-bottom:1px solid var(--ivory)}
+  .infl-row:hover{background:var(--ivory)}
+  .infl-row.pick{background:rgba(201,168,76,.18)}
+  .infl-row .yr{font-weight:600;color:var(--navy)}
+  .infl-row .rt{text-align:right;font-variant-numeric:tabular-nums}
+  .infl-note{background:var(--white);border:1px solid var(--ivory-2);border-radius:10px;padding:14px;font-size:13px;color:var(--muted);line-height:1.5}
+  .source-link{color:var(--gold);font-size:12px;font-weight:600;text-decoration:none}
+  .source-link:hover{text-decoration:underline}
+
+  /* Screen 3 */
+  .verdicts{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px}
+  @media(max-width:680px){.verdicts{grid-template-columns:1fr}}
+  .verdict{border-radius:14px;padding:16px 20px;border:1px solid var(--line);background:var(--white)}
+  .verdict.present{border-left:4px solid var(--navy)}
+  .verdict.revised{border-left:4px solid var(--gold)}
+  .verdict .tag{font-size:10.5px;letter-spacing:2px;text-transform:uppercase;font-weight:700;color:var(--muted)}
+  .verdict.present .tag{color:var(--navy)} .verdict.revised .tag{color:var(--gold)}
+  .verdict .line{display:flex;justify-content:space-between;align-items:baseline;margin-top:8px;gap:10px}
+  .verdict .res{font-size:15px;font-weight:600}
+  .verdict .res.good{color:var(--good)} .verdict .res.bad{color:var(--bad)}
+  .verdict .bal{font-size:22px;font-weight:700;color:var(--navy);font-variant-numeric:tabular-nums}
+
+  .status-banner{display:none;margin-bottom:14px;border-radius:12px;padding:13px 18px;background:rgba(201,168,76,.12);
+    border:1px solid var(--gold);color:#8a6d1e;font-weight:600;font-size:14px;line-height:1.4}
+  .status-banner.on{display:block}
+  .status-banner b{color:var(--navy)}
+
+  .levers{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:18px}
+  @media(max-width:900px){.levers{grid-template-columns:repeat(3,1fr)}}
+  @media(max-width:560px){.levers{grid-template-columns:repeat(2,1fr)}}
+  .lever{background:var(--navy);border-radius:12px;padding:13px 12px;color:var(--white);text-align:center;border:1.5px solid var(--navy);cursor:pointer;transition:.15s}
+  .lever:hover{border-color:var(--gold-soft);transform:translateY(-2px)}
+  .lever.touched{border-color:var(--gold);box-shadow:0 0 0 2px rgba(201,168,76,.3)}
+  .lever .name{font-size:10.5px;letter-spacing:1px;text-transform:uppercase;color:var(--gold-soft);font-weight:600}
+  .lever .val{font-size:18px;font-weight:700;margin-top:6px;font-variant-numeric:tabular-nums;line-height:1.15}
+  .lever .val .per{font-size:11px;font-weight:500;color:var(--gold-soft)}
+  .lever .val .yr{display:block;font-size:12px;font-weight:600;color:var(--gold-soft);margin-top:1px}
+  .lever .tap{font-size:9.5px;letter-spacing:.8px;text-transform:uppercase;color:rgba(255,255,255,.4);margin-top:7px;font-weight:600}
+
+  /* lever modal tabs + panels */
+  .tabs{display:flex;gap:10px;margin-bottom:4px;flex-wrap:wrap}
+  .tab{flex:1;min-width:160px;border:1.5px solid var(--navy);background:var(--white);color:var(--navy);border-radius:10px;
+    padding:11px 14px;font-family:'Montserrat';font-weight:600;font-size:13px;cursor:pointer;transition:.14s;text-align:center}
+  .tab.on{background:var(--navy);color:var(--gold)}
+  .tab:hover:not(.on){background:var(--ivory-2)}
+  .lpanel{display:none;padding-top:18px;text-align:center}
+  .lpanel.on{display:block}
+  .lpanel p{font-weight:600;color:var(--navy);font-size:14px;margin-bottom:16px;line-height:1.45}
+  .lpanel .inrow{display:inline-flex;align-items:center;gap:14px;flex-wrap:wrap;justify-content:center}
+  .lpanel label.chk{display:inline-flex;align-items:center;gap:7px;font-weight:500;color:var(--ink);font-size:14px;cursor:pointer}
+  .lpanel label.chk input{accent-color:var(--gold);width:16px;height:16px}
+  .lpanel .bigin{border:none;border-bottom:1.5px solid var(--line);text-align:center;font-family:'Montserrat';font-weight:700;
+    font-size:22px;color:var(--navy);background:transparent;outline:none;width:140px;padding:4px 2px}
+  .lpanel .bigin:focus{border-color:var(--gold)}
+  .lpanel .calc{margin-top:18px;background:var(--gold);color:var(--navy);border:none;border-radius:10px;padding:11px 28px;
+    font-family:'Montserrat';font-weight:700;font-size:13px;letter-spacing:.5px;cursor:pointer;text-transform:uppercase}
+  .lpanel .calc:hover{background:#b8973f}
+  .lpanel .histlink{display:inline-block;margin-top:14px;color:var(--gold);font-weight:600;font-size:13px;cursor:pointer}
+  .lpanel .histlink:hover{text-decoration:underline}
+
+  .table-scroll{border:1px solid var(--line);border-radius:14px;overflow:hidden}
+  .col-heads{display:grid;grid-template-columns:1fr 64px 1fr;background:var(--navy)}
+  .col-heads .ch{padding:12px;color:var(--white);font-family:'Cormorant Garamond',serif;font-size:19px;font-weight:600;text-align:center}
+  .col-heads .ch.age-h{background:var(--navy-2);color:var(--gold-soft);font-family:'Montserrat';font-size:11px;letter-spacing:1px;text-transform:uppercase;font-weight:600;display:grid;place-items:center}
+  .col-heads .ch.revised{background:linear-gradient(90deg,var(--navy),var(--navy-2))}
+  .col-heads .ch.revised span{color:var(--gold)}
+  .subheads{display:grid;grid-template-columns:1fr 1fr 64px 1fr 1fr;background:var(--ivory-2);font-size:10px;letter-spacing:.8px;text-transform:uppercase;color:var(--muted);font-weight:600}
+  .subheads div{padding:8px 10px;text-align:right}
+  .subheads .c{text-align:center}
+  .rows{max-height:430px;overflow-y:auto}
+  .rrow{display:grid;grid-template-columns:1fr 1fr 64px 1fr 1fr;font-size:13.5px;font-variant-numeric:tabular-nums;border-top:1px solid var(--ivory-2)}
+  .rrow:nth-child(even){background:#fbf9f3}
+  .rrow div{padding:9px 10px;text-align:right;color:var(--ink)}
+  .rrow .age{text-align:center;font-weight:600;color:var(--navy);background:rgba(13,31,60,.03)}
+  .rrow .ls{color:var(--navy);font-weight:600}
+  .rrow.retire{border-top:2px solid var(--gold)}
+  .rrow .depleted{color:var(--bad);font-weight:600}
+  .rrow .rev-bal,.rrow .rev-ls{background:rgba(201,168,76,.06)}
+  .rrow .rev-ls{color:#8a6d1e;font-weight:600}
+  .legend{display:flex;gap:18px;flex-wrap:wrap;font-size:11px;color:var(--muted);margin-top:14px;align-items:center}
+  .legend b{color:var(--navy)}
+  .footnote{font-size:11px;color:var(--muted);margin-top:18px;line-height:1.6;border-top:1px solid var(--line);padding-top:14px}
+
+  @media print{
+    body{background:#fff}
+    .stepper,.levers,.actions,.no-print{display:none!important}
+    .rows{max-height:none}
+    .card{box-shadow:none;border:none}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="brand">
+    <div class="brand-id">
+      <div class="crest">E</div>
+      <div>
+        <div class="brand-name">Edwards Financial &amp; Associates</div>
+        <div class="brand-tag">Protect &middot; Grow &middot; Legacy</div>
+      </div>
+    </div>
+    <div class="stepper" id="stepper">
+      <div class="step active" data-s="1"><span class="dot">1</span><span>Readiness</span></div>
+      <div class="bar"></div>
+      <div class="step" data-s="2"><span class="dot">2</span><span>Assumptions</span></div>
+      <div class="bar"></div>
+      <div class="step" data-s="3"><span class="dot">3</span><span>Illustration</span></div>
+    </div>
+  </div>
+
+  <!-- SCREEN 1 -->
+  <section class="screen on" id="s1">
+    <div class="ready-hero">
+      <div class="eyebrow">Retirement Readiness</div>
+      <h1 class="ready-q">How prepared would you say you are for retirement?</h1>
+      <p class="ready-sub">There&rsquo;s no wrong answer &mdash; it just gives us a starting point. We&rsquo;ll show you exactly where things stand on the next screen.</p>
+      <div class="scale" id="scale"></div>
+      <div class="scale-ends"><span>Not at all</span><span>Completely confident</span></div>
+    </div>
+    <div class="actions" style="justify-content:flex-end">
+      <button class="btn btn-primary" id="toS2" disabled>Continue &rarr;</button>
+    </div>
+  </section>
+
+  <!-- SCREEN 2 -->
+  <section class="screen" id="s2">
+    <div class="card">
+      <div class="card-head"><h2>Assumptions</h2><span class="hint">Tap any pencil to itemize &mdash; estimates are fine to start</span></div>
+      <div class="card-body">
+
+        <div class="grid g3">
+          <div class="field"><label>Current Age</label><input type="number" id="curAge" value="42"></div>
+          <div class="field"><label>Retirement Age</label><input type="number" id="retAge" value="65"></div>
+          <div class="field"><label class="accent">Life Expectancy</label><input type="number" id="lifeExp" value="90"></div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="grid g3">
+          <div class="field"><label>Current Income</label>
+            <div class="efield"><div class="val" id="sumIncome">$0</div><button class="pencil" data-modal="incomes" title="Edit incomes">✎</button></div>
+          </div>
+          <div class="field"><label>Annual Saving</label>
+            <div class="efield"><div class="val" id="sumSaving">$0</div><button class="pencil" data-modal="annualSavings" title="Edit savings">✎</button></div>
+            <label class="toggle"><input type="checkbox" id="inflateSave" checked> Inflate savings each year</label>
+          </div>
+          <div class="field"><label>Accumulated Savings</label>
+            <div class="efield"><div class="val" id="sumAccum">$0</div><button class="pencil" data-modal="accounts" title="Edit accounts">✎</button></div>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="grid g4">
+          <div class="field"><label>Accumulation Rate <span class="suffix">(pre-ret.)</span></label><input type="text" id="accRate" value="6%"></div>
+          <div class="field"><label>Distribution Rate <span class="suffix">(in ret.)</span></label><input type="text" id="distRate" value="5%"></div>
+          <div class="field"><label class="accent">Inflation</label>
+            <div class="efield"><input type="text" id="infl" value="3%"><button class="pencil" data-modal="inflation" title="Historic inflation">✎</button></div>
+          </div>
+          <div class="field"><label class="accent">Effective Tax</label>
+            <div class="efield"><input type="text" id="tax" value="25%"><button class="pencil" data-modal="tax" title="Federal + state tax calculator">✎</button></div>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="grid g4">
+          <div class="field"><label>Defined Benefits</label>
+            <div class="efield"><div class="val" id="sumDb">$0</div><button class="pencil" data-modal="dbs" title="Edit defined benefits">✎</button></div>
+          </div>
+          <div class="field"><label>Future Assets</label>
+            <div class="efield"><div class="val" id="sumFA">$0</div><button class="pencil" data-modal="futureAssets" title="Edit future assets">✎</button></div>
+          </div>
+          <div class="field"><label>Future Expenses</label>
+            <div class="efield"><div class="val" id="sumFE">$0</div><button class="pencil" data-modal="futureExpenses" title="Edit future expenses">✎</button></div>
+          </div>
+          <div class="field"><label class="accent">Desired Legacy</label>
+            <div class="efield"><div class="val" id="sumLegacy">$0</div><button class="pencil" data-modal="legacy" title="Edit legacy goal">✎</button></div>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="lifestyle">
+          <div>
+            <div class="lbl">Current Lifestyle</div>
+            <div class="big" id="curLifestyle">$0</div>
+            <div class="formula">= Current Income &minus; Tax &minus; Annual Savings</div>
+          </div>
+          <div>
+            <div class="lbl">Retirement Lifestyle <span style="color:var(--gold)">(today&rsquo;s $)</span></div>
+            <input type="text" id="retLifestyle" value="$96,000" inputmode="numeric" style="font-size:24px;font-weight:700;color:var(--navy);border:none;border-bottom:1.5px solid var(--line);background:transparent;width:160px;outline:none">
+            <label class="toggle"><input type="checkbox" id="cola" checked> COLA &mdash; rises with inflation</label>
+          </div>
+        </div>
+
+      </div>
+    </div>
+    <div class="actions">
+      <div style="display:flex;gap:12px;flex-wrap:wrap">
+        <button class="btn btn-ghost" id="backTo1">&larr; Back</button>
+        <button class="btn btn-ghost" id="resetAssumptions">Reset</button>
+      </div>
+      <button class="btn btn-primary" id="toS3">See the illustration &rarr;</button>
+    </div>
+  </section>
+
+  <!-- SCREEN 3 -->
+  <section class="screen" id="s3">
+    <div class="card">
+      <div class="card-head"><h2>Your Retirement Illustration</h2><span class="hint" id="readyEcho"></span></div>
+      <div class="card-body">
+        <div class="verdicts">
+          <div class="verdict present">
+            <div class="tag">Present Projection</div>
+            <div class="line"><span class="res" id="pRes"></span><span class="bal" id="pBal"></span></div>
+            <div style="font-size:12px;color:var(--muted);font-weight:500" id="pSub"></div>
+          </div>
+          <div class="verdict revised">
+            <div class="tag">Revised Projection</div>
+            <div class="line"><span class="res" id="rRes"></span><span class="bal" id="rBal"></span></div>
+            <div style="font-size:12px;color:var(--muted);font-weight:500" id="rSub"></div>
+          </div>
+        </div>
+
+        <div class="status-banner" id="statusBanner"></div>
+
+        <div class="levers" id="levers">
+          <div class="lever" data-k="ror"><div class="name">Increase ROR</div><div class="val" id="vRor">6% / 5%</div><div class="tap">Tap to adjust</div></div>
+          <div class="lever" data-k="save"><div class="name">Save More</div><div class="val" id="vSave">$0/yr</div><div class="tap">Tap to adjust</div></div>
+          <div class="lever" data-k="work"><div class="name">Work Longer</div><div class="val" id="vWork">Age 65</div><div class="tap">Tap to adjust</div></div>
+          <div class="lever" data-k="spend"><div class="name">Decrease Lifestyle</div><div class="val" id="vSpend">$0/yr</div><div class="tap">Tap to adjust</div></div>
+          <div class="lever" data-k="infl"><div class="name">Change Inflation</div><div class="val" id="vInfl">3.0%</div><div class="tap">Tap to adjust</div></div>
+        </div>
+
+        <div class="table-scroll">
+          <div class="col-heads">
+            <div class="ch present">Present Projection</div>
+            <div class="ch age-h">Age</div>
+            <div class="ch revised"><span>Revised Projection</span></div>
+          </div>
+          <div class="subheads">
+            <div>Account Balance</div><div>Lifestyle + DBs</div><div class="c">Age</div><div>Account Balance</div><div>Lifestyle + DBs</div>
+          </div>
+          <div class="rows" id="rows"></div>
+        </div>
+
+        <div class="legend">
+          <span><b>&mdash;</b> Gold rule marks the retirement year.</span>
+          <span><b>Lifestyle + DBs</b> = total annual income lived on.</span>
+        </div>
+        <div class="footnote" id="footnote"></div>
+      </div>
+    </div>
+    <div class="actions">
+      <div style="display:flex;gap:12px;flex-wrap:wrap">
+        <button class="btn btn-ghost" id="backTo2">&larr; Edit assumptions</button>
+        <button class="btn btn-ghost no-print" id="dbBtn">Defined Benefits</button>
+      </div>
+      <div style="display:flex;gap:12px">
+        <button class="btn btn-ghost no-print" id="resetLevers">Reset levers</button>
+        <button class="btn btn-primary no-print" id="printBtn">Print / Save PDF</button>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<!-- Modal mount -->
+<div class="overlay" id="overlay"><div class="modal" id="modal"></div></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+
+<script>
+/* ===================== helpers ===================== */
+const $ = id => document.getElementById(id);
+const num = s => { const v = parseFloat(String(s).replace(/[^0-9.\-]/g,'')); return isNaN(v)?0:v; };
+const pct = s => num(s)/100;
+const money = n => '$' + Math.round(n).toLocaleString('en-US');
+const esc = s => String(s).replace(/"/g,'&quot;').replace(/</g,'&lt;');
+
+/* ===================== data model ===================== */
+const data = {
+  incomes:[{desc:'Annual Earned Income', amount:102000}],
+  annualSavings:[{desc:'Annual Savings', amount:6000, tax:'Tax Def.', risk:'High', accessible:'No'}],
+  accounts:[{name:'Current Value of Investments', amount:88000, tax:'Tax Def.', risk:'High', accessible:'No'}],
+  dbs:[],                  /* {desc, amount, cola, startAge, endAge, taxable, hide, excl} */
+  futureAssets:[],         /* {desc, amount, age, taxable} */
+  futureExpenses:[],       /* {desc, amount, age, taxable} */
+  legacy:0
+};
+const sum = arr => arr.reduce((t,x)=>t+(+x.amount||0),0);
+
+/* defaults for the Reset button */
+const DEFAULT_DATA = JSON.parse(JSON.stringify(data));
+const DEFAULT_FIELDS = {curAge:'42',retAge:'65',lifeExp:'90',accRate:'6%',distRate:'5%',infl:'3%',tax:'25%',retLifestyle:'$96,000'};
+function resetAssumptions(){
+  if(!confirm('Reset everything back to defaults?')) return;
+  ['incomes','annualSavings','accounts','dbs','futureAssets','futureExpenses'].forEach(k=>data[k]=JSON.parse(JSON.stringify(DEFAULT_DATA[k])));
+  data.legacy=DEFAULT_DATA.legacy;
+  Object.entries(DEFAULT_FIELDS).forEach(([id,v])=>{if($(id))$(id).value=v;});
+  $('inflateSave').checked=true; $('cola').checked=true;
+  selectedState='CA';
+  resetRev();                                                   /* clear revised levers + status banner */
+  readiness=null;                                               /* clear readiness score */
+  document.querySelectorAll('.pip').forEach(p=>p.classList.remove('sel'));
+  if($('toS2')) $('toS2').disabled=true;
+  if($('readyEcho')) $('readyEcho').textContent='';
+  refreshSummaries(); render();
+}
+
+/* ===================== 2026 tax constants (IRS Rev. Proc. 2025-32) ===================== */
+const STD_DED_2026 = { mfj:32200, single:16100, hoh:24150, mfs:16100 };
+const ADD_SD_2026  = { married:1650, single:2050 }; /* additional std ded per box, 65+ or blind — verify each yr */
+/* Representative TOP MARGINAL state income tax rates (~2025). Approximate & editable; no-income-tax states = 0. */
+const STATES=[
+ ['AL','Alabama',5.0],['AK','Alaska',0],['AZ','Arizona',2.5],['AR','Arkansas',3.9],['CA','California',13.3],
+ ['CO','Colorado',4.4],['CT','Connecticut',6.99],['DE','Delaware',6.6],['DC','District of Columbia',10.75],
+ ['FL','Florida',0],['GA','Georgia',5.39],['HI','Hawaii',11.0],['ID','Idaho',5.8],['IL','Illinois',4.95],
+ ['IN','Indiana',3.05],['IA','Iowa',3.8],['KS','Kansas',5.7],['KY','Kentucky',4.0],['LA','Louisiana',3.0],
+ ['ME','Maine',7.15],['MD','Maryland',5.75],['MA','Massachusetts',9.0],['MI','Michigan',4.25],['MN','Minnesota',9.85],
+ ['MS','Mississippi',4.7],['MO','Missouri',4.8],['MT','Montana',5.9],['NE','Nebraska',5.84],['NV','Nevada',0],
+ ['NH','New Hampshire',0],['NJ','New Jersey',10.75],['NM','New Mexico',5.9],['NY','New York',10.9],
+ ['NC','North Carolina',4.5],['ND','North Dakota',2.5],['OH','Ohio',3.5],['OK','Oklahoma',4.75],['OR','Oregon',9.9],
+ ['PA','Pennsylvania',3.07],['RI','Rhode Island',5.99],['SC','South Carolina',6.2],['SD','South Dakota',0],
+ ['TN','Tennessee',0],['TX','Texas',0],['UT','Utah',4.55],['VT','Vermont',8.75],['VA','Virginia',5.75],
+ ['WA','Washington',0],['WV','West Virginia',5.12],['WI','Wisconsin',7.65],['WY','Wyoming',0]
+];
+const STATE_RATE = Object.fromEntries(STATES.map(s=>[s[0],s[2]]));
+const STATE_NAME = Object.fromEntries(STATES.map(s=>[s[0],s[1]]));
+let selectedState='CA';   /* lives in the tax pop-up only */
+const BRACKETS_2026 = {
+  single:[[0,.10],[12400,.12],[50400,.22],[105700,.24],[201775,.32],[256225,.35],[640600,.37]],
+  mfj:   [[0,.10],[24800,.12],[100800,.22],[211400,.24],[403550,.32],[512450,.35],[768700,.37]],
+  hoh:   [[0,.10],[17700,.12],[67450,.22],[105700,.24],[201775,.32],[256200,.35],[640600,.37]],
+  mfs:   [[0,.10],[12400,.12],[50400,.22],[105700,.24],[201775,.32],[256225,.35],[384350,.37]]
+};
+function federalTax(taxable, status){
+  const b = BRACKETS_2026[status]; let tax=0;
+  for(let i=0;i<b.length;i++){
+    const lo=b[i][0], rate=b[i][1], hi=(i+1<b.length)?b[i+1][0]:Infinity;
+    if(taxable>lo) tax += (Math.min(taxable,hi)-lo)*rate; else break;
+  }
+  return tax;
+}
+function marginalRate(taxable, status){
+  const b=BRACKETS_2026[status]; let r=b[0][1];
+  for(const [lo,rate] of b){ if(taxable>lo) r=rate; }
+  return r;
+}
+
+/* ===================== historic CPI-U inflation (BLS, annual avg) ===================== */
+/* Educational series — verify/replace with your verified BLS dataset. */
+const INFLATION = {
+1914:1.0,1915:1.0,1916:7.9,1917:17.4,1918:18.0,1919:14.6,1920:15.6,1921:-10.5,1922:-6.1,1923:1.8,
+1924:0.0,1925:2.3,1926:1.1,1927:-1.7,1928:-1.7,1929:0.0,1930:-2.3,1931:-9.0,1932:-9.9,1933:-5.1,
+1934:3.1,1935:2.2,1936:1.5,1937:3.6,1938:-2.1,1939:-1.4,1940:0.7,1941:5.0,1942:10.9,1943:6.1,
+1944:1.7,1945:2.3,1946:8.3,1947:14.4,1948:8.1,1949:-1.2,1950:1.3,1951:7.9,1952:1.9,1953:0.8,
+1954:0.7,1955:-0.4,1956:1.5,1957:3.3,1958:2.8,1959:0.7,1960:1.7,1961:1.0,1962:1.0,1963:1.3,
+1964:1.3,1965:1.6,1966:2.9,1967:3.1,1968:4.2,1969:5.5,1970:5.7,1971:4.4,1972:3.2,1973:6.2,
+1974:11.0,1975:9.1,1976:5.8,1977:6.5,1978:7.6,1979:11.3,1980:13.5,1981:10.3,1982:6.2,1983:3.2,
+1984:4.3,1985:3.6,1986:1.9,1987:3.6,1988:4.1,1989:4.8,1990:5.4,1991:4.2,1992:3.0,1993:3.0,
+1994:2.6,1995:2.8,1996:3.0,1997:2.3,1998:1.6,1999:2.2,2000:3.4,2001:2.8,2002:1.6,2003:2.3,
+2004:2.7,2005:3.4,2006:3.2,2007:2.8,2008:3.8,2009:-0.4,2010:1.6,2011:3.2,2012:2.1,2013:1.5,
+2014:1.6,2015:0.1,2016:1.3,2017:2.1,2018:2.4,2019:1.8,2020:1.2,2021:4.7,2022:8.0,2023:4.1,
+2024:2.9,2025:2.9
+};
+
+/* ===================== state ===================== */
+let readiness = null;
+const rev = { accRate:null, distRate:null, saving:null, retAge:null, retLife:null, infl:null };
+let statusMsg = '';
+let inflPicks = [];
+
+/* ===================== screen nav ===================== */
+function go(n){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));
+  $('s'+n).classList.add('on');
+  document.querySelectorAll('.step').forEach(st=>{const s=+st.dataset.s;st.classList.toggle('active',s===n);st.classList.toggle('done',s<n);});
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+/* ===================== Screen 1 ===================== */
+const scale=$('scale');
+for(let i=1;i<=10;i++){const b=document.createElement('button');b.className='pip';b.textContent=i;
+  b.onclick=()=>{document.querySelectorAll('.pip').forEach(p=>p.classList.remove('sel'));b.classList.add('sel');readiness=i;$('toS2').disabled=false;};
+  scale.appendChild(b);}
+$('toS2').onclick=()=>go(2);
+$('backTo1').onclick=()=>go(1);
+
+/* ===================== summaries ===================== */
+function refreshSummaries(){
+  $('sumIncome').textContent  = money(sum(data.incomes));
+  $('sumSaving').textContent  = money(sum(data.annualSavings));
+  $('sumAccum').textContent   = money(sum(data.accounts));
+  $('sumDb').innerHTML        = money(sum(data.dbs)) + (data.dbs.length?'<span class="sub">'+data.dbs.length+' source'+(data.dbs.length>1?'s':'')+'</span>':'');
+  $('sumFA').textContent      = money(sum(data.futureAssets));
+  $('sumFE').textContent      = money(sum(data.futureExpenses));
+  $('sumLegacy').textContent  = money(data.legacy);
+  refreshLifestyle();
+}
+function refreshLifestyle(){
+  const inc=sum(data.incomes), tax=pct($('tax').value), sav=sum(data.annualSavings);
+  $('curLifestyle').textContent = money(inc - inc*tax - sav);
+}
+$('tax').addEventListener('input',refreshLifestyle);
+
+/* ===================== MODALS ===================== */
+const overlay=$('overlay'), modalEl=$('modal');
+function closeModal(){overlay.classList.remove('on');modalEl.innerHTML='';inflPicks=[];}
+overlay.addEventListener('click',e=>{if(e.target===overlay)closeModal();});
+
+const TAXOPTS=['Taxable','Tax Def.','Tax-Free'], RISKOPTS=['Low','Medium','High'], ACCOPTS=['Yes','No'];
+function opt(list,sel){return list.map(o=>'<option'+(o===sel?' selected':'')+'>'+o+'</option>').join('');}
+
+/* column configs for list modals */
+const LISTS={
+  incomes:{title:'Current Incomes', cols:'1fr 150px 40px',
+    head:['Description','Amount',''],
+    blank:()=>({desc:'',amount:0}),
+    row:(r,i)=>`<input data-i="${i}" data-f="desc" value="${esc(r.desc)}" placeholder="e.g. Earned income">
+      <input data-i="${i}" data-f="amount" value="${r.amount}" inputmode="numeric">
+      <button class="del" data-del="${i}">🗑</button>`},
+  annualSavings:{title:'Annual Savings', cols:'1.4fr 120px 1fr .8fr .9fr 40px',
+    head:['Description','Amount','Taxation','Risk','Accessible',''],
+    blank:()=>({desc:'',amount:0,tax:'Tax Def.',risk:'High',accessible:'No'}),
+    row:(r,i)=>`<input data-i="${i}" data-f="desc" value="${esc(r.desc)}">
+      <input data-i="${i}" data-f="amount" value="${r.amount}" inputmode="numeric">
+      <select data-i="${i}" data-f="tax">${opt(TAXOPTS,r.tax)}</select>
+      <select data-i="${i}" data-f="risk">${opt(RISKOPTS,r.risk)}</select>
+      <select data-i="${i}" data-f="accessible">${opt(ACCOPTS,r.accessible)}</select>
+      <button class="del" data-del="${i}">🗑</button>`},
+  accounts:{title:'Accumulated Savings', cols:'1.4fr 120px 1fr .8fr .9fr 40px',
+    head:['Account Name','Balance','Taxation','Risk','Accessible',''],
+    blank:()=>({name:'',amount:0,tax:'Tax Def.',risk:'High',accessible:'No'}),
+    row:(r,i)=>`<input data-i="${i}" data-f="name" value="${esc(r.name)}">
+      <input data-i="${i}" data-f="amount" value="${r.amount}" inputmode="numeric">
+      <select data-i="${i}" data-f="tax">${opt(TAXOPTS,r.tax)}</select>
+      <select data-i="${i}" data-f="risk">${opt(RISKOPTS,r.risk)}</select>
+      <select data-i="${i}" data-f="accessible">${opt(ACCOPTS,r.accessible)}</select>
+      <button class="del" data-del="${i}">🗑</button>`},
+  dbs:{title:'Defined Benefits', cols:'1.3fr 100px 60px 60px 60px 70px 50px 50px 36px',
+    head:['Description','Amount','COLA%','Start','End','%Tax','Hide','Excl',''],
+    blank:()=>({desc:'',amount:0,cola:2,startAge:67,endAge:99,taxable:50,hide:false,excl:false}),
+    row:(r,i)=>`<input data-i="${i}" data-f="desc" value="${esc(r.desc)}" placeholder="e.g. SS">
+      <input data-i="${i}" data-f="amount" value="${r.amount}" inputmode="numeric">
+      <input data-i="${i}" data-f="cola" value="${r.cola}">
+      <input data-i="${i}" data-f="startAge" value="${r.startAge}">
+      <input data-i="${i}" data-f="endAge" value="${r.endAge}">
+      <input data-i="${i}" data-f="taxable" value="${r.taxable}">
+      <label class="sw"><input type="checkbox" data-i="${i}" data-f="hide" ${r.hide?'checked':''}><span class="track"></span><span class="knob"></span></label>
+      <label class="sw"><input type="checkbox" data-i="${i}" data-f="excl" ${r.excl?'checked':''}><span class="track"></span><span class="knob"></span></label>
+      <button class="del" data-del="${i}">🗑</button>`},
+  futureAssets:{title:'Future Assets', cols:'1.6fr 130px 70px 80px 40px',
+    head:['Description','Amount','Age','%Tax',''],
+    blank:()=>({desc:'',amount:0,age:70,taxable:0}),
+    row:(r,i)=>`<input data-i="${i}" data-f="desc" value="${esc(r.desc)}" placeholder="e.g. Home sale">
+      <input data-i="${i}" data-f="amount" value="${r.amount}" inputmode="numeric">
+      <input data-i="${i}" data-f="age" value="${r.age}">
+      <input data-i="${i}" data-f="taxable" value="${r.taxable}">
+      <button class="del" data-del="${i}">🗑</button>`},
+  futureExpenses:{title:'Future Expenses', cols:'1.6fr 130px 70px 80px 40px',
+    head:['Description','Amount','Age','%Ded',''],
+    blank:()=>({desc:'',amount:0,age:70,taxable:0}),
+    row:(r,i)=>`<input data-i="${i}" data-f="desc" value="${esc(r.desc)}" placeholder="e.g. Wedding">
+      <input data-i="${i}" data-f="amount" value="${r.amount}" inputmode="numeric">
+      <input data-i="${i}" data-f="age" value="${r.age}">
+      <input data-i="${i}" data-f="taxable" value="${r.taxable}">
+      <button class="del" data-del="${i}">🗑</button>`}
+};
+
+function openList(key){
+  const cfg=LISTS[key];
+  const draft=JSON.parse(JSON.stringify(data[key])); /* edit a copy; commit on save */
+  function paint(){
+    const heads=cfg.head.map(h=>'<div>'+h+'</div>').join('');
+    const body = draft.length? draft.map((r,i)=>`<div class="ltrow" style="grid-template-columns:${cfg.cols}">${cfg.row(r,i)}</div>`).join('')
+                             : '<div class="empty">Nothing here yet &mdash; tap Add to create the first entry.</div>';
+    modalEl.innerHTML=`
+      <div class="modal-head"><h3>${cfg.title}</h3><button class="x" id="mx">&times;</button></div>
+      <div class="modal-body">
+        <div class="ltable">
+          <div class="lthead" style="grid-template-columns:${cfg.cols}">${heads}</div>
+          <div id="ltbody">${body}</div>
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button class="add-btn" id="madd"><span class="plus">+</span> Add</button>
+        <button class="save-btn" id="msave">✓ Save &amp; Return</button>
+      </div>`;
+    $('mx').onclick=closeModal;
+    $('madd').onclick=()=>{draft.push(cfg.blank());paint();};
+    $('msave').onclick=()=>{ readDraft(); data[key]=draft.filter(rowNotEmpty); refreshSummaries(); if($('s3').classList.contains('on')) render(); closeModal(); };
+    modalEl.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{readDraft();draft.splice(+b.dataset.del,1);paint();});
+  }
+  function readDraft(){
+    modalEl.querySelectorAll('[data-i]').forEach(el=>{
+      const i=+el.dataset.i, f=el.dataset.f;
+      if(!draft[i])return;
+      if(el.type==='checkbox') draft[i][f]=el.checked;
+      else if(['amount','cola','startAge','endAge','taxable','age'].includes(f)) draft[i][f]=num(el.value);
+      else draft[i][f]=el.value;
+    });
+  }
+  function rowNotEmpty(r){return (r.desc||r.name||'').trim()!=='' || (+r.amount||0)!==0;}
+  overlay.classList.add('on'); paint();
+}
+
+/* ---- Legacy (single value) ---- */
+function openLegacy(){
+  modalEl.innerHTML=`
+    <div class="modal-head"><h3>Desired Legacy</h3><button class="x" id="mx">&times;</button></div>
+    <div class="modal-body">
+      <div class="util-row"><label class="accent">Desired Legacy <span style="color:var(--muted);font-weight:500">(future $ left to heirs)</span></label>
+        <input id="legVal" value="${data.legacy}" inputmode="numeric"></div>
+    </div>
+    <div class="modal-foot"><span></span><button class="save-btn" id="msave">✓ Save &amp; Return</button></div>`;
+  $('mx').onclick=closeModal;
+  $('msave').onclick=()=>{data.legacy=num($('legVal').value);refreshSummaries();closeModal();};
+  overlay.classList.add('on');
+}
+
+/* ---- Historic inflation ---- */
+function openInflation(applyCb){
+  const years=Object.keys(INFLATION).map(Number).sort((a,b)=>a-b);
+  const rows=years.map(y=>`<div class="infl-row" data-y="${y}"><span class="yr">${y}</span><span class="rt">${INFLATION[y].toFixed(2)}%</span></div>`).join('');
+  modalEl.innerHTML=`
+    <div class="modal-head"><h3>Historic Inflation Rates</h3><button class="x" id="mx">&times;</button></div>
+    <div class="modal-body">
+      <div style="display:grid;grid-template-columns:1.1fr 1fr;gap:16px;align-items:start">
+        <div class="infl-list" id="iList">${rows}</div>
+        <div>
+          <div class="infl-note" id="iNote">Click any two years to calculate the average annual inflation across that span, then apply it to your assumption.</div>
+          <div class="result-box" id="iResult" style="margin-top:14px">
+            <div class="result-grid"><div><div class="rb-lbl">Average / yr</div><div class="rb-val" id="iAvg">&mdash;</div></div>
+            <div><div class="rb-lbl">Span</div><div class="rb-val" id="iSpan" style="font-size:16px">&mdash;</div></div>
+            <div><div class="rb-lbl">Years</div><div class="rb-val" id="iN">&mdash;</div></div></div>
+            <button class="save-btn" id="iApply" style="width:100%;justify-content:center;margin-top:14px">Apply to Inflation</button>
+          </div>
+          <a class="source-link" href="https://www.bls.gov/cpi/" target="_blank" rel="noopener" style="display:inline-block;margin-top:12px">Source: U.S. Bureau of Labor Statistics (CPI-U) &nearr;</a>
+        </div>
+      </div>
+    </div>
+    <div class="modal-foot"><span style="font-size:11px;color:var(--muted)">Educational series &mdash; confirm against your verified dataset.</span><button class="save-btn" id="mx2">Done</button></div>`;
+  $('mx').onclick=closeModal; $('mx2').onclick=closeModal;
+  inflPicks=[];
+  $('iList').querySelectorAll('.infl-row').forEach(r=>r.onclick=()=>{
+    const y=+r.dataset.y;
+    if(inflPicks.includes(y)){inflPicks=inflPicks.filter(x=>x!==y);}
+    else{inflPicks.push(y); if(inflPicks.length>2) inflPicks.shift();}
+    $('iList').querySelectorAll('.infl-row').forEach(x=>x.classList.toggle('pick',inflPicks.includes(+x.dataset.y)));
+    if(inflPicks.length===2){
+      const [a,b]=[...inflPicks].sort((x,y)=>x-y);
+      let tot=0,c=0; for(let y=a;y<=b;y++){if(INFLATION[y]!=null){tot+=INFLATION[y];c++;}}
+      const avg=tot/c;
+      $('iAvg').textContent=avg.toFixed(2)+'%'; $('iSpan').textContent=a+'–'+b; $('iN').textContent=c;
+      $('iResult').classList.add('on');
+      $('iApply').onclick=()=>{ if(applyCb){applyCb(avg);} else {$('infl').value=avg.toFixed(1)+'%';refreshLifestyle();} closeModal(); };
+    } else { $('iResult').classList.remove('on'); }
+  });
+  overlay.classList.add('on');
+}
+
+/* ---- Federal tax liability ---- */
+function openTax(){
+  const gross=sum(data.incomes);
+  const curState=selectedState;
+  const stateOpts=STATES.map(s=>`<option value="${s[0]}"${s[0]===curState?' selected':''}>${s[1]} (${s[2]}%)</option>`).join('');
+  modalEl.innerHTML=`
+    <div class="modal-head"><h3>What is Your Tax Liability?</h3><button class="x" id="mx">&times;</button></div>
+    <div class="modal-body">
+      <div class="util-row"><label>Select Your Filing Status</label>
+        <select id="txStatus"><option value="mfj">Married Filing Jointly</option><option value="single">Single</option>
+        <option value="hoh">Head of Household</option><option value="mfs">Married Filing Separately</option></select></div>
+      <div class="util-row"><label>Enter Your Gross Income</label><input id="txGross" value="${gross}" inputmode="numeric"></div>
+      <div class="checkrow">
+        <b>Add&rsquo;l deduction &mdash;</b>
+        <span><b>Client:</b> <label><input type="checkbox" id="c65"> 65+</label> <label><input type="checkbox" id="cbl"> Blind</label></span>
+        <span><b>Spouse:</b> <label><input type="checkbox" id="s65"> 65+</label> <label><input type="checkbox" id="sbl"> Blind</label></span>
+      </div>
+      <div class="util-row"><label class="accent">Standard Deduction</label><input id="txStd" value="" readonly></div>
+      <div class="util-row"><label>Your Taxable Income</label><input id="txTaxable" value="" readonly></div>
+      <div class="util-row"><label>State <span style="color:var(--muted);font-weight:500">(income tax)</span></label>
+        <select id="txState">${stateOpts}</select></div>
+      <div class="result-box" id="txResult">
+        <div class="result-grid">
+          <div><div class="rb-lbl">Federal Tax</div><div class="rb-val" id="txTax">&mdash;</div></div>
+          <div><div class="rb-lbl">State Tax</div><div class="rb-val" id="txStTax">&mdash;</div></div>
+          <div><div class="rb-lbl">Total Tax</div><div class="rb-val" id="txTotal">&mdash;</div></div>
+        </div>
+        <div style="text-align:center;margin-top:12px;font-size:13px;color:var(--navy);font-weight:600">
+          Combined effective rate <span id="txEff" style="color:var(--gold)">&mdash;</span>
+          &nbsp;&middot;&nbsp; Federal marginal <span id="txMarg">&mdash;</span></div>
+        <button class="save-btn" id="txApply" style="width:100%;justify-content:center;margin-top:14px">Apply Combined Effective Rate</button>
+      </div>
+      <p style="font-size:11px;color:var(--muted);margin-top:12px">2026 federal brackets &amp; standard deduction (IRS Rev. Proc. 2025-32). State figure applies the state&rsquo;s approximate top marginal rate to taxable income &mdash; a rough estimate; adjust the final rate as needed. Excludes FICA, capital-gains rates, local tax, and the temporary OBBBA senior deduction. Not tax advice.</p>
+    </div>
+    <div class="modal-foot"><span></span><button class="save-btn" id="txCalc">Calculate</button></div>`;
+  $('mx').onclick=closeModal;
+  function stdDed(){
+    const st=$('txStatus').value; let d=STD_DED_2026[st];
+    const perBox=(st==='single'||st==='hoh')?ADD_SD_2026.single:ADD_SD_2026.married;
+    let boxes=0; if($('c65').checked)boxes++; if($('cbl').checked)boxes++;
+    if(st==='mfj'){ if($('s65').checked)boxes++; if($('sbl').checked)boxes++; }
+    return d + boxes*perBox;
+  }
+  function recalc(){
+    const st=$('txStatus').value, gross=num($('txGross').value), sd=stdDed();
+    const taxable=Math.max(0,gross-sd), fed=federalTax(taxable,st);
+    const stAbbr=$('txState').value, stRate=(STATE_RATE[stAbbr]||0)/100, stateTax=taxable*stRate;
+    const total=fed+stateTax, eff=gross>0?total/gross:0, marg=marginalRate(taxable,st);
+    $('txStd').value=money(sd); $('txTaxable').value=money(taxable);
+    $('txTax').textContent=money(fed); $('txStTax').textContent=money(stateTax); $('txTotal').textContent=money(total);
+    $('txEff').textContent=(eff*100).toFixed(1)+'%'; $('txMarg').textContent=(marg*100).toFixed(0)+'%';
+    $('txResult').classList.add('on');
+    $('txApply').onclick=()=>{ selectedState=stAbbr; $('tax').value=(eff*100).toFixed(1)+'%'; refreshLifestyle(); closeModal(); };
+  }
+  ['txStatus','c65','cbl','s65','sbl','txState'].forEach(id=>$(id).addEventListener('change',()=>{$('txStd').value=money(stdDed()); if($('txResult').classList.contains('on'))recalc();}));
+  $('txStd').value=money(stdDed());
+  $('txCalc').onclick=recalc;
+  overlay.classList.add('on');
+}
+
+/* pencil dispatch */
+document.querySelectorAll('.pencil').forEach(p=>p.onclick=()=>{
+  const m=p.dataset.modal;
+  if(m==='legacy')openLegacy();
+  else if(m==='inflation')openInflation();
+  else if(m==='tax')openTax();
+  else openList(m);
+});
+
+/* ===================== gather scalar inputs ===================== */
+function baseInputs(){
+  return {
+    curAge:num($('curAge').value), retAge:num($('retAge').value), lifeExp:num($('lifeExp').value),
+    income:sum(data.incomes), saving:sum(data.annualSavings), inflateSave:$('inflateSave').checked,
+    accum:sum(data.accounts),
+    accRate:pct($('accRate').value), distRate:pct($('distRate').value),
+    infl:pct($('infl').value), tax:pct($('tax').value),
+    retLife:num($('retLifestyle').value), cola:$('cola').checked,
+    legacy:data.legacy
+  };
+}
+
+/* ===================== revised overrides + solvers ===================== */
+function applyRev(b){
+  const a={...b};
+  if(rev.accRate!=null) a.accRate=rev.accRate;
+  if(rev.distRate!=null) a.distRate=rev.distRate;
+  if(rev.saving!=null)  a.saving=rev.saving;
+  if(rev.retAge!=null)  a.retAge=rev.retAge;
+  if(rev.retLife!=null) a.retLife=rev.retLife;
+  if(rev.infl!=null)    a.infl=rev.infl;
+  return a;
+}
+function anyRev(){return Object.values(rev).some(v=>v!=null);}
+
+/* balance at a target age (used by solvers) */
+function balanceAtAge(a, targetAge){
+  let bal=a.accum; const ytr=Math.max(0,a.retAge-a.curAge); const needAtRet=a.retLife*Math.pow(1+a.infl,ytr);
+  for(let age=a.curAge; age<=targetAge; age++){
+    const yr=age-a.curAge, working=age<a.retAge;
+    if(working){const c=a.inflateSave?a.saving*Math.pow(1+a.infl,yr):a.saving; bal=bal*(1+a.accRate)+c;}
+    else{const ry=age-a.retAge; const need=a.cola?needAtRet*Math.pow(1+a.infl,ry):needAtRet;
+      const db=dbIncomeAt(age); bal=(bal-Math.max(0,need-db))*(1+a.distRate);}
+    bal+=faAt(age)-feAt(age);
+  }
+  return bal;
+}
+/* Goal for all "Calculate" modes: balance at the last withdrawal age equals the Desired Legacy. */
+function solveROR(base,lastAge,includeDist){
+  let lo=-0.5,hi=0.6;
+  for(let i=0;i<90;i++){const mid=(lo+hi)/2;
+    const a={...base,accRate:mid,distRate:includeDist?mid:base.distRate};
+    (balanceAtAge(a,lastAge)>base.legacy)?hi=mid:lo=mid;}
+  return (lo+hi)/2;
+}
+function solveSave(base,lastAge){
+  let lo=0,hi=1e7;
+  for(let i=0;i<90;i++){const mid=(lo+hi)/2;(balanceAtAge({...base,saving:mid},lastAge)>base.legacy)?hi=mid:lo=mid;}
+  return (lo+hi)/2;
+}
+function solveSpend(base,lastAge){           /* highest sustainable lifestyle (PV) */
+  let lo=0,hi=Math.max(base.income*4,500000);
+  for(let i=0;i<90;i++){const mid=(lo+hi)/2;(balanceAtAge({...base,retLife:mid},lastAge)>base.legacy)?lo=mid:hi=mid;}
+  return (lo+hi)/2;
+}
+function solveWork(base,lastAge){            /* earliest retirement age that meets the goal */
+  for(let age=base.curAge+1;age<=lastAge;age++){ if(balanceAtAge({...base,retAge:age},lastAge)>=base.legacy) return age; }
+  return lastAge;
+}
+
+/* ===================== projection engine ===================== */
+function dbIncomeAt(age){
+  let t=0;
+  data.dbs.forEach(d=>{
+    if(d.excl)return;
+    if(age>=d.startAge && age<=d.endAge){ t += (+d.amount||0)*Math.pow(1+(+d.cola||0)/100, age-d.startAge); }
+  });
+  return t;
+}
+function faAt(age){return data.futureAssets.reduce((t,x)=>t+(x.age===age?(+x.amount||0):0),0);}
+function feAt(age){return data.futureExpenses.reduce((t,x)=>t+(x.age===age?(+x.amount||0):0),0);}
+
+function project(a){
+  const rows=[]; let bal=a.accum, depletedAt=null;
+  const ytr=Math.max(0,a.retAge-a.curAge);
+  const needAtRet=a.retLife*Math.pow(1+a.infl,ytr);
+  for(let age=a.curAge; age<=a.lifeExp; age++){
+    const yr=age-a.curAge, working=age<a.retAge; let lifestyle=0;
+    if(working){
+      const contrib=a.inflateSave?a.saving*Math.pow(1+a.infl,yr):a.saving;
+      bal=bal*(1+a.accRate)+contrib;
+    } else {
+      const ry=age-a.retAge;
+      const need=a.cola?needAtRet*Math.pow(1+a.infl,ry):needAtRet;
+      const db=dbIncomeAt(age);
+      lifestyle=need;
+      const draw=Math.max(0,need-db);
+      bal=(bal-draw)*(1+a.distRate);
+    }
+    bal+=faAt(age)-feAt(age);
+    if(bal<0){if(depletedAt===null)depletedAt=age;bal=0;}
+    rows.push({age,bal,lifestyle,retire:age===a.retAge});
+  }
+  return {rows,depletedAt,endBal:bal,a};
+}
+
+/* ===================== render screen 3 ===================== */
+function lastsText(p){return p.depletedAt===null?{ok:true,txt:'Funds last through age '+p.a.lifeExp}:{ok:false,txt:'Funds run out at age '+p.depletedAt};}
+function moYr(annual){return money(annual/12)+'<span class="per">/m</span><span class="yr">'+money(annual)+'/yr</span>';}
+function render(){
+  const base=baseInputs(), a=applyRev(base), present=project(base), revised=project(a);
+  const ytr=Math.max(0,a.retAge-a.curAge);
+  const futLife=a.retLife*Math.pow(1+a.infl,ytr); /* first-year retirement spend, future $ */
+
+  $('vRor').textContent=(a.accRate*100).toFixed(0)+'% / '+(a.distRate*100).toFixed(0)+'%';
+  $('vSave').innerHTML=moYr(a.saving);
+  $('vWork').textContent='Age '+a.retAge;
+  $('vSpend').innerHTML=moYr(futLife);
+  $('vInfl').textContent=(a.infl*100).toFixed(1)+'%';
+  document.querySelector('.lever[data-k="ror"]').classList.toggle('touched',rev.accRate!=null||rev.distRate!=null);
+  document.querySelector('.lever[data-k="save"]').classList.toggle('touched',rev.saving!=null);
+  document.querySelector('.lever[data-k="work"]').classList.toggle('touched',rev.retAge!=null);
+  document.querySelector('.lever[data-k="spend"]').classList.toggle('touched',rev.retLife!=null);
+  document.querySelector('.lever[data-k="infl"]').classList.toggle('touched',rev.infl!=null);
+
+  const sb=$('statusBanner');
+  if(statusMsg){sb.innerHTML=statusMsg;sb.classList.add('on');} else {sb.classList.remove('on');}
+
+  const pl=lastsText(present), rl=lastsText(revised);
+  $('pRes').textContent=pl.txt;$('pRes').className='res '+(pl.ok?'good':'bad');
+  $('rRes').textContent=rl.txt;$('rRes').className='res '+(rl.ok?'good':'bad');
+  $('pBal').textContent=money(present.endBal); $('rBal').textContent=money(revised.endBal);
+  $('pSub').textContent='Ending balance at age '+base.lifeExp; $('rSub').textContent='Ending balance at age '+base.lifeExp;
+  if(base.legacy>0){
+    $('pSub').textContent+=' · Legacy '+money(base.legacy)+(present.endBal>=base.legacy?' ✓':' ✗');
+    $('rSub').textContent+=' · Legacy '+money(base.legacy)+(revised.endBal>=base.legacy?' ✓':' ✗');
+  }
+
+  const rows=$('rows'); rows.innerHTML='';
+  present.rows.forEach((pr,i)=>{
+    const rr=revised.rows[i]||{bal:0,lifestyle:0};
+    const div=document.createElement('div'); div.className='rrow'+(pr.retire?' retire':'');
+    const pD=(present.depletedAt!==null&&pr.age>=present.depletedAt&&pr.bal===0)?'depleted':'';
+    const rD=(revised.depletedAt!==null&&rr.age>=revised.depletedAt&&rr.bal===0)?'depleted':'';
+    div.innerHTML=`<div class="${pD}">${money(pr.bal)}</div><div class="ls">${pr.lifestyle?money(pr.lifestyle):'&mdash;'}</div>
+      <div class="age">${pr.age}</div><div class="rev-bal ${rD}">${money(rr.bal)}</div><div class="rev-ls">${rr.lifestyle?money(rr.lifestyle):'&mdash;'}</div>`;
+    rows.appendChild(div);
+  });
+
+  $('footnote').innerHTML='Assumptions: accumulation '+(base.accRate*100).toFixed(1)+'%, distribution '+(base.distRate*100).toFixed(1)+
+    '%, inflation '+(base.infl*100).toFixed(1)+'%. Retirement lifestyle '+money(base.retLife)+' in today&rsquo;s dollars, '+
+    (base.cola?'grown with COLA':'held flat')+' from age '+base.retAge+'. Defined benefits begin at each source&rsquo;s start age and grow by its own COLA. '+
+    'For illustration only &mdash; not a guarantee of future results, and not tax or legal advice. Edwards Financial &amp; Associates &middot; Protect &middot; Grow &middot; Legacy.';
+  if(readiness)$('readyEcho').textContent='Client self-rated readiness: '+readiness+' / 10';
+}
+
+/* ===================== lever modals (Specify / Calculate) ===================== */
+function leverModal(title, specTab, calcTab, specHTML, calcHTML, onSpec, onCalc, single){
+  modalEl.innerHTML=`
+    <div class="modal-head"><h3>${title}</h3><button class="x" id="mx">&times;</button></div>
+    <div class="modal-body">
+      ${single?'':`<div class="tabs"><button class="tab on" data-t="spec">${specTab}</button><button class="tab" data-t="calc">${calcTab}</button></div>`}
+      <div class="lpanel on" id="pSpec">${specHTML}</div>
+      ${single?'':`<div class="lpanel" id="pCalc">${calcHTML}</div>`}
+    </div>`;
+  $('mx').onclick=closeModal;
+  if(!single){modalEl.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{
+    modalEl.querySelectorAll('.tab').forEach(x=>x.classList.toggle('on',x===t));
+    $('pSpec').classList.toggle('on',t.dataset.t==='spec'); $('pCalc').classList.toggle('on',t.dataset.t==='calc');});}
+  if($('specCalc'))onSpec&&($('specCalc').onclick=onSpec);
+  if($('calcCalc'))onCalc&&($('calcCalc').onclick=onCalc);
+  overlay.classList.add('on');
+}
+const dollarIn = (id,val,suf)=>`<div class="inrow"><span style="font-weight:700;color:var(--navy)">$</span><input class="bigin" id="${id}" value="${Math.round(val)}"><span style="color:var(--muted)">${suf}</span></div>`;
+const ageIn = (id,val)=>`<div class="inrow"><input class="bigin" id="${id}" value="${val}"></div>`;
+const calcBtn = id=>`<div><button class="calc" id="${id}">Calculate</button></div>`;
+
+/* shared ROR relative-framing message (used by both Specify and Calculate) */
+function rorMsg(reqRate, baseRate){
+  if(baseRate>0){
+    const rel=(reqRate/baseRate-1)*100;
+    if(rel>=0) return `<b>Required ROR is ${rel.toFixed(2)}% higher!</b> Reaching this goal on returns alone needs ${(reqRate*100).toFixed(2)}% instead of ${(baseRate*100).toFixed(0)}%.`;
+    return `<b>Required ROR is ${Math.abs(rel).toFixed(2)}% lower.</b> This goal needs only ${(reqRate*100).toFixed(2)}% instead of ${(baseRate*100).toFixed(0)}%.`;
+  }
+  return `<b>Required ROR: ${(reqRate*100).toFixed(2)}%.</b>`;
+}
+
+function openLever(key){
+  const base=baseInputs(), last=base.lifeExp, inflNow=(rev.infl!=null?rev.infl:base.infl);
+
+  if(key==='ror'){
+    const accNow=(rev.accRate!=null?rev.accRate:base.accRate)*100;
+    const spec=`<p>Select whether the distribution years are included, then enter the revised rate of return.</p>
+      <div class="inrow"><label class="chk"><input type="checkbox" id="rorIncS"> Include Distribution Years</label>
+      <input class="bigin" id="rorRate" value="${accNow.toFixed(1)}"><span style="font-weight:700;color:var(--navy)">%</span></div>${calcBtn('specCalc')}`;
+    const calc=`<p>Select whether the distribution years are included, then enter the last age at which a withdrawal will occur.</p>
+      <div class="inrow"><label class="chk"><input type="checkbox" id="rorIncC"> Include Distribution Years</label>
+      <input class="bigin" id="rorLast" value="${last}"></div>${calcBtn('calcCalc')}`;
+    leverModal('Increase Rate of Return','Specify the rate of return','Calculate the required return',spec,calc,
+      ()=>{const r=num($('rorRate').value)/100, inc=$('rorIncS').checked; rev.accRate=r; rev.distRate=inc?r:null;
+        statusMsg=rorMsg(r, base.accRate); closeModal();render();},
+      ()=>{const la=num($('rorLast').value), inc=$('rorIncC').checked; const req=solveROR(base,la,inc);
+        rev.accRate=req; rev.distRate=inc?req:null;
+        statusMsg=rorMsg(req, base.accRate); closeModal();render();}, false);
+  }
+
+  else if(key==='save'){
+    const saveNow=rev.saving!=null?rev.saving:base.saving;
+    leverModal('Save More','Specify the amount to save','Calculate savings requirement',
+      `<p>Please enter the revised annual savings below.</p>${dollarIn('saveAmt',saveNow,'/yr')}${calcBtn('specCalc')}`,
+      `<p>Please enter the last age at which a withdrawal will occur.</p>${ageIn('saveLast',last)}${calcBtn('calcCalc')}`,
+      ()=>{const v=num($('saveAmt').value); rev.saving=v; statusMsg=`<b>Revised savings: ${money(v)}/yr</b> (${money(v/12)}/mo).`; closeModal();render();},
+      ()=>{const la=num($('saveLast').value); const req=solveSave(base,la); rev.saving=req; const d=req-base.saving;
+        statusMsg=`<b>Required savings: ${money(req)}/yr</b> (${money(req/12)}/mo) to fund the plan through age ${la} &mdash; ${d>=0?money(d)+'/yr more':money(-d)+'/yr less'} than today.`;
+        closeModal();render();}, false);
+  }
+
+  else if(key==='work'){
+    const ageNow=rev.retAge!=null?rev.retAge:base.retAge;
+    leverModal('Work Longer','Specify the retirement age','Calculate the retirement age',
+      `<p>Please enter the revised retirement age below.</p>${ageIn('workAge',ageNow)}${calcBtn('specCalc')}`,
+      `<p>Please enter the last age at which a withdrawal will occur.</p>${ageIn('workLast',last)}${calcBtn('calcCalc')}`,
+      ()=>{rev.retAge=num($('workAge').value); statusMsg=`<b>Revised retirement age: ${rev.retAge}.</b>`; closeModal();render();},
+      ()=>{const la=num($('workLast').value); const req=solveWork(base,la); rev.retAge=req;
+        const diff=req-base.retAge;
+        statusMsg=`<b>Retire by age ${req}</b> to fund the plan through age ${la}${diff>0?` &mdash; ${diff} year${diff===1?'':'s'} longer than planned`:(diff<0?` &mdash; ${-diff} year${diff===-1?'':'s'} sooner than planned`:'')}.`;
+        closeModal();render();}, false);
+  }
+
+  else if(key==='spend'){
+    const pvNow=rev.retLife!=null?rev.retLife:base.retLife;
+    const ytr=Math.max(0,(rev.retAge!=null?rev.retAge:base.retAge)-base.curAge);
+    leverModal('Decrease Lifestyle','Specify the withdrawal','Calculate the withdrawal',
+      `<p>Please enter the present value of the revised retirement lifestyle below.</p>${dollarIn('spendPV',pvNow,'/yr today')}${calcBtn('specCalc')}`,
+      `<p>Please enter the last age at which a withdrawal will occur.</p>${ageIn('spendLast',last)}${calcBtn('calcCalc')}`,
+      ()=>{const pv=num($('spendPV').value); rev.retLife=pv; const fut=pv*Math.pow(1+inflNow,ytr);
+        statusMsg=`<b>Revised lifestyle: ${money(pv)}/yr in today&rsquo;s dollars</b> &mdash; ${money(fut)}/yr (${money(fut/12)}/mo) at retirement.`; closeModal();render();},
+      ()=>{const la=num($('spendLast').value); const req=solveSpend(base,la); rev.retLife=req; const fut=req*Math.pow(1+inflNow,ytr);
+        statusMsg=`<b>Sustainable lifestyle: ${money(req)}/yr in today&rsquo;s dollars</b> &mdash; ${money(fut)}/yr (${money(fut/12)}/mo) at retirement, lasting through age ${la}.`; closeModal();render();}, false);
+  }
+
+  else if(key==='infl'){
+    const inflPct=(rev.infl!=null?rev.infl:base.infl)*100;
+    leverModal('Change Inflation','','',
+      `<p>Please enter the revised inflation rate below.</p>
+       <div class="inrow"><input class="bigin" id="inflRate" value="${inflPct.toFixed(1)}"><span style="font-weight:700;color:var(--navy)">%</span></div>
+       ${calcBtn('specCalc')}<div><span class="histlink" id="inflHist">Historic Inflation &nearr;</span></div>`,
+      '', ()=>{rev.infl=num($('inflRate').value)/100; statusMsg=`<b>Revised inflation: ${(rev.infl*100).toFixed(1)}%.</b>`; closeModal();render();},
+      null, true);
+    $('inflHist').onclick=()=>openInflation(avg=>{rev.infl=avg/100; statusMsg=`<b>Revised inflation: ${avg.toFixed(1)}%</b> (historic average applied).`; render();});
+  }
+}
+
+/* ===================== PDF report ===================== */
+function stripHTML(s){return s.replace(/<[^>]+>/g,'').replace(/&mdash;/g,'—').replace(/&amp;/g,'&').replace(/&rsquo;/g,'\u2019').replace(/&ldquo;|&rdquo;/g,'"');}
+function generatePDF(){
+  if(!(window.jspdf && window.jspdf.jsPDF)){ window.print(); return; }  /* fallback */
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({unit:'pt', format:'letter'});
+  const W = doc.internal.pageSize.getWidth(), H = doc.internal.pageSize.getHeight();
+  const navy=[13,31,60], gold=[201,168,76], muted=[107,117,135], ink=[40,40,40];
+  const base=baseInputs(), a=applyRev(base), present=project(base), revised=project(a);
+  const pl=lastsText(present), rl=lastsText(revised);
+
+  /* header band */
+  doc.setFillColor(...navy); doc.rect(0,0,W,80,'F');
+  doc.setTextColor(...gold); doc.setFont('helvetica','bold'); doc.setFontSize(8.5);
+  doc.text('PROTECT  ·  GROW  ·  LEGACY', 40, 30);
+  doc.setTextColor(255,255,255); doc.setFontSize(19);
+  doc.text('Edwards Financial & Associates', 40, 52);
+  doc.setTextColor(...gold); doc.setFontSize(11);
+  doc.text('Retirement Illustration', 40, 69);
+  doc.setTextColor(230,212,154); doc.setFontSize(9); doc.setFont('helvetica','normal');
+  const dt=new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
+  doc.text(dt, W-40, 52, {align:'right'});
+  if(readiness) doc.text('Client readiness: '+readiness+' / 10', W-40, 69, {align:'right'});
+
+  let y=108;
+  doc.setTextColor(...navy); doc.setFont('helvetica','bold'); doc.setFontSize(13);
+  doc.text('Summary', 40, y); y+=18;
+  doc.setFont('helvetica','normal'); doc.setFontSize(10); doc.setTextColor(...ink);
+  doc.text('Present:  '+pl.txt+'.   Ending balance '+money(present.endBal)+'.', 40, y); y+=15;
+  doc.text('Revised:  '+rl.txt+'.   Ending balance '+money(revised.endBal)+'.', 40, y); y+=15;
+  if(base.legacy>0){ doc.text('Legacy goal '+money(base.legacy)+'  —  Present '+(present.endBal>=base.legacy?'met':'not met')+', Revised '+(revised.endBal>=base.legacy?'met':'not met')+'.',40,y); y+=15; }
+  if(statusMsg){ doc.setTextColor(...muted);
+    const lines=doc.splitTextToSize('Scenario applied: '+stripHTML(statusMsg), W-80);
+    doc.text(lines,40,y+3); y+=3+lines.length*13; }
+  y+=10;
+
+  const aRows=[
+    ['Current / Retirement / Life age', base.curAge+'  /  '+base.retAge+'  /  '+base.lifeExp],
+    ['Current income', money(base.income)],
+    ['Annual savings'+(base.inflateSave?' (inflating)':''), money(base.saving)],
+    ['Accumulated savings', money(base.accum)],
+    ['Accumulation / Distribution ROR', (base.accRate*100).toFixed(1)+'%  /  '+(base.distRate*100).toFixed(1)+'%'],
+    ['Inflation / Effective tax', (base.infl*100).toFixed(1)+'%  /  '+(base.tax*100).toFixed(0)+'%'],
+    ['Retirement lifestyle (today\u2019s $)', money(base.retLife)+(base.cola?'  + COLA':'')],
+    ['Defined benefits (annual, today\u2019s $)', money(sum(data.dbs))],
+    ['Desired legacy', money(base.legacy)]
+  ];
+  doc.autoTable({startY:y, head:[['Assumption','Value']], body:aRows, theme:'grid',
+    headStyles:{fillColor:navy,textColor:gold,fontStyle:'bold',fontSize:9},
+    bodyStyles:{fontSize:9,textColor:ink}, alternateRowStyles:{fillColor:[247,244,236]},
+    margin:{left:40,right:40}, columnStyles:{1:{halign:'right'}} });
+  y=doc.lastAutoTable.finalY+20;
+
+  const body=present.rows.map((pr,i)=>{const rr=revised.rows[i]||{bal:0,lifestyle:0};
+    return [pr.age, money(pr.bal), pr.lifestyle?money(pr.lifestyle):'—', money(rr.bal), rr.lifestyle?money(rr.lifestyle):'—'];});
+  doc.autoTable({startY:y,
+    head:[['Age','Present Balance','Present Lifestyle+DB','Revised Balance','Revised Lifestyle+DB']],
+    body, theme:'striped', headStyles:{fillColor:navy,textColor:gold,fontStyle:'bold',fontSize:8},
+    bodyStyles:{fontSize:8,textColor:ink}, alternateRowStyles:{fillColor:[251,249,243]},
+    columnStyles:{0:{halign:'center',cellWidth:34},1:{halign:'right'},2:{halign:'right'},3:{halign:'right'},4:{halign:'right'}},
+    margin:{left:40,right:40},
+    didDrawPage:()=>{ doc.setFontSize(7); doc.setTextColor(...muted);
+      doc.text('For illustration only — not a guarantee of future results, and not tax or legal advice. Edwards Financial & Associates.',40,H-22);
+      doc.text('Page '+doc.internal.getNumberOfPages(), W-40, H-22, {align:'right'}); }
+  });
+  doc.save('Edwards-Retirement-Illustration.pdf');
+}
+
+/* ===================== wiring ===================== */
+$('levers').addEventListener('click',e=>{const card=e.target.closest('.lever'); if(card)openLever(card.dataset.k);});
+function resetRev(){Object.keys(rev).forEach(k=>rev[k]=null);statusMsg='';}
+$('resetLevers').onclick=()=>{resetRev();render();};
+$('toS3').onclick=()=>{resetRev();go(3);render();};
+$('backTo2').onclick=()=>go(2);
+$('resetAssumptions').onclick=resetAssumptions;
+$('dbBtn').onclick=()=>openList('dbs');
+$('printBtn').onclick=generatePDF;
+
+document.querySelectorAll('input[inputmode="numeric"]').forEach(inp=>{
+  if(inp.id==='retLifestyle') inp.addEventListener('blur',()=>{if(inp.value.trim()!=='')inp.value=money(num(inp.value));});
+});
+
+refreshSummaries();
+</script>
+</body>
+</html>
