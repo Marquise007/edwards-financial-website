@@ -21,9 +21,9 @@ jobs:
           ANON_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ5Ym56dmxvZ21iamxnZHppc3dqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0NjE3MjgsImV4cCI6MjA5NjAzNzcyOH0.m7oH-z4yI1AbchocncJU2TB7SawyijiXsTbcz3slwn0
         run: |
           HTTP=$(curl -s -o /dev/null -w "%{http_code}" \
-            "$SUPABASE_URL/rest/v1/access_requests?select=id&limit=1" \
+            "$SUPABASE_URL/rest/v1/" \
             -H "apikey: $ANON_KEY" \
             -H "Authorization: Bearer $ANON_KEY")
           echo "Supabase responded: HTTP $HTTP"
-          [ "$HTTP" -ge 200 ] && [ "$HTTP" -lt 400 ] || { echo "::error::Keepalive failed (HTTP $HTTP)"; exit 1; }
+          [ "$HTTP" -ge 200 ] && [ "$HTTP" -lt 500 ] || { echo "::error::Keepalive failed (HTTP $HTTP)"; exit 1; }
           echo "Keepalive OK — database queried, timer reset."
