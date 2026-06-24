@@ -1008,9 +1008,9 @@
   </div>
   <div class="pp-grid reveal">
     <div class="pp-card"><h4>Advanced Case Design</h4><p>Sophisticated, individually engineered strategies &mdash; never templated.</p></div>
-    <div class="pp-card"><h4>Retirement Income Planning</h4><p>Sequencing, gap analysis, and durable income across a full retirement.</p></div>
-    <div class="pp-card"><h4>California Pension Analysis</h4><p>Full coverage of all seven California public pension systems and their tiers.</p></div>
     <div class="pp-card"><h4>Premium Financing</h4><p>Asset-based liquidity strategies for qualified, higher-net-worth cases.</p></div>
+    <div class="pp-card"><h4>Retirement Income Planning</h4><p>Sequencing, gap analysis, and durable income across a full retirement.</p></div>
+    <div class="pp-card"><h4>Pension Analysis</h4><p>Full coverage across the public pension systems we serve, with detail down to the tier level.</p></div>
     <div class="pp-card"><h4>Executive Benefits</h4><p>Compensation and protection structures for key people and owners.</p></div>
     <div class="pp-card"><h4>Annuity Analysis</h4><p>Independent review and design where guaranteed income fits the plan.</p></div>
     <div class="pp-card"><h4>Tax-Efficient Wealth Transfer</h4><p>Strategies that move more of what is built to the next generation.</p></div>
@@ -1096,7 +1096,7 @@
         <div class="pp-field"><label>Firm / Practice Name</label><input type="text" id="pp-firm" placeholder="Your firm"></div>
         <div class="pp-field"><label>Your Name</label><input type="text" id="pp-name" placeholder="First and last name"></div>
         <div class="pp-field"><label>Email Address</label><input type="email" id="pp-email" placeholder="you@firm.com"></div>
-        <div class="pp-field"><label>Phone</label><input type="tel" id="pp-phone" placeholder="(optional)"></div>
+        <div class="pp-field"><label>Phone</label><input type="tel" id="pp-phone" placeholder="(555) 123-4567"></div>
         <div class="pp-field">
           <label>Profession</label>
           <select id="pp-profession">
@@ -1177,9 +1177,9 @@
 
   async function submitInquiry() {
     const val = id => document.getElementById(id).value.trim();
-    const firm = val('pp-firm'), name = val('pp-name'), email = val('pp-email');
-    if (!firm || !name || !email) {
-      ppMsg('error', 'Please add your firm, your name, and an email so we can reach you.');
+    const firm = val('pp-firm'), name = val('pp-name'), email = val('pp-email'), phone = val('pp-phone');
+    if (!firm || !name || !email || !phone) {
+      ppMsg('error', 'Please add your firm, name, email, and phone so we can reach you.');
       return;
     }
     const btn = document.getElementById('pp-submit');
