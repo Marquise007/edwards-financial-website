@@ -1,0 +1,1672 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>The Private Reserve Strategy™ — Edwards Financial &amp; Associates</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,500&family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   THE PRIVATE RESERVE STRATEGY — client-facing concept module
+   Single-file. Edit the ORDER array (near top of <script>) to
+   change the flow. Each slide shows its position top-right.
+   ============================================================ */
+:root{
+  --navy:#13314e;  --navy-2:#0d2238;  --ink:#1c3e60;
+  --blue:#1f9ad6;  --blue-deep:#2f6ea7;
+  --gold:#c6a24a;  --gold-2:#e3cf8f;
+  --paper:#ffffff; --mist:#eef5fb;   --mist-2:#e3eef9; --line:#d4e3f1;
+  --debt:#d8262c;  --save:#1f3fce;   --grow:#1f9d3a;   --grow-soft:#9bdca0;
+  --text:#22384e;  --muted:#6c8298;
+  --r:16px;
+  --shadow:0 24px 60px rgba(8,24,42,.45);
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{
+  font-family:'Montserrat',system-ui,sans-serif;
+  color:var(--text);
+  background:
+    radial-gradient(1200px 700px at 50% -10%, #1b4368 0%, rgba(27,67,104,0) 60%),
+    linear-gradient(160deg,#0c2036 0%, #122e49 55%, #0c2036 100%);
+  -webkit-font-smoothing:antialiased;
+  display:flex;flex-direction:column;min-height:100vh;
+}
+
+/* ---------- App frame ---------- */
+.app{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:12px 14px 10px;gap:10px;
+  --deckw:min(96vw, 1600px, calc((100vh - 116px) * 16 / 9))}
+.brandbar{width:var(--deckw);max-width:none;display:flex;align-items:center;justify-content:space-between;color:#cfe2f3}
+.brandbar .name{font-family:'Cormorant Garamond',serif;font-size:20px;letter-spacing:.3px;color:#eaf3fb}
+.brandbar .name b{color:var(--gold-2);font-weight:600}
+.brandbar .sub{font-size:11px;letter-spacing:2.4px;text-transform:uppercase;color:#8fb0cd}
+
+/* ---------- The slide (white stage) ---------- */
+.stage-wrap{width:var(--deckw);max-width:none}
+.stage{
+  position:relative;background:var(--paper);border-radius:var(--r);
+  box-shadow:var(--shadow);overflow:hidden;
+  aspect-ratio:16/9;min-height:360px;
+}
+.stage::before{content:"";position:absolute;inset:0 0 auto 0;height:4px;
+  background:linear-gradient(90deg,var(--gold) 0%,var(--gold-2) 50%,var(--gold) 100%);z-index:5}
+.slide{position:absolute;inset:0;padding:42px 52px 56px;display:flex;flex-direction:column;
+  opacity:0;transform:translateY(8px);pointer-events:none}
+.slide.active{opacity:1;transform:none;pointer-events:auto;transition:opacity .5s ease, transform .5s ease}
+
+/* number badge top-right */
+.badge{position:absolute;top:16px;right:16px;z-index:6;display:flex;align-items:baseline;gap:2px;
+  background:var(--navy);color:#fff;border-radius:10px;padding:7px 11px 6px;
+  box-shadow:0 6px 16px rgba(8,24,42,.28)}
+.badge .pos{font-weight:800;font-size:16px;letter-spacing:.5px;color:var(--gold-2)}
+.badge .tot{font-size:10px;color:#9cb9d6;font-weight:600}
+.badge .key{position:absolute;top:100%;right:2px;margin-top:5px;font-size:8.5px;letter-spacing:1.5px;
+  text-transform:uppercase;color:#8aa6c2;font-weight:600;white-space:nowrap}
+
+/* eyebrow + titles */
+.eyebrow{font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);font-weight:700;margin-bottom:6px}
+.title{font-family:'Cormorant Garamond',serif;color:var(--ink);font-weight:600;line-height:1.04;
+  font-size:clamp(26px,3.4vw,42px);margin:0 0 4px}
+.title .tm{font-size:.45em;vertical-align:super;color:var(--blue-deep)}
+.subtitle{font-family:'Cormorant Garamond',serif;color:var(--blue-deep);font-weight:500;
+  font-size:clamp(18px,2.1vw,26px);line-height:1.15;margin:0}
+
+/* generic content column */
+.body{flex:1;display:flex;flex-direction:column;min-height:0}
+.center{justify-content:center}
+
+/* chevron rows / pills */
+.rows{display:flex;flex-direction:column;gap:14px;margin-top:8px}
+.row{display:flex;align-items:center;gap:14px}
+.chev{width:30px;height:24px;flex:none;filter:drop-shadow(2px 3px 2px rgba(19,49,78,.35))}
+.pill{flex:1;background:linear-gradient(180deg,#f4f9fe,#e9f2fb);border:1px solid var(--line);
+  border-radius:9px;padding:13px 18px;color:var(--ink);font-weight:600;
+  font-size:clamp(14px,1.5vw,19px);line-height:1.25}
+.pill.lg{font-size:clamp(15px,1.7vw,22px)}
+
+/* definition card */
+.defcard{background:linear-gradient(180deg,#f3f9fe,#e9f2fb);border:1px solid var(--line);
+  border-radius:14px;padding:26px 30px;color:var(--blue-deep);font-weight:600;
+  font-size:clamp(15px,1.8vw,22px);line-height:1.5}
+.defcard p{margin:0 0 16px}.defcard p:last-child{margin:0}
+.defcard .key{color:var(--ink)}
+.travelers{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:22px}
+.tlead{font-family:'Cormorant Garamond',serif;font-style:italic;color:var(--blue-deep);
+  font-size:clamp(15px,1.7vw,21px);font-weight:500;margin-right:4px}
+.tchip{font-family:'Montserrat';font-weight:700;font-size:clamp(12px,1.3vw,15px);letter-spacing:.3px;
+  border-radius:999px;padding:8px 17px;border:1.5px solid}
+.tchip.sp{color:#b01e22;border-color:#e7b3b4;background:linear-gradient(180deg,#fdeeee,#f9e2e2)}
+.tchip.sv{color:#1c4fb0;border-color:#b9cdef;background:linear-gradient(180deg,#eef3fd,#e2ecf9)}
+.tchip.wc{color:#0c7a2a;border-color:#a9dcb4;background:linear-gradient(180deg,#eefaf0,#e0f4e4)}
+
+/* footnote band */
+.note{margin-top:auto;background:var(--mist);border:1px solid var(--line);border-radius:11px;
+  padding:13px 20px;color:var(--ink);font-size:clamp(12px,1.25vw,15px);font-weight:600;line-height:1.4;text-align:center}
+.note b{color:var(--blue-deep)}
+
+/* chart card */
+.chartcard{flex:1;background:#fff;border:1px solid var(--line);border-radius:14px;
+  box-shadow:inset 0 0 0 6px #f3f8fd;padding:8px;min-height:0;display:flex}
+.chartcard svg{width:100%;height:100%;display:block}
+.zerolab{font:700 16px 'Montserrat';fill:#000}
+.glab{font:700 19px 'Montserrat'}
+
+/* Q&A slide */
+.qa{display:flex;flex-direction:column;gap:18px;margin-top:6px}
+.qa .q{display:flex;gap:14px;align-items:flex-start}
+.qa .qmark{font-family:'Cormorant Garamond',serif;font-weight:700;color:var(--gold);
+  font-size:46px;line-height:.8;flex:none;filter:drop-shadow(1px 2px 1px rgba(0,0,0,.2))}
+.qa .ask{background:linear-gradient(180deg,#f1f8fe,#e6f1fb);border:1px solid var(--line);border-radius:9px;
+  padding:11px 16px;color:var(--blue-deep);font-weight:700;font-size:clamp(14px,1.55vw,20px);line-height:1.25}
+.qa .ans{margin:8px 0 0 58px;background:#fffceb;border:1.5px solid var(--gold);border-radius:9px;
+  padding:12px 16px;color:#2a2a2a;font-weight:600;font-size:clamp(13px,1.4vw,17px);line-height:1.4}
+
+/* tank slide */
+.tankgrid{flex:1;display:grid;grid-template-columns:300px 1fr;gap:30px;align-items:center;min-height:0}
+.tankgrid svg{width:auto;height:clamp(190px,42vh,300px);max-width:100%;display:block;margin:0 auto}
+
+/* calculator slide */
+.calc{flex:1;display:grid;grid-template-columns:270px 1fr;gap:18px;min-height:0}
+.calc .panel{display:flex;flex-direction:column;gap:8px}
+.callout{background:var(--mist);border:1px solid var(--line);border-radius:10px;padding:11px 13px;
+  font-size:12px;font-weight:600;color:var(--ink);line-height:1.35;text-align:justify}
+.inputs{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.inrow{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:7px 11px;border-bottom:1px solid #edf3f9}
+.inrow:last-child{border-bottom:0}
+.inrow label{font-size:12px;font-weight:700;color:var(--blue-deep)}
+.inrow input{width:92px;text-align:right;border:1px solid var(--line);border-radius:6px;padding:5px 8px;
+  font-family:'Montserrat';font-weight:700;font-size:13px;color:var(--ink);background:#fff}
+.inrow input:focus{outline:2px solid var(--blue);border-color:var(--blue)}
+.gp-head{background:var(--navy);color:#fff;text-align:center;font-size:11px;letter-spacing:2px;
+  text-transform:uppercase;font-weight:700;padding:6px}
+.gp{display:flex;justify-content:space-between;padding:8px 12px;font-weight:800;font-size:14px}
+.gp .lbl{color:var(--blue-deep)}
+.gp.full{background:#fbf3df}.gp.del{background:#fbf3df}.gp.diff{background:#fbecec}
+.gp.diff .val{color:var(--debt)}
+.chartbox{border:1px solid var(--line);border-radius:10px;padding:8px 8px 4px;display:flex;flex-direction:column;min-height:0}
+.chartbox svg{width:100%;flex:1;min-height:180px;display:block}
+.legend{display:flex;gap:18px;justify-content:center;align-items:center;font-size:12px;font-weight:700;padding-top:4px}
+.legend i{display:inline-block;width:13px;height:13px;border-radius:3px;margin-right:6px;vertical-align:-2px}
+.sliderwrap{display:flex;align-items:center;gap:10px;padding:2px 6px 4px}
+.sliderwrap input[type=range]{flex:1;accent-color:var(--blue)}
+.sliderwrap .tf{font-size:12px;font-weight:800;color:var(--ink);white-space:nowrap}
+
+/* benefits grid */
+.benefits{flex:1;display:grid;grid-template-columns:1fr 1fr;gap:11px 26px;align-content:center}
+.benefits-wrap{flex:1;display:flex;flex-direction:column;gap:14px;min-height:0}
+.bsel-row{display:flex;justify-content:center;align-items:center;gap:16px;flex-wrap:wrap}
+.bsel{font-family:'Montserrat';font-weight:600;font-size:clamp(14px,1.5vw,17px);color:var(--ink);
+  background:#fff;border:1.5px solid var(--line);border-radius:10px;padding:11px 18px;min-width:300px;max-width:100%;cursor:pointer}
+.bsel:focus{outline:none;border-color:var(--blue)}
+.bscore{font-family:'Montserrat';font-weight:700;font-size:14px;color:var(--muted);white-space:nowrap}
+.bscore b{color:var(--navy)}
+.bscore.win{color:#0c7a2a}.bscore.win b{color:#0c7a2a}
+.brow{display:flex;align-items:center;gap:11px;cursor:pointer;user-select:none}
+.brow .pill{transition:background .2s, transform .15s, box-shadow .2s;font-size:clamp(12px,1.3vw,16px);padding:10px 14px}
+.brow:hover .pill{background:linear-gradient(180deg,#eaf4fd,#dcebf9);box-shadow:0 4px 12px rgba(31,154,214,.18);transform:translateX(2px)}
+.brow.applies .pill{background:linear-gradient(180deg,#d4ecfb,#bfe0f7);border-color:#54a8e0;color:#0d3a5c;font-weight:700;box-shadow:0 3px 10px rgba(31,154,214,.20)}
+.brow.open .pill{background:var(--navy);color:#fff;border-color:var(--navy)}
+.bdesc{grid-column:1/-1;background:#fffceb;border:1.5px solid var(--gold);border-radius:9px;
+  padding:11px 15px;color:#2a2a2a;font-weight:600;font-size:14px;line-height:1.4;display:none}
+.bdesc.show{display:block}
+
+/* ---------- controls ---------- */
+.controls{width:var(--deckw);max-width:none;display:flex;align-items:center;justify-content:space-between;gap:14px}
+.nav{display:flex;align-items:center;gap:10px}
+.btn{font-family:'Montserrat';font-weight:700;font-size:13px;letter-spacing:.4px;border:0;cursor:pointer;
+  border-radius:10px;padding:10px 16px;background:rgba(255,255,255,.08);color:#dfeaf5;
+  border:1px solid rgba(255,255,255,.14);transition:background .18s,transform .12s}
+.btn:hover{background:rgba(255,255,255,.16)}
+.btn:active{transform:translateY(1px)}
+.btn.primary{background:var(--blue);border-color:var(--blue);color:#fff}
+.btn.primary:hover{background:#36a8df}
+.btn:disabled{opacity:.35;cursor:default}
+.dots{display:flex;gap:7px;flex:1;justify-content:center;flex-wrap:wrap}
+.dot{width:9px;height:9px;border-radius:50%;background:rgba(255,255,255,.22);border:0;cursor:pointer;padding:0;transition:all .2s}
+.dot.on{background:var(--gold);transform:scale(1.35)}
+.dot:hover{background:rgba(255,255,255,.5)}
+
+/* overview */
+.overlay{position:fixed;inset:0;background:rgba(8,20,34,.86);backdrop-filter:blur(4px);z-index:50;
+  display:none;flex-direction:column;padding:32px;overflow:auto}
+.overlay.show{display:flex}
+.ovhead{display:flex;align-items:center;justify-content:space-between;color:#eaf3fb;max-width:1100px;margin:0 auto 18px;width:100%}
+.ovhead h2{font-family:'Cormorant Garamond',serif;font-weight:600;font-size:26px;margin:0}
+.ovgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;max-width:1100px;margin:0 auto;width:100%}
+.ovcard{background:#fff;border-radius:12px;padding:14px;position:relative;border:2px solid transparent;transition:border .15s}
+.ovcard.cur{border-color:var(--gold)}
+.ovcard .n{position:absolute;top:8px;right:10px;font-weight:800;color:var(--gold);font-size:18px}
+.ovcard .nm{font-family:'Cormorant Garamond',serif;font-weight:600;color:var(--ink);font-size:18px;line-height:1.1;padding-right:26px;margin-bottom:4px;cursor:pointer}
+.ovcard .meta{font-size:10.5px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);font-weight:700;margin-bottom:10px}
+.ovcard .move{display:flex;gap:6px}
+.ovcard .move button{flex:1;border:1px solid var(--line);background:var(--mist);border-radius:7px;padding:5px;cursor:pointer;font-weight:800;color:var(--blue-deep)}
+.ovcard .move button:hover{background:var(--mist-2)}
+.ordbar{max-width:1100px;margin:18px auto 0;width:100%;display:flex;gap:10px;align-items:center;color:#bcd2e8;font-size:12px}
+.ordbar code{background:rgba(255,255,255,.08);padding:6px 10px;border-radius:8px;flex:1;overflow:auto;white-space:nowrap;color:#dfeaf5;font-size:11px}
+
+/* ---------- lottery game ---------- */
+.lotto{flex:1;display:flex;flex-direction:column;gap:12px;min-height:0}
+.opts{display:flex;align-items:stretch;gap:14px}
+.opt{flex:1;border-radius:12px;padding:11px 16px;border:1.5px solid var(--line);background:var(--mist)}
+.opt .ot{font-size:10.5px;letter-spacing:2px;text-transform:uppercase;font-weight:700;color:var(--muted)}
+.opt .ov{font-family:'Cormorant Garamond',serif;font-weight:700;font-size:clamp(19px,2.3vw,29px);line-height:1.05}
+.opt .od{font-size:11.5px;font-weight:600;color:var(--muted);margin-top:2px}
+.opt.gold{border-color:var(--gold);background:linear-gradient(180deg,#fdf8ea,#f7eece)}
+.opt.gold .ov{color:#9a7d24}
+.opt.green{border-color:var(--grow);background:linear-gradient(180deg,#eefaf0,#dff3e2)}
+.opt.green .ov{color:var(--grow)}
+.vs{align-self:center;font-family:'Cormorant Garamond',serif;font-style:italic;color:var(--muted);font-size:19px}
+.lstage{flex:1;display:grid;grid-template-columns:1fr 116px;gap:18px;min-height:0;align-items:stretch}
+.lread{display:flex;flex-direction:column;justify-content:center}
+.lday{font-size:12.5px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted)}
+.lof{color:#aebccb}
+.lval{font-family:'Montserrat';font-weight:800;color:var(--ink);font-size:clamp(32px,6vw,66px);line-height:1;letter-spacing:-1px;transform-origin:left center}
+.lval.bump{animation:lbump .28s ease}
+@keyframes lbump{0%{transform:scale(1)}40%{transform:scale(1.07);color:var(--grow)}100%{transform:scale(1)}}
+.lflag{font-weight:800;font-size:14px;opacity:0;transform:translateY(4px);transition:.3s;color:var(--grow);height:18px}
+.lflag.show{opacity:1;transform:none}
+.lbar{position:relative;background:linear-gradient(180deg,#f1f6fb,#e6eff8);border:1px solid var(--line);
+  border-radius:12px;overflow:hidden;min-height:150px}
+.lfill{position:absolute;left:0;right:0;bottom:0;height:0%;
+  background:linear-gradient(180deg,#37e85e,#0c9a30);transition:height .42s cubic-bezier(.4,.1,.2,1)}
+.lfill.hot{background:linear-gradient(180deg,#ffd34d,#0c9a30);box-shadow:0 0 26px rgba(255,200,60,.75)}
+.lmark{position:absolute;left:0;right:0;border-top:2px dashed var(--gold);z-index:2}
+.lmark span{position:absolute;right:5px;top:-15px;font-size:9.5px;font-weight:800;color:#9a7d24;background:#fff;padding:0 4px;border-radius:4px}
+.lctrl{display:flex;gap:10px;flex-wrap:wrap}
+.lbtn{font-family:'Montserrat';font-weight:700;font-size:13px;border:0;cursor:pointer;border-radius:9px;padding:10px 16px;color:#fff;transition:.15s}
+.lbtn:active{transform:translateY(1px)}
+.lbtn:hover{filter:brightness(1.06)}
+.lbtn.run{background:var(--grow)}
+.lbtn.run.active{box-shadow:0 0 0 3px rgba(31,157,58,.3)}
+.lbtn.stop{background:#7c8a99}
+.lbtn.step{background:var(--blue)}
+.lbtn.reset{background:#e6eef6;color:var(--ink)}
+
+/* ---------- einstein quote ---------- */
+.quote{max-width:840px;margin:0 auto;text-align:center;position:relative}
+.quote .qmk{font-family:'Cormorant Garamond',serif;font-size:84px;line-height:.35;color:var(--gold);opacity:.5}
+.quote blockquote{font-family:'Cormorant Garamond',serif;font-style:italic;font-weight:500;
+  font-size:clamp(22px,3.1vw,40px);line-height:1.28;color:var(--ink);margin:8px 0 16px}
+.quote .earn{color:var(--grow);font-style:normal;font-weight:600}
+.quote .pay{color:var(--debt);font-style:normal;font-weight:600}
+.quote .qby{font-size:12.5px;letter-spacing:2.4px;text-transform:uppercase;font-weight:700;color:var(--muted)}
+.quote .rev{margin-top:22px;background:var(--blue);display:inline-block}
+.qreveal{display:none;margin:16px auto 0;max-width:660px;background:#fffceb;border:1.5px solid var(--gold);
+  border-radius:10px;padding:13px 18px;font-size:15px;font-weight:600;color:#2a2a2a;line-height:1.45}
+.qreveal.show{display:block;animation:qfade .4s ease}
+@keyframes qfade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+/* ---------- two-calculator race ---------- */
+.race{flex:1;display:grid;grid-template-columns:1fr 1fr;gap:24px;min-height:0;align-items:stretch}
+.racer{display:flex;flex-direction:column;align-items:center;gap:9px;border-radius:14px;
+  border:1.6px solid var(--line);padding:14px 12px;background:var(--mist);transition:box-shadow .2s, transform .2s}
+.racer.green{border-color:var(--grow);background:linear-gradient(180deg,#eefaf0,#e1f4e4)}
+.racer.red{border-color:var(--debt);background:linear-gradient(180deg,#fdeeee,#f8e1e1)}
+.racer .rt{font-size:12px;letter-spacing:1.6px;text-transform:uppercase;font-weight:700;text-align:center}
+.racer.green .rt{color:#0c7a2a}.racer.red .rt{color:#b01e22}
+.racer .rv{font-family:'Montserrat';font-weight:800;font-size:clamp(20px,3vw,38px);line-height:1;
+  color:var(--ink);letter-spacing:-1px;transform-origin:center}
+.racer .rv.bump{animation:lbump .28s ease}
+.rbar{position:relative;width:62px;flex:1;min-height:120px;background:#fff;border:1px solid var(--line);
+  border-radius:10px;overflow:hidden}
+.rfill{position:absolute;left:0;right:0;bottom:0;height:0%;transition:height .5s cubic-bezier(.4,.1,.2,1)}
+.rfill.a{background:linear-gradient(180deg,#37e85e,#0c9a30)}
+.rfill.b{background:linear-gradient(180deg,#f3756f,#c01f24)}
+.racer.drained{animation:drainflash .6s ease}
+@keyframes drainflash{0%,100%{box-shadow:none;transform:none}
+  30%{box-shadow:0 0 0 4px rgba(216,38,44,.45);transform:translateY(-3px)}}
+.raceday{text-align:center;font-size:13px;font-weight:700;letter-spacing:1px;text-transform:uppercase;
+  color:var(--muted);margin-top:8px}
+
+/* ---------- heart slides: liquidity / arbitrage / buy-borrow-die ---------- */
+.goldtext{color:var(--gold)}
+.note.heart{background:linear-gradient(180deg,#fbf7ea,#f6eed6);border-color:var(--gold);text-align:center}
+.note.musk{background:linear-gradient(180deg,#fbf7ea,#f6eed6);border-color:var(--gold);text-align:left}
+
+.fork{display:flex;flex-direction:column;align-items:center;gap:10px;width:100%}
+.forknode{text-align:center;background:linear-gradient(180deg,#fbf6e6,#f4ead0);border:1.5px solid var(--gold);
+  border-radius:12px;padding:9px 24px}
+.forknode .fn-amt{font-family:'Cormorant Garamond',serif;font-weight:700;font-size:clamp(24px,2.6vw,32px);color:#9a7d24}
+.forknode .fn-lbl{font-weight:600;color:#9a7d24;font-size:13px;margin-left:8px}
+.forknode .fn-need{font-size:13px;font-weight:600;color:var(--ink);margin-top:1px}
+.forkrow{display:grid;grid-template-columns:1fr 1fr;gap:18px;width:100%;max-width:780px}
+.ppath{border-radius:12px;padding:13px 16px;text-align:center;border:1.6px solid var(--line);background:#f7fafd}
+.ppath.dim{opacity:.8}
+.ppath.glow{border-color:var(--grow);background:linear-gradient(180deg,#eefaf0,#e0f4e4);box-shadow:0 10px 26px rgba(31,157,58,.18)}
+.ppath .pph{font-size:11.5px;letter-spacing:1.6px;text-transform:uppercase;font-weight:700;color:var(--muted)}
+.ppath .ppbig{font-family:'Cormorant Garamond',serif;font-weight:700;font-size:clamp(22px,2.4vw,28px);color:var(--ink);margin:3px 0;line-height:1}
+.ppath.glow .ppbig{color:#0c7a2a}
+.ppath .ppbig .plus{display:block;font-size:15px;color:var(--gold);font-weight:600;margin-top:2px}
+.ppath .ppsub{font-size:12px;color:var(--muted);font-weight:600}
+.ppath .pptag{margin-top:8px;font-weight:700;font-size:13px}
+.pptag.red{color:var(--debt)}.pptag.green{color:var(--grow)}
+
+.arb{flex:1;display:grid;grid-template-columns:.85fr 1.15fr;gap:28px;min-height:0;align-items:center}
+.arb-left{display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center}
+.arb-left .vault{width:118px;height:118px;flex:none}
+.arb-say{font-size:14px;font-weight:600;color:var(--ink);line-height:1.42}
+.arb-say .gold{color:#9a7d24}.arb-say .blue{color:var(--blue-deep)}
+.arb-key{font-size:13px;font-weight:600;color:var(--blue-deep);background:var(--mist);border:1px solid var(--line);border-radius:9px;padding:10px 13px;line-height:1.4}
+.arb-right{display:flex;flex-direction:column;gap:11px}
+.arb-row{display:grid;grid-template-columns:108px 1fr 52px;gap:12px;align-items:center}
+.arb-row label{font-size:13px;font-weight:700;color:var(--ink)}
+.arb-row input[type=range]{accent-color:var(--blue)}
+.aval{font-weight:800;font-size:15px;text-align:right}
+.aval.gold{color:#9a7d24}.aval.blue{color:var(--blue-deep)}
+.arb-track{display:flex;flex-direction:column;gap:8px;margin-top:2px}
+.abar{position:relative;height:26px;background:#f1f6fb;border:1px solid var(--line);border-radius:7px;overflow:hidden}
+.abar span{position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:11px;font-weight:700;color:#5a7089;z-index:2}
+.afill{position:absolute;left:0;top:0;bottom:0;width:0;border-radius:6px 0 0 6px;transition:width .25s ease}
+.afill.gold{background:linear-gradient(90deg,#eed79a,#c6a24a)}
+.afill.blue{background:linear-gradient(90deg,#4aa9e0,#2f6ea7)}
+.spreadbox{display:flex;align-items:baseline;gap:10px;justify-content:center;
+  background:linear-gradient(180deg,#eefaf0,#dff3e2);border:1.6px solid var(--grow);border-radius:11px;padding:7px 14px}
+.spreadbox.neg{background:linear-gradient(180deg,#fdeeee,#f8e1e1);border-color:var(--debt)}
+.spreadbox .sp-num{font-family:'Montserrat';font-weight:800;font-size:clamp(24px,3vw,32px);color:#0c7a2a;letter-spacing:-1px}
+.spreadbox.neg .sp-num{color:var(--debt)}
+.spreadbox .sp-lbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted)}
+.sp-note{font-size:13px;font-weight:600;color:var(--ink);text-align:center;line-height:1.35}
+
+.bb{flex:1;display:grid;grid-template-columns:1.05fr .95fr;gap:24px;min-height:0;align-items:start}
+.bb-table{border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.bbh{display:grid;grid-template-columns:1fr 1.5fr;background:var(--navy);color:#fff;font-size:11px;
+  letter-spacing:1.4px;text-transform:uppercase;font-weight:700;padding:9px 14px}
+.bbr{display:grid;grid-template-columns:1fr 1.5fr;padding:11px 14px;border-top:1px solid #edf3f9;
+  font-weight:600;align-items:center;font-size:14px}
+.bbr span:first-child{color:var(--muted)}
+.bbr span:last-child{font-weight:700;color:var(--ink)}
+.bbr.gold{background:linear-gradient(180deg,#fbf6e6,#f4ead0)}
+.bbr.gold span{color:#9a7d24}
+.bb-bbd{display:flex;flex-direction:column;gap:8px}
+.bbd-title{font-family:'Cormorant Garamond',serif;font-weight:700;font-size:clamp(22px,2.4vw,28px);color:var(--ink);letter-spacing:.5px}
+.bbd-step{background:var(--mist);border-left:3px solid var(--gold);border-radius:8px;padding:9px 13px;font-size:14px;font-weight:600;color:var(--ink)}
+.bbd-step b{color:var(--blue-deep)}
+.bbd-foot{margin-top:2px;font-weight:700;color:var(--blue-deep);font-size:14px}
+
+/* ---------- debt treadmill calculator ---------- */
+.dc{flex:1;display:flex;flex-direction:column;gap:10px;min-height:0}
+.dc-row1{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.dc-card{border-radius:11px;padding:9px 14px;border:1.5px solid var(--line)}
+.dc-card.green{border-color:var(--grow);background:linear-gradient(180deg,#eefaf0,#e2f4e5)}
+.dc-card.red{border-color:var(--debt);background:linear-gradient(180deg,#fdeeee,#f8e2e2)}
+.dc-lbl{font-size:11px;letter-spacing:1.4px;text-transform:uppercase;font-weight:700;color:var(--muted)}
+.dc-card.green .dc-lbl{color:#0c7a2a}.dc-card.red .dc-lbl{color:#b01e22}
+.dc-val{font-family:'Montserrat';font-weight:800;font-size:clamp(20px,2.4vw,28px);color:var(--ink);letter-spacing:-.5px;line-height:1.05}
+.dc-rate{font-size:12px;font-weight:600;color:var(--muted);margin-top:1px}
+.dc-rate input{width:48px;text-align:right;border:1px solid var(--line);border-radius:5px;padding:2px 5px;font-family:'Montserrat';font-weight:700;font-size:12px;color:var(--ink)}
+.dc-rate input.amt{width:64px}
+.dc-name{font-family:'Montserrat';font-weight:700;font-size:11px;letter-spacing:1px;text-transform:uppercase;
+  color:#0c7a2a;background:#fff;border:1px solid var(--grow);border-radius:6px;padding:3px 7px;cursor:pointer;max-width:100%}
+.dc-nameother{font-family:'Montserrat';font-weight:700;font-size:12px;color:#0c7a2a;border:1px solid var(--grow);
+  border-radius:6px;padding:3px 7px;margin-top:3px;width:170px;max-width:100%}
+.dc-nwstart{font-size:12px;font-weight:600;color:#9cb9d6;margin-top:4px}
+.dc-nwstart input{width:78px;text-align:right;border:1px solid #d4e3f1;border-radius:5px;padding:3px 6px;
+  font-family:'Montserrat';font-weight:700;font-size:12px;color:var(--ink);background:#fff}
+.dc-sub{font-size:12px;font-weight:600;color:var(--muted);margin-top:2px}
+.dc-card.green .dc-sub b{color:#0c7a2a}
+.dc-card.red .dc-sub b{color:#b01e22}
+.dc-score{font-size:13px;font-weight:800;color:#dbe8f5;margin-top:7px;padding-top:7px;border-top:1px solid rgba(255,255,255,.16);letter-spacing:.2px}
+.dc-score b.g{color:#5fe07f}.dc-score b.r{color:#ff8a8a}
+.dc-oppline{font-size:12px;font-weight:700;color:#caa6f5;margin-top:4px;line-height:1.3}
+.dc-oppline b{color:#e7d4ff}
+.dc-toggle.opp.on{background:#7c4dbc;border-color:#7c4dbc;color:#fff}
+.dc-table td.op{color:#6a3fb0;font-weight:800;background:#f7f2fd}
+.dc-table tbody tr:nth-child(even) td.op{background:#f1e9fb}
+.dc-table tbody tr.cur td.op{background:#efe3fb}
+.dc-math{font-size:11.5px;font-weight:600;color:#5a7089;padding:5px 4px 1px;line-height:1.3;text-align:center}
+.dc-math b.g{color:#0c7a2a}.dc-math b.r{color:#b01e22}
+.dc-runrow{display:flex;gap:7px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
+.dc-pay{font-family:'Montserrat';font-weight:700;font-size:12px;border:1.5px solid var(--line);border-radius:8px;
+  padding:7px 9px;background:#fff;color:var(--ink);cursor:pointer}
+.dc-paypct{font-size:12px;font-weight:600;color:var(--muted)}
+.dc-paypct input{width:46px;text-align:right;border:1px solid var(--line);border-radius:5px;padding:5px 6px;
+  font-family:'Montserrat';font-weight:700;font-size:12px;color:var(--ink)}
+.lbtn.doc{background:var(--gold);color:#3a2c08;border-color:var(--gold)}
+.lbtn.doc:hover{filter:brightness(1.06)}
+/* documentation spreadsheet */
+.dc-doc-cap{max-width:1040px;margin:0 auto 12px;color:#cfe0f0;font-size:13px;font-weight:600;line-height:1.45;text-align:center}
+.dc-doc-cap b{color:#fff}
+.dc-doc-wrap{max-width:1040px;width:100%;margin:0 auto;max-height:70vh;overflow:auto;background:#fff;border-radius:12px;box-shadow:0 18px 50px rgba(0,0,0,.4)}
+.dc-table{width:100%;border-collapse:collapse;font-family:'Montserrat';font-size:12.5px}
+.dc-table th{position:sticky;top:0;background:var(--navy);color:#fff;font-weight:700;font-size:10.5px;letter-spacing:.4px;
+  line-height:1.2;padding:9px 11px;text-align:right;white-space:nowrap;z-index:1}
+.dc-table th:first-child{text-align:center}
+.dc-table td{padding:7px 11px;text-align:right;border-top:1px solid #eef3f8;color:var(--ink);font-weight:600;white-space:nowrap}
+.dc-table td:first-child{text-align:center;color:var(--muted);font-weight:700}
+.dc-table td.g{color:#0c7a2a}.dc-table td.r{color:#b01e22}
+.dc-table td.nw{font-weight:800;color:var(--navy);background:#f4f8fc}
+.dc-table tbody tr:nth-child(even) td{background:#fafcfe}
+.dc-table tbody tr:nth-child(even) td.nw{background:#eef4fb}
+.dc-table tbody tr.cur td{background:#fff6db}
+.dc-table tbody tr.cur td.nw{background:#f6ecc8}
+.dc-table tbody tr.cur td:first-child{color:var(--gold-2,#a9842e);font-weight:800}
+.dc-table tfoot td{position:sticky;bottom:0;border-top:2px solid var(--navy);background:#eaf2fb;font-weight:800;padding:9px 11px}
+.dc-row2{flex:1;display:grid;grid-template-columns:236px 1fr;gap:12px;min-height:0}
+.dc-poolbox{display:flex;flex-direction:column;justify-content:center;background:var(--navy);border-radius:11px;padding:12px 15px;color:#fff}
+.dc-pl{font-size:11px;letter-spacing:1.1px;text-transform:uppercase;font-weight:700;color:#9cb9d6}
+.dc-pl b{color:var(--gold-2)}
+.dc-poolnum{font-family:'Montserrat';font-weight:800;font-size:clamp(24px,3vw,34px);letter-spacing:-.5px;line-height:1.12;margin-top:2px}
+.dc-poolnum.flat{color:#e3cf8f}.dc-poolnum.pos{color:#5fe07f}.dc-poolnum.neg{color:#ff6b6b}
+.dc-realwrap{font-size:12px;font-weight:600;color:#9cb9d6;margin-top:3px}
+.dc-realnum{font-weight:800}.dc-realnum.neg{color:#ff6b6b}.dc-realnum.pos{color:#5fe07f}
+.dc-hint{font-size:11.5px;color:#cfe0f0;font-weight:600;margin-top:8px;line-height:1.32}
+.dc-graphwrap{display:flex;flex-direction:column;min-height:0;border:1px solid var(--line);border-radius:11px;background:#fff;padding:6px 8px}
+.dc-legend{display:flex;gap:14px;flex-wrap:wrap;font-size:11px;font-weight:700;color:#5a7089;padding:1px 2px 4px}
+.dc-legend i{display:inline-block;width:15px;height:3px;border-radius:2px;margin-right:5px;vertical-align:middle}
+.dc-legend i.green{background:#1f9d3a}.dc-legend i.red{background:#d8262c}.dc-legend i.dark{background:#222}.dc-legend i.gold{background:#c6a24a}
+.dc-graphwrap svg{width:100%;flex:1;min-height:148px;display:block}
+.dc-ctrls{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.dc-toggles{display:flex;align-items:center;gap:9px}
+.dc-toggle{font-family:'Montserrat';font-weight:700;font-size:12px;border:1.5px solid var(--line);background:#fff;color:var(--ink);border-radius:8px;padding:8px 12px;cursor:pointer;transition:.15s}
+.dc-toggle:hover{background:var(--mist)}
+.dc-toggle.on{background:var(--blue);border-color:var(--blue);color:#fff}
+.dc-toggle.life.on{background:var(--debt);border-color:var(--debt);color:#fff}
+.dc-infrate input{width:44px;text-align:right;border:1px solid var(--line);border-radius:5px;padding:5px 6px;font-family:'Montserrat';font-weight:700;font-size:12px;color:var(--ink)}
+.dc-infrate input:disabled{opacity:.4}
+@media (max-width:760px){
+  .dc-row2{grid-template-columns:1fr}
+  .dc-graphwrap svg{min-height:130px}
+  .dc-ctrls{justify-content:center}
+}
+
+@media (max-width:760px){
+  .forkrow{grid-template-columns:1fr}
+  .arb{grid-template-columns:1fr;gap:14px}
+  .arb-left .vault{width:84px;height:84px}
+  .bb{grid-template-columns:1fr;gap:14px}
+}
+
+@media (max-width:760px){
+  .race{gap:12px}.rbar{width:48px}
+  .lbar{height:120px;min-height:120px}
+  .opts{flex-direction:column}.vs{display:none}
+  .slide{padding:34px 24px 48px}
+  .tankgrid{grid-template-columns:1fr;gap:14px}
+  .tankgrid svg{height:170px}
+  .calc{grid-template-columns:1fr;gap:12px}
+  .benefits{grid-template-columns:1fr}
+  .qa .ans{margin-left:0}
+}
+@media (prefers-reduced-motion:reduce){
+  .slide,.slide.active{transition:none}
+}
+
+/* ============================================================
+   PHONE LAYOUT (≤760px) — desktop is untouched above.
+   The 16:9 strip is too short to read on a phone, so the stage
+   becomes a tall card filling the screen and each slide scrolls.
+   ============================================================ */
+@media (max-width:760px){
+  .app{padding:8px 7px 10px;gap:7px;--deckw:94vw}
+  .brandbar .sub{display:none}
+  .brandbar .name{font-size:16px}
+  .stage{aspect-ratio:auto;height:calc(100vh - 104px);height:calc(100dvh - 104px);min-height:380px}
+  .slide{padding:30px 15px 20px;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch}
+  .badge{top:9px;right:9px;padding:5px 8px 4px}
+  .badge .key{font-size:7.5px}
+  .controls{gap:8px}
+
+  /* slide 1 — definition + travelers */
+  .defcard{padding:19px 17px}
+  .travelers{margin-top:16px;gap:8px}
+  .tlead{flex-basis:100%;text-align:center;margin-right:0;font-size:16px}
+
+  /* slide 6 — the treadmill calculator (stack everything, full-width & legible) */
+  .dc{gap:9px}
+  .dc-row1{grid-template-columns:1fr;gap:8px}
+  .dc-card{padding:9px 12px}
+  .dc-graphwrap svg{min-height:170px}
+  .dc-toggles{justify-content:center;gap:7px}
+  .dc-runrow{justify-content:center;width:100%}
+  .dc-pay{padding:6px 9px}
+
+  /* documentation modal */
+  .overlay{padding:16px 9px}
+  .ovhead h2,.ovhead #dc-doc-title{font-size:19px}
+  .dc-doc-cap{font-size:12px;margin-bottom:10px}
+  .dc-doc-wrap{max-height:76vh}
+  .dc-table th{padding:7px 8px}
+  .dc-table td{padding:6px 8px;font-size:11.5px}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="brandbar">
+    <div class="name">Edwards Financial &amp; <b>Associates</b></div>
+    <div class="sub">A Strategy for Control &amp; Certainty</div>
+  </div>
+
+  <div class="stage-wrap">
+    <div class="stage" id="stage"><!-- active slide injected here --></div>
+  </div>
+
+  <div class="controls">
+    <div class="nav">
+      <button class="btn" id="prev">‹ Back</button>
+      <button class="btn primary" id="next">Next ›</button>
+    </div>
+    <div class="dots" id="dots"></div>
+    <div class="nav">
+      <button class="btn" id="grid">▦ Overview</button>
+    </div>
+  </div>
+</div>
+
+<!-- Overview / reorder -->
+<div class="overlay" id="overlay">
+  <div class="ovhead">
+    <h2>Flow &amp; Order</h2>
+    <button class="btn" id="closeov">Close ✕</button>
+  </div>
+  <div class="ovgrid" id="ovgrid"></div>
+  <div class="ordbar">
+    <span>Current ORDER:</span>
+    <code id="ordcode"></code>
+    <button class="btn" id="copyord">Copy</button>
+  </div>
+</div>
+
+<div class="overlay" id="dc-doc">
+  <div class="ovhead" style="max-width:1040px;width:100%">
+    <h2 id="dc-doc-title">Year by Year</h2>
+    <button class="btn" id="dc-doc-close">Close ✕</button>
+  </div>
+  <div class="dc-doc-cap">Each year your money earns interest (green) while your debt charges interest (red). “You paid” is the cash leaving your pocket. <b>Net Worth</b> is what’s really yours after both. The current year is highlighted.</div>
+  <div class="dc-doc-wrap"><table class="dc-table" id="dc-doctable"></table></div>
+</div>
+
+<script>
+"use strict";
+/* ============================================================
+   EDIT THE FLOW HERE.
+   ORDER controls the sequence. Remove / reorder ids freely.
+   The number top-right of each slide reflects its position.
+   ============================================================ */
+const ORDER = [
+  "definition",   // 1  PRS_1
+  "lottery",      // 2  the penny-doubling hook (no context yet)
+  "transfers",    // 3  PRS_2
+  "debtor",       // 4  PRS_3 + PRS_4  (animated)
+  "consumerdebt", // 5  PRS_5
+  "debttreadmill",// 6  NEW — 401k vs debt: running in place (+ inflation, life event)
+  "saver",        // 7  PRS_6 + PRS_7  (animated)
+  "spendersaver", // 8  Spender & Saver together: "what's the same?"
+  "tankrace",     // 9  live race: uninterrupted vs. drained every 5 days
+  "consider",     // 10 PRS_9_5
+  "wealth",       // 11 PRS_10 + PRS_11 (animated)
+  "liquidity",    // 12 growth OR access? have both (asset-based liquidity)
+  "arbitrage",    // 13 the spread is the engine (Gold Vault 2.0)
+  "buyborrow",    // 14 borrow against assets, don't sell (Buy/Borrow/Die)
+  "compare",      // 15 PRS_12
+  "futureeffect", // 16 PRS_13         (live calculator)
+  "benefits"      // 17 PRS_14
+];
+// Parked (still defined below, not in the flow): "einstein", "tankfull", "tankdrain".
+// Re-add any of them to this list to bring them back.
+
+const REDUCE = window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+const CHEV = `<svg class="chev" viewBox="0 0 30 24"><defs>
+  <linearGradient id="cg" x1="0" y1="0" x2="1" y2="1">
+  <stop offset="0" stop-color="#3a6da0"/><stop offset="1" stop-color="#142f4c"/></linearGradient></defs>
+  <path d="M2 2 L20 12 L2 22 L9 12 Z" fill="url(#cg)"/></svg>`;
+
+/* ---------- Chart path generators ---------- */
+function toothPath({x0,xEnd,zeroY,cycles,amp,dir,steps,dropAtStart}){
+  const cw=(xEnd-x0)/cycles; let d=`M ${x0} ${zeroY}`;
+  for(let c=0;c<cycles;c++){
+    const cx=x0+c*cw;
+    if(dropAtStart){
+      d+=` L ${cx} ${zeroY} L ${cx} ${zeroY+dir*amp}`;
+      for(let s=1;s<=steps;s++){
+        const nx=cx+cw*s/steps;
+        const prevY=zeroY+dir*amp - dir*amp*(s-1)/steps;
+        const ny=zeroY+dir*amp - dir*amp*s/steps;
+        d+=` L ${nx.toFixed(1)} ${prevY.toFixed(1)} L ${nx.toFixed(1)} ${ny.toFixed(1)}`;
+      }
+    }else{
+      for(let s=1;s<=steps;s++){
+        const nx=cx+cw*0.88*s/steps;
+        const prevY=zeroY+dir*amp*(s-1)/steps;
+        const ny=zeroY+dir*amp*s/steps;
+        d+=` L ${nx.toFixed(1)} ${prevY.toFixed(1)} L ${nx.toFixed(1)} ${ny.toFixed(1)}`;
+      }
+      d+=` L ${(cx+cw).toFixed(1)} ${(zeroY+dir*amp).toFixed(1)} L ${(cx+cw).toFixed(1)} ${zeroY}`;
+    }
+  }
+  return d;
+}
+function expCurveY(zeroY,maxRise,k){const denom=Math.exp(k)-1;return t=>zeroY-maxRise*(Math.exp(k*t)-1)/denom;}
+function wealthPath({x0,xEnd,zeroY,cycles,maxRise,k,dipAmp,steps}){
+  const cw=(xEnd-x0)/cycles, cy=expCurveY(zeroY,maxRise,k); let d=`M ${x0} ${zeroY}`;
+  for(let c=0;c<cycles;c++){
+    const t0=c/cycles,t1=(c+1)/cycles,yS=cy(t0),yE=cy(t1),cx=x0+c*cw,base=yS+dipAmp;
+    d+=` L ${cx.toFixed(1)} ${yS.toFixed(1)} L ${cx.toFixed(1)} ${base.toFixed(1)}`;
+    for(let s=1;s<=steps;s++){
+      const nx=cx+cw*s/steps;
+      const prevY=base+(yE-base)*(s-1)/steps, ny=base+(yE-base)*s/steps;
+      d+=` L ${nx.toFixed(1)} ${prevY.toFixed(1)} L ${nx.toFixed(1)} ${ny.toFixed(1)}`;
+    }
+  }
+  return d;
+}
+function dottedCurve(x0,xEnd,zeroY,maxRise,k,samples=80){
+  const cy=expCurveY(zeroY,maxRise,k);let d=`M ${x0} ${cy(0).toFixed(1)}`;
+  for(let i=1;i<=samples;i++){const t=i/samples;d+=` L ${(x0+(xEnd-x0)*t).toFixed(1)} ${cy(t).toFixed(1)}`;}
+  return d;
+}
+function curveDots(x0,xEnd,zeroY,maxRise,k,cycles){
+  const cy=expCurveY(zeroY,maxRise,k),pts=[];
+  for(let c=1;c<=cycles;c++){const t=c/cycles;pts.push([x0+(xEnd-x0)*t,cy(t)]);}
+  return pts;
+}
+function dotsOnLine(x0,xEnd,y,cycles){const cw=(xEnd-x0)/cycles,a=[];for(let c=0;c<=cycles;c++)a.push([x0+c*cw,y]);return a;}
+
+/* animate stroke draw-in */
+function drawIn(svg,sel,delay=0,dur=1100){
+  svg.querySelectorAll(sel).forEach((p,i)=>{
+    const len=p.getTotalLength();
+    p.style.strokeDasharray=len; p.style.strokeDashoffset=len;
+    if(REDUCE){p.style.strokeDashoffset=0;return;}
+    p.getBoundingClientRect(); // reflow
+    p.style.transition=`stroke-dashoffset ${dur}ms cubic-bezier(.4,.1,.2,1) ${delay+i*120}ms`;
+    requestAnimationFrame(()=>{p.style.strokeDashoffset=0;});
+  });
+}
+function popDots(svg,sel,delay=0){
+  svg.querySelectorAll(sel).forEach((c,i)=>{
+    if(REDUCE){c.style.opacity=1;return;}
+    c.style.opacity=0;c.style.transform='scale(0)';c.style.transformOrigin='center';
+    c.style.transformBox='fill-box';
+    setTimeout(()=>{c.style.transition='opacity .3s, transform .35s cubic-bezier(.3,1.4,.5,1)';
+      c.style.opacity=1;c.style.transform='scale(1)';},delay+i*110);
+  });
+}
+
+/* ---------- Tank SVG ---------- */
+function tankSVG(id){
+  return `<svg viewBox="0 0 220 320" preserveAspectRatio="xMidYMid meet">
+    <defs>
+      <linearGradient id="metal" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0" stop-color="#9aa7b2"/><stop offset=".12" stop-color="#e9eef2"/>
+        <stop offset=".5" stop-color="#c4ced6"/><stop offset=".88" stop-color="#eef2f5"/>
+        <stop offset="1" stop-color="#8a98a4"/></linearGradient>
+      <linearGradient id="liq" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0" stop-color="#0fae37"/><stop offset=".5" stop-color="#37e85e"/>
+        <stop offset="1" stop-color="#0c9a30"/></linearGradient>
+      <linearGradient id="brass" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#e7c976"/><stop offset=".5" stop-color="#b8932f"/>
+        <stop offset="1" stop-color="#7d621b"/></linearGradient>
+      <clipPath id="tankclip-${id}"><rect x="40" y="46" width="120" height="220" rx="6"/></clipPath>
+    </defs>
+    <!-- body -->
+    <rect x="40" y="46" width="120" height="220" rx="6" fill="url(#metal)" stroke="#7e8b96" stroke-width="1.5"/>
+    <!-- liquid (clipped) -->
+    <g clip-path="url(#tankclip-${id})">
+      <rect class="liquid" x="40" y="46" width="120" height="220" fill="url(#liq)"/>
+    </g>
+    <!-- top rim -->
+    <ellipse cx="100" cy="46" rx="60" ry="11" fill="url(#metal)" stroke="#7e8b96" stroke-width="1.5"/>
+    <ellipse cx="100" cy="46" rx="52" ry="8" fill="#dfe6ec" opacity=".6"/>
+    <!-- bottom rim -->
+    <ellipse cx="100" cy="266" rx="60" ry="11" fill="url(#metal)" stroke="#7e8b96" stroke-width="1.5"/>
+    <!-- right faucet -->
+    <g transform="translate(160,232)">
+      <rect x="0" y="-5" width="14" height="10" rx="2" fill="url(#brass)"/>
+      <rect x="11" y="-7" width="9" height="20" rx="2" fill="url(#brass)"/>
+      <rect x="9" y="11" width="13" height="6" rx="2" fill="url(#brass)"/>
+      <rect x="13" y="-16" width="5" height="11" rx="2" fill="url(#brass)"/>
+    </g>
+    <!-- left faucet (drain) -->
+    <g class="leftfaucet" transform="translate(40,236)" opacity="0">
+      <rect x="-14" y="-5" width="14" height="10" rx="2" fill="url(#brass)"/>
+      <rect x="-20" y="-7" width="9" height="20" rx="2" fill="url(#brass)"/>
+      <rect x="-22" y="11" width="13" height="6" rx="2" fill="url(#brass)"/>
+    </g>
+  </svg>`;
+}
+function setTank(svg,levelPct,animate){
+  const liq=svg.querySelector('.liquid'); if(!liq)return;
+  const full=220, h=full*levelPct/100, y=46+(full-h);
+  if(animate && !REDUCE){liq.style.transition='y 1.4s cubic-bezier(.5,0,.3,1), height 1.4s cubic-bezier(.5,0,.3,1)';}
+  liq.setAttribute('height',h.toFixed(1)); liq.setAttribute('y',y.toFixed(1));
+}
+
+/* ---------- Gold vault icon (arbitrage slide) ---------- */
+function vaultSVG(){
+  const ticks=[0,45,90,135,180,225,270,315].map(a=>{
+    const r=a*Math.PI/180, x1=100+33*Math.cos(r), y1=100+33*Math.sin(r), x2=100+47*Math.cos(r), y2=100+47*Math.sin(r);
+    return `<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="#7d621b" stroke-width="3"/>`;
+  }).join('');
+  return `<svg viewBox="0 0 200 200" class="vault" preserveAspectRatio="xMidYMid meet">
+    <defs><linearGradient id="vaultg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#eed79a"/><stop offset=".5" stop-color="#c6a24a"/><stop offset="1" stop-color="#9a7d24"/></linearGradient></defs>
+    <rect x="26" y="32" width="148" height="136" rx="14" fill="url(#vaultg)" stroke="#7d621b" stroke-width="2.5"/>
+    <rect x="40" y="46" width="120" height="108" rx="9" fill="#ffffff" opacity=".16"/>
+    <circle cx="100" cy="100" r="47" fill="none" stroke="#7d621b" stroke-width="5"/>
+    <circle cx="100" cy="100" r="33" fill="none" stroke="#fff7e0" stroke-width="2" opacity=".7"/>
+    ${ticks}
+    <circle cx="100" cy="100" r="11" fill="#7d621b"/>
+    <line x1="100" y1="100" x2="126" y2="82" stroke="#7d621b" stroke-width="5" stroke-linecap="round"/>
+    <line x1="60" y1="168" x2="60" y2="180" stroke="#7d621b" stroke-width="5" stroke-linecap="round"/>
+    <line x1="140" y1="168" x2="140" y2="180" stroke="#7d621b" stroke-width="5" stroke-linecap="round"/>
+  </svg>`;
+}
+
+/* ============================================================
+   SLIDE DEFINITIONS  (key -> {meta,title,html,onEnter})
+   ============================================================ */
+const SLIDES = {
+
+definition:{meta:"Definition",
+ html:`<div class="eyebrow">The Foundation</div>
+   <h1 class="title">The Private Reserve Strategy<span class="tm">™</span></h1>
+   <div class="body center">
+     <div class="defcard">
+       <p>A strategy designed to <span class="key">accelerate the accumulation of productive capital</span>, by <span class="key">maximizing the utility of every dollar</span>. This type of capital management avoids or minimizes wealth transfers where possible, and accumulates an increasing pool of capital — providing <span class="key">accessibility and control</span>.</p>
+       <p>Most assets force a choice: you can <span class="key">grow your money</span>, or you can <span class="key">use your money</span> — rarely both. The Private Reserve Strategy is built to give you <span class="key">both at once</span>, by employing one of the most powerful tools in the world of finance: <span class="key">Asset-Based Liquidity</span>.</p>
+     </div>
+     <div class="travelers">
+       <span class="tlead">To see why it matters, we'll follow three people across one lifetime:</span>
+       <span class="tchip sp">The Spender</span>
+       <span class="tchip sv">The Saver</span>
+       <span class="tchip wc">The Wealth Creator</span>
+     </div>
+   </div>`},
+
+transfers:{meta:"Wealth Transfers",
+ html:`<div class="eyebrow">Where Wealth Goes</div>
+   <h2 class="subtitle">Some transfers are avoidable. Others you can only minimize.</h2>
+   <div class="body center">
+     <div class="rows">
+       <div class="row">${CHEV}<div class="pill lg">You finance everything you buy.
+         You either <b>earn</b> interest — or you <b>pay</b> interest.</div></div>
+       <div class="row">${CHEV}<div class="pill lg">Every dollar not saved is consumed by
+         transfers and lifestyle.</div></div>
+     </div>
+   </div>`},
+
+debtor:{meta:"The Debtor",
+ html:`<div class="eyebrow">Position One</div>
+   <h2 class="subtitle">The Debtor — perpetually below the line.</h2>
+   <div class="body"><div class="chartcard">
+     <svg id="ch-debtor" viewBox="0 0 1000 540" preserveAspectRatio="xMidYMid meet"></svg>
+   </div></div>`,
+ onEnter(){
+   const svg=document.getElementById('ch-debtor'), Z=135, AMP=235;
+   const d=toothPath({x0:84,xEnd:952,zeroY:Z,cycles:6,amp:AMP,dir:1,steps:4,dropAtStart:true});
+   const dots=dotsOnLine(84,952,Z,6).slice(0,6);
+   svg.innerHTML=`
+     <line x1="60" y1="${Z}" x2="952" y2="${Z}" stroke="#111" stroke-width="6" stroke-linecap="round"/>
+     <text class="zerolab" x="40" y="${Z+6}">0</text>
+     <path d="${d}" fill="none" stroke="#d8262c" stroke-width="5" stroke-linejoin="round"/>
+     <text class="glab" x="100" y="${Z+34}" fill="#d8262c">Debtor</text>
+     ${dots.map(p=>`<circle cx="${p[0]}" cy="${p[1]}" r="8" fill="#111"/>`).join('')}`;
+   drawIn(svg,'path[stroke="#d8262c"]',150,1500);
+ }},
+
+consumerdebt:{meta:"Consumer Debt",
+ html:`<div class="eyebrow">Why It Hurts</div>
+   <h1 class="title" style="font-size:clamp(24px,3vw,38px)">The Problem with Consumer Debt</h1>
+   <div class="body center"><div class="rows">
+     <div class="row">${CHEV}<div class="pill">Obligation on your future earnings</div></div>
+     <div class="row">${CHEV}<div class="pill">Lose capital to the purchase <b>and</b> to financing costs — forever</div></div>
+     <div class="row">${CHEV}<div class="pill">You become a debtor to the creditor</div></div>
+     <div class="row">${CHEV}<div class="pill">Loss of control</div></div>
+   </div>
+   <div class="note">Consumer debt is an inefficient purchasing strategy. The purchase is lost,
+     <b>and</b> the interest owed — a loss that can compound and spiral out of control.</div>
+   </div>`},
+
+debttreadmill:{meta:"The Treadmill",
+ html:`<div class="eyebrow">The Danger of Debt</div>
+   <h1 class="title" style="font-size:clamp(20px,2.5vw,32px);margin-bottom:2px">Running in Place</h1>
+   <div class="body"><div class="dc">
+     <div class="dc-row1">
+       <div class="dc-card green">
+         <select class="dc-name" id="dc-name">
+           <option>401(k)</option><option>403(b)</option><option>457(b)</option>
+           <option>IRA</option><option>Roth IRA</option><option>SEP IRA</option>
+           <option>Pension</option><option>Brokerage</option><option value="__other">Other…</option>
+         </select>
+         <input class="dc-nameother" id="dc-name-other" type="text" placeholder="name it" maxlength="22" style="display:none">
+         <div class="dc-val" id="dc-aval">$50,000</div>
+         <div class="dc-sub">Interest earned: <b id="dc-earned">$0</b></div>
+         <div class="dc-rate">start $<input class="amt" id="dc-a0" type="number" value="50000" min="0" step="1000"> · <input id="dc-ga" type="number" value="7" min="0" max="25" step="0.5">%</div>
+       </div>
+       <div class="dc-card red">
+         <div class="dc-lbl">Your Debt</div>
+         <div class="dc-val" id="dc-dval">$35,000</div>
+         <div class="dc-sub">Total payments on debt: <b id="dc-paid">$0</b></div>
+         <div class="dc-rate">start $<input class="amt" id="dc-d0" type="number" value="35000" min="0" step="1000"> · <input id="dc-gd" type="number" value="7" min="0" max="30" step="0.5">%</div>
+       </div>
+     </div>
+     <div class="dc-row2">
+       <div class="dc-poolbox">
+         <div class="dc-pl">Net Worth · Year <b id="dc-year">0</b></div>
+         <div class="dc-poolnum flat" id="dc-pool">$100,000</div>
+         <div class="dc-nwstart">start $<input id="dc-nw0" type="number" value="100000" min="0" step="1000"></div>
+         <div class="dc-realwrap" id="dc-realwrap" style="display:none">today's dollars <span class="dc-realnum neg" id="dc-poolreal">$0</span></div>
+         <div class="dc-score" id="dc-score">Earned <b class="g">$0</b> − Paid <b class="r">$0</b> = <b class="g">$0</b></div>
+         <div class="dc-oppline" id="dc-oppline" style="display:none"></div>
+         <div class="dc-hint" id="dc-hint">Are you getting ahead — or running in place?</div>
+       </div>
+       <div class="dc-graphwrap">
+         <div class="dc-legend">
+           <span><i class="green"></i><span id="dc-lg-name">401(k)</span></span><span><i class="red"></i>Debt</span>
+           <span><i class="dark"></i>Net Worth</span>
+           <span id="dc-lg-real" style="visibility:hidden"><i class="gold"></i>After inflation</span>
+         </div>
+         <svg id="dc-graph" viewBox="0 0 600 300" preserveAspectRatio="none"></svg>
+         <div class="dc-math" id="dc-math">Starting out — investment $50,000, debt $35,000.</div>
+       </div>
+     </div>
+     <div class="dc-ctrls">
+       <div class="dc-toggles">
+         <button class="dc-toggle" id="dc-inftoggle">Inflation: Off</button>
+         <span class="dc-infrate"><input id="dc-inf" type="number" value="3" min="0" max="15" step="0.5" disabled>%</span>
+         <button class="dc-toggle opp" id="dc-opptoggle">Opportunity cost: Off</button>
+         <span class="dc-infrate"><input id="dc-opp" type="number" value="7" min="0" max="20" step="0.5" disabled>%</span>
+         <select class="dc-pay" id="dc-pay">
+           <option value="off">No payments</option>
+           <option value="full" selected>Pay full interest</option>
+           <option value="partial">Pay partial</option>
+         </select>
+         <span class="dc-paypct" id="dc-paypct" style="display:none"><input id="dc-pp" type="number" value="50" min="0" max="100" step="5">% of interest</span>
+         <button class="dc-toggle life" id="dc-life">Life event</button>
+       </div>
+       <div class="dc-runrow">
+         <button class="lbtn run" id="dc-run">▶ Auto-Run</button>
+         <button class="lbtn step" id="dc-step">+1 Yr</button>
+         <button class="lbtn reset" id="dc-reset">↺</button>
+         <button class="lbtn doc" id="dc-docbtn">📄 Documentation</button>
+       </div>
+     </div>
+   </div></div>`,
+ onEnter(){ initDebtCalc(); }},
+
+saver:{meta:"The Saver",
+ html:`<div class="eyebrow">Position Two</div>
+   <h2 class="subtitle">The Saver — builds up, then drains back to zero.</h2>
+   <div class="body"><div class="chartcard">
+     <svg id="ch-saver" viewBox="0 0 1000 540" preserveAspectRatio="xMidYMid meet"></svg>
+   </div></div>`,
+ onEnter(){
+   const svg=document.getElementById('ch-saver'), Z=425, AMP=200;
+   const d=toothPath({x0:84,xEnd:952,zeroY:Z,cycles:6,amp:AMP,dir:-1,steps:4,dropAtStart:false});
+   const dots=dotsOnLine(84,952,Z,6);
+   svg.innerHTML=`
+     <line x1="60" y1="${Z}" x2="952" y2="${Z}" stroke="#111" stroke-width="6" stroke-linecap="round"/>
+     <text class="zerolab" x="40" y="${Z+6}">0</text>
+     <path d="${d}" fill="none" stroke="#1f3fce" stroke-width="5" stroke-linejoin="round"/>
+     <text class="glab" x="100" y="${Z-AMP-18}" fill="#1f3fce">Saver</text>
+     ${dots.map(p=>`<circle cx="${p[0]}" cy="${p[1]}" r="8" fill="#111"/>`).join('')}`;
+   drawIn(svg,'path[stroke="#1f3fce"]',150,1500);
+ }},
+
+spendersaver:{meta:"Spender & Saver",
+ html:`<div class="eyebrow">Notice Anything?</div>
+   <h2 class="subtitle">What do you notice that's the same about these two?</h2>
+   <div class="body" style="gap:12px">
+     <div class="chartcard" style="flex:1"><svg id="ch-saver7" viewBox="0 0 1000 220" preserveAspectRatio="xMidYMid meet"></svg></div>
+     <div class="chartcard" style="flex:1"><svg id="ch-spend7" viewBox="0 0 1000 220" preserveAspectRatio="xMidYMid meet"></svg></div>
+   </div>`,
+ onEnter(){
+   // TOP: The Saver (blue) — builds up, then drains back to zero
+   const s1=document.getElementById('ch-saver7'), Z1=185, A1=130;
+   const d1=toothPath({x0:84,xEnd:952,zeroY:Z1,cycles:6,amp:A1,dir:-1,steps:4,dropAtStart:false});
+   const k1=dotsOnLine(84,952,Z1,6);
+   s1.innerHTML=`
+     <line x1="60" y1="${Z1}" x2="952" y2="${Z1}" stroke="#111" stroke-width="5" stroke-linecap="round"/>
+     <text class="zerolab" x="40" y="${Z1+6}">0</text>
+     <text class="glab" x="84" y="34" fill="#1f3fce">The Saver</text>
+     <path d="${d1}" fill="none" stroke="#1f3fce" stroke-width="5" stroke-linejoin="round"/>
+     ${k1.map(p=>`<circle cx="${p[0]}" cy="${p[1]}" r="7" fill="#111"/>`).join('')}`;
+   drawIn(s1,'path[stroke="#1f3fce"]',150,1200);
+   // BOTTOM: The Spender (red) — drops below zero, returns to zero
+   const s2=document.getElementById('ch-spend7'), Z2=48, A2=130;
+   const d2=toothPath({x0:84,xEnd:952,zeroY:Z2,cycles:6,amp:A2,dir:1,steps:4,dropAtStart:true});
+   const k2=dotsOnLine(84,952,Z2,6).slice(0,6);
+   s2.innerHTML=`
+     <line x1="60" y1="${Z2}" x2="952" y2="${Z2}" stroke="#111" stroke-width="5" stroke-linecap="round"/>
+     <text class="zerolab" x="40" y="${Z2+6}">0</text>
+     <text class="glab" x="84" y="34" fill="#d8262c">The Spender</text>
+     <path d="${d2}" fill="none" stroke="#d8262c" stroke-width="5" stroke-linejoin="round"/>
+     ${k2.map(p=>`<circle cx="${p[0]}" cy="${p[1]}" r="7" fill="#111"/>`).join('')}`;
+   drawIn(s2,'path[stroke="#d8262c"]',450,1200);
+ }},
+
+tankrace:{meta:"The Race",
+ html:`<div class="eyebrow">The Power of Uninterrupted Compounding</div>
+   <h2 class="subtitle">Two pennies. One is left to compound — one is drained every 5 days.</h2>
+   <div class="body">
+     <div class="race">
+       <div class="racer green" id="racer-a">
+         <div class="rt">Never Interrupted</div>
+         <div class="rv" id="r-a">$0.01</div>
+         <div class="rbar"><div class="rfill a" id="rf-a"></div></div>
+       </div>
+       <div class="racer red" id="racer-b">
+         <div class="rt">Drained Every 5 Days</div>
+         <div class="rv" id="r-b">$0.01</div>
+         <div class="rbar"><div class="rfill b" id="rf-b"></div></div>
+       </div>
+     </div>
+     <div class="raceday">Day <span id="r-day">1</span> <span class="lof">of 31</span></div>
+     <div class="lctrl" style="justify-content:center">
+       <button class="lbtn run" id="r-run">▶ Auto-Run</button>
+       <button class="lbtn step" id="r-step">+1 Day</button>
+       <button class="lbtn reset" id="r-reset">↺ Reset</button>
+     </div>
+   </div>`,
+ onEnter(){ initRace(); }},
+
+tankfull:{meta:"Paying Cash",
+ html:`<div class="eyebrow">Position Three</div>
+   <h1 class="title" style="font-size:clamp(24px,3vw,38px)">The Problem with Paying Cash</h1>
+   <div class="body center"><div class="tankgrid">
+     <div>${tankSVG('full')}</div>
+     <div class="rows">
+       <div class="row">${CHEV}<div class="pill lg">To pay cash, you first have to <b>save</b> the cash.</div></div>
+     </div>
+   </div></div>`,
+ onEnter(){const svg=document.querySelector('#stage svg');setTank(svg,100,false);}},
+
+tankdrain:{meta:"Draining the Tank",
+ html:`<div class="eyebrow">Position Three</div>
+   <h1 class="title" style="font-size:clamp(24px,3vw,38px)">The Problem with Paying Cash</h1>
+   <div class="body center"><div class="tankgrid">
+     <div>${tankSVG('drain')}</div>
+     <div class="rows">
+       <div class="row">${CHEV}<div class="pill">To pay cash, you first have to save the cash.</div></div>
+       <div class="row">${CHEV}<div class="pill">You must <b>drain the tank</b> to make the purchase.</div></div>
+       <div class="row">${CHEV}<div class="pill">Annual tax leakage along the way.</div></div>
+     </div>
+   </div>
+   <div class="note">Paying cash isn't bad — it just isn't the most efficient. You lose the interest you'd
+     have earned had you never drained the tank. It is a <b>defensive</b> strategy.</div>
+   </div>`,
+ onEnter(){
+   const svg=document.querySelector('#stage svg');
+   setTank(svg,100,false);
+   setTimeout(()=>{setTank(svg,8,true);
+     const lf=svg.querySelector('.leftfaucet');
+     if(lf){lf.style.transition='opacity .6s';lf.style.opacity=1;}
+   },REDUCE?0:350);
+ }},
+
+consider:{meta:"Consider This",
+ html:`<div class="eyebrow">A Better Question</div>
+   <h2 class="subtitle" style="text-align:center">Consider this…</h2>
+   <div class="body center"><div class="qa">
+     <div>
+       <div class="q"><span class="qmark">?</span>
+         <div class="ask">What if you could make the purchase without “emptying the tank?”</div></div>
+       <div class="ans">Your private capital reserve keeps compounding — minimizing the lost opportunity cost
+         of money you would otherwise spend and never see again.</div>
+     </div>
+     <div>
+       <div class="q"><span class="qmark">?</span>
+         <div class="ask">If I don't use my capital, whose do I use?</div></div>
+       <div class="ans">You collateralize a loan from a financial institution — securing it by pledging
+         a portion of your Private Reserve, which stays at work the entire time.</div>
+     </div>
+   </div></div>`},
+
+wealth:{meta:"The Wealth Creator",
+ html:`<div class="eyebrow">Position Four</div>
+   <h2 class="subtitle">The Wealth Creator — the curve that keeps compounding.</h2>
+   <div class="body"><div class="chartcard">
+     <svg id="ch-wealth" viewBox="0 0 1000 540" preserveAspectRatio="xMidYMid meet"></svg>
+   </div></div>`,
+ onEnter(){
+   const svg=document.getElementById('ch-wealth'),Z=430,x0=84,xEnd=952,mr=370,k=2.0;
+   const path=wealthPath({x0,xEnd,zeroY:Z,cycles:6,maxRise:mr,k,dipAmp:74,steps:5});
+   const dc=dottedCurve(x0,xEnd,Z,mr,k);
+   const dots=curveDots(x0,xEnd,Z,mr,k,6);
+   svg.innerHTML=`
+     <line x1="60" y1="${Z}" x2="952" y2="${Z}" stroke="#111" stroke-width="5" stroke-linecap="round"/>
+     <text class="zerolab" x="40" y="${Z+6}">0</text>
+     <path class="dc" d="${dc}" fill="none" stroke="#1f9d3a" stroke-width="4"
+        stroke-dasharray="2 9" stroke-linecap="round" opacity=".85"/>
+     <path class="wp" d="${path}" fill="none" stroke="#1f9d3a" stroke-width="5" stroke-linejoin="round"/>
+     <text class="glab" x="100" y="120" fill="#1f9d3a">Wealth Creator</text>
+     ${dots.map(p=>`<circle class="gd" cx="${p[0]}" cy="${p[1]}" r="11" fill="#9bdca0" stroke="#1f9d3a" stroke-width="2"/>`).join('')}`;
+   drawIn(svg,'.wp',150,1700);
+   if(REDUCE){svg.querySelector('.dc').style.strokeDashoffset=0;}
+   popDots(svg,'.gd',1100);
+ }},
+
+liquidity:{meta:"Growth or Access",
+ html:`<div class="eyebrow">The Heart of the Strategy</div>
+   <h1 class="title">Growth or Access? <span class="goldtext">Have Both.</span></h1>
+   <p class="subtitle" style="font-style:italic;margin-bottom:2px">"The goal isn't to borrow money — it's to avoid interrupting the compounding."</p>
+   <div class="body center"><div class="fork">
+     <div class="forknode">
+       <span class="fn-amt">$500,000</span><span class="fn-lbl">compounding for you</span>
+       <div class="fn-need">You need <b>$50,000</b>. How do you get it?</div>
+     </div>
+     <div class="forkrow">
+       <div class="ppath dim">
+         <div class="pph">Withdraw it</div>
+         <div class="ppbig">$450,000</div>
+         <div class="ppsub">left to compound</div>
+         <div class="pptag red">▾ The engine shrinks</div>
+       </div>
+       <div class="ppath glow">
+         <div class="pph">Collateralize it</div>
+         <div class="ppbig">$500,000<span class="plus">+ $50,000 in hand</span></div>
+         <div class="ppsub">still fully compounding</div>
+         <div class="pptag green">▴ The engine never slows</div>
+       </div>
+     </div>
+   </div></div>
+   <div class="note heart">Most assets force a trade between <b>growth</b> and <b>access</b>. This one is built to give you <b>both — at the same time.</b></div>`},
+
+arbitrage:{meta:"The Spread",
+ html:`<div class="eyebrow">Arbitrage</div>
+   <h1 class="title" style="font-size:clamp(24px,3vw,40px)">The Spread Is the Engine</h1>
+   <div class="body"><div class="arb">
+     <div class="arb-left">
+       ${vaultSVG()}
+       <div class="arb-say">Your vault appreciates <b class="gold">8%</b>. A lender lends against it at <b class="blue">5%</b>. As long as it grows faster than it costs to borrow, the difference is yours.</div>
+       <div class="arb-key">The loan isn't the benefit. The benefit is that your asset <b>never stops compounding</b> while you hold the cash.</div>
+     </div>
+     <div class="arb-right">
+       <div class="arb-row"><label>Asset growth</label>
+         <input id="ar-grow" type="range" min="0" max="12" step="0.5" value="8"><span class="aval gold" id="av-grow">8.0%</span></div>
+       <div class="arb-row"><label>Cost to borrow</label>
+         <input id="ar-cost" type="range" min="0" max="12" step="0.5" value="5"><span class="aval blue" id="av-cost">5.0%</span></div>
+       <div class="arb-track">
+         <div class="abar"><span>Growth</span><div class="afill gold" id="af-grow"></div></div>
+         <div class="abar"><span>Cost</span><div class="afill blue" id="af-cost"></div></div>
+       </div>
+       <div class="spreadbox" id="sp-box">
+         <div class="sp-num" id="sp-num">+3.0%</div><div class="sp-lbl">your spread</div>
+       </div>
+       <div class="sp-note" id="sp-note">Your asset grows faster than the loan costs — the difference works in your favor.</div>
+     </div>
+   </div></div>`,
+ onEnter(){ initArb(); }},
+
+buyborrow:{meta:"Wealthy Playbook",
+ html:`<div class="eyebrow">The Same Playbook</div>
+   <h1 class="title" style="font-size:clamp(22px,2.8vw,36px)">Borrow Against Assets — Don't Sell Them</h1>
+   <p class="subtitle" style="font-size:clamp(15px,1.7vw,21px);margin-bottom:4px">This isn't unique to life insurance. It's how wealthy families operate everywhere.</p>
+   <div class="body"><div class="bb">
+     <div class="bb-table">
+       <div class="bbh"><span>Asset</span><span>Borrow against it with</span></div>
+       <div class="bbr"><span>Your home</span><span>HELOC</span></div>
+       <div class="bbr"><span>Stock portfolio</span><span>Securities-Based Line of Credit</span></div>
+       <div class="bbr"><span>A business</span><span>Business loan</span></div>
+       <div class="bbr gold"><span>Life insurance</span><span>Policy loan</span></div>
+     </div>
+     <div class="bb-bbd">
+       <div class="bbd-title">Buy · Borrow · Die</div>
+       <div class="bbd-step"><b>Buy</b> appreciating assets.</div>
+       <div class="bbd-step"><b>Borrow</b> against them for liquidity — instead of selling.</div>
+       <div class="bbd-step"><b>Pass them on</b>, sidestepping the taxes that selling would trigger.</div>
+       <div class="bbd-foot">▸ Life insurance policy loans fit this exact framework.</div>
+     </div>
+   </div></div>
+   <div class="note musk"><b>Case in point —</b> when Elon Musk financed his acquisition of Twitter, he didn't sell his way to cash. The deal leaned on credit backed by his assets, because lenders extend the best terms to those who hold valuable collateral.</div>`},
+
+compare:{meta:"All Three",
+ html:`<div class="eyebrow">Side by Side</div>
+   <h2 class="subtitle">Same dollars. Three very different destinations.</h2>
+   <div class="body"><div class="chartcard">
+     <svg id="ch-cmp" viewBox="0 0 1000 560" preserveAspectRatio="xMidYMid meet"></svg>
+   </div></div>`,
+ onEnter(){
+   const svg=document.getElementById('ch-cmp'),Z=300,x0=84,xEnd=952,mr=240,k=2.0;
+   const debt=toothPath({x0,xEnd,zeroY:Z,cycles:6,amp:200,dir:1,steps:6,dropAtStart:true});
+   const save=toothPath({x0,xEnd,zeroY:Z,cycles:6,amp:150,dir:-1,steps:6,dropAtStart:false});
+   const grow=wealthPath({x0,xEnd,zeroY:Z,cycles:6,maxRise:mr,k,dipAmp:48,steps:5});
+   const dc=dottedCurve(x0,xEnd,Z,mr,k);
+   const dots=curveDots(x0,xEnd,Z,mr,k,6);
+   const lineDots=dotsOnLine(x0,xEnd,Z,6);
+   svg.innerHTML=`
+     <line x1="60" y1="${Z}" x2="952" y2="${Z}" stroke="#111" stroke-width="5" stroke-linecap="round"/>
+     <text class="zerolab" x="40" y="${Z+6}">0</text>
+     <path class="r" d="${debt}" fill="none" stroke="#d8262c" stroke-width="4" stroke-linejoin="round"/>
+     <path class="b" d="${save}" fill="none" stroke="#1f3fce" stroke-width="4" stroke-linejoin="round"/>
+     <path class="dc" d="${dc}" fill="none" stroke="#1f9d3a" stroke-width="4" stroke-dasharray="2 9" stroke-linecap="round" opacity=".85"/>
+     <path class="g" d="${grow}" fill="none" stroke="#1f9d3a" stroke-width="4.5" stroke-linejoin="round"/>
+     <text class="glab" x="96" y="110" fill="#1f9d3a">Wealth Creator</text>
+     <text class="glab" x="96" y="${Z-118}" fill="#1f3fce">Saver</text>
+     <text class="glab" x="96" y="${Z+40}" fill="#d8262c">Debtor</text>
+     ${lineDots.map(p=>`<circle cx="${p[0]}" cy="${p[1]}" r="7" fill="#111"/>`).join('')}
+     ${dots.map(p=>`<circle class="gd" cx="${p[0]}" cy="${p[1]}" r="9" fill="#9bdca0" stroke="#1f9d3a" stroke-width="2"/>`).join('')}`;
+   drawIn(svg,'.r',150,1300);
+   drawIn(svg,'.b',450,1300);
+   drawIn(svg,'.g',800,1500);
+   if(REDUCE){svg.querySelector('.dc').style.strokeDashoffset=0;}
+   popDots(svg,'.gd',1500);
+ }},
+
+futureeffect:{meta:"The Future Effect",
+ html:`<div class="eyebrow">Make It Real</div>
+   <h1 class="title" style="font-size:clamp(22px,2.7vw,34px)">The Future Effect of Paying Cash</h1>
+   <div class="body"><div class="calc">
+     <div class="panel">
+       <div class="callout">“Emptying the tank” resets the compounding cycle and shifts the growth curve
+         to the right — a dramatic effect on future wealth.</div>
+       <div class="inputs">
+         <div class="inrow"><label>Annual contribution</label><input id="i-pmt" type="text" value="$5,000"></div>
+         <div class="inrow"><label>Rate of return</label><input id="i-rate" type="text" value="5.00%"></div>
+         <div class="inrow"><label>Time (years)</label><input id="i-years" type="number" value="30" min="5" max="40"></div>
+         <div class="inrow"><label>Times tank drained</label><input id="i-drain" type="number" value="5" min="0" max="12"></div>
+         <div class="inrow"><label>Years to refill</label><input id="i-refill" type="number" value="4" min="0" max="10"></div>
+       </div>
+       <div class="inputs">
+         <div class="gp-head">Growth Potential</div>
+         <div class="gp full"><span class="lbl">Full</span><span class="val" id="o-full">—</span></div>
+         <div class="gp del"><span class="lbl">Delayed</span><span class="val" id="o-del">—</span></div>
+         <div class="gp diff"><span class="lbl">Long-term difference</span><span class="val" id="o-diff">—</span></div>
+       </div>
+     </div>
+     <div class="chartbox">
+       <svg id="ch-fut" viewBox="0 0 640 360" preserveAspectRatio="none"></svg>
+       <div class="sliderwrap">
+         <span class="tf">5 yrs</span>
+         <input id="i-slider" type="range" min="5" max="40" value="30">
+         <span class="tf" id="tf-lab">30 Years</span>
+       </div>
+       <div class="legend">
+         <span><i style="background:var(--grow)"></i>Full</span>
+         <span><i style="background:var(--debt)"></i>Delayed</span>
+       </div>
+     </div>
+   </div></div>`,
+ onEnter(){ initCalc(); }},
+
+benefits:{meta:"Ideal Account",
+ html:`<div class="eyebrow">Putting It All Together</div>
+   <h1 class="title" style="font-size:clamp(19px,2.4vw,31px);text-align:center;color:#1c7fc2;line-height:1.14">Which account do you use when lifestyle cash flow is not enough?</h1>
+   <div class="body"><div class="benefits-wrap">
+     <div class="bsel-row">
+       <select id="b-acct" class="bsel"><option value="-1">Select account type…</option></select>
+       <span class="bscore" id="b-score"></span>
+     </div>
+     <div class="benefits" id="benefits"></div>
+   </div></div>`,
+ onEnter(){ initBenefits(); }},
+
+lottery:{meta:"The Lottery",
+ html:`<div class="eyebrow">A Quick Game</div>
+   <h1 class="title" style="font-size:clamp(22px,2.8vw,36px)">You've Just Won the Lottery…</h1>
+   <div class="body"><div class="lotto">
+     <div class="opts">
+       <div class="opt gold"><div class="ot">Option A</div>
+         <div class="ov">$1,000,000</div><div class="od">Guaranteed. In your hand today.</div></div>
+       <div class="vs">— or —</div>
+       <div class="opt green"><div class="ot">Option B</div>
+         <div class="ov">A single penny</div><div class="od">Doubled every day — 100% a day — for 31 days.</div></div>
+     </div>
+     <div class="lstage">
+       <div class="lread">
+         <div class="lday">Day <span id="l-day">1</span> <span class="lof">of 31</span></div>
+         <div class="lval" id="l-val">$0.01</div>
+         <div class="lflag" id="l-flag">▲ now beats the $1,000,000</div>
+       </div>
+       <div class="lbar">
+         <div class="lmark" style="bottom:9.3%"><span>$1,000,000</span></div>
+         <div class="lfill" id="l-fill"></div>
+       </div>
+     </div>
+     <div class="lctrl">
+       <button class="lbtn run" id="l-run">▶ Auto-Run</button>
+       <button class="lbtn step" id="l-step">+1 Day · Double It</button>
+       <button class="lbtn reset" id="l-reset">↺ Reset</button>
+     </div>
+   </div></div>`,
+ onEnter(){ initLottery(); }},
+
+einstein:{meta:"Eighth Wonder",
+ html:`<div class="eyebrow">The Eighth Wonder</div>
+   <div class="body center"><div class="quote">
+     <div class="qmk">&ldquo;</div>
+     <blockquote>Compound interest is the eighth wonder of the world.
+       He who understands it, <span class="earn">earns&nbsp;it</span>;
+       he who doesn't, <span class="pay">pays&nbsp;it</span>.</blockquote>
+     <div class="qby">— attributed to Albert Einstein</div>
+     <button class="lbtn step rev" id="e-reveal">Remember the penny? ▾</button>
+     <div class="qreveal" id="e-reveal-out">From one cent — doubled and never interrupted —
+       <b>$5,368,709.12</b> by Day 30. The game was never about the lottery.
+       It was about <b>never interrupting the compounding.</b></div>
+   </div></div>`,
+ onEnter(){
+   const b=document.getElementById('e-reveal'), o=document.getElementById('e-reveal-out');
+   if(b) b.onclick=()=>{ o.classList.add('show'); b.style.display='none'; };
+ }}
+
+};
+
+/* ---------- Calculator logic ---------- */
+function fv(pmt,r,n){ if(n<=0)return 0; return r===0? pmt*n : pmt*((Math.pow(1+r,n)-1)/r); }
+function money(n){ return '$'+Math.round(n).toLocaleString('en-US'); }
+function parseMoney(s){ return parseFloat(String(s).replace(/[^0-9.]/g,''))||0; }
+function parsePct(s){ return (parseFloat(String(s).replace(/[^0-9.]/g,''))||0)/100; }
+
+function initCalc(){
+  const g=id=>document.getElementById(id);
+  const els={pmt:g('i-pmt'),rate:g('i-rate'),years:g('i-years'),drain:g('i-drain'),
+    refill:g('i-refill'),slider:g('i-slider'),tf:g('tf-lab'),
+    full:g('o-full'),del:g('o-del'),diff:g('o-diff'),svg:g('ch-fut')};
+  function recompute(){
+    const pmt=parseMoney(els.pmt.value), r=parsePct(els.rate.value);
+    let years=Math.max(5,Math.min(40,parseInt(els.years.value)||30));
+    const drain=Math.max(0,parseInt(els.drain.value)||0);
+    const refill=Math.max(0,parseInt(els.refill.value)||0);
+    els.slider.value=years; els.tf.textContent=years+' Years';
+    const full=fv(pmt,r,years+1);
+    const delN=Math.max(0,years+1-drain*refill);
+    const del=fv(pmt,r,delN);
+    els.full.textContent=money(full);
+    els.del.textContent=money(del);
+    els.diff.textContent=(del-full<0?'-':'')+money(Math.abs(del-full));
+    drawBars(els.svg,{pmt,r,years,drain,refill,full});
+  }
+  function syncMoney(){ const v=parseMoney(els.pmt.value); els.pmt.value=v?'$'+v.toLocaleString('en-US'):''; }
+  function syncPct(){ const v=parseFloat(String(els.rate.value).replace(/[^0-9.]/g,''))||0; els.rate.value=v.toFixed(2)+'%'; }
+  ['pmt','rate','years','drain','refill'].forEach(k=>els[k].addEventListener('input',recompute));
+  els.pmt.addEventListener('blur',syncMoney); els.rate.addEventListener('blur',syncPct);
+  els.slider.addEventListener('input',()=>{els.years.value=els.slider.value;recompute();});
+  recompute();
+}
+function drawBars(svg,{pmt,r,years,drain,refill,full}){
+  const W=640,H=360,pad={l:54,r:14,t:14,b:30},pw=W-pad.l-pad.r,ph=H-pad.t-pad.b;
+  const maxV=fv(pmt,r,years+1)||1;
+  const fullY=y=>fv(pmt,r,y+1);
+  // Drain events spaced evenly, with none on the final year so year `years` is a peak.
+  // Each drain resets the compounding cycle, costing `refill` periods → the red bar drops.
+  const drainYears=[];
+  for(let i=1;i<=drain;i++) drainYears.push(Math.round(i*years/(drain+1)));
+  const drainsBy=y=>drainYears.filter(dy=>dy<=y).length;
+  const delY=y=>fv(pmt,r,Math.max(0,(y+1)-drainsBy(y)*refill));
+  const slot=pw/years, bw=Math.min(slot*0.42,9);
+  let bars='';
+  for(let y=1;y<=years;y++){
+    const cx=pad.l+slot*(y-0.5);
+    const fh=ph*fullY(y)/maxV, dh=ph*delY(y)/maxV;
+    bars+=`<rect x="${(cx-bw-0.5).toFixed(1)}" y="${(pad.t+ph-fh).toFixed(1)}" width="${bw.toFixed(1)}" height="${fh.toFixed(1)}" fill="#1f9d3a"/>`;
+    bars+=`<rect x="${(cx+0.5).toFixed(1)}" y="${(pad.t+ph-dh).toFixed(1)}" width="${bw.toFixed(1)}" height="${dh.toFixed(1)}" fill="#d8262c"/>`;
+  }
+  const ticks=4; let grid='';
+  for(let i=0;i<=ticks;i++){
+    const v=maxV*i/ticks, y=pad.t+ph-ph*i/ticks;
+    grid+=`<line x1="${pad.l}" y1="${y}" x2="${W-pad.r}" y2="${y}" stroke="#e8eef4" stroke-width="1"/>`;
+    grid+=`<text x="${pad.l-6}" y="${y+4}" text-anchor="end" font="600 10px Montserrat" fill="#8295a6" font-size="10">$${Math.round(v/1000)}k</text>`;
+  }
+  let xlab='';
+  for(let y=5;y<=years;y+=5){const cx=pad.l+slot*(y-0.5);
+    xlab+=`<text x="${cx.toFixed(1)}" y="${H-10}" text-anchor="middle" font-size="10" fill="#8295a6" font-weight="600">${y}</text>`;}
+  svg.innerHTML=grid+bars+xlab+
+    `<line x1="${pad.l}" y1="${pad.t+ph}" x2="${W-pad.r}" y2="${pad.t+ph}" stroke="#111" stroke-width="1.5"/>`;
+}
+
+/* ---------- Benefits ---------- */
+const BENEFITS=[
+ ["Tax Deferred Growth","Your money compounds without an annual tax bill pulling it backward."],
+ ["Tax Free Distribution","Designed so you can access your capital later without triggering a new tax."],
+ ["Competitive Return","A dependable rate built on certainty — not speculation or guesswork."],
+ ["High Contributions","Room to put meaningful capital to work, not a capped trickle."],
+ ["Deductible Contributions","Contributions that may reduce taxable income — where the account and tax code allow."],
+ ["Collateral Opportunities","Your reserve can back a loan — so it keeps working while you use it."],
+ ["Safe","Protected ground for your capital, shielded from market whiplash."],
+ ["No-Loss Provisions","A floor under your value so a down year doesn't set you back."],
+ ["Guaranteed Loan Option","A contractual right to borrow against your own money."],
+ ["Unstructured Loan Payments","Repay on your schedule — not a rigid bank calendar."],
+ ["Liquidity, Use and Control","You decide when, how, and why. The money answers to you."],
+ ["Additional Benefits","Living benefits and a legacy that protect the people you love."]
+];
+/* Which characteristics each account offers. Indexes map to BENEFITS above.
+   Edit these arrays freely to match your compliance-approved matrix. */
+const ACCOUNTS=[
+ ["Savings Account / Money Market",[3,5,6,7,10]],
+ ["Certificate of Deposit",[3,6,7]],
+ ["Real Estate Equity w/HELOC",[0,2,5,10]],
+ ["Margin Account on Stock Portfolio",[0,2,3,5,10]],
+ ["401(k) Qualified Plan",[0,2,3,4,8]],
+ ["Cash Value Life Insurance",[0,1,2,3,5,6,7,8,9,10,11]]
+];
+function initBenefits(){
+  const wrap=document.getElementById('benefits'); if(!wrap)return;
+  const sel=document.getElementById('b-acct'), score=document.getElementById('b-score');
+  sel.innerHTML='<option value="-1">Select account type…</option>'+
+    ACCOUNTS.map((a,i)=>`<option value="${i}">${a[0]}</option>`).join('');
+  const half=Math.ceil(BENEFITS.length/2);
+  let rowsHtml='';
+  for(let i=0;i<half;i++){
+    const b=BENEFITS[i+half];
+    rowsHtml+=`<div class="brow" data-i="${i}">${CHEV}<div class="pill">${BENEFITS[i][0]}</div></div>`;
+    rowsHtml+= b?`<div class="brow" data-i="${i+half}">${CHEV}<div class="pill">${b[0]}</div></div>`:`<div></div>`;
+  }
+  rowsHtml+=`<div class="bdesc" id="bdesc"></div>`;
+  wrap.innerHTML=rowsHtml;
+  const desc=document.getElementById('bdesc');
+  const rows=[...wrap.querySelectorAll('.brow')];
+  rows.forEach(row=>{
+    row.addEventListener('click',()=>{
+      const i=+row.dataset.i, open=row.classList.contains('open');
+      rows.forEach(r=>r.classList.remove('open'));
+      if(open){desc.classList.remove('show');return;}
+      row.classList.add('open');
+      desc.innerHTML=`<b>${BENEFITS[i][0]}.</b> ${BENEFITS[i][1]}`;
+      desc.classList.add('show');
+    });
+  });
+  function applyAcct(){
+    const idx=+sel.value;
+    rows.forEach(r=>{r.classList.remove('applies');r.classList.remove('open');});
+    desc.classList.remove('show');
+    if(idx<0){ score.textContent=''; score.classList.remove('win'); return; }
+    const set=ACCOUNTS[idx][1];
+    rows.forEach(r=>{ if(set.indexOf(+r.dataset.i)>-1) r.classList.add('applies'); });
+    score.innerHTML=`Meets <b>${set.length}</b> of <b>${BENEFITS.length}</b> characteristics`;
+    score.classList.toggle('win', set.length>=BENEFITS.length-1);
+  }
+  sel.onchange=applyAcct;
+  applyAcct();
+}
+
+/* ---------- Lottery / penny-doubling game ---------- */
+function initLottery(){
+  const g=id=>document.getElementById(id);
+  const MAX=31, MAXV=0.01*Math.pow(2,MAX-1), MILLION=1000000;
+  const dayEl=g('l-day'), valEl=g('l-val'), fillEl=g('l-fill'), flagEl=g('l-flag');
+  const runB=g('l-run'), stepB=g('l-step'), resetB=g('l-reset');
+  let day=1, timer=null, displayed=0.01;
+  const val=d=>0.01*Math.pow(2,d-1);
+  const fmt=n=>'$'+n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+  function tween(to){
+    if(REDUCE){displayed=to;valEl.textContent=fmt(to);return;}
+    const from=displayed, start=performance.now(), dur=700;
+    (function fr(t){ const k=Math.min(1,(t-start)/dur), e=1-Math.pow(1-k,3);
+      displayed=from+(to-from)*e; valEl.textContent=fmt(displayed);
+      if(k<1) requestAnimationFrame(fr); })(start);
+  }
+  function paint(){
+    const v=val(day); dayEl.textContent=day; tween(v);
+    fillEl.style.height=Math.min(100, v/MAXV*100)+'%';
+    const hot=v>MILLION;
+    flagEl.classList.toggle('show',hot);
+    fillEl.classList.toggle('hot',hot);
+    valEl.classList.remove('bump'); void valEl.offsetWidth; valEl.classList.add('bump');
+  }
+  function stop(){ if(timer){clearInterval(timer);timer=null;} runB.classList.remove('active'); runB.innerHTML='▶ Auto-Run'; }
+  function step(){ if(day<MAX){ day++; paint(); } else stop(); }
+  function run(){ if(timer)return; if(day>=MAX){day=1;displayed=val(1);paint();} runB.classList.add('active'); runB.innerHTML='⏸ Pause';
+    timer=setInterval(()=>{ if(day<MAX) step(); else stop(); }, 1000); }
+  function toggleRun(){ if(timer) stop(); else run(); }
+  function reset(){ stop(); day=1; displayed=val(1); paint(); }
+  runB.onclick=toggleRun; stepB.onclick=step; resetB.onclick=reset;
+  window.__cleanup=stop;       // stop auto-run if the slide changes
+  paint();
+}
+
+/* ---------- Two-calculator race (uninterrupted vs. drained every 5 days) ---------- */
+function initRace(){
+  const g=id=>document.getElementById(id);
+  const MAX=31, DRAIN=5;
+  const vA=g('r-a'), vB=g('r-b'), fA=g('rf-a'), fB=g('rf-b'), dayEl=g('r-day'), racerB=g('racer-b');
+  const runB=g('r-run'), stepB=g('r-step'), resetB=g('r-reset');
+  const MAXA=0.01*Math.pow(2,MAX-1), MAXB=0.01*Math.pow(2,DRAIN-1); // B tops out at $0.16
+  let day=1, timer=null;
+  const valA=d=>0.01*Math.pow(2,d-1);
+  const valB=d=>0.01*Math.pow(2,((d-1)%DRAIN));          // re-seeds to a penny every 5 days
+  const fmt=n=>'$'+n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+  function paint(drained){
+    dayEl.textContent=day;
+    const a=valA(day), b=valB(day);
+    vA.textContent=fmt(a); vB.textContent=fmt(b);
+    fA.style.height=Math.min(100,a/MAXA*100)+'%';
+    fB.style.height=Math.min(100,b/MAXB*100)+'%';
+    vA.classList.remove('bump'); void vA.offsetWidth; vA.classList.add('bump');
+    if(drained){ racerB.classList.remove('drained'); void racerB.offsetWidth; racerB.classList.add('drained'); }
+  }
+  function stop(){ if(timer){clearInterval(timer);timer=null;} runB.classList.remove('active'); runB.innerHTML='▶ Auto-Run'; }
+  function step(){
+    if(day>=MAX){ stop(); return; }
+    day++;
+    const drained = (((day-1)%DRAIN)===0);   // the drain days: 6, 11, 16, 21, 26, 31
+    paint(drained);
+  }
+  function run(){ if(timer)return; if(day>=MAX){day=1;paint(false);} runB.classList.add('active'); runB.innerHTML='⏸ Pause'; timer=setInterval(step,1000); }
+  function toggleRun(){ if(timer) stop(); else run(); }
+  function reset(){ stop(); day=1; paint(false); }
+  runB.onclick=toggleRun; stepB.onclick=step; resetB.onclick=reset;
+  window.__cleanup=stop;
+  paint(false);
+}
+
+/* ---------- Arbitrage / spread calculator ---------- */
+function initArb(){
+  const g=id=>document.getElementById(id), MAX=12;
+  const grow=g('ar-grow'), cost=g('ar-cost'), avG=g('av-grow'), avC=g('av-cost'),
+        afG=g('af-grow'), afC=g('af-cost'), box=g('sp-box'), num=g('sp-num'), note=g('sp-note');
+  function upd(){
+    const gv=parseFloat(grow.value), cv=parseFloat(cost.value), sp=gv-cv;
+    avG.textContent=gv.toFixed(1)+'%'; avC.textContent=cv.toFixed(1)+'%';
+    afG.style.width=(gv/MAX*100)+'%';  afC.style.width=(cv/MAX*100)+'%';
+    num.textContent=(sp>0?'+':'')+sp.toFixed(1)+'%';
+    box.classList.toggle('neg', sp<0);
+    if(sp>0.0001)       note.innerHTML='Your asset grows faster than the loan costs — the difference works in your favor.';
+    else if(sp<-0.0001) note.innerHTML='The cost is outrunning the growth — the spread has <b>inverted</b> against you.';
+    else                note.innerHTML='Growth and borrowing cost are even — the spread disappears.';
+  }
+  grow.addEventListener('input',upd); cost.addEventListener('input',upd); upd();
+}
+
+/* ---------- Debt treadmill: earning vs paying, net worth, payments, documentation ---------- */
+function initDebtCalc(){
+  const g=id=>document.getElementById(id);
+  const MAX=30;
+  const nameSel=g('dc-name'), nameOther=g('dc-name-other'), lgName=g('dc-lg-name');
+  const a0I=g('dc-a0'), d0I=g('dc-d0'), nw0I=g('dc-nw0');
+  const gaI=g('dc-ga'), gdI=g('dc-gd'), infI=g('dc-inf');
+  const aVal=g('dc-aval'), dVal=g('dc-dval'), earnedEl=g('dc-earned'), paidEl=g('dc-paid'),
+        poolEl=g('dc-pool'), realWrap=g('dc-realwrap'), realEl=g('dc-poolreal'),
+        scoreEl=g('dc-score'), hintEl=g('dc-hint'), mathEl=g('dc-math');
+  const infBtn=g('dc-inftoggle'), lifeBtn=g('dc-life'), yearEl=g('dc-year'),
+        svg=g('dc-graph'), lgReal=g('dc-lg-real');
+  const paySel=g('dc-pay'), payPctWrap=g('dc-paypct'), ppI=g('dc-pp');
+  const oppBtn=g('dc-opptoggle'), oppI=g('dc-opp'), oppLine=g('dc-oppline');
+  const runB=g('dc-run'), stepB=g('dc-step'), resetB=g('dc-reset'), docBtn=g('dc-docbtn');
+  const docOv=g('dc-doc'), docTable=g('dc-doctable'), docTitle=g('dc-doc-title'), docClose=g('dc-doc-close');
+  let year=0, timer=null, inflationOn=false, oppOn=false, freezeYear=Infinity;
+  const numv=(el,d)=>{const v=parseFloat(el.value);return isNaN(v)?d:v;};
+  const A0=()=>numv(a0I,50000), D0=()=>numv(d0I,35000), NW0=()=>numv(nw0I,100000);
+  const rA=()=>numv(gaI,7)/100, rD=()=>numv(gdI,7)/100, rI=()=>numv(infI,3)/100, rO=()=>numv(oppI,7)/100;
+  const payMode=()=>paySel.value, partialFrac=()=>Math.max(0,Math.min(1,numv(ppI,50)/100));
+  const money=n=>(n<-0.5?'-$':'$')+Math.round(Math.abs(n)).toLocaleString('en-US');
+  const curName=()=>nameSel.value==='__other'?(nameOther.value.trim()||'Other'):nameSel.value;
+
+  // Build the full year-by-year series under current settings.
+  function compute(){
+    const a0=A0(),d0=D0(),nw0=NW0(),ga=rA(),gd=rD(),go=rO(),fz=freezeYear,mode=payMode(),pf=partialFrac();
+    const acct=[a0],debt=[d0],intE=[0],dInt=[0],paid=[0],nw=[nw0],opp=[0];
+    for(let y=0;y<MAX;y++){
+      const ai=(y>=fz)?0:acct[y]*ga;                       // interest earned this year (0 if frozen)
+      const di=debt[y]*gd;                                  // interest charged on debt this year
+      const pay=mode==='off'?0:(mode==='full'?di:di*pf);    // cash actually paid toward debt
+      acct.push(acct[y]+ai);
+      debt.push(Math.max(0,debt[y]+di-pay));                // unpaid interest compounds
+      intE.push(intE[y]+ai);
+      dInt.push(dInt[y]+di);
+      paid.push(paid[y]+pay);
+      nw.push(nw0+intE[y+1]-dInt[y+1]);                     // net worth = start + earned − interest cost
+      opp.push(opp[y]*(1+go)+pay);                          // had those payments been invested, compounding
+    }
+    return {acct,debt,intE,dInt,paid,nw,opp};
+  }
+
+  function paint(){
+    const s=compute(), y=year, base=NW0();
+    yearEl.textContent=y;
+    lgName.textContent=curName();
+    aVal.textContent=money(s.acct[y]);
+    dVal.textContent=money(s.debt[y]);
+    earnedEl.textContent=money(s.intE[y]);
+    paidEl.textContent=money(s.paid[y]);
+    const nw=s.nw[y];
+    poolEl.textContent=money(nw);
+    poolEl.className='dc-poolnum '+(nw>base+50?'pos':(nw<base-50?'neg':'flat'));
+    // scoreboard: earned vs paid → are they running in place?
+    const earned=s.intE[y], paidv=s.paid[y], net=earned-paidv;
+    scoreEl.innerHTML='Earned <b class="g">'+money(earned)+'</b> − Paid <b class="r">'+money(paidv)
+      +'</b> = <b class="'+(net>=0?'g':'r')+'">'+(net>=0?'+':'')+money(net)+'</b>';
+    if(inflationOn){
+      realWrap.style.display=''; const rp=nw/Math.pow(1+rI(),y);
+      realEl.textContent=money(rp); realEl.className='dc-realnum '+(rp<base?'neg':'pos');
+    } else realWrap.style.display='none';
+    lgReal.style.visibility=inflationOn?'visible':'hidden';
+    // opportunity cost: what those debt payments could have become if invested
+    if(oppOn){
+      oppLine.style.display='';
+      const oc=s.opp[y], pr=Math.round(rO()*100*10)/10;
+      oppLine.innerHTML='↳ those payments, invested at '+pr+'%, could be <b>'+money(oc)+'</b>';
+    } else oppLine.style.display='none';
+    // a little math, year by year, so anyone can follow
+    if(y===0){
+      mathEl.textContent='Starting out — '+curName()+' '+money(s.acct[0])+', debt '+money(s.debt[0])+'.';
+    } else {
+      const eY=s.intE[y]-s.intE[y-1], oY=s.dInt[y]-s.dInt[y-1], pY=s.paid[y]-s.paid[y-1], netY=eY-oY;
+      mathEl.innerHTML='Year '+y+': earned <b class="g">+'+money(eY)+'</b> · debt interest <b class="r">'+money(oY)
+        +'</b> (paid '+money(pY)+') → net <b class="'+(netY>=0?'g':'r')+'">'+(netY>=0?'+':'')+money(netY)+'</b> to your net worth';
+    }
+    hintEl.textContent = lifeBtn.classList.contains('on')
+      ? "One life event — and the debt overtakes everything."
+      : inflationOn
+        ? "After inflation, your net worth is sliding backward."
+        : (net>50 ? "You're earning more than you pay — but how much of it goes back out?"
+                  : net<-50 ? "You're paying out more than you earn — running backward."
+                            : "Earnings in, payments out — you're running in place.");
+    draw(s);
+  }
+  function draw(s){
+    const W=600,H=300,pad={l:10,r:12,t:10,b:10},pw=W-pad.l-pad.r,ph=H-pad.t-pad.b;
+    const A=[],D=[],N=[],R=[];
+    for(let y=0;y<=MAX;y++){A.push(s.acct[y]);D.push(-s.debt[y]);N.push(s.nw[y]);if(inflationOn)R.push(s.nw[y]/Math.pow(1+rI(),y));}
+    let lo=0,hi=0;[A,D,N].concat(inflationOn?[R]:[]).forEach(a=>a.forEach(v=>{lo=Math.min(lo,v);hi=Math.max(hi,v);}));
+    const span=(hi-lo)||1; hi+=span*0.06; lo-=span*0.06;
+    const X=y=>pad.l+pw*y/MAX, Y=v=>pad.t+ph*(hi-v)/(hi-lo);
+    const path=(a,col,w,dash)=>{let d='M '+X(0).toFixed(1)+' '+Y(a[0]).toFixed(1);
+      for(let i=1;i<a.length;i++)d+=' L '+X(i).toFixed(1)+' '+Y(a[i]).toFixed(1);
+      return '<path d="'+d+'" fill="none" stroke="'+col+'" stroke-width="'+w+'" '+(dash?'stroke-dasharray="'+dash+'"':'')+' stroke-linejoin="round"/>';};
+    let grid='';
+    for(let y=0;y<=MAX;y+=5) grid+='<line x1="'+X(y).toFixed(1)+'" y1="'+pad.t+'" x2="'+X(y).toFixed(1)+'" y2="'+(pad.t+ph)+'" stroke="#eef3f8" stroke-width="1"/>';
+    const zy=Y(0);
+    const marker='<line x1="'+X(year).toFixed(1)+'" y1="'+pad.t+'" x2="'+X(year).toFixed(1)+'" y2="'+(pad.t+ph)+'" stroke="#b9c8d8" stroke-width="1.5" stroke-dasharray="4 4"/>';
+    const dots='<circle cx="'+X(year).toFixed(1)+'" cy="'+Y(s.acct[year]).toFixed(1)+'" r="5" fill="#1f9d3a"/>'
+              +'<circle cx="'+X(year).toFixed(1)+'" cy="'+Y(-s.debt[year]).toFixed(1)+'" r="5" fill="#d8262c"/>'
+              +'<circle cx="'+X(year).toFixed(1)+'" cy="'+Y(s.nw[year]).toFixed(1)+'" r="5" fill="#15314e"/>';
+    svg.innerHTML=grid
+      +'<line x1="'+pad.l+'" y1="'+zy.toFixed(1)+'" x2="'+(W-pad.r)+'" y2="'+zy.toFixed(1)+'" stroke="#9aa7b4" stroke-width="1.5"/>'
+      +(inflationOn?path(R,'#c6a24a',2.5,'7 5'):'')
+      +path(A,'#1f9d3a',3)+path(D,'#d8262c',3)+path(N,'#15314e',3.6)+marker+dots;
+  }
+
+  // Documentation: an easy-to-read year-by-year spreadsheet
+  function buildDoc(){
+    const s=compute(), name=curName(), showReal=inflationOn, showOpp=oppOn;
+    let h='<thead><tr><th>Year</th><th>'+name+'</th><th>Interest<br>earned</th><th>Debt</th><th>Interest<br>charged</th><th>You<br>paid</th><th>Net Worth</th>'
+      +(showReal?'<th>Today\u2019s $</th>':'')+(showOpp?'<th>Opportunity<br>cost</th>':'')+'</tr></thead><tbody>';
+    for(let y=0;y<=MAX;y++){
+      const eY=y?s.intE[y]-s.intE[y-1]:0, oY=y?s.dInt[y]-s.dInt[y-1]:0, pY=y?s.paid[y]-s.paid[y-1]:0;
+      const real=s.nw[y]/Math.pow(1+rI(),y);
+      h+='<tr class="'+(y===year?'cur':'')+'"><td>'+y+'</td><td>'+money(s.acct[y])+'</td>'
+        +'<td class="g">'+(y?'+'+money(eY):'\u2014')+'</td><td>'+money(s.debt[y])+'</td>'
+        +'<td class="r">'+(y?money(oY):'\u2014')+'</td><td class="r">'+(y?money(pY):'\u2014')+'</td>'
+        +'<td class="nw">'+money(s.nw[y])+'</td>'+(showReal?'<td>'+money(real)+'</td>':'')
+        +(showOpp?'<td class="op">'+money(s.opp[y])+'</td>':'')+'</tr>';
+    }
+    h+='</tbody><tfoot><tr><td>Total</td><td></td><td class="g">+'+money(s.intE[MAX])+'</td><td></td><td></td>'
+      +'<td class="r">'+money(s.paid[MAX])+'</td><td class="nw">'+money(s.nw[MAX])+'</td>'+(showReal?'<td></td>':'')
+      +(showOpp?'<td class="op">'+money(s.opp[MAX])+'</td>':'')+'</tr></tfoot>';
+    docTable.innerHTML=h;
+    docTitle.textContent=name+' vs. Debt — Year by Year';
+  }
+  function showDoc(){ buildDoc(); docOv.classList.add('show'); }
+  function hideDoc(){ docOv.classList.remove('show'); }
+
+  function stop(){ if(timer){clearInterval(timer);timer=null;} runB.classList.remove('active'); runB.innerHTML='▶ Auto-Run'; }
+  function stepFn(){ if(year>=MAX){stop();return;} year++; paint(); }
+  function run(){ if(timer)return; if(year>=MAX){year=0;paint();} runB.classList.add('active'); runB.innerHTML='⏸ Pause'; timer=setInterval(stepFn,1000); }
+  function toggleRun(){ if(timer) stop(); else run(); }
+  function reset(){
+    stop(); year=0; inflationOn=false; oppOn=false; freezeYear=Infinity;
+    a0I.value=50000; d0I.value=35000; nw0I.value=100000;
+    gaI.value=7; gdI.value=7; infI.value=3; infI.disabled=true;
+    oppI.value=7; oppI.disabled=true; oppBtn.classList.remove('on'); oppBtn.textContent='Opportunity cost: Off';
+    nameSel.value='401(k)'; nameOther.style.display='none'; nameOther.value='';
+    paySel.value='full'; payPctWrap.style.display='none'; ppI.value=50;
+    infBtn.classList.remove('on'); infBtn.textContent='Inflation: Off';
+    lifeBtn.classList.remove('on'); lifeBtn.textContent='Life event';
+    hideDoc(); paint();
+  }
+  nameSel.onchange=()=>{ const other=nameSel.value==='__other';
+    nameOther.style.display=other?'':'none'; if(other) nameOther.focus(); paint(); };
+  nameOther.addEventListener('input',paint);
+  paySel.onchange=()=>{ payPctWrap.style.display=(paySel.value==='partial')?'':'none'; paint(); };
+  ppI.addEventListener('input',paint);
+  infBtn.onclick=()=>{ inflationOn=!inflationOn; infBtn.classList.toggle('on',inflationOn);
+    infBtn.textContent='Inflation: '+(inflationOn?'On':'Off'); infI.disabled=!inflationOn; paint(); };
+  oppBtn.onclick=()=>{ oppOn=!oppOn; oppBtn.classList.toggle('on',oppOn);
+    oppBtn.textContent='Opportunity cost: '+(oppOn?'On':'Off'); oppI.disabled=!oppOn; paint(); };
+  lifeBtn.onclick=()=>{ const on=!lifeBtn.classList.contains('on'); lifeBtn.classList.toggle('on',on);
+    lifeBtn.textContent=on?'Life event: ON':'Life event'; freezeYear=on?year:Infinity; paint(); };
+  [a0I,d0I,nw0I,gaI,gdI,infI,oppI].forEach(i=>i.addEventListener('input',paint));
+  runB.onclick=toggleRun; stepB.onclick=stepFn; resetB.onclick=reset;
+  docBtn.onclick=showDoc; docClose.onclick=hideDoc;
+  docOv.addEventListener('click',e=>{ if(e.target===docOv) hideDoc(); });
+  window.__cleanup=()=>{ stop(); hideDoc(); };
+  infI.disabled=true; oppI.disabled=true; paySel.value='full'; payPctWrap.style.display='none'; paint();
+}
+
+/* ============================================================
+   ENGINE: render, navigate, overview/reorder
+   ============================================================ */
+let order=ORDER.slice();
+let idx=0;
+const stage=document.getElementById('stage');
+const dotsEl=document.getElementById('dots');
+
+function render(){
+  if(window.__cleanup){try{window.__cleanup();}catch(e){} window.__cleanup=null;}
+  const key=order[idx], s=SLIDES[key];
+  stage.innerHTML='';
+  const slide=document.createElement('div');
+  slide.className='slide';
+  slide.innerHTML=`<div class="badge"><span class="pos">${String(idx+1).padStart(2,'0')}</span>
+    <span class="tot">/ ${String(order.length).padStart(2,'0')}</span>
+    <span class="key">${key}</span></div>${s.html}`;
+  stage.appendChild(slide);
+  requestAnimationFrame(()=>slide.classList.add('active'));
+  if(s.onEnter) requestAnimationFrame(()=>setTimeout(s.onEnter,80));
+  document.getElementById('prev').disabled=idx===0;
+  document.getElementById('next').disabled=idx===order.length-1;
+  renderDots();
+}
+function renderDots(){
+  dotsEl.innerHTML='';
+  order.forEach((k,i)=>{
+    const b=document.createElement('button');
+    b.className='dot'+(i===idx?' on':''); b.title=SLIDES[k].meta;
+    b.onclick=()=>{idx=i;render();};
+    dotsEl.appendChild(b);
+  });
+}
+function go(d){const n=idx+d; if(n>=0&&n<order.length){idx=n;render();}}
+document.getElementById('next').onclick=()=>go(1);
+document.getElementById('prev').onclick=()=>go(-1);
+document.addEventListener('keydown',e=>{
+  if(document.getElementById('overlay').classList.contains('show'))return;
+  const t=e.target.tagName;
+  if(t==='INPUT'||t==='TEXTAREA')return;
+  if(e.key==='ArrowRight'||e.key===' '){go(1);e.preventDefault();}
+  if(e.key==='ArrowLeft')go(-1);
+});
+
+/* overview */
+const overlay=document.getElementById('overlay');
+document.getElementById('grid').onclick=()=>{overlay.classList.add('show');renderOverview();};
+document.getElementById('closeov').onclick=()=>overlay.classList.remove('show');
+overlay.addEventListener('click',e=>{if(e.target===overlay)overlay.classList.remove('show');});
+function renderOverview(){
+  const grid=document.getElementById('ovgrid'); grid.innerHTML='';
+  order.forEach((k,i)=>{
+    const s=SLIDES[k], c=document.createElement('div');
+    c.className='ovcard'+(i===idx?' cur':'');
+    c.innerHTML=`<div class="n">${String(i+1).padStart(2,'0')}</div>
+      <div class="nm">${s.meta}</div>
+      <div class="meta">${k}</div>
+      <div class="move"><button data-d="-1" ${i===0?'disabled':''}>▲ up</button>
+      <button data-d="1" ${i===order.length-1?'disabled':''}>▼ down</button></div>`;
+    c.querySelector('.nm').onclick=()=>{idx=i;overlay.classList.remove('show');render();};
+    c.querySelectorAll('.move button').forEach(btn=>btn.onclick=()=>{
+      const d=+btn.dataset.d, j=i+d; if(j<0||j>=order.length)return;
+      [order[i],order[j]]=[order[j],order[i]];
+      if(idx===i)idx=j; else if(idx===j)idx=i;
+      renderOverview(); updateOrdCode();
+    });
+    grid.appendChild(c);
+  });
+  updateOrdCode();
+}
+function updateOrdCode(){
+  document.getElementById('ordcode').textContent='['+order.map(k=>`"${k}"`).join(', ')+']';
+}
+document.getElementById('copyord').onclick=()=>{
+  const txt='['+order.map(k=>`"${k}"`).join(', ')+']';
+  navigator.clipboard?.writeText(txt);
+  const b=document.getElementById('copyord'); const o=b.textContent; b.textContent='Copied ✓';
+  setTimeout(()=>b.textContent=o,1200);
+};
+
+render();
+</script>
+</body>
+</html>
