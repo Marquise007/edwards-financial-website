@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tools & Resources | Edwards Financial & Associates</title>
+<meta name="description" content="Free retirement planning tools and resources for California public employees — pension calculators, income illustrators, and guides from Edwards Financial & Associates.">
+<link rel="canonical" href="https://edwardsfinancialandassociates.com/resources">
+<meta property="og:title" content="Tools & Resources | Edwards Financial & Associates">
+<meta property="og:description" content="Free retirement planning tools and resources for California public employees.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://edwardsfinancialandassociates.com/resources">
+<meta property="og:site_name" content="Edwards Financial & Associates">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+<!-- Calendly popup widget -->
+<link href="https://assets.calendly.com/assets/external/widget.css" rel="stylesheet">
+<script src="https://assets.calendly.com/assets/external/widget.js" type="text/javascript" async></script>
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --ink: #0d1e3a;
+    --parchment: #f7f4ef;
+    --gold: #b8972e;
+    --gold-light: #d4af5a;
+    --gold-muted: #8a6e22;
+    --warm-gray: #6b6560;
+    --rule: #d6cfc4;
+    --white: #ffffff;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Montserrat', sans-serif;
+    background: var(--parchment);
+    color: var(--ink);
+    overflow-x: hidden;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 48px;
+    padding: 28px 60px;
+    background: rgba(247, 244, 239, 0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid transparent;
+    transition: border-color 0.4s, padding 0.4s;
+  }
+  nav.scrolled { border-color: var(--rule); padding: 18px 60px; }
+  .nav-logo {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 20px; font-weight: 500;
+    letter-spacing: 0.08em;
+    color: var(--ink); text-decoration: none;
+  }
+  .nav-logo span { color: var(--gold); }
+  .nav-links { display: flex; gap: 40px; list-style: none; }
+  .nav-links a {
+    font-size: 10px; font-weight: 500;
+    letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--warm-gray); text-decoration: none;
+    transition: color 0.3s;
+  }
+  .nav-links a:hover { color: var(--gold); }
+  .nav-right { display: flex; align-items: center; gap: 12px; }
+  .nav-partner {
+    font-size: 10px; font-weight: 500;
+    letter-spacing: 0.2em; text-transform: uppercase;
+    color: rgba(107,101,96,0.7); text-decoration: none;
+    font-family: 'Montserrat', sans-serif;
+    transition: color 0.3s;
+  }
+  .nav-partner:hover { color: var(--gold); }
+  .nav-portal {
+    font-size: 10px; font-weight: 500;
+    letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--gold); text-decoration: none;
+    border: 1px solid var(--gold);
+    padding: 10px 22px;
+    transition: background 0.3s, color 0.3s;
+  }
+  .nav-portal:hover { background: var(--gold); color: var(--ink); }
+
+  /* Mobile menu toggle — hidden on desktop, shown only in the phone breakpoint */
+  .nav-toggle {
+    display: none; background: none; border: none; cursor: pointer;
+    width: 28px; height: 20px; padding: 0;
+    flex-direction: column; justify-content: space-between;
+  }
+  .nav-toggle span {
+    display: block; height: 2px; width: 100%; background: var(--ink);
+    transition: transform 0.3s, opacity 0.3s;
+  }
+  nav.open .nav-toggle span:nth-child(1) { transform: translateY(9px) rotate(45deg); }
+  nav.open .nav-toggle span:nth-child(2) { opacity: 0; }
+  nav.open .nav-toggle span:nth-child(3) { transform: translateY(-9px) rotate(-45deg); }
+  .nav-cta {
+    font-size: 10px; font-weight: 500;
+    letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--white); background: var(--ink);
+    padding: 12px 28px; text-decoration: none;
+    transition: background 0.3s;
+  }
+  .nav-cta:hover { background: var(--gold-muted); }
+
+  /* ===== RESOURCES PAGE ===== */
+  .resources-intro {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 180px 60px 32px;
+  }
+  .resources-eyebrow {
+    font-size: 11px; font-weight: 500;
+    letter-spacing: 0.3em; text-transform: uppercase;
+    color: var(--gold-muted);
+    margin-bottom: 22px;
+  }
+  .resources-intro h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 54px; font-weight: 300;
+    line-height: 1.08;
+    margin-bottom: 22px;
+  }
+  .resources-intro h1 em { font-style: italic; color: var(--gold); }
+  .resources-lead {
+    font-size: 15px; font-weight: 300;
+    line-height: 1.8; color: var(--warm-gray);
+    max-width: 640px;
+  }
+
+  .resources-body {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 24px 60px 120px;
+  }
+
+  /* Group heading — use one above each grid when adding sections (e.g. "Articles & Guides") */
+  .group-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 30px; font-weight: 400;
+    margin: 56px 0 24px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--rule);
+  }
+  .group-title:first-child { margin-top: 0; }
+
+  /* Auto-flowing card grid — drop in more .tool-card anchors and they reflow automatically */
+  .tools-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 20px;
+  }
+  .tool-card {
+    background: var(--white);
+    border: 1px solid var(--rule);
+    padding: 36px;
+    text-decoration: none;
+    display: flex;
+    flex-direction: column;
+    transition: border-color 0.2s, background 0.2s, transform 0.2s;
+  }
+  .tool-card:hover {
+    border-color: rgba(184,151,46,0.4);
+    background: rgba(184,151,46,0.04);
+    transform: translateY(-2px);
+  }
+  .tool-eyebrow {
+    font-size: 10px; font-weight: 500;
+    letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--gold-muted);
+    margin-bottom: 16px;
+  }
+  .tool-name {
+    color: var(--ink);
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 25px; font-weight: 400;
+    line-height: 1.2;
+    margin-bottom: 12px;
+  }
+  .tool-desc {
+    font-size: 13px;
+    color: var(--warm-gray);
+    line-height: 1.7;
+    margin-bottom: 22px;
+  }
+  .tool-link {
+    margin-top: auto;
+    font-size: 10px; font-weight: 500;
+    letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--gold-muted);
+    transition: color 0.3s;
+  }
+  .tool-card:hover .tool-link { color: var(--gold); }
+
+  /* FOOTER */
+  footer { background: #060f1e; padding: 32px 60px; display: flex; align-items: center; justify-content: space-between; }
+  .footer-logo { font-family: 'Cormorant Garamond', serif; font-size: 16px; font-weight: 400; letter-spacing: 0.08em; color: rgba(247,244,239,0.4); }
+  .footer-logo span { color: var(--gold); }
+  .footer-copy { font-size: 9px; font-weight: 400; letter-spacing: 0.15em; color: rgba(247,244,239,0.2); }
+  .footer-disc { font-size: 9px; color: rgba(247,244,239,0.2); text-align: right; max-width: 300px; line-height: 1.6; }
+
+  /* Reveal on scroll */
+  .reveal { opacity: 0; transform: translateY(30px); transition: opacity 0.8s ease, transform 0.8s ease; }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+
+  /* RESPONSIVE */
+  @media (max-width: 1024px) {
+    nav { padding: 24px 32px; }
+    nav.scrolled { padding: 16px 32px; }
+    .nav-links { gap: 24px; }
+    .resources-intro { padding-left: 32px; padding-right: 32px; }
+    .resources-body { padding-left: 32px; padding-right: 32px; }
+    footer { flex-direction: column; gap: 16px; text-align: center; }
+    .footer-disc { text-align: center; }
+  }
+
+  /* ===== PHONE BREAKPOINT — applies only at <=600px; desktop is unaffected ===== */
+  @media (max-width: 600px) {
+    html, body { overflow-x: hidden; }
+
+    /* NAV → hamburger menu */
+    nav { padding: 16px 20px; flex-wrap: wrap; gap: 0; }
+    nav.scrolled { padding: 14px 20px; }
+    .nav-logo { font-size: 18px; }
+    .nav-toggle { display: flex; }
+    .nav-links, .nav-right { display: none; }
+    nav.open .nav-links {
+      display: flex; flex-direction: column; gap: 2px; width: 100%;
+      margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--rule);
+    }
+    nav.open .nav-links a { padding: 11px 0; }
+    nav.open .nav-right {
+      display: flex; flex-direction: column; align-items: stretch; gap: 10px;
+      width: 100%; margin-top: 10px;
+    }
+    nav.open .nav-partner, nav.open .nav-portal, nav.open .nav-cta {
+      text-align: center; padding: 13px;
+    }
+
+    .resources-intro { padding: 130px 20px 24px; }
+    .resources-intro h1 { font-size: 38px; }
+    .resources-body { padding: 16px 20px 80px; }
+    .tools-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV (markup mirrors professional-partners.html; hrefs root-anchored since this page lives in /resources/) -->
+<nav id="nav">
+  <a href="/" class="nav-logo">Edwards <span>&</span> Associates</a>
+  <button class="nav-toggle" id="navToggle" aria-label="Open menu" aria-expanded="false"><span></span><span></span><span></span></button>
+  <ul class="nav-links">
+    <li><a href="/#serve">Who We Serve</a></li>
+    <li><a href="/#services">Services</a></li>
+    <li><a href="/professional-partners.html">For Advisors</a></li>
+    <li><a href="/resources">Resources</a></li>
+    <li><a href="/#about">About</a></li>
+  </ul>
+  <div class="nav-right">
+    <a href="/portal-partner-login.html" class="nav-partner">Partner Access</a>
+    <a href="/" class="nav-portal">Client Portal</a>
+    <a href="https://calendly.com/jedwards-finance/30min" target="_blank" rel="noopener noreferrer" onclick="if(window.Calendly){Calendly.initPopupWidget({url:'https://calendly.com/jedwards-finance/30min'});return false;}" class="nav-cta">Begin the Conversation</a>
+  </div>
+</nav>
+
+<!-- INTRO -->
+<section class="resources-intro reveal">
+  <p class="resources-eyebrow">Tools &amp; Resources</p>
+  <h1>Plan With <em>Clarity</em></h1>
+  <p class="resources-lead">Free, interactive planning tools built for California public employees — estimate your pension, model your retirement income, and see your numbers clearly before you make a move.</p>
+</section>
+
+<!-- RESOURCES -->
+<section class="resources-body">
+
+  <!-- TOOLS GRID — to add a tool, copy one .tool-card anchor below; the grid reflows automatically. -->
+  <div class="tools-grid">
+
+    <a class="tool-card reveal" href="/resources/california-pension-calculator">
+      <span class="tool-eyebrow">Calculator</span>
+      <span class="tool-name">California Public Pension Calculator</span>
+      <span class="tool-desc">Estimate your CalPERS, CalSTRS, LACERA, OCERS, or UCRP pension, project your retirement income gap, and see the capital needed to bridge it for life.</span>
+      <span class="tool-link">Open the Calculator &rarr;</span>
+    </a>
+
+    <a class="tool-card reveal" href="/resources/retirement-income-illustrator">
+      <span class="tool-eyebrow">Illustrator</span>
+      <span class="tool-name">Retirement Income Illustrator</span>
+      <span class="tool-desc">Model your retirement income year by year — see how your savings, pension, and Social Security fund your lifestyle, and stress-test it with adjustable assumptions.</span>
+      <span class="tool-link">Open the Illustrator &rarr;</span>
+    </a>
+
+  </div>
+
+  <!--
+    To add an articles/guides section later, copy this pattern:
+
+    <h2 class="group-title">Articles &amp; Guides</h2>
+    <div class="tools-grid">
+      <a class="tool-card reveal" href="/resources/your-article-slug">
+        <span class="tool-eyebrow">Guide</span>
+        <span class="tool-name">Article Title</span>
+        <span class="tool-desc">One or two sentences describing the piece.</span>
+        <span class="tool-link">Read the Guide &rarr;</span>
+      </a>
+    </div>
+  -->
+
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">Edwards <span>&</span> Associates</div>
+  <p class="footer-copy">&copy; 2025 Edwards Financial &amp; Associates. All rights reserved.</p>
+  <p class="footer-disc">Investment and insurance products are not FDIC insured. This website is for informational purposes only and does not constitute financial advice.</p>
+</footer>
+
+<script>
+  // Nav scroll
+  const nav = document.getElementById('nav');
+  window.addEventListener('scroll', () => nav.classList.toggle('scrolled', window.scrollY > 40));
+
+  // Mobile menu toggle
+  const navToggle = document.getElementById('navToggle');
+  navToggle.addEventListener('click', () => {
+    const open = nav.classList.toggle('open');
+    navToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+  });
+  nav.querySelectorAll('.nav-links a, .nav-right a').forEach(a => {
+    a.addEventListener('click', () => {
+      nav.classList.remove('open');
+      navToggle.setAttribute('aria-expanded', 'false');
+    });
+  });
+
+  // Reveal on scroll
+  const reveals = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.12 });
+  reveals.forEach(el => observer.observe(el));
+</script>
+
+</body>
+</html>
