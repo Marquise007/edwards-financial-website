@@ -3,7 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Edwards Financial & Associates</title>
+<title>Premium Finance | Edwards Financial &amp; Associates</title>
+<meta name="description" content="Premium finance for significant estates — a specialist resource for the advisors who serve high-net-worth clients. Conservative case design, transparent risk, and you keep the relationship.">
+<link rel="canonical" href="https://edwardsfinancialandassociates.com/premium-finance">
+<meta property="og:title" content="Premium Finance | Edwards Financial & Associates">
+<meta property="og:description" content="A specialist resource for advisors and high-net-worth clients — conservative premium finance case design with transparent risk.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://edwardsfinancialandassociates.com/premium-finance">
+<meta property="og:site_name" content="Edwards Financial & Associates">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -852,495 +859,355 @@
   @media (max-width: 760px) {
     .alliances, .advisors-cta { padding-left: 24px; padding-right: 24px; }
   }
+
+  /* ===== PREMIUM FINANCE — practice-area page ===== */
+  .pf-btn-line {
+    display: inline-block; padding: 16px 36px;
+    font-size: 10px; font-weight: 500; letter-spacing: 0.22em; text-transform: uppercase;
+    border: 1px solid rgba(13,30,58,0.22); color: var(--ink); text-decoration: none;
+    transition: border-color 0.3s, color 0.3s;
+  }
+  .pf-btn-line:hover { border-color: var(--gold); color: var(--gold-muted); }
+
+  /* Hero */
+  .pf-hero { padding: 184px 60px 108px; max-width: 1180px; margin: 0 auto; }
+  .pf-hero-eyebrow { font-size: 10px; font-weight: 500; letter-spacing: 0.34em; text-transform: uppercase; color: var(--gold); margin-bottom: 26px; }
+  .pf-hero-title { font-family: 'Cormorant Garamond', serif; font-size: clamp(52px, 6vw, 88px); font-weight: 300; line-height: 1.02; letter-spacing: -0.01em; color: var(--ink); margin-bottom: 0; }
+  .pf-hero-rule { width: 64px; height: 1px; background: var(--gold); margin: 36px 0 40px; }
+  .pf-hero-lead { font-size: 15px; font-weight: 300; line-height: 2; color: var(--warm-gray); max-width: 640px; margin-bottom: 46px; }
+  .pf-hero-ctas { display: flex; flex-wrap: wrap; gap: 16px; }
+
+  /* Generic sections */
+  .pf-section { padding: 104px 60px; max-width: 1180px; margin: 0 auto; }
+  .pf-band-alt { background: #f0ece4; }
+  .pf-band-alt .pf-section { max-width: 1180px; }
+  .pf-eyebrow { font-size: 10px; font-weight: 500; letter-spacing: 0.3em; text-transform: uppercase; color: var(--gold); margin-bottom: 18px; }
+  .pf-h2 { font-family: 'Cormorant Garamond', serif; font-size: clamp(32px, 3.2vw, 46px); font-weight: 300; line-height: 1.15; color: var(--ink); margin-bottom: 26px; }
+  .pf-h2 em { font-style: italic; color: var(--gold-muted); }
+  .pf-body { font-size: 13.5px; font-weight: 300; line-height: 2; color: var(--warm-gray); max-width: 680px; }
+  .pf-body + .pf-body { margin-top: 20px; }
+  .pf-cred { font-size: 13.5px; font-weight: 300; line-height: 2; color: var(--warm-gray); max-width: 680px; }
+  .pf-carriers { margin-top: 32px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 0 32px; max-width: 540px; }
+  .pf-carriers span { font-family: 'Cormorant Garamond', serif; font-size: 19px; font-weight: 400; color: var(--ink); letter-spacing: 0.01em; padding: 12px 0; border-bottom: 1px solid var(--rule); }
+  .pf-marks { display: grid; grid-template-columns: 1fr 1fr; gap: 38px 52px; margin-top: 50px; }
+  .pf-mark-term { font-family: 'Cormorant Garamond', serif; font-size: 21px; font-weight: 400; color: var(--ink); line-height: 1.25; margin-bottom: 10px; }
+  .pf-mark-term::before { content: ''; display: block; width: 26px; height: 1px; background: var(--gold); margin-bottom: 18px; }
+  .pf-mark-text { font-size: 12px; font-weight: 300; line-height: 1.85; color: var(--warm-gray); }
+
+  /* Split header/body layout */
+  .pf-split { display: grid; grid-template-columns: 1fr 1.32fr; gap: 64px; align-items: start; max-width: 1180px; margin: 0 auto; padding: 104px 60px; }
+
+  /* "When it fits" list */
+  .pf-list { list-style: none; margin-top: 30px; display: grid; gap: 14px; }
+  .pf-list li { font-size: 12.5px; font-weight: 400; line-height: 1.7; color: var(--ink); padding-left: 22px; position: relative; }
+  .pf-list li::before { content: '\2014'; position: absolute; left: 0; color: var(--gold); }
+
+  /* How it works — steps */
+  .pf-steps { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1px; background: var(--rule); margin-top: 48px; }
+  .pf-step { background: var(--parchment); padding: 38px 34px; }
+  .pf-step-num { font-family: 'Cormorant Garamond', serif; font-size: 13px; font-weight: 300; color: var(--gold); letter-spacing: 0.2em; display: block; margin-bottom: 14px; }
+  .pf-step-title { font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 400; color: var(--ink); margin-bottom: 11px; line-height: 1.2; }
+  .pf-step-desc { font-size: 11.5px; font-weight: 300; line-height: 1.85; color: var(--warm-gray); }
+
+  /* Risk framework — navy */
+  .pf-risk { background: var(--ink); padding: 112px 60px; position: relative; overflow: hidden; }
+  .pf-risk::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at 82% 18%, rgba(184,151,46,0.10) 0%, transparent 60%); pointer-events: none; }
+  .pf-risk-inner { max-width: 1180px; margin: 0 auto; position: relative; }
+  .pf-risk .pf-eyebrow { color: var(--gold); }
+  .pf-risk-h2 { font-family: 'Cormorant Garamond', serif; font-size: clamp(32px, 3.2vw, 46px); font-weight: 300; color: var(--white); line-height: 1.15; margin-bottom: 24px; max-width: 720px; }
+  .pf-risk-h2 em { font-style: italic; color: var(--gold-light); }
+  .pf-risk-lead { font-size: 14px; font-weight: 300; line-height: 1.95; color: rgba(247,244,239,0.62); max-width: 720px; margin-bottom: 56px; }
+  .pf-risk-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1px; background: rgba(255,255,255,0.07); }
+  .pf-risk-item { background: rgba(13,30,58,0.55); padding: 36px 32px; position: relative; }
+  .pf-risk-item::before { content: ''; position: absolute; top: 0; left: 0; width: 26px; height: 2px; background: var(--gold); opacity: 0.6; }
+  .pf-risk-term { font-family: 'Cormorant Garamond', serif; font-size: 21px; font-weight: 400; color: var(--white); margin-bottom: 12px; line-height: 1.2; }
+  .pf-risk-text { font-size: 11.5px; font-weight: 300; line-height: 1.85; color: rgba(247,244,239,0.5); }
+  .pf-risk-note { margin-top: 46px; font-size: 13px; font-style: italic; color: rgba(247,244,239,0.72); max-width: 720px; line-height: 1.8; }
+
+  .pf-howit { background: var(--ink); padding: 112px 60px; position: relative; overflow: hidden; }
+  .pf-howit::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at 20% 18%, rgba(184,151,46,0.10) 0%, transparent 62%); pointer-events: none; }
+  .pf-howit-inner { max-width: 1180px; margin: 0 auto; position: relative; text-align: center; }
+  .pf-howit .pf-eyebrow { color: var(--gold); }
+  .pf-howit-h2 { font-family: 'Cormorant Garamond', serif; font-size: clamp(32px, 3.2vw, 46px); font-weight: 300; color: var(--white); line-height: 1.15; margin-bottom: 24px; }
+  .pf-howit-h2 em { font-style: italic; color: var(--gold-light); }
+  .pf-howit-lead { font-size: 14px; font-weight: 300; line-height: 1.95; color: rgba(247,244,239,0.62); max-width: 620px; margin: 0 auto; }
+  .pf-howit-diagram { max-width: 1000px; margin: 34px auto 0; }
+  .pf-howit-diagram svg { width: 100%; height: auto; display: block; }
+  .pf-howit-note { margin: 26px auto 0; font-size: 13px; font-style: italic; color: rgba(247,244,239,0.72); max-width: 680px; line-height: 1.8; }
+
+  /* Engagement path */
+  .pf-path { display: flex; flex-wrap: wrap; align-items: center; gap: 0 14px; margin-top: 38px; }
+  .pf-path span { font-size: 10.5px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink); padding: 6px 0; }
+  .pf-path span:not(:last-child)::after { content: '\00B7'; color: var(--gold); margin-left: 14px; }
+
+  /* Representative engagements */
+  .pf-cases { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; background: var(--rule); margin-top: 42px; }
+  .pf-case { background: var(--parchment); padding: 46px 42px; }
+  .pf-case-tag { font-size: 9px; font-weight: 600; letter-spacing: 0.28em; text-transform: uppercase; color: var(--gold); display: block; margin-bottom: 18px; }
+  .pf-case-title { font-family: 'Cormorant Garamond', serif; font-size: 25px; font-weight: 400; color: var(--ink); margin-bottom: 15px; line-height: 1.22; }
+  .pf-case-text { font-size: 12px; font-weight: 300; line-height: 1.85; color: var(--warm-gray); }
+  .pf-illus { font-size: 10px; font-style: italic; letter-spacing: 0.03em; color: var(--warm-gray); margin-top: 28px; max-width: 720px; line-height: 1.7; }
+
+  /* Closing CTA — navy */
+  .pf-cta { background: var(--ink); padding: 122px 60px; text-align: center; position: relative; overflow: hidden; }
+  .pf-cta::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 0%, rgba(184,151,46,0.10) 0%, transparent 60%); pointer-events: none; }
+  .pf-cta-inner { max-width: 720px; margin: 0 auto; position: relative; }
+  .pf-cta .pf-eyebrow { color: var(--gold); }
+  .pf-cta-title { font-family: 'Cormorant Garamond', serif; font-size: clamp(34px, 3.4vw, 52px); font-weight: 300; color: var(--white); line-height: 1.12; margin-bottom: 22px; }
+  .pf-cta-title em { font-style: italic; color: var(--gold-light); }
+  .pf-cta-sub { font-size: 13px; font-weight: 300; line-height: 1.9; color: rgba(247,244,239,0.6); max-width: 560px; margin: 0 auto 40px; }
+  .pf-cta-btns { display: flex; flex-wrap: wrap; gap: 16px; justify-content: center; }
+
+  /* Disclosure */
+  .pf-disclosure { background: #0a1424; padding: 42px 60px; }
+  .pf-disclosure p { max-width: 1180px; margin: 0 auto; font-size: 10px; font-weight: 300; line-height: 1.85; color: rgba(247,244,239,0.34); }
+
+  /* Responsive */
+  @media (max-width: 1024px) {
+    .pf-split { grid-template-columns: 1fr; gap: 28px; }
+    .pf-steps, .pf-risk-grid, .pf-cases, .pf-marks { grid-template-columns: 1fr; }
+    .pf-hero, .pf-section, .pf-split, .pf-risk, .pf-cta, .pf-disclosure { padding-left: 32px; padding-right: 32px; }
+  }
+  @media (max-width: 600px) {
+    .pf-hero { padding: 128px 24px 72px; }
+    .pf-section, .pf-split, .pf-risk, .pf-cta { padding-top: 66px; padding-bottom: 66px; padding-left: 24px; padding-right: 24px; }
+    .pf-disclosure { padding: 32px 24px; }
+    .pf-hero-ctas, .pf-cta-btns { flex-direction: column; }
+    .pf-hero-ctas .btn-primary, .pf-hero-ctas .pf-btn-line, .pf-cta-btns .btn-primary, .pf-cta-btns .btn-outline { text-align: center; }
+  }
 </style>
 </head>
 <body>
 
-<!-- NAV -->
 <nav id="nav">
-  <a href="#" class="nav-logo">Edwards <span>&</span> Associates</a>
+  <a href="index.html" class="nav-logo">Edwards <span>&amp;</span> Associates</a>
   <button class="nav-toggle" id="navToggle" aria-label="Open menu" aria-expanded="false"><span></span><span></span><span></span></button>
   <ul class="nav-links">
-    <li><a href="#serve">Who We Serve</a></li>
-    <li><a href="#services">Practice Areas</a></li>
+    <li><a href="index.html#serve">Who We Serve</a></li>
+    <li><a href="index.html#services">Practice Areas</a></li>
     <li><a href="professional-partners.html">For Advisors</a></li>
     <li><a href="/resources">Resources</a></li>
-    <li><a href="#about">About</a></li>
+    <li><a href="index.html#about">About</a></li>
   </ul>
   <div class="nav-right">
     <a href="portal-partner-login.html" class="nav-partner">Partner Access</a>
-    <a href="#" class="nav-portal" id="openPortal">Client Portal</a>
+    <a href="index.html" class="nav-portal">Client Portal</a>
     <a href="https://calendly.com/jedwards-finance/30min" target="_blank" rel="noopener noreferrer" onclick="if(window.Calendly){Calendly.initPopupWidget({url:'https://calendly.com/jedwards-finance/30min'});return false;}" class="nav-cta">Begin the Conversation</a>
   </div>
 </nav>
 
 <!-- HERO -->
-<section class="hero">
-  <div class="hero-left">
-    <p class="hero-eyebrow">Edwards Financial & Associates</p>
-    <h1 class="hero-heading">Wealth<br>Built to<br><em>Endure.</em></h1>
-    <p class="hero-sub">We design retirement, legacy, and protection strategies around the assets you’ve already built — working alongside the CPAs, attorneys, and advisors who serve you. Led by strategy, not products.</p>
-    <div class="hero-btns">
-      <a href="#contact" class="btn-primary">Schedule a Consultation</a>
-      <a href="#serve" class="btn-outline">Our Approach</a>
-    </div>
+<header class="pf-hero reveal">
+  <p class="pf-hero-eyebrow">Practice Area</p>
+  <h1 class="pf-hero-title">Premium Finance</h1>
+  <div class="pf-hero-rule"></div>
+  <p class="pf-hero-lead">Premium finance applies institutional leverage to one of the most durable assets there is — permanent life insurance. A bank funds the premiums; the client&rsquo;s own capital stays at work; and the structure can serve two ends: the liquidity a significant estate needs, or a substantial, tax-advantaged pool of future income. We serve as the specialist behind that structure. You remain the client&rsquo;s trusted advisor at every step.</p>
+  <div class="pf-hero-ctas">
+    <a href="https://calendly.com/jedwards-finance/30min" target="_blank" rel="noopener noreferrer" onclick="if(window.Calendly){Calendly.initPopupWidget({url:'https://calendly.com/jedwards-finance/30min'});return false;}" class="btn-primary">Begin a Confidential Conversation</a>
+    <a href="mailto:joshua@edwardsfinancialandassociates.com?subject=Premium%20Finance%20%E2%80%94%20Case%20for%20Design&amp;body=Firm%20%2F%20advisor%3A%0AYour%20role%3A%0AClient%20situation%20%28brief%29%3A%0AApproximate%20net%20worth%20range%3A%0AExisting%20coverage%3A%0APrimary%20objective%3A%0ABest%20way%20to%20reach%20you%3A" class="pf-btn-line">Submit a Case for Design</a>
   </div>
-  <div class="hero-right">
-    <div class="hero-stat-grid">
-      <div class="hero-stat">
-        <div class="hero-stat-number">18<sup>+</sup></div>
-        <div class="hero-stat-label">Years of Practice</div>
+</header>
+
+<!-- HOW IT WORKS (VISUAL) -->
+<section class="pf-howit reveal">
+  <div class="pf-howit-inner">
+    <p class="pf-eyebrow">How It Works</p>
+    <h2 class="pf-howit-h2">One Asset,<br><em>Funded Through Leverage</em></h2>
+    <p class="pf-howit-lead">The structure may be advanced, but the moving parts are not. A lender funds the premiums; the policy does the work; the client’s own capital stays invested throughout.</p>
+    <div class="pf-howit-diagram">
+      <svg viewBox="0 0 1080 310" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Premium finance structure: the bank funds the premiums and the client provides collateral and interest; together they support a permanent policy that builds value and later provides supplemental income during life and a death benefit to the family.">
+        <defs>
+          <marker id="pfArrowL" markerWidth="11" markerHeight="11" refX="6.5" refY="3" orient="auto" markerUnits="strokeWidth">
+            <path d="M0,0 L6.5,3 L0,6" fill="none" stroke="#d4af5a" stroke-width="1.3"/>
+          </marker>
+        </defs>
+        <circle cx="540" cy="155" r="70" fill="rgba(212,175,90,0.05)" stroke="#d4af5a" stroke-width="1.4"/>
+        <text x="540" y="163" text-anchor="middle" font-family="'Cormorant Garamond', Georgia, serif" font-size="27" fill="#f7f4ef">The Policy</text>
+        <text x="540" y="252" text-anchor="middle" font-family="Montserrat, Arial, sans-serif" font-size="12.5" letter-spacing="0.3" fill="#c2bbac">builds value over time</text>
+        <path d="M280,108 C372,118 414,120 474,122" fill="none" stroke="#d4af5a" stroke-width="1.3" marker-end="url(#pfArrowL)"/>
+        <path d="M280,212 C372,202 414,196 474,190" fill="none" stroke="#d4af5a" stroke-width="1.3" marker-end="url(#pfArrowL)"/>
+        <path d="M606,122 C680,118 710,114 762,108" fill="none" stroke="#d4af5a" stroke-width="1.3" marker-end="url(#pfArrowL)"/>
+        <path d="M606,190 C680,194 710,200 762,206" fill="none" stroke="#d4af5a" stroke-width="1.3" marker-end="url(#pfArrowL)"/>
+        <text x="258" y="102" text-anchor="end" font-family="'Cormorant Garamond', Georgia, serif" font-size="22" fill="#f7f4ef">The Bank</text>
+        <text x="258" y="123" text-anchor="end" font-family="Montserrat, Arial, sans-serif" font-size="12" letter-spacing="0.3" fill="#c2bbac">funds the premiums</text>
+        <text x="258" y="206" text-anchor="end" font-family="'Cormorant Garamond', Georgia, serif" font-size="22" fill="#f7f4ef">The Client</text>
+        <text x="258" y="227" text-anchor="end" font-family="Montserrat, Arial, sans-serif" font-size="12" letter-spacing="0.3" fill="#c2bbac">collateral &amp; interest only</text>
+        <text x="786" y="102" text-anchor="start" font-family="'Cormorant Garamond', Georgia, serif" font-size="22" fill="#f7f4ef">Supplemental Income</text>
+        <text x="786" y="123" text-anchor="start" font-family="Montserrat, Arial, sans-serif" font-size="12" letter-spacing="0.3" fill="#c2bbac">drawn during life</text>
+        <text x="786" y="206" text-anchor="start" font-family="'Cormorant Garamond', Georgia, serif" font-size="22" fill="#f7f4ef">A Death Benefit</text>
+        <text x="786" y="227" text-anchor="start" font-family="Montserrat, Arial, sans-serif" font-size="12" letter-spacing="0.3" fill="#c2bbac">to the family, at the end</text>
+      </svg>
+    </div>
+    <p class="pf-howit-note">The client carries the financing cost and pledges collateral — a fraction of the premium — and the loan is repaid through a defined, planned exit. None of it is left to chance.</p>
+  </div>
+</section>
+
+<!-- WHEN IT FITS -->
+<section class="pf-split reveal">
+  <div>
+    <p class="pf-eyebrow">When It Fits</p>
+    <h2 class="pf-h2">A Specific Tool for a<br><em>Specific Situation</em></h2>
+  </div>
+  <div>
+    <p class="pf-body">Premium finance is a sophisticated strategy for a specific situation — not a product for general use. It tends to fit when a client has a genuine need for substantial permanent coverage, the net worth and income to support the arrangement, the liquidity to meet collateral requirements, and the temperament to hold a long-term structure through changing conditions. The first work of any engagement is to determine, honestly, whether those conditions are met. Often they are not — and saying so is part of the service.</p>
+    <ul class="pf-list">
+      <li>Providing the liquidity a large estate needs — without forcing the sale of a business or illiquid assets.</li>
+      <li>Equalizing an inheritance when wealth is concentrated in a single holding.</li>
+      <li>Funding a buy-sell agreement, or insuring a person the business cannot easily replace.</li>
+      <li>Preserving a performing portfolio rather than liquidating it to pay premiums.</li>
+      <li>Building a substantial, tax-advantaged pool of future income for a high earner whose peak years are concentrated and finite.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- THE LANDSCAPE / FIFTH OPTION -->
+<section class="pf-split reveal">
+  <div>
+    <p class="pf-eyebrow">The Landscape</p>
+    <h2 class="pf-h2">A Favorable Moment,<br><em>Not a Fixed One</em></h2>
+  </div>
+  <div>
+    <p class="pf-body">Today&rsquo;s federal exemption is generous and, for now, permanent — the sunset that dominated planning for two years was set aside in 2025. But the tax code has called numbers &ldquo;permanent&rdquo; before. A future Congress can lower the exemption as readily as this one raised it, and within living memory the top federal estate-tax rate stood at seventy-seven percent for thirty-five years. Planning that quietly assumes today&rsquo;s rules are forever is planning on a fault line — and securing protection while one is healthy, insurable, and the law is favorable has value precisely because it does not depend on the law staying that way.</p>
+    <p class="pf-body">For the estates that do face exposure — above the federal lines, in one of the dozen-plus states with lower thresholds, or concentrated in a business that cannot easily be sold — the conventional ways to create the liquidity an estate needs are well known:</p>
+    <ul class="pf-list">
+      <li>An IRC &sect;6166 installment election.</li>
+      <li>A Graegin loan made to the estate.</li>
+      <li>Paying the insurance premiums from cash flow.</li>
+      <li>Leaving heirs to settle the bill.</li>
+    </ul>
+    <p class="pf-body" style="margin-top:22px;">Premium finance is a fifth path — and, for the right situation, a more efficient one.</p>
+  </div>
+</section>
+
+<!-- RISK FRAMEWORK -->
+<section class="pf-risk reveal">
+  <div class="pf-risk-inner">
+    <p class="pf-eyebrow">The Risk Framework</p>
+    <h2 class="pf-risk-h2">Leverage Introduces Risk.<br><em>We Treat It Openly.</em></h2>
+    <p class="pf-risk-lead">Every financed structure carries risk, and pretending otherwise serves no one. We name each risk plainly, model conservatively, and design only the cases that can withstand conditions not going their way.</p>
+    <div class="pf-risk-grid">
+      <div class="pf-risk-item"><h3 class="pf-risk-term">Interest-Rate Risk</h3><p class="pf-risk-text">Borrowing costs move. Every case is stress-tested against materially higher rates before it is ever recommended.</p></div>
+      <div class="pf-risk-item"><h3 class="pf-risk-term">Collateral Maintenance</h3><p class="pf-risk-text">Pledged collateral must be maintained. We size it with margin from the outset, so a market dip does not force a call.</p></div>
+      <div class="pf-risk-item"><h3 class="pf-risk-term">Policy Performance</h3><p class="pf-risk-text">Policies perform within ranges, not certainties. We model on conservative assumptions, never best-case illustrations.</p></div>
+      <div class="pf-risk-item"><h3 class="pf-risk-term">The Defined Exit</h3><p class="pf-risk-text">Loans come due. Every structure carries a repayment plan, established before the first premium is financed.</p></div>
+    </div>
+    <p class="pf-risk-note">We would rather decline a case than design one that depends on everything going right.</p>
+  </div>
+</section>
+
+<!-- WHAT A WELL-BUILT STRUCTURE LOOKS LIKE -->
+<div class="pf-band-alt">
+  <section class="pf-section reveal">
+    <p class="pf-eyebrow">Built With Discipline</p>
+    <h2 class="pf-h2">The Marks of a<br><em>Well-Built Structure</em></h2>
+    <p class="pf-body">Not all premium finance is built the same. These are the features that separate a structure designed to last from one designed simply to close.</p>
+    <div class="pf-marks">
+      <div><h3 class="pf-mark-term">An Annual Review — and a Walk-Away</h3><p class="pf-mark-text">The structure is re-examined every year, and the client keeps the ability to step out if it no longer serves them. No one is trapped in a plan that has stopped working.</p></div>
+      <div><h3 class="pf-mark-term">Several Bank Options</h3><p class="pf-mark-text">More than one lender is presented, so the financing is matched to the client — not to a single institution&rsquo;s program or incentives.</p></div>
+      <div><h3 class="pf-mark-term">Customized Interest &amp; Collateral</h3><p class="pf-mark-text">How interest is paid and how collateral is pledged is shaped to the client&rsquo;s cash flow and balance sheet, not forced into a template.</p></div>
+      <div><h3 class="pf-mark-term">Fixed or Variable, Deliberately</h3><p class="pf-mark-text">Rate structure is a choice made with the trade-offs on the table — not a default the client inherits without discussion.</p></div>
+      <div><h3 class="pf-mark-term">Non-Recourse Options Where They Fit</h3><p class="pf-mark-text">Where appropriate, loan structures that keep the client&rsquo;s broader balance sheet off the line beyond the collateral pledged.</p></div>
+      <div><h3 class="pf-mark-term">Case Rescue</h3><p class="pf-mark-text">When an existing financed policy is underperforming or mispriced, it can often be restructured rather than surrendered. A second opinion is always worth having.</p></div>
+    </div>
+  </section>
+</div>
+
+<!-- HOW WE WORK WITH YOUR FIRM -->
+<section class="pf-split reveal">
+  <div>
+    <p class="pf-eyebrow">For Professional Advisors</p>
+    <h2 class="pf-h2">A Specialist Behind<br><em>Your Counsel</em></h2>
+  </div>
+  <div>
+    <p class="pf-body">We work the way a good specialist should — invisible to the client&rsquo;s sense of who their advisor is, and indispensable to the quality of the outcome. You bring the relationship and the context. We coordinate the case design, the carriers and lenders, the illustration and stress-testing, and the implementation — and we bring it back to the table for your review before anything reaches the client.</p>
+    <p class="pf-body">You remain the client&rsquo;s trusted advisor throughout. Compensation and disclosures are transparent, by default.</p>
+    <div class="pf-path"><span>Discovery</span><span>Analysis</span><span>Strategy Design</span><span>Collaborative Review</span><span>Implementation</span><span>Ongoing Monitoring</span></div>
+  </div>
+</section>
+
+<!-- REPRESENTATIVE ENGAGEMENTS -->
+<div class="pf-band-alt">
+  <section class="pf-section reveal">
+    <p class="pf-eyebrow">Representative Engagements</p>
+    <h2 class="pf-h2">Selected<br><em>Matters</em></h2>
+    <div class="pf-cases">
+      <div class="pf-case">
+        <span class="pf-case-tag">Concentrated Estate</span>
+        <h3 class="pf-case-title">Keeping the Business in the Family</h3>
+        <p class="pf-case-text">A business owner held most of their net worth in a closely held company and faced an estate-tax liability that would have forced a sale at the worst possible time. A financed permanent policy, sized to the projected liability and collateralized conservatively, provided the liquidity the estate needed — the family kept the business, and the structure was stress-tested against materially higher rates.</p>
       </div>
-      <div class="hero-stat">
-        <div class="hero-stat-number">10<sup>+</sup></div>
-        <div class="hero-stat-label">Leverage Potential</div>
-      </div>
-      <div class="hero-stat">
-        <div class="hero-stat-number">25<sup>+</sup></div>
-        <div class="hero-stat-label">Carrier Partnerships</div>
-      </div>
-      <div class="hero-stat">
-        <div class="hero-stat-number">14<sup>+</sup></div>
-        <div class="hero-stat-label">Public Pension Systems</div>
+      <div class="pf-case">
+        <span class="pf-case-tag">Portfolio Preservation</span>
+        <h3 class="pf-case-title">Funding a Legacy Without Liquidating</h3>
+        <p class="pf-case-text">A family wished to leave a meaningful legacy and equalize inheritances among their children without liquidating a long-held, well-performing portfolio to fund premiums. Premium financing kept the portfolio intact while funding substantial coverage, with collateral drawn from a mix of policy value and pledged assets and a clearly defined exit.</p>
       </div>
     </div>
-    <div class="hero-quote">
-      <blockquote>"The most powerful estate transfer tool in existence doesn't require a dynasty trust or a family office. It requires the right policy, the right structure, and a strategist who knows the difference."</blockquote>
-      <cite>Joshua Edwards — Founder</cite>
+    <p class="pf-illus">Illustrative scenarios for educational purposes. They do not depict specific clients and are not a guarantee or prediction of results.</p>
+  </section>
+</div>
+
+<!-- CARRIERS & LENDING -->
+<section class="pf-split reveal">
+  <div>
+    <p class="pf-eyebrow">Carriers &amp; Lending</p>
+    <h2 class="pf-h2">Established Partners,<br><em>Conservative Design</em></h2>
+  </div>
+  <div>
+    <p class="pf-cred">Premium finance is a discipline of its own. For the financing structure, we work through established premium-finance offices — a small group of dedicated desks that maintain the bank relationships, engineer each case, and present options across multiple lenders. We bring the relationship and the planning; they bring the financing machinery — so the structure is matched to the client rather than to any one institution.</p>
+    <p class="pf-cred" style="margin-top:20px;">Cases are designed with established national carriers whose permanent products are suited to financed structures, on a single philosophy: conservative assumptions, adequate collateral, and a defined exit — because leverage rewards discipline and punishes optimism.</p>
+    <div class="pf-carriers">
+      <span>Allianz</span>
+      <span>Lincoln Financial</span>
+      <span>Nationwide</span>
+      <span>Pacific Life</span>
+      <span>Protective Life</span>
+      <span>Prudential</span>
+      <span>Securian Financial</span>
+      <span>United of Omaha</span>
+    </div>
+    <p class="pf-cred" style="margin-top:24px;">Joshua Edwards is a licensed life and annuity producer in California and over a dozen other states, with seventeen years in advanced insurance and estate strategy.</p>
+  </div>
+</section>
+
+<!-- ON LEVERAGE / THE SECOND APPLICATION -->
+<div class="pf-band-alt">
+<section class="pf-split reveal">
+  <div>
+    <p class="pf-eyebrow">The Principle</p>
+    <h2 class="pf-h2">Leverage, Applied<br><em>to a Lifetime</em></h2>
+  </div>
+  <div>
+    <p class="pf-body">Leverage, used well, is a simple idea: putting capital you don’t have to commit to work as though it were your own. A bank funds the premiums; the client carries only the cost of the money — a fraction of the policy’s own growth potential, at a rate that can be locked — and the difference works in the client’s favor. The same principle has more than one use: the estate work described above, and a second, less widely known one.</p>
+    <p class="pf-body">For a high earner with a compressed window — a professional athlete, a performer, a founder approaching an exit — a bank-funded policy can accumulate over decades and later provide a substantial stream of supplemental income, drawn in a form the tax code does not treat as taxable under current law, so long as the policy is maintained as designed. It is among the most efficient pools of future capital available to someone whose earning years are bright but finite — and, done carelessly, one of the ways these strategies go wrong. Which is the point of doing it with discipline.</p>
+  </div>
+</section>
+</div>
+
+<!-- CLOSE CTA -->
+<section class="pf-cta reveal">
+  <div class="pf-cta-inner">
+    <p class="pf-eyebrow">A Private Engagement</p>
+    <h2 class="pf-cta-title">A Confidential<br><em>Conversation.</em></h2>
+    <p class="pf-cta-sub">Whether you&rsquo;re an advisor exploring premium finance for a client, or evaluating the strategy for your own estate — the conversation is private, unhurried, and without obligation.</p>
+    <div class="pf-cta-btns">
+      <a href="mailto:joshua@edwardsfinancialandassociates.com?subject=Premium%20Finance%20%E2%80%94%20Case%20for%20Design&amp;body=Firm%20%2F%20advisor%3A%0AYour%20role%3A%0AClient%20situation%20%28brief%29%3A%0AApproximate%20net%20worth%20range%3A%0AExisting%20coverage%3A%0APrimary%20objective%3A%0ABest%20way%20to%20reach%20you%3A" class="btn-primary">Submit a Case for Design</a>
+      <a href="https://calendly.com/jedwards-finance/30min" target="_blank" rel="noopener noreferrer" onclick="if(window.Calendly){Calendly.initPopupWidget({url:'https://calendly.com/jedwards-finance/30min'});return false;}" class="btn-outline">Begin a Confidential Conversation</a>
     </div>
   </div>
 </section>
 
-<!-- STRATEGIC ALLIANCES -->
-<section class="alliances reveal">
-  <p class="alliances-label">Strategic Alliances</p>
-  <p class="alliances-lead">Trusted by the professionals who serve successful families, business owners, educators, executives, and retirees.</p>
-  <p class="alliances-types">CPAs &nbsp;&middot;&nbsp; Estate Attorneys &nbsp;&middot;&nbsp; Business Managers &nbsp;&middot;&nbsp; Sports &amp; Entertainment Agents &nbsp;&middot;&nbsp; Real Estate Advisors &nbsp;&middot;&nbsp; Family Offices</p>
-  <a href="professional-partners.html">Explore a Professional Partnership &rarr;</a>
-</section>
-
-<!-- WHO WE SERVE -->
-<section class="serve" id="serve">
-  <div class="section-header reveal">
-    <div>
-      <p class="section-label">Clientele</p>
-      <h2 class="section-title">Who We<br><em>Serve</em></h2>
-    </div>
-    <p class="section-desc">Two distinct client profiles. One uncompromising standard of care. Whether you're building an empire or protecting one, this practice was built for you.</p>
-  </div>
-  <div class="serve-cards reveal">
-    <div class="serve-card">
-      <span class="serve-card-tag">Private Wealth & Legacy</span>
-      <h3 class="serve-card-title">High-Net-Worth<br>& Business Owners</h3>
-      <p class="serve-card-desc">For those whose net worth demands more than conventional planning — clients who want their assets to work harder in death than they did in life.</p>
-      <ul class="serve-card-list">
-        <li>Asset-Based Liquidity Strategies</li>
-        <li>Tax-Efficient Wealth Transfer</li>
-        <li>Efficient Wealth Transfer to Heirs</li>
-        <li>Irrevocable Life Insurance Trust (ILIT) Strategy</li>
-        <li>Business Succession & Key-Person Planning</li>
-        <li>Multi-Generational Planning Structures</li>
-      </ul>
-      <div class="serve-card-arrow">
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-          <path d="M3 8h10M9 4l4 4-4 4" stroke="#b8972e" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </div>
-    </div>
-    <div class="serve-card">
-      <span class="serve-card-tag">Retirement & Income</span>
-      <h3 class="serve-card-title">Families,<br>Retirees & Pensioners</h3>
-      <p class="serve-card-desc">For those who've worked a lifetime to build something worth protecting — and deserve a retirement with dignity and a legacy that outlasts them.</p>
-      <ul class="serve-card-list">
-        <li>Pension Gap & Survivor Benefit Planning</li>
-        <li>Social Security Optimization</li>
-        <li>Lifetime Income Planning</li>
-        <li>Public Pension Systems (CalSTRS, CalPERS, LACERA & more)</li>
-        <li>Tax-Efficient Retirement Distribution</li>
-        <li>Tax-Advantaged Retirement Supplement Strategies</li>
-      </ul>
-      <div class="serve-card-arrow">
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-          <path d="M3 8h10M9 4l4 4-4 4" stroke="#b8972e" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- LEVERAGE SECTION -->
-<section class="leverage-banner reveal">
-  <div class="leverage-header">
-    <p class="leverage-header-label">Our Approach</p>
-    <h2 class="leverage-header-title">Protection &amp; Control.<br><em>Certainty &amp; Legacy.</em></h2>
-  </div>
-  <div class="leverage-inner">
-    <div class="leverage-pillar">
-      <span class="leverage-pillar-num">I — Asset-Based Liquidity</span>
-      <h3 class="leverage-pillar-title">Put Assets to Work</h3>
-      <p class="leverage-pillar-desc">Strategies designed to put the assets you’ve already built to work — keeping your capital invested and your broader plan intact while strengthening the protection in place for your family and estate.</p>
-    </div>
-    <div class="leverage-pillar">
-      <span class="leverage-pillar-num">II — Tax-Efficient Growth</span>
-      <h3 class="leverage-pillar-title">Compound Efficiently</h3>
-      <p class="leverage-pillar-desc">Tax-advantaged accumulation structures that pursue growth with built-in downside protection, can be accessed during your lifetime, and are designed to pass efficiently to heirs. Outcomes depend on the structure and policy selected.</p>
-    </div>
-    <div class="leverage-pillar">
-      <span class="leverage-pillar-num">III — Enduring Legacy</span>
-      <h3 class="leverage-pillar-title">Transfer Efficiently</h3>
-      <p class="leverage-pillar-desc">Wealth positioned with intention so that more of what you’ve built reaches the next generation — coordinated with your attorney and tax professional, and structured to endure across generations.</p>
-    </div>
-  </div>
-</section>
-
-<!-- PHILOSOPHY -->
-<section class="philosophy">
-  <div class="philosophy-inner reveal">
-    <p class="philosophy-label">Our Philosophy</p>
-    <p class="philosophy-quote">"The right plan doesn’t start with a product.<br>It starts with what you want to <span>protect, control, and pass on</span><br>— and builds everything around that."</p>
-    <p class="philosophy-attr">Joshua Edwards — Edwards Financial & Associates</p>
-  </div>
-</section>
-
-<!-- SERVICES -->
-<section class="services" id="services">
-  <div class="section-header reveal">
-    <div>
-      <p class="section-label">What We Do</p>
-      <h2 class="section-title">Practice<br><em>Areas</em></h2>
-    </div>
-    <p class="section-desc">A full spectrum of advanced financial strategies, each tailored precisely — never templated.</p>
-  </div>
-  <div class="services-grid reveal">
-    <div class="service-item">
-      <div class="service-num">01</div>
-      <div class="service-icon"></div>
-      <h3 class="service-title">Retirement Strategy</h3>
-      <p class="service-desc">Income strategies built around the retirement you actually want — turning what you’ve accumulated into dependable, lasting cash flow, with protection and long-term-care planning built in, so a health event late in life doesn’t undo the plan you’ve spent decades building.</p>
-    </div>
-    <div class="service-item">
-      <div class="service-num">02</div>
-      <div class="service-icon"></div>
-      <h3 class="service-title">Estate &amp; Legacy Planning</h3>
-      <p class="service-desc">Advanced planning that works in concert with your attorney and CPA — using trust and insurance structures to transfer wealth across generations as efficiently as the law allows, and to direct part of what you’ve built toward the causes and community you care about.</p>
-    </div>
-    <div class="service-item">
-      <div class="service-num">03</div>
-      <div class="service-icon"></div>
-      <h3 class="service-title">Premium Financing</h3>
-      <p class="service-desc">A strategy for qualified high-net-worth clients — using third-party financing to fund substantial life insurance while keeping your capital deployed where it already serves you, structured conservatively and coordinated with your existing plan.</p>
-    </div>
-    <div class="service-item">
-      <div class="service-num">04</div>
-      <div class="service-icon"></div>
-      <h3 class="service-title">Asset-Based Liquidity</h3>
-      <p class="service-desc">Strategies that put the assets you’ve already built to work — building a private reserve that strengthens protection and liquidity for your estate while keeping your broader plan intact, and coordinated with your existing advisors.</p>
-    </div>
-    <div class="service-item">
-      <div class="service-num">05</div>
-      <div class="service-icon"></div>
-      <h3 class="service-title">Tax-Advantaged Accumulation</h3>
-      <p class="service-desc">Accumulation strategies that pursue growth with downside protection and tax advantages, and can supplement retirement income. Results depend on the structure and policy selected.</p>
-    </div>
-    <div class="service-item">
-      <div class="service-num">06</div>
-      <div class="service-icon"></div>
-      <h3 class="service-title">Business Succession &amp; Key-Person Planning</h3>
-      <p class="service-desc">For owners whose company is their largest asset — funding buy-sell agreements, insuring the people the business can’t replace, and structuring an exit that honors a lifetime of building.</p>
-    </div>
-  </div>
-</section>
-
-<!-- PENSION OPTIMIZATION -->
-<section class="pension" id="pension">
-  <div class="pension-inner reveal">
-    <div class="pension-intro">
-      <p class="pension-label">Our Specialty</p>
-      <h2 class="pension-title">Pension<br><em>Optimization</em></h2>
-      <p class="pension-lead">You spent a career earning it. Yet the decisions that turn a pension into a lifetime of security are made once — and most can never be undone. This is the work this practice was built for.</p>
-      <div class="pension-cta-row">
-        <a href="/resources/california-pension-calculator" class="btn-primary">Run Your Pension Numbers</a>
-        <a href="https://calendly.com/jedwards-finance/30min" target="_blank" rel="noopener noreferrer" onclick="if(window.Calendly){Calendly.initPopupWidget({url:'https://calendly.com/jedwards-finance/30min'});return false;}" class="btn-outline">Begin the Conversation</a>
-      </div>
-    </div>
-    <div class="pension-pillars">
-      <div class="pension-pillar">
-        <span class="pension-pillar-num">01</span>
-        <h3 class="pension-pillar-title">The Election &amp; Survivor Decision</h3>
-        <p class="pension-pillar-desc">The permanent choice between a larger check today and protection for the spouse who may outlive you — modeled clearly, with intention, before the form is ever signed.</p>
-      </div>
-      <div class="pension-pillar">
-        <span class="pension-pillar-num">02</span>
-        <h3 class="pension-pillar-title">The Pension Gap</h3>
-        <p class="pension-pillar-desc">The distance between what your pension replaces and what your retirement actually costs — quantified honestly, then closed with the right complementary strategies.</p>
-      </div>
-      <div class="pension-pillar">
-        <span class="pension-pillar-num">03</span>
-        <h3 class="pension-pillar-title">Social Security Coordination</h3>
-        <p class="pension-pillar-desc">When to claim, and how it sequences alongside your pension — timing decisions that quietly determine how much of the retirement you earned you actually keep.</p>
-      </div>
-      <div class="pension-pillar">
-        <span class="pension-pillar-num">04</span>
-        <h3 class="pension-pillar-title">Pension Taxation</h3>
-        <p class="pension-pillar-desc">Pension income is generally taxed as ordinary income federally, and states differ sharply — California taxes it in full; others, like Florida, not at all. How and where you draw matters.</p>
-      </div>
-    </div>
-  </div>
-  <p class="pension-systems">CalSTRS · CalPERS · LACERA · LACERS · UCRP · OCERS · SDCERA &amp; more</p>
-</section>
-
-<!-- PROCESS -->
-<section class="process">
-  <div class="process-inner">
-    <div class="section-header reveal">
-      <div>
-        <p class="section-label">The Experience</p>
-        <h2 class="section-title">How We<br><em>Work</em></h2>
-      </div>
-      <p class="section-desc">Every engagement begins with listening. Every plan ends with clarity. No rushing, no templates — just strategy built around you.</p>
-    </div>
-    <div class="process-steps reveal">
-      <div class="process-step">
-        <div class="process-step-num">I</div>
-        <h4 class="process-step-title">Discovery</h4>
-        <p class="process-step-desc">A private consultation to understand your goals, your family, and the full picture of what you've built — and what you want to leave behind.</p>
-      </div>
-      <div class="process-step">
-        <div class="process-step-num">II</div>
-        <h4 class="process-step-title">Analysis</h4>
-        <p class="process-step-desc">A thorough review of your financial position — identifying gaps, inefficiencies, leverage opportunities, and estate vulnerabilities.</p>
-      </div>
-      <div class="process-step">
-        <div class="process-step-num">III</div>
-        <h4 class="process-step-title">Strategy</h4>
-        <p class="process-step-desc">A bespoke plan — presented clearly, structured precisely, and engineered to perform across your lifetime and beyond.</p>
-      </div>
-      <div class="process-step">
-        <div class="process-step-num">IV</div>
-        <h4 class="process-step-title">Legacy</h4>
-        <p class="process-step-desc">Implementation, ongoing stewardship, and a relationship that evolves as your wealth, family, and goals evolve with it.</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ABOUT -->
-<section class="about" id="about">
-  <div class="about-content reveal">
-    <p class="section-label">The Consultant</p>
-    <h2 class="about-title">A Different Kind of<br><em>Financial Mind</em></h2>
-    <p class="about-body">Joshua Edwards brings over 17 years of independent financial practice to every client relationship — built on a foundation of advanced insurance strategy, estate planning, and a belief that financial solutions should be precision instruments, not products.</p>
-    <p class="about-body">Operating as Edwards Financial &amp; Associates, Joshua specializes in retirement, legacy, and advanced protection planning — and in collaborating with the CPAs, attorneys, business managers, and agents who serve his clients, as a specialist resource rather than a replacement.</p>
-    <p class="about-body">His practice serves high-net-worth individuals and business owners seeking sophisticated estate solutions, alongside families, retirees, and pension holders who deserve the same standard of care — under one roof, with one standard.</p>
-    <div class="about-credentials">
-      <div class="credential"><div class="credential-dot"></div><span class="credential-text">Life Insurance &amp; Annuity Producer</span></div>
-      <div class="credential"><div class="credential-dot"></div><span class="credential-text">Licensed Financial Professional</span></div>
-      <div class="credential"><div class="credential-dot"></div><span class="credential-text">Premium Finance Specialist</span></div>
-      <div class="credential"><div class="credential-dot"></div><span class="credential-text">Public Pension Expert</span></div>
-      <div class="credential"><div class="credential-dot"></div><span class="credential-text">Estate & Legacy Strategist</span></div>
-      <div class="credential"><div class="credential-dot"></div><span class="credential-text">Independent — Client-First</span></div>
-    </div>
-  </div>
-  <div class="about-visual reveal">
-    <div class="about-frame">
-      <img class="about-frame-photo" src="joshua-edwards.jpg" alt="Joshua Edwards, Founder of Edwards Financial & Associates">
-      <div class="about-frame-years">17</div>
-      <div class="about-frame-text">
-        <p class="about-frame-name">Joshua Edwards</p>
-        <p class="about-frame-title">Founder — Edwards Financial & Associates</p>
-      </div>
-    </div>
-    <div class="about-accent"></div>
-  </div>
-</section>
-
-<!-- FOR ADVISORS -->
-<section class="advisors-cta reveal">
-  <p class="section-label">For Professional Advisors</p>
-  <h2>A Specialist Resource for<br>the Advisors Who <em>Serve Them Best</em></h2>
-  <p>We work alongside CPAs, attorneys, business managers, and agents to implement sophisticated planning strategies for their clients &mdash; as a specialist resource, not a replacement.</p>
-  <p class="advisors-promise">We do not replace your advisors. We do not take the relationship. <strong>You remain the client&rsquo;s trusted advisor at every step.</strong></p>
-  <a href="professional-partners.html" class="btn-primary">For Advisors &rarr;</a>
-  <p style="margin-top:24px;font-size:11px;letter-spacing:0.04em;color:var(--warm-gray);"><a href="premium-finance.html" style="color:var(--gold-muted);text-decoration:none;border-bottom:1px solid rgba(184,151,46,0.45);padding-bottom:2px;">Premium Finance &mdash; our specialist practice for significant estates &rarr;</a></p>
-</section>
-
-<!-- CONTACT -->
-<section class="contact" id="contact">
-  <div class="contact-inner">
-    <p class="contact-label">Begin the Conversation</p>
-    <h2 class="contact-title">Your Legacy<br>Starts Here.</h2>
-    <p class="contact-sub">Whether you’re a client seeking clarity on your retirement and legacy, or a professional exploring a partnership — this conversation is private, pressure-free, and purposeful.</p>
-    <div class="contact-btns">
-      <a href="https://calendly.com/jedwards-finance/30min" target="_blank" rel="noopener noreferrer" onclick="if(window.Calendly){Calendly.initPopupWidget({url:'https://calendly.com/jedwards-finance/30min'});return false;}" class="btn-primary">Request a Consultation</a>
-      <a href="tel:+16199169773" class="btn-outline" style="color:rgba(247,244,239,0.6);border-color:rgba(247,244,239,0.2);">Call Our Office</a>
-    </div>
-    <div class="contact-info">
-      <div class="contact-info-item">
-        <p class="contact-info-label">Practice</p>
-        <p class="contact-info-value">Edwards Financial & Associates</p>
-      </div>
-      <div class="contact-info-item">
-        <p class="contact-info-label">Meeting Format</p>
-        <p class="contact-info-value">Zoom · In-Person · By Appointment</p>
-      </div>
-      <div class="contact-info-item">
-        <p class="contact-info-label">Availability</p>
-        <p class="contact-info-value">Mon — Fri, By Appointment</p>
-      </div>
-    </div>
-  </div>
+<!-- DISCLOSURE -->
+<section class="pf-disclosure">
+  <!-- COMPLIANCE: final disclosure language to be confirmed by carrier / BD / compliance desk. Advertising rules in each state where Joshua is licensed may require an "advertisement" label and specific disclosures. -->
+  <p>Premium finance is a sophisticated planning strategy involving permanent life insurance and third-party lending. It is suitable only for qualified individuals who meet specific net-worth, income, and liquidity requirements, and it involves risks — including interest-rate risk, collateral maintenance, policy performance, and loan-renewal risk. Any strategy is illustrative until implemented and is coordinated with the client&rsquo;s independent tax and legal advisors. This page is educational and is not a solicitation or offer of any specific product. Joshua Edwards — Life &amp; Annuity Producer, licensed in California and over a dozen other states · CA Lic. #0G52544 / NPN #13411537.</p>
 </section>
 
 <!-- FOOTER -->
 <footer>
-  <div class="footer-logo">Edwards <span>&</span> Associates</div>
-  <p class="footer-copy">© 2025 Edwards Financial & Associates. All rights reserved.</p>
+  <div class="footer-logo">Edwards <span>&amp;</span> Associates</div>
+  <p class="footer-copy">&copy; 2025 Edwards Financial &amp; Associates. All rights reserved.</p>
   <p class="footer-disc">Investment and insurance products are not FDIC insured. This website is for informational purposes only and does not constitute financial advice.</p>
 </footer>
-
-<!-- CLIENT PORTAL MODAL -->
-<div class="portal-overlay" id="portalOverlay">
-
-  <!-- AUTH FLOW -->
-  <div class="portal-modal" id="authModal">
-    <div class="portal-modal-header">
-      <button class="portal-close" id="closePortal">&#x2715;</button>
-      <p class="portal-modal-label">Edwards Financial & Associates</p>
-      <p class="portal-modal-title">Client Portal</p>
-    </div>
-    <div class="portal-modal-body">
-      <div class="portal-tabs">
-        <button class="portal-tab active" data-tab="login">Sign In</button>
-        <button class="portal-tab" data-tab="register">Create Account</button>
-      </div>
-
-      <!-- LOGIN PANEL -->
-      <div class="portal-panel active" id="tab-login">
-        <div class="portal-step active" id="login-step1">
-          <div class="portal-field">
-            <label class="portal-label">Email Address</label>
-            <input class="portal-input" type="email" placeholder="you@example.com" id="login-email">
-          </div>
-          <div class="portal-field">
-            <label class="portal-label">Password</label>
-            <input class="portal-input" type="password" placeholder="••••••••••" id="login-password">
-          </div>
-          <button class="portal-btn portal-btn-gold" onclick="handleLogin()">Sign In</button>
-          <p class="portal-link">Forgot your password? <span onclick="alert('Password reset link sent.')">Reset it here</span></p>
-        </div>
-      </div>
-
-      <!-- REGISTER PANEL -->
-      <div class="portal-panel" id="tab-register">
-
-        <!-- Step 1: Basic Info -->
-        <div class="portal-step active" id="reg-step1">
-          <div class="portal-input-row">
-            <div class="portal-field">
-              <label class="portal-label">First Name</label>
-              <input class="portal-input" type="text" placeholder="First" id="reg-first">
-            </div>
-            <div class="portal-field">
-              <label class="portal-label">Last Name</label>
-              <input class="portal-input" type="text" placeholder="Last" id="reg-last">
-            </div>
-          </div>
-          <div class="portal-field">
-            <label class="portal-label">Email Address</label>
-            <input class="portal-input" type="email" placeholder="you@example.com" id="reg-email">
-          </div>
-          <div class="portal-field">
-            <label class="portal-label">Create Password</label>
-            <input class="portal-input" type="password" placeholder="Min. 8 characters" id="reg-password">
-          </div>
-          <button class="portal-btn" onclick="goToPhoneStep()">Continue</button>
-          <p class="portal-link">Already have an account? <span onclick="switchTab('login')">Sign in</span></p>
-        </div>
-
-        <!-- Step 2: Phone -->
-        <div class="portal-step" id="reg-step2">
-          <div class="portal-field">
-            <label class="portal-label">Mobile Phone Number</label>
-            <input class="portal-input" type="tel" placeholder="+1 (000) 000-0000" id="reg-phone">
-          </div>
-          <div class="portal-code-hint">
-            We'll send a 6-digit verification code to your mobile number. Standard message rates may apply.
-          </div>
-          <button class="portal-btn portal-btn-gold" onclick="sendCode()">Send Verification Code</button>
-          <p class="portal-link"><span onclick="backToStep1()">&#8592; Back</span></p>
-        </div>
-
-        <!-- Step 3: Verify Code -->
-        <div class="portal-step" id="reg-step3">
-          <div class="portal-code-hint" id="code-hint-text">
-            Enter the 6-digit code sent to your mobile number.
-          </div>
-          <div class="portal-code-inputs">
-            <input class="portal-code-box" type="text" maxlength="1" id="c0">
-            <input class="portal-code-box" type="text" maxlength="1" id="c1">
-            <input class="portal-code-box" type="text" maxlength="1" id="c2">
-            <input class="portal-code-box" type="text" maxlength="1" id="c3">
-            <input class="portal-code-box" type="text" maxlength="1" id="c4">
-            <input class="portal-code-box" type="text" maxlength="1" id="c5">
-          </div>
-          <button class="portal-btn portal-btn-gold" onclick="verifyCode()">Verify & Create Account</button>
-          <p class="portal-resend">Didn't receive it? <span onclick="sendCode()">Resend code</span></p>
-        </div>
-
-        <!-- Step 4: Success -->
-        <div class="portal-step" id="reg-step4">
-          <div class="portal-success">
-            <div class="portal-success-icon">&#10003;</div>
-            <p class="portal-success-title">Account Created</p>
-            <p class="portal-success-sub">Your identity has been verified and your account is active. Welcome to the Edwards Financial client portal.</p>
-            <button class="portal-btn portal-btn-gold" onclick="openDashboard()">Enter Portal</button>
-          </div>
-        </div>
-
-      </div>
-    </div>
-  </div>
-
-  <!-- DASHBOARD (members only) -->
-  <div class="portal-modal portal-dashboard" id="dashModal">
-    <div class="portal-dash-header">
-      <button class="portal-close" id="closeDash">&#x2715;</button>
-      <p class="portal-dash-welcome">Welcome Back</p>
-      <p class="portal-dash-name" id="dash-name">Client</p>
-    </div>
-    <div class="portal-dash-body">
-      <p class="portal-dash-label">Advanced Strategies</p>
-      <div class="portal-tool" onclick="openTool('premium-finance-illustrator.html')">
-        <span class="portal-tool-name">Premium Finance Illustrator</span>
-        <span class="portal-tool-arrow">&#8594;</span>
-      </div>
-      <div class="portal-tool" style="opacity:0.5;cursor:default;">
-        <span class="portal-tool-name">Estate Multiplication Calculator</span>
-        <span class="portal-tool-coming">Coming Soon</span>
-      </div>
-      <div class="portal-tool" style="opacity:0.5;cursor:default;">
-        <span class="portal-tool-name">Annuity Income Planner</span>
-        <span class="portal-tool-coming">Coming Soon</span>
-      </div>
-      <p class="portal-dash-label" style="margin-top:16px;">Portal</p>
-      <div class="portal-tool" style="opacity:0.5;cursor:default;">
-        <span class="portal-tool-name">Client Document Vault</span>
-        <span class="portal-tool-coming">Coming Soon</span>
-      </div>
-      <div class="portal-tool" style="opacity:0.5;cursor:default;">
-        <span class="portal-tool-name">Policy Review Center</span>
-        <span class="portal-tool-coming">Coming Soon</span>
-      </div>
-    </div>
-    <button class="portal-dash-logout" onclick="logout()">Sign Out</button>
-  </div>
-
-</div>
-
-<!-- TOOL VIEWER OVERLAY -->
-<div id="toolOverlay" style="position:fixed;inset:0;z-index:200;background:#060f1e;display:none;flex-direction:column;">
-  <iframe id="toolFrame" style="flex:1;width:100%;height:100%;border:none;" src="" title="Client Tool"></iframe>
-</div>
 
 <script>
   // Nav scroll
@@ -1353,7 +1220,6 @@
     const open = nav.classList.toggle('open');
     navToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
   });
-  // Close the menu after tapping any nav link
   nav.querySelectorAll('.nav-links a, .nav-right a').forEach(a => {
     a.addEventListener('click', () => {
       nav.classList.remove('open');
@@ -1361,140 +1227,12 @@
     });
   });
 
-  // Reveal
+  // Reveal on scroll
   const reveals = document.querySelectorAll('.reveal');
   const observer = new IntersectionObserver(entries => {
     entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
   }, { threshold: 0.12 });
   reveals.forEach(el => observer.observe(el));
-
-  // Portal open/close
-  const overlay = document.getElementById('portalOverlay');
-  const authModal = document.getElementById('authModal');
-  const dashModal = document.getElementById('dashModal');
-
-  function openPortalModal() {
-    overlay.classList.add('active');
-    document.body.style.overflow = 'hidden';
-    const loggedIn = sessionStorage.getItem('efa_user');
-    if (loggedIn) {
-      authModal.style.display = 'none';
-      dashModal.classList.add('active');
-      document.getElementById('dash-name').textContent = sessionStorage.getItem('efa_name') || 'Client';
-    } else {
-      authModal.style.display = '';
-      dashModal.classList.remove('active');
-    }
-  }
-  function closePortalModal() {
-    overlay.classList.remove('active');
-    document.body.style.overflow = '';
-  }
-
-  document.getElementById('openPortal').addEventListener('click', e => { e.preventDefault(); openPortalModal(); });
-  document.getElementById('closePortal').addEventListener('click', closePortalModal);
-  document.getElementById('closeDash').addEventListener('click', closePortalModal);
-  overlay.addEventListener('click', e => { if (e.target === overlay) closePortalModal(); });
-
-  // Tabs
-  document.querySelectorAll('.portal-tab').forEach(tab => {
-    tab.addEventListener('click', () => switchTab(tab.dataset.tab));
-  });
-  function switchTab(name) {
-    document.querySelectorAll('.portal-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === name));
-    document.querySelectorAll('.portal-panel').forEach(p => p.classList.toggle('active', p.id === 'tab-' + name));
-  }
-
-  // Login
-  function handleLogin() {
-    const email = document.getElementById('login-email').value.trim();
-    const pass = document.getElementById('login-password').value;
-    if (!email || !pass) { alert('Please enter your email and password.'); return; }
-    // Demo: accept any credentials
-    sessionStorage.setItem('efa_user', email);
-    sessionStorage.setItem('efa_name', email.split('@')[0]);
-    openDashboard();
-  }
-
-  // Register step navigation
-  function showStep(panel, step) {
-    document.querySelectorAll('#' + panel + ' .portal-step').forEach(s => s.classList.remove('active'));
-    document.getElementById(step).classList.add('active');
-  }
-  function goToPhoneStep() {
-    const first = document.getElementById('reg-first').value.trim();
-    const last = document.getElementById('reg-last').value.trim();
-    const email = document.getElementById('reg-email').value.trim();
-    const pass = document.getElementById('reg-password').value;
-    if (!first || !last || !email || !pass) { alert('Please complete all fields.'); return; }
-    if (pass.length < 8) { alert('Password must be at least 8 characters.'); return; }
-    showStep('tab-register', 'reg-step2');
-  }
-  function backToStep1() { showStep('tab-register', 'reg-step1'); }
-
-  function sendCode() {
-    const phone = document.getElementById('reg-phone').value.trim();
-    if (!phone) { alert('Please enter your mobile number.'); return; }
-    // Store demo code
-    sessionStorage.setItem('efa_code', '123456');
-    document.getElementById('code-hint-text').textContent = 'Enter the 6-digit code sent to ' + phone + '. (Demo code: 123456)';
-    showStep('tab-register', 'reg-step3');
-    // Auto-advance code boxes
-    for (let i = 0; i < 6; i++) {
-      document.getElementById('c' + i).addEventListener('input', function() {
-        this.value = this.value.replace(/[^0-9]/g,'');
-        if (this.value && i < 5) document.getElementById('c' + (i+1)).focus();
-      });
-      document.getElementById('c' + i).addEventListener('keydown', function(e) {
-        if (e.key === 'Backspace' && !this.value && i > 0) document.getElementById('c' + (i-1)).focus();
-      });
-    }
-  }
-
-  function verifyCode() {
-    const entered = [0,1,2,3,4,5].map(i => document.getElementById('c'+i).value).join('');
-    const stored = sessionStorage.getItem('efa_code') || '123456';
-    if (entered !== stored) { alert('Incorrect code. Please try again.'); return; }
-    showStep('tab-register', 'reg-step4');
-  }
-
-  function openDashboard() {
-    const first = document.getElementById('reg-first').value.trim();
-    const email = document.getElementById('login-email').value.trim();
-    const name = first || (email ? email.split('@')[0] : 'Client');
-    sessionStorage.setItem('efa_user', 'active');
-    sessionStorage.setItem('efa_name', name.charAt(0).toUpperCase() + name.slice(1));
-    authModal.style.display = 'none';
-    dashModal.classList.add('active');
-    document.getElementById('dash-name').textContent = sessionStorage.getItem('efa_name');
-  }
-
-  // Tool launcher
-  function openTool(src) {
-    const overlay = document.getElementById('toolOverlay');
-    const frame = document.getElementById('toolFrame');
-    frame.src = src;
-    overlay.style.display = 'flex';
-    document.body.style.overflow = 'hidden';
-  }
-  window.closeTool = function() {
-    const overlay = document.getElementById('toolOverlay');
-    const frame = document.getElementById('toolFrame');
-    overlay.style.display = 'none';
-    frame.src = '';
-    document.body.style.overflow = 'hidden'; // keep portal scroll locked
-  };
-
-  function logout() {
-    sessionStorage.removeItem('efa_user');
-    sessionStorage.removeItem('efa_name');
-    dashModal.classList.remove('active');
-    authModal.style.display = '';
-    switchTab('login');
-    showStep('tab-register', 'reg-step1');
-    document.getElementById('login-email').value = '';
-    document.getElementById('login-password').value = '';
-  }
 </script>
 </body>
 </html>
