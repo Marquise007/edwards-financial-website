@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Behavioral Investor Type — Client Diagnostic | Edwards Financial &amp; Associates</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=DM+Sans:ital,wght@0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#0d1e3a; --navy-2:#23365a; --gold:#b8972e; --gold-soft:#cdb15a;
+    --cream:#f7f5f1; --cream-2:#efeae1; --ink:#1d2433; --muted:#6c7384;
+    --line:#e3ddd0; --card:#ffffff; --emo:#b8972e; --cog:#23365a;
+    --radius:14px; --shadow:0 10px 34px rgba(13,30,58,.10);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:"DM Sans",system-ui,sans-serif; color:var(--ink);
+    background:var(--cream); line-height:1.6; -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:880px; margin:0 auto; padding:32px 22px 90px;}
+  h1,h2,h3,.serif{font-family:"Cormorant Garamond",Georgia,serif;}
+
+  /* Portal close bar — shared partner-portal chrome */
+  .topbar{background:#060f1e;padding:8px 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:2px solid var(--gold);}
+  .topbar-logo{font-family:'Cormorant Garamond',serif;font-size:13px;color:rgba(255,255,255,0.6);letter-spacing:.06em;}
+  .topbar-logo span{color:var(--gold-soft);}
+  .topbar-close{background:none;border:1px solid rgba(255,255,255,.18);color:rgba(255,255,255,.5);padding:5px 14px;font-size:10px;letter-spacing:.15em;text-transform:uppercase;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s;}
+  .topbar-close:hover{border-color:var(--gold);color:var(--gold);}
+  a{color:var(--navy);}
+
+  /* Header */
+  .masthead{text-align:center; padding:14px 0 22px; border-bottom:2px solid var(--gold); margin-bottom:30px;}
+  .kicker{font-size:12px; letter-spacing:.22em; text-transform:uppercase; color:var(--gold); font-weight:700;}
+  .masthead h1{font-size:46px; line-height:1.05; color:var(--navy); font-weight:700; margin:8px 0 4px;}
+  .masthead .sub{font-family:"Cormorant Garamond",serif; font-style:italic; font-size:21px; color:var(--navy-2); margin:0;}
+  .tagline{font-size:12px; letter-spacing:.22em; text-transform:uppercase; color:var(--gold); font-weight:700; margin-top:14px;}
+
+  .card{background:var(--card); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); padding:26px 26px; margin-bottom:24px;}
+  .card h2{font-size:27px; color:var(--navy); margin:0 0 6px; font-weight:600;}
+  .lead{color:var(--muted); margin:0 0 4px; font-size:15px;}
+
+  .meta{display:flex; flex-wrap:wrap; gap:16px; margin-top:14px;}
+  .meta .fld{flex:1 1 220px;}
+  label.flbl{display:block; font-size:12px; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); font-weight:700; margin-bottom:5px;}
+  input[type=text],input[type=date],textarea{
+    width:100%; font-family:inherit; font-size:15px; color:var(--ink);
+    padding:10px 12px; border:1px solid var(--line); border-radius:9px; background:#fdfcfa;
+  }
+  input:focus,textarea:focus{outline:none; border-color:var(--gold); box-shadow:0 0 0 3px rgba(184,151,46,.16);}
+  textarea{resize:vertical; min-height:74px;}
+
+  /* Questionnaire */
+  .part-title{display:flex; align-items:baseline; gap:12px; margin:6px 0 14px;}
+  .part-title .n{font-family:"Cormorant Garamond",serif; font-size:34px; color:var(--gold); font-weight:700; line-height:1;}
+  .part-title .t{font-family:"Cormorant Garamond",serif; font-size:24px; color:var(--navy); font-weight:600;}
+  .part-title .hint{font-size:13px; color:var(--muted); margin-left:auto; text-align:right; max-width:300px;}
+
+  .q{padding:16px 0; border-top:1px solid var(--line);}
+  .q:first-of-type{border-top:none;}
+  .q .stem{font-size:15.5px; color:var(--ink); margin-bottom:11px; font-weight:500;}
+  .q .stem .lead-in{color:var(--muted); font-weight:400;}
+  .scale{display:grid; grid-template-columns:repeat(5,1fr); gap:7px;}
+  .scale button{
+    font-family:inherit; font-size:12.5px; cursor:pointer; padding:9px 4px; border-radius:9px;
+    border:1px solid var(--line); background:#fbfaf7; color:var(--muted); transition:all .12s; line-height:1.25;
+  }
+  .scale button:hover{border-color:var(--gold-soft); color:var(--navy);}
+  .scale button.on{background:var(--navy); border-color:var(--navy); color:#fff; box-shadow:0 4px 12px rgba(13,30,58,.22);}
+  .scale button .em{display:block; font-size:10px; letter-spacing:.04em; opacity:.8; margin-top:1px;}
+
+  /* Buttons */
+  .actions{display:flex; flex-wrap:wrap; gap:12px; margin-top:8px;}
+  .btn{font-family:inherit; font-size:15px; font-weight:700; cursor:pointer; border:none; border-radius:10px; padding:13px 24px; transition:all .15s; letter-spacing:.01em;}
+  .btn-primary{background:var(--navy); color:#fff;}
+  .btn-primary:hover{background:#142a4f; box-shadow:0 8px 22px rgba(13,30,58,.28);}
+  .btn-gold{background:var(--gold); color:#fff;}
+  .btn-gold:hover{background:#a6862a;}
+  .btn-ghost{background:transparent; color:var(--navy); border:1px solid var(--line);}
+  .btn-ghost:hover{border-color:var(--gold); color:var(--gold);}
+  .warn{color:#9a3b2c; font-size:14px; margin-top:10px; display:none;}
+
+  /* Result */
+  #result{display:none;}
+  .res-head{background:var(--navy); color:#fff; border-radius:var(--radius) var(--radius) 0 0; padding:24px 26px; margin:-26px -26px 22px;}
+  .res-head .tag{font-size:12px; letter-spacing:.2em; text-transform:uppercase; color:var(--gold-soft); font-weight:700;}
+  .res-head h2{font-family:"Cormorant Garamond",serif; font-size:40px; color:#fff; margin:4px 0 2px; font-weight:700;}
+  .res-head .one{font-family:"Cormorant Garamond",serif; font-style:italic; font-size:21px; color:#dfe4ee;}
+  .crosslink{display:flex; gap:10px; align-items:center; background:#eef3fa; border:1px solid #cdddf0; border-radius:10px; padding:11px 14px; font-size:14px; color:#23365a; margin-bottom:16px;}
+  .crosslink .ic{font-size:17px;}
+  .chips{display:flex; flex-wrap:wrap; gap:8px; margin-top:14px;}
+  .chip{font-size:12px; font-weight:700; letter-spacing:.04em; padding:5px 11px; border-radius:20px; background:rgba(255,255,255,.12); color:#fff; border:1px solid rgba(255,255,255,.25);}
+
+  .res-grid{display:grid; grid-template-columns:300px 1fr; gap:26px;}
+  @media(max-width:680px){ .res-grid{grid-template-columns:1fr;} }
+
+  .quad-wrap{text-align:center;}
+  .quad-cap{font-size:12px; color:var(--muted); margin-top:8px;}
+  .scorebar{margin:14px 0;}
+  .scorebar .sb-lbl{display:flex; justify-content:space-between; font-size:12px; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:.05em; margin-bottom:5px;}
+  .sb-track{position:relative; height:10px; border-radius:6px; background:linear-gradient(90deg,var(--cream-2),#dfe4ee);}
+  .sb-track.bias{background:linear-gradient(90deg,#23365a22,#b8972e33);}
+  .sb-mark{position:absolute; top:50%; width:16px; height:16px; border-radius:50%; background:var(--gold); border:3px solid var(--navy); transform:translate(-50%,-50%);}
+
+  .res-sec{margin-bottom:16px;}
+  .res-sec h3{font-size:20px; color:var(--navy); margin:0 0 6px; font-weight:600; display:flex; align-items:center; gap:8px;}
+  .res-sec h3::before{content:""; width:14px; height:2px; background:var(--gold); display:inline-block;}
+  .res-sec p{margin:0 0 6px; font-size:15px;}
+  .biasrow{display:flex; flex-wrap:wrap; gap:7px;}
+  .biaspill{font-size:13px; font-weight:600; padding:5px 11px; border-radius:8px; background:var(--cream); border:1px solid var(--line); color:var(--navy-2);}
+  .doctrine{display:inline-block; font-size:12px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; padding:4px 12px; border-radius:6px; margin-bottom:8px;}
+  .doctrine.adapt{background:#b8972e22; color:#7d6418; border:1px solid #b8972e55;}
+  .doctrine.educate{background:#23365a18; color:#23365a; border:1px solid #23365a44;}
+  .flag{background:#fbf6e8; border:1px solid #e6d49a; border-radius:10px; padding:13px 15px; font-size:14px; color:#6b5618; margin:6px 0 16px;}
+  .flag b{color:#5a4712;}
+
+  /* Saved */
+  .saved-item{display:flex; align-items:center; gap:12px; padding:11px 14px; border:1px solid var(--line); border-radius:10px; margin-bottom:9px; background:#fdfcfa;}
+  .saved-item .nm{font-weight:700; color:var(--navy);}
+  .saved-item .ty{font-size:13px; color:var(--muted);}
+  .saved-item .sp{margin-left:auto; display:flex; gap:8px;}
+  .mini{font-size:13px; padding:7px 13px;}
+  .empty{color:var(--muted); font-size:14px; font-style:italic;}
+
+  .meth-note{font-size:12.5px; color:var(--muted); line-height:1.6; border-top:1px solid var(--line); padding-top:14px; margin-top:6px;}
+
+  /* Print area (hidden on screen) */
+  #printArea{display:none;}
+  @media print{
+    @page{margin:14mm;}
+    body{background:#fff;}
+    .screen-only{display:none !important;}
+    #printArea{display:block !important;}
+  }
+</style>
+</head>
+<body>
+<div class="topbar screen-only">
+  <span class="topbar-logo">Edwards <span>&amp;</span> Associates — Client Portal</span>
+  <button class="topbar-close" onclick="if(window.parent&&window.parent.closeTool)window.parent.closeTool();else window.close();">&#x2715; Close Tool</button>
+</div>
+<div class="wrap screen-only">
+
+  <div class="masthead">
+    <div class="kicker">Edwards Financial &amp; Associates &nbsp;·&nbsp; Practice Tools</div>
+    <h1>Behavioral Investor Type</h1>
+    <p class="sub">A point-of-contact diagnostic for client personality</p>
+    <div class="tagline">Protect &nbsp;·&nbsp; Grow &nbsp;·&nbsp; Legacy</div>
+  </div>
+
+  <div class="card">
+    <h2>Before you begin</h2>
+    <p class="lead">Answer each statement as it applies to the client in front of you — drawing on what they say, how they say it, and what you know of their history. The instrument scores two axes from Michael Pompian&rsquo;s Behavioral Investor Types — how <em>active</em> they are with risk, and whether their decisions are driven by <em>emotion</em> or <em>cognition</em> — and resolves them into one of four types, with the biases to watch and the right mode of counsel.</p>
+    <div class="meta">
+      <div class="fld">
+        <label class="flbl" for="cName">Client name (optional)</label>
+        <input type="text" id="cName" placeholder="e.g., Margaret Ellison">
+      </div>
+      <div class="fld">
+        <label class="flbl" for="cDate">Date</label>
+        <input type="date" id="cDate">
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="part-title">
+      <span class="n">1</span>
+      <span class="t">Activity &amp; risk</span>
+      <span class="hint">How hands-on they are, and how much risk their disposition will bear.</span>
+    </div>
+    <div id="partA"></div>
+  </div>
+
+  <div class="card">
+    <div class="part-title">
+      <span class="n">2</span>
+      <span class="t">Decision drivers</span>
+      <span class="hint">Whether decisions are governed by feeling or by information.</span>
+    </div>
+    <div id="partB"></div>
+  </div>
+
+  <div class="card">
+    <div class="actions">
+      <button class="btn btn-primary" id="computeBtn">Determine investor type</button>
+      <button class="btn btn-ghost" id="resetBtn">Reset answers</button>
+    </div>
+    <div class="warn" id="warnMsg">Please answer every statement to get an accurate read.</div>
+  </div>
+
+  <div class="card" id="result">
+    <div class="res-head">
+      <div class="tag" id="rTag">Behavioral Investor Type</div>
+      <h2 id="rName">—</h2>
+      <div class="one" id="rOne">—</div>
+      <div class="chips" id="rChips"></div>
+    </div>
+
+    <div class="crosslink" id="rCross" style="display:none;"></div>
+    <div class="flag" id="rFlag" style="display:none;"></div>
+
+    <div class="res-grid">
+      <div>
+        <div class="quad-wrap">
+          <svg id="quad" viewBox="0 0 320 320" width="100%" style="max-width:300px;" role="img" aria-label="Investor type quadrant"></svg>
+          <div class="quad-cap">Passive &harr; Active &nbsp;·&nbsp; Emotional &harr; Cognitive</div>
+        </div>
+        <div class="scorebar">
+          <div class="sb-lbl"><span>Passive</span><span>Active</span></div>
+          <div class="sb-track"><div class="sb-mark" id="markA"></div></div>
+        </div>
+        <div class="scorebar">
+          <div class="sb-lbl"><span>Cognitive</span><span>Emotional</span></div>
+          <div class="sb-track bias"><div class="sb-mark" id="markB"></div></div>
+        </div>
+        <p style="font-size:13px;color:var(--muted);text-align:center;margin-top:2px;" id="rStrength"></p>
+      </div>
+
+      <div>
+        <div class="res-sec">
+          <h3>How to recognize them</h3>
+          <p id="rRecognize"></p>
+        </div>
+        <div class="res-sec">
+          <h3>Signature biases</h3>
+          <div class="biasrow" id="rBias"></div>
+        </div>
+        <div class="res-sec">
+          <h3>How to advise</h3>
+          <span class="doctrine" id="rDoctrine"></span>
+          <p id="rAdvise"></p>
+        </div>
+        <div class="res-sec">
+          <h3>Concept &amp; solution alignment</h3>
+          <p id="rConcept"></p>
+        </div>
+      </div>
+    </div>
+
+    <div class="res-sec" style="margin-top:8px;">
+      <h3>Meeting notes</h3>
+      <textarea id="cNotes" placeholder="Observations, follow-ups, products discussed…"></textarea>
+    </div>
+
+    <div class="actions" style="margin-top:6px;">
+      <button class="btn btn-gold" id="printBtn">Print one-page summary</button>
+      <button class="btn btn-ghost" id="saveBtn">Save assessment</button>
+    </div>
+
+    <p class="meth-note">
+      <b>Read this as a lens, not a cage.</b> Pompian&rsquo;s types are regions on continuous dimensions, not fixed boxes — real clients blend, sit near boundaries, and shift with circumstance. A near-boundary result names two types for a reason. Re-assess at life transitions (retirement, inheritance, business sale) and major market dislocations, and triangulate this read against biography and observed behavior rather than trusting any single instrument.
+    </p>
+  </div>
+
+  <div class="card">
+    <h2>Saved assessments</h2>
+    <p class="lead">Stored on this device. Reopen to review a past client&rsquo;s type and notes.</p>
+    <div id="savedList" style="margin-top:14px;"></div>
+  </div>
+
+</div>
+
+<!-- ============ PRINT SUMMARY ============ -->
+<div id="printArea"></div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ---------- Data: statements ---------- */
+  // axis: 'A' = activity/risk (passive- .. active+), 'B' = bias (cognitive- .. emotional+)
+  // dir: +1 agreement pushes positive (active / emotional); -1 reverse-keyed
+  var QA = [
+    {axis:'A', dir:+1, stem:"They built their wealth by putting their own capital at risk — business ownership or entrepreneurship."},
+    {axis:'A', dir:+1, stem:"They want to be hands-on and keep control over investment decisions."},
+    {axis:'A', dir:+1, stem:"They are comfortable with significant market swings in pursuit of higher returns."},
+    {axis:'A', dir:+1, stem:"They would view a sharp market drop as a buying opportunity rather than a threat."},
+    {axis:'A', dir:-1, stem:"Their overriding priority is protecting principal and avoiding losses, even at the cost of growth."},
+    {axis:'A', dir:-1, stem:"They prefer to delegate investment decisions and stay largely uninvolved."}
+  ];
+  var QB = [
+    {axis:'B', dir:+1, stem:"Their financial decisions are driven more by how options feel than by analysis."},
+    {axis:'B', dir:+1, stem:"When markets move, they react strongly — with fear or with excitement."},
+    {axis:'B', dir:+1, stem:"They hold firmly to their financial views even when the data contradicts them."},
+    {axis:'B', dir:-1, stem:"They base decisions on research, data, and logical reasoning."},
+    {axis:'B', dir:-1, stem:"They can be persuaded to change their mind when shown clear evidence."},
+    {axis:'B', dir:-1, stem:"They tend to follow tips, trends, or what others are doing rather than their own conviction."}
+  ];
+
+  var SCALE = [
+    {v:-2, lbl:"Strongly", em:"disagree"},
+    {v:-1, lbl:"Disagree", em:""},
+    {v:0,  lbl:"Neutral", em:""},
+    {v:1,  lbl:"Agree", em:""},
+    {v:2,  lbl:"Strongly", em:"agree"}
+  ];
+
+  /* ---------- Data: type profiles ---------- */
+  var TYPES = {
+    PRESERVER:{
+      name:"The Passive Preserver", one:"Security before growth.",
+      risk:"Lowest risk tolerance", driver:"Emotionally driven",
+      doctrine:"adapt", doctrineLabel:"Adapt to the emotion",
+      biases:["Loss aversion","Status-quo bias","Endowment","Regret aversion","Anchoring","Mental accounting"],
+      recognize:"Wealth most often inherited or earned through a salaried profession — not built by risking their own capital. Speaks the language of safety: \u201cI don\u2019t want to lose it,\u201d worst-case first. Deliberate and slow to decide; can freeze for fear of the wrong move. Frequently sitting on excess cash. Warm but non-committal in the room \u2014 do not read agreement as a yes.",
+      advise:"You will not reason them out of fear, so build a plan they can emotionally live with. Lead with the big picture and the security the plan buys; go slow and keep the data light; recommend one clear path rather than a menu. Name the hidden risk \u2014 inflation and longevity quietly eroding \u2018safe\u2019 money \u2014 framed as a threat to their security, never as a growth pitch.",
+      concept:"The natural home for principal protection and guaranteed lifetime income. Establish the concept first \u2014 protected principal, income that cannot be outlived \u2014 and let the solution become the obvious answer to a need they have already named. Concept before contract."
+    },
+    FOLLOWER:{
+      name:"The Friendly Follower", one:"Takes cues from the crowd.",
+      risk:"Low-to-moderate risk tolerance", driver:"Cognitively driven",
+      doctrine:"educate", doctrineLabel:"Educate and moderate",
+      biases:["Recency","Availability","Hindsight","Framing","Regret aversion"],
+      recognize:"Passive, with no strong views of their own; takes the lead from friends, colleagues, and whatever is trending. Tends to overestimate their own risk tolerance and to want whatever is currently popular, with little regard for how it fits a long-term plan. Prone to chasing last year\u2019s winner.",
+      advise:"Educate. Show with data how chasing the hot thing has burned people, and keep them anchored to the plan rather than the headlines. Provide guardrails and a disciplined process so they are not reacting to noise. Their errors are correctable \u2014 information, steadily delivered, is the remedy.",
+      concept:"Lead with a clear, structured plan and the discipline it provides \u2014 certainty over speculation. Frame the solution as the steady path that protects them from their own impulse to chase, and revisit it on a set cadence so trends do not pull them off course."
+    },
+    INDEPENDENT:{
+      name:"The Independent Individualist", one:"Does their own homework.",
+      risk:"Moderate-to-high risk tolerance", driver:"Cognitively driven",
+      doctrine:"educate", doctrineLabel:"Educate and collaborate",
+      biases:["Overconfidence","Confirmation","Self-attribution","Conservatism","Representativeness"],
+      recognize:"Active and willing to risk their own capital. Contrarian, strong-willed, and genuinely engaged; does their own research and holds their own opinions. Difficult to advise \u2014 but grounded enough to listen to sound counsel when it respects their independence.",
+      advise:"Educate with evidence they can engage and argue with. Do not single out a recent loss; teach concepts steadily through regular discussion. Respect their independence \u2014 collaborate as equals rather than dictate \u2014 and let the data, not your authority, carry the point.",
+      concept:"Bring rigor and a second set of eyes. Position protection and tax-efficiency as the sophisticated edge their own research may have missed \u2014 a collaboration grounded in evidence, not a correction of their judgment."
+    },
+    ACCUMULATOR:{
+      name:"The Active Accumulator", one:"Wants control and upside.",
+      risk:"Highest risk tolerance", driver:"Emotionally driven",
+      doctrine:"adapt", doctrineLabel:"Adapt to the conviction",
+      biases:["Overconfidence","Illusion of control","Self-control","Affinity"],
+      recognize:"The most aggressive of the four \u2014 entrepreneurial, frequently the first generation to create wealth, hands-on, and even more confident and strong-willed than the Independent. Wants control and is the hardest of the types to advise.",
+      advise:"Take the lead and demonstrate authority \u2014 they respect strength. You will not argue them out of their conviction, so adapt to it, then govern concentrated risk and bring discipline to the control instinct. Lead the relationship; do not chase it.",
+      concept:"Lead with legacy, structure, and risk governance \u2014 the sophisticated moves that protect an empire they built. Position protection as a strength play, not a retreat: certainty and control engineered around their upside."
+    }
+  };
+
+  function classify(A, B){
+    var EPS = 0.12;
+    var active = A >= 0, emotional = B >= 0;
+    var key = active ? (emotional ? 'ACCUMULATOR' : 'INDEPENDENT') : (emotional ? 'PRESERVER' : 'FOLLOWER');
+    var flag = null, nearA = Math.abs(A) < EPS, nearB = Math.abs(B) < EPS;
+    if(nearA && nearB){
+      flag = {center:true, msg:"This client lands near the center on both axes \u2014 no strong lean. That centrist, balanced profile has no dedicated Pompian type; in the older Bailard, Biehl &amp; Kaiser model it is the <b>Straight Arrow</b>. Treat the type below as a tentative lean and confirm it through direct observation."};
+    } else if(nearA){
+      var pair = emotional ? ["Passive Preserver","Active Accumulator"] : ["Friendly Follower","Independent Individualist"];
+      flag = {msg:"This client sits close to the passive/active line \u2014 a <b>blend</b> of the "+pair[0]+" and the "+pair[1]+". Both share the same decision-driver; the difference is how hands-on they are with risk. Confirm activity level before committing to one."};
+    } else if(nearB){
+      var pair2 = active ? ["Independent Individualist","Active Accumulator"] : ["Passive Preserver","Friendly Follower"];
+      flag = {msg:"This client sits close to the emotional/cognitive line \u2014 a <b>blend</b> of the "+pair2[0]+" and the "+pair2[1]+". Watch whether decisions are ultimately governed by feeling or by information, and let that resolve the type."};
+    }
+    return {key:key, flag:flag};
+  }
+
+  function strengthLabel(A,B){
+    var m = Math.min(Math.abs(A), Math.abs(B));
+    if(m >= 0.45) return "Strong, well-defined lean on both axes.";
+    if(m >= 0.22) return "Moderate lean \u2014 the type is clear but not extreme.";
+    return "Slight lean \u2014 treat as provisional and confirm by observation.";
+  }
+
+  /* ---------- Render questionnaire ---------- */
+  var answers = {}; // id -> value
+
+  function renderQ(list, mountId, prefix){
+    var mount = document.getElementById(mountId);
+    list.forEach(function(q, i){
+      var id = prefix + i;
+      var wrap = document.createElement('div'); wrap.className = 'q';
+      var stem = document.createElement('div'); stem.className = 'stem';
+      stem.innerHTML = '<span class="lead-in">They&hellip;</span> ' + q.stem.replace(/^They\s/,'');
+      wrap.appendChild(stem);
+      var scale = document.createElement('div'); scale.className = 'scale';
+      SCALE.forEach(function(s){
+        var b = document.createElement('button');
+        b.type = 'button';
+        b.innerHTML = s.lbl + (s.em ? '<span class="em">'+s.em+'</span>' : '');
+        b.setAttribute('data-id', id);
+        b.setAttribute('data-v', s.v);
+        b.addEventListener('click', function(){
+          answers[id] = s.v;
+          Array.prototype.forEach.call(scale.children, function(c){ c.classList.remove('on'); });
+          b.classList.add('on');
+        });
+        scale.appendChild(b);
+      });
+      wrap.appendChild(scale);
+      mount.appendChild(wrap);
+    });
+  }
+  renderQ(QA, 'partA', 'A');
+  renderQ(QB, 'partB', 'B');
+
+  // default date = today
+  (function(){
+    var d = new Date(); var p = function(n){return (n<10?'0':'')+n;};
+    document.getElementById('cDate').value = d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate());
+  })();
+
+  /* ---------- Compute ---------- */
+  function compute(){
+    var all = QA.concat(QB);
+    var total = QA.length + QB.length;
+    if(Object.keys(answers).length < total){
+      document.getElementById('warnMsg').style.display = 'block';
+      return null;
+    }
+    document.getElementById('warnMsg').style.display = 'none';
+
+    var sumA=0, cntA=0, sumB=0, cntB=0;
+    QA.forEach(function(q,i){ sumA += answers['A'+i]*q.dir; cntA++; });
+    QB.forEach(function(q,i){ sumB += answers['B'+i]*q.dir; cntB++; });
+    var A = sumA/(cntA*2); // -1..1
+    var B = sumB/(cntB*2); // -1..1
+
+    var c = classify(A,B);
+    return {A:A, B:B, type:TYPES[c.key], key:c.key, flag:c.flag, strength:strengthLabel(A,B)};
+  }
+
+  function drawQuad(A,B){
+    var svg = document.getElementById('quad');
+    var cx=160, cy=160, R=140;
+    var labels = [
+      {x:80, y:78, t:"Preserver", em:true},
+      {x:240, y:78, t:"Accumulator", em:true},
+      {x:80, y:250, t:"Follower", em:false},
+      {x:240, y:250, t:"Independent", em:false}
+    ];
+    var qfill = '<rect x="20" y="20" width="140" height="140" fill="#b8972e10"/>'+
+                '<rect x="160" y="20" width="140" height="140" fill="#b8972e10"/>'+
+                '<rect x="20" y="160" width="140" height="140" fill="#23365a0d"/>'+
+                '<rect x="160" y="160" width="140" height="140" fill="#23365a0d"/>';
+    var grid = '<line x1="160" y1="20" x2="160" y2="300" stroke="#cfc8ba" stroke-width="1"/>'+
+               '<line x1="20" y1="160" x2="300" y2="160" stroke="#cfc8ba" stroke-width="1"/>'+
+               '<rect x="20" y="20" width="280" height="280" fill="none" stroke="#d9d2c4" stroke-width="1"/>';
+    var axText = '<text x="160" y="14" text-anchor="middle" font-size="10" fill="#6c7384" font-family="DM Sans">EMOTIONAL</text>'+
+                 '<text x="160" y="313" text-anchor="middle" font-size="10" fill="#6c7384" font-family="DM Sans">COGNITIVE</text>'+
+                 '<text x="12" y="163" text-anchor="middle" font-size="10" fill="#6c7384" font-family="DM Sans" transform="rotate(-90 12 160)">PASSIVE</text>'+
+                 '<text x="308" y="163" text-anchor="middle" font-size="10" fill="#6c7384" font-family="DM Sans" transform="rotate(90 308 160)">ACTIVE</text>';
+    var lab = labels.map(function(l){
+      return '<text x="'+l.x+'" y="'+l.y+'" text-anchor="middle" font-size="13" font-weight="700" font-family="Cormorant Garamond,serif" fill="'+(l.em?'#9a7c1f':'#23365a')+'">'+l.t+'</text>';
+    }).join('');
+    var px = cx + A*R, py = cy - B*R;
+    var dot = '<circle cx="'+px+'" cy="'+py+'" r="9" fill="#b8972e" stroke="#0d1e3a" stroke-width="3"/>'+
+              '<circle cx="'+px+'" cy="'+py+'" r="17" fill="none" stroke="#b8972e" stroke-width="1.5" opacity="0.5"/>';
+    svg.innerHTML = qfill + grid + axText + lab + dot;
+  }
+
+  function showResult(r){
+    var t = r.type;
+    document.getElementById('rName').textContent = t.name;
+    document.getElementById('rOne').textContent = t.one;
+    document.getElementById('rChips').innerHTML =
+      '<span class="chip">'+t.risk+'</span><span class="chip">'+t.driver+'</span>';
+    document.getElementById('rRecognize').textContent = t.recognize;
+    document.getElementById('rBias').innerHTML = t.biases.map(function(b){return '<span class="biaspill">'+b+'</span>';}).join('');
+    var doc = document.getElementById('rDoctrine');
+    doc.textContent = t.doctrineLabel;
+    doc.className = 'doctrine ' + t.doctrine;
+    document.getElementById('rAdvise').textContent = t.advise;
+    document.getElementById('rConcept').textContent = t.concept;
+    document.getElementById('rStrength').textContent = r.strength;
+
+    var fl = document.getElementById('rFlag');
+    if(r.flag){ fl.style.display='block'; fl.innerHTML = r.flag.msg; }
+    else { fl.style.display='none'; }
+
+    drawQuad(r.A, r.B);
+    document.getElementById('markA').style.left = ((r.A+1)/2*100) + '%';
+    document.getElementById('markB').style.left = ((r.B+1)/2*100) + '%';
+
+    showCrossLink();
+    document.getElementById('result').style.display = 'block';
+    document.getElementById('result').scrollIntoView({behavior:'smooth', block:'start'});
+  }
+
+  document.getElementById('computeBtn').addEventListener('click', function(){
+    var r = compute();
+    if(r){ lastResult = r; showResult(r); }
+  });
+  document.getElementById('resetBtn').addEventListener('click', function(){
+    answers = {};
+    document.querySelectorAll('.scale button').forEach(function(b){ b.classList.remove('on'); });
+    document.getElementById('result').style.display='none';
+    document.getElementById('warnMsg').style.display='none';
+    window.scrollTo({top:0, behavior:'smooth'});
+  });
+
+  /* ---------- Print one-page summary ---------- */
+  var lastResult = null;
+  function buildPrint(){
+    if(!lastResult) return;
+    var t = lastResult.type;
+    var nm = (document.getElementById('cName').value || 'Unnamed client').trim();
+    var dt = document.getElementById('cDate').value || '';
+    var notes = (document.getElementById('cNotes').value || '').trim();
+    var px = 160 + lastResult.A*140, py = 160 - lastResult.B*140;
+    var flagHtml = lastResult.flag ? '<div style="border:1px solid #e6d49a;background:#fbf6e8;border-radius:8px;padding:10px 12px;font-size:12px;color:#6b5618;margin:10px 0;">'+lastResult.flag.msg.replace(/<\/?b>/g,'')+'</div>' : '';
+    var html = ''+
+    '<div style="font-family:\'DM Sans\',sans-serif;color:#1d2433;max-width:680px;margin:0 auto;">'+
+      '<div style="text-align:center;border-bottom:2px solid #b8972e;padding-bottom:10px;margin-bottom:14px;">'+
+        '<div style="font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:#b8972e;font-weight:700;">Edwards Financial &amp; Associates &nbsp;·&nbsp; Client Personality Summary</div>'+
+        '<div style="font-family:\'Cormorant Garamond\',serif;font-size:30px;color:#0d1e3a;font-weight:700;margin-top:4px;">Behavioral Investor Type</div>'+
+      '</div>'+
+      '<table style="width:100%;font-size:13px;margin-bottom:12px;border-collapse:collapse;">'+
+        '<tr><td style="padding:3px 0;color:#6c7384;width:90px;">Client</td><td style="font-weight:700;color:#0d1e3a;">'+esc(nm)+'</td>'+
+            '<td style="padding:3px 0;color:#6c7384;width:60px;text-align:right;">Date</td><td style="font-weight:700;text-align:right;width:120px;">'+esc(dt)+'</td></tr>'+
+      '</table>'+
+      '<div style="background:#0d1e3a;color:#fff;border-radius:8px;padding:14px 16px;margin-bottom:12px;">'+
+        '<div style="font-family:\'Cormorant Garamond\',serif;font-size:26px;font-weight:700;">'+t.name+'</div>'+
+        '<div style="font-family:\'Cormorant Garamond\',serif;font-style:italic;font-size:15px;color:#dfe4ee;">'+t.one+'</div>'+
+        '<div style="margin-top:8px;font-size:11px;font-weight:700;letter-spacing:.04em;">'+t.risk+' &nbsp;·&nbsp; '+t.driver+'</div>'+
+      '</div>'+
+      flagHtml+
+      '<div style="display:flex;gap:16px;align-items:flex-start;">'+
+        '<svg viewBox="0 0 320 320" width="160" height="160" style="flex:none;">'+
+          '<rect x="20" y="20" width="280" height="280" fill="none" stroke="#d9d2c4"/>'+
+          '<line x1="160" y1="20" x2="160" y2="300" stroke="#cfc8ba"/><line x1="20" y1="160" x2="300" y2="160" stroke="#cfc8ba"/>'+
+          '<text x="80" y="78" text-anchor="middle" font-size="13" font-weight="700" font-family="Cormorant Garamond,serif" fill="#9a7c1f">Preserver</text>'+
+          '<text x="240" y="78" text-anchor="middle" font-size="13" font-weight="700" font-family="Cormorant Garamond,serif" fill="#9a7c1f">Accumulator</text>'+
+          '<text x="80" y="250" text-anchor="middle" font-size="13" font-weight="700" font-family="Cormorant Garamond,serif" fill="#23365a">Follower</text>'+
+          '<text x="240" y="250" text-anchor="middle" font-size="13" font-weight="700" font-family="Cormorant Garamond,serif" fill="#23365a">Independent</text>'+
+          '<circle cx="'+px+'" cy="'+py+'" r="9" fill="#b8972e" stroke="#0d1e3a" stroke-width="3"/>'+
+        '</svg>'+
+        '<div style="flex:1;">'+
+          '<div style="font-family:\'Cormorant Garamond\',serif;font-size:17px;color:#0d1e3a;font-weight:700;margin-bottom:3px;">Signature biases</div>'+
+          '<div style="font-size:12px;margin-bottom:10px;">'+t.biases.join(' &nbsp;·&nbsp; ')+'</div>'+
+          '<div style="font-family:\'Cormorant Garamond\',serif;font-size:17px;color:#0d1e3a;font-weight:700;margin-bottom:3px;">How to advise &mdash; '+t.doctrineLabel.toLowerCase()+'</div>'+
+          '<div style="font-size:12px;line-height:1.5;">'+t.advise+'</div>'+
+        '</div>'+
+      '</div>'+
+      '<div style="margin-top:12px;">'+
+        '<div style="font-family:\'Cormorant Garamond\',serif;font-size:17px;color:#0d1e3a;font-weight:700;margin-bottom:3px;">Concept &amp; solution alignment</div>'+
+        '<div style="font-size:12px;line-height:1.5;">'+t.concept+'</div>'+
+      '</div>'+
+      '<div style="margin-top:12px;">'+
+        '<div style="font-family:\'Cormorant Garamond\',serif;font-size:17px;color:#0d1e3a;font-weight:700;margin-bottom:3px;">Meeting notes</div>'+
+        '<div style="font-size:12px;line-height:1.55;white-space:pre-wrap;border:1px solid #e3ddd0;border-radius:6px;padding:9px 11px;min-height:54px;">'+(notes?esc(notes):'<span style="color:#9aa0ac;">&mdash;</span>')+'</div>'+
+      '</div>'+
+      '<div style="margin-top:14px;border-top:1px solid #e3ddd0;padding-top:8px;font-size:10px;color:#6c7384;display:flex;justify-content:space-between;">'+
+        '<span>Protect &nbsp;·&nbsp; Grow &nbsp;·&nbsp; Legacy</span>'+
+        '<span>A lens, not a cage \u2014 re-assess at life transitions. Framework: Pompian, Behavioral Investor Types.</span>'+
+      '</div>'+
+    '</div>';
+    document.getElementById('printArea').innerHTML = html;
+  }
+  document.getElementById('printBtn').addEventListener('click', function(){
+    buildPrint();
+    window.print();
+  });
+
+  function esc(s){ return String(s).replace(/[&<>"]/g, function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];}); }
+
+  /* ---------- Persistence (graceful) ---------- */
+  var STORE = 'EFA_BIT_ASSESSMENTS_V1';
+  var PROFILE_STORE = 'EFA_CLIENT_PROFILES_V1';
+  function storageOK(){ try{ var k='__t'; localStorage.setItem(k,'1'); localStorage.removeItem(k); return true; }catch(e){ return false; } }
+  var HAS_STORE = storageOK();
+
+  function loadSaved(){ try{ return JSON.parse(localStorage.getItem(STORE)||'[]'); }catch(e){ return []; } }
+  function writeSaved(arr){ try{ localStorage.setItem(STORE, JSON.stringify(arr)); }catch(e){} }
+
+  /* shared client-profile store — interoperates with the planning-profile tool */
+  function normName(n){ return (n||'').trim().toLowerCase().replace(/\s+/g,' '); }
+  function loadProfiles(){ try{ return JSON.parse(localStorage.getItem(PROFILE_STORE)||'{}'); }catch(e){ return {}; } }
+  function writeProfiles(o){ try{ localStorage.setItem(PROFILE_STORE, JSON.stringify(o)); }catch(e){} }
+  function getProfile(name){ var k=normName(name); if(!k) return null; var p=loadProfiles(); return p[k]||null; }
+  function upsertProfile(name, kind, data){
+    if(!HAS_STORE) return; var k=normName(name); if(!k) return;
+    var p=loadProfiles(); if(!p[k]) p[k]={name:(name||'').trim()};
+    p[k].name=(name||'').trim()||p[k].name; p[k][kind]=data; p[k].updated=Date.now(); writeProfiles(p);
+  }
+  function showCrossLink(){
+    var box=document.getElementById('rCross');
+    var prof=getProfile(document.getElementById('cName').value);
+    if(prof && prof.planning){
+      box.style.display='flex';
+      box.innerHTML='<span class="ic">&#128279;</span><span>This client is also typed for planning: <b>'+esc(prof.planning.typeName)+'</b>'+(prof.planning.line?' &middot; '+esc(prof.planning.line):'')+(prof.planning.date?' &middot; saved '+esc(prof.planning.date):'')+'</span>';
+    } else { box.style.display='none'; }
+  }
+  document.getElementById('cName').addEventListener('blur', function(){
+    if(document.getElementById('result').style.display==='block') showCrossLink();
+  });
+
+  function renderSaved(){
+    var box = document.getElementById('savedList');
+    if(!HAS_STORE){ box.innerHTML = '<p class="empty">Saving is unavailable in this preview, but works when the tool is hosted on your site.</p>'; return; }
+    var arr = loadSaved();
+    if(!arr.length){ box.innerHTML = '<p class="empty">No saved assessments yet.</p>'; return; }
+    box.innerHTML = '';
+    arr.slice().reverse().forEach(function(rec, idx){
+      var realIdx = arr.length - 1 - idx;
+      var row = document.createElement('div'); row.className='saved-item';
+      var prof = getProfile(rec.name);
+      var alsoPlan = (prof && prof.planning) ? ' &nbsp;·&nbsp; <span style="color:#23365a;">+ planning: '+esc(prof.planning.typeName)+'</span>' : '';
+      row.innerHTML = '<div><div class="nm">'+esc(rec.name||'Unnamed')+'</div>'+
+                      '<div class="ty">'+esc(rec.typeName)+' &nbsp;·&nbsp; '+esc(rec.date||'')+alsoPlan+'</div></div>'+
+                      '<div class="sp">'+
+                        '<button class="btn btn-ghost mini" data-act="load" data-i="'+realIdx+'">Open</button>'+
+                        '<button class="btn btn-ghost mini" data-act="del" data-i="'+realIdx+'">Delete</button>'+
+                      '</div>';
+      box.appendChild(row);
+    });
+    box.querySelectorAll('button').forEach(function(b){
+      b.addEventListener('click', function(){
+        var i = +b.getAttribute('data-i'), act = b.getAttribute('data-act');
+        var arr = loadSaved();
+        if(act==='del'){ arr.splice(i,1); writeSaved(arr); renderSaved(); }
+        else { openSaved(arr[i]); }
+      });
+    });
+  }
+
+  function openSaved(rec){
+    document.getElementById('cName').value = rec.name||'';
+    document.getElementById('cDate').value = rec.date||'';
+    document.getElementById('cNotes').value = rec.notes||'';
+    lastResult = {A:rec.A, B:rec.B, type:TYPES[rec.key], key:rec.key, flag:classify(rec.A,rec.B).flag, strength:strengthLabel(rec.A,rec.B)};
+    showResult(lastResult);
+  }
+
+  document.getElementById('saveBtn').addEventListener('click', function(){
+    if(!lastResult) return;
+    if(!HAS_STORE){ alert('Saving is unavailable in this preview. It will work once the tool is hosted on your site.'); return; }
+    var nm = (document.getElementById('cName').value||'').trim();
+    if(!nm){ alert('Enter a client name to save \u2014 the name links this profile to the planning-profile tool.'); document.getElementById('cName').focus(); return; }
+    var dt = document.getElementById('cDate').value||'';
+    upsertProfile(nm,'investor',{ typeName:lastResult.type.name, key:lastResult.key, line:lastResult.type.risk+' / '+lastResult.type.driver, A:lastResult.A, B:lastResult.B, date:dt, notes:document.getElementById('cNotes').value||'' });
+    var arr = loadSaved();
+    arr.push({
+      name: nm,
+      date: dt,
+      notes: document.getElementById('cNotes').value||'',
+      key: lastResult.key, typeName: lastResult.type.name,
+      A: lastResult.A, B: lastResult.B, ts: Date.now()
+    });
+    writeSaved(arr);
+    renderSaved(); showCrossLink();
+    var btn = this; var orig = btn.textContent; btn.textContent='Saved \u2713';
+    setTimeout(function(){ btn.textContent=orig; }, 1400);
+  });
+
+  renderSaved();
+})();
+</script>
+</body>
+</html>
