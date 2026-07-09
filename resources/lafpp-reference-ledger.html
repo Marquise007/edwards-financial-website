@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>LAFPP Reference Ledger (LA Fire &amp; Police Pensions) | Edwards Financial &amp; Associates</title>
+<meta name="description" content="A tier-by-tier reference for Los Angeles Fire &amp; Police Pensions (LAFPP): Tier 3/5/6 service formulas, the DROP, COLA, contributions, survivor options, and tax considerations — with verified sources.">
+<link rel="canonical" href="https://edwardsfinancialandassociates.com/resources/lafpp-reference-ledger">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta property="og:title" content="LAFPP Reference Ledger | Edwards Financial &amp; Associates">
+<meta property="og:description" content="Tier-by-tier LAFPP reference: service formulas, DROP, COLA, contributions, survivor options, and tax considerations for Los Angeles Fire &amp; Police.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://edwardsfinancialandassociates.com/resources/lafpp-reference-ledger">
+<meta property="og:site_name" content="Edwards Financial &amp; Associates">
+<meta property="og:image" content="https://edwardsfinancialandassociates.com/edwards-og-image.jpg">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--navy:#0a1f3c;--navy-mid:#12305a;--gold:#b8832a;--gold-light:#d4a84b;--gold-pale:#faf0dc;--cream:#f7f5f1;--white:#fff;--gray-50:#fafaf8;--gray-100:#f0ede8;--gray-200:#ddd9d2;--gray-400:#9a9590;--gray-700:#36332e;--lafpp:#7a1f2b;--lafpp-light:#f4e6e8;--t5:#1a4a7a;--t6:#1a5c3a;--red:#c0392b;--green:#27ae60;--shadow:0 3px 20px rgba(10,31,60,.09);}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--gray-700);min-height:100vh;line-height:1.55;}
+.topbar{background:#060f1e;padding:8px 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:2px solid var(--gold);flex-wrap:wrap;gap:8px;}
+.topbar-logo{font-family:'Cormorant Garamond',serif;font-size:14px;color:rgba(255,255,255,.6);letter-spacing:.06em;}
+.topbar-logo span{color:var(--gold-light);}
+.topbar-link{background:none;border:1px solid rgba(255,255,255,.18);color:rgba(255,255,255,.6);padding:5px 14px;font-size:10px;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;font-family:'DM Sans',sans-serif;text-decoration:none;transition:all .2s;}
+.topbar-link:hover{border-color:var(--gold);color:var(--gold);}
+.header{background:var(--navy);border-bottom:4px solid var(--gold);}
+.header-inner{max-width:1100px;margin:auto;padding:26px 22px 22px;display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:14px;}
+.header h1{font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:700;color:#fff;line-height:1.1;}
+.header h1 .amp{color:var(--gold-light);}
+.header-sub{font-size:.72rem;color:rgba(255,255,255,.5);letter-spacing:.05em;text-transform:uppercase;margin-top:6px;}
+.sys-pills{display:flex;gap:6px;flex-wrap:wrap;}
+.sys-pill{font-size:.66rem;font-weight:600;padding:5px 11px;letter-spacing:.06em;text-transform:uppercase;border-radius:3px;color:#fff;}
+.pill-lafpp{background:var(--lafpp);}
+.pill-t5{background:var(--t5);}
+.pill-t6{background:var(--t6);}
+.tab-bar{background:var(--navy-mid);display:flex;overflow-x:auto;border-bottom:3px solid var(--gold);scrollbar-width:none;}
+.tab-bar::-webkit-scrollbar{display:none;}
+.tab-btn{padding:12px 17px;color:rgba(255,255,255,.55);font-size:.74rem;font-weight:600;letter-spacing:.05em;text-transform:uppercase;cursor:pointer;border:none;background:none;white-space:nowrap;font-family:'DM Sans',sans-serif;border-bottom:3px solid transparent;margin-bottom:-3px;transition:color .18s,border-color .18s;}
+.tab-btn:hover{color:rgba(255,255,255,.9);}
+.tab-btn.active{color:var(--gold-light);border-bottom-color:var(--gold-light);}
+.tab-content{display:none;max-width:1100px;margin:26px auto 44px;padding:0 20px;}
+.tab-content.active{display:block;}
+.card{background:var(--white);border-radius:10px;box-shadow:var(--shadow);padding:20px 22px;margin-bottom:20px;}
+.card-title{font-family:'Cormorant Garamond',serif;font-size:1.35rem;font-weight:700;color:var(--navy);margin-bottom:4px;}
+.card-lede{font-size:.9rem;color:var(--gray-700);margin-bottom:14px;}
+h3.sub{font-size:.78rem;text-transform:uppercase;letter-spacing:.07em;color:var(--lafpp);font-weight:600;margin:16px 0 8px;}
+p{margin-bottom:10px;font-size:.9rem;}
+ul{margin:0 0 12px 20px;font-size:.9rem;}
+li{margin-bottom:6px;}
+.tbl{width:100%;border-collapse:collapse;font-size:.82rem;margin:6px 0 12px;}
+.tbl th{background:var(--navy);color:#fff;padding:8px 10px;font-size:.7rem;font-weight:600;text-transform:uppercase;letter-spacing:.04em;text-align:left;}
+.tbl th.t5{background:var(--t5);}
+.tbl th.t6{background:var(--t6);}
+.tbl th.t3{background:var(--navy-mid);}
+.tbl th.num,.tbl td.num{text-align:right;}
+.tbl td{padding:7px 10px;border-bottom:1px solid var(--gray-200);vertical-align:top;}
+.tbl td.rowhead{font-weight:700;color:var(--navy);background:var(--gray-100);min-width:150px;}
+.tbl tr:hover td{background:#f0f4fa;}
+.tbl tr:hover td.rowhead{background:var(--gray-200);}
+.tbl td.cap{font-weight:700;color:var(--lafpp);}
+.callout{border-left:3px solid var(--gold);background:var(--gold-pale);border-radius:0 6px 6px 0;padding:11px 14px;font-size:.84rem;margin:12px 0;}
+.callout b{color:var(--navy);}
+.flag{border-left:3px solid var(--red);background:#fbeeec;border-radius:0 6px 6px 0;padding:11px 14px;font-size:.82rem;margin:12px 0;}
+.flag b{color:var(--red);}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+@media(max-width:720px){.two{grid-template-columns:1fr;}.header h1{font-size:1.6rem;}}
+.mini{font-size:.78rem;color:var(--gray-400);}
+.cite-bar{max-width:1100px;margin:0 auto 40px;padding:16px 20px;background:var(--navy);color:rgba(255,255,255,.82);font-size:.74rem;line-height:1.6;border-radius:8px;}
+.cite-bar strong{color:var(--gold-light);}
+.cite-bar a{color:var(--gold-light);}
+.footer{background:#060f1e;color:rgba(255,255,255,.4);font-size:.72rem;text-align:center;padding:18px;}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <span class="topbar-logo">Edwards <span>&amp;</span> Associates — Advisor Reference</span>
+  <a class="topbar-link" href="/resources/california-pension-calculator">&#8592; Open the Pension Calculator</a>
+</div>
+<div class="header">
+  <div class="header-inner">
+    <div>
+      <h1>LAFPP <span class="amp">Reference</span> Ledger</h1>
+      <div class="header-sub">Los Angeles Fire &amp; Police Pensions · Tiers 3 / 5 / 6 &amp; DROP · Advisor Reference · Edwards Financial &amp; Associates</div>
+    </div>
+    <div class="sys-pills"><span class="sys-pill pill-lafpp">LAFPP</span><span class="sys-pill pill-t6">Tier 6</span><span class="sys-pill pill-t5">Tier 5</span></div>
+  </div>
+</div>
+
+<div class="tab-bar">
+  <button class="tab-btn active" onclick="showTab('overview',this)">System Overview</button>
+  <button class="tab-btn" onclick="showTab('factors',this)">Service Factors</button>
+  <button class="tab-btn" onclick="showTab('tiers',this)">Tier Comparison</button>
+  <button class="tab-btn" onclick="showTab('drop',this)">DROP</button>
+  <button class="tab-btn" onclick="showTab('cola',this)">COLA</button>
+  <button class="tab-btn" onclick="showTab('contrib',this)">Contributions</button>
+  <button class="tab-btn" onclick="showTab('planning',this)">Planning &amp; Tax</button>
+</div>
+
+<!-- ============ TAB 1: OVERVIEW ============ -->
+<div class="tab-content active" id="tab-overview">
+  <div class="card">
+    <div class="card-title">What LAFPP Is</div>
+    <div class="card-lede">Los Angeles Fire &amp; Police Pensions (LAFPP) is the independent retirement system of the City of Los Angeles for its sworn Fire and Police members, and certain sworn Harbor (Port) and Airport Police.</div>
+    <p>LAFPP is a <b>defined-benefit</b> plan: a member who meets the age and service requirements receives a lifetime pension set by a formula, not by an account balance. Two features make it different from the CalPERS and 1937-Act county systems modeled elsewhere in this suite:</p>
+    <ul>
+      <li><b>No Social Security.</b> Sworn members do not pay into or earn Social Security through this employment.</li>
+      <li><b>No reciprocity.</b> LAFPP does not exchange service credit with any other public system. Service earned elsewhere does not combine with LAFPP service.</li>
+      <li><b>Service-based formula.</b> The pension percentage is driven by <b>years of service</b>, not by an age factor. Age 50 is an eligibility gate, not a multiplier.</li>
+      <li><b>A DROP.</b> LAFPP offers a Deferred Retirement Option Plan — see the DROP tab.</li>
+    </ul>
+    <div class="callout"><b>Who is in which tier is set by hire date, not by choice.</b> New members hired today enter <b>Tier 6</b>. The primary near-retirement group today is <b>Tier 5</b> (members hired 2002&ndash;2011, now reaching 20+ years of service).</div>
+  </div>
+  <div class="card">
+    <div class="card-title">The Tiers at a Glance</div>
+    <table class="tbl">
+      <thead><tr><th>Tier</th><th>Who</th><th>Status for this ledger</th></tr></thead>
+      <tbody>
+        <tr><td class="rowhead">Tiers 1 &amp; 2</td><td>Earliest sworn members</td><td>Legacy / largely retired — not modeled in the calculator</td></tr>
+        <tr><td class="rowhead">Tier 3</td><td>Hired before Jan 1, 2002</td><td>Modeled; also the formula used for a <b>deferred</b> benefit</td></tr>
+        <tr><td class="rowhead">Tier 4</td><td>A closed intervening tier</td><td>Legacy — not modeled</td></tr>
+        <tr><td class="rowhead">Tier 5</td><td>Hired Jan 1, 2002 &ndash; Jun 30, 2011</td><td>Modeled — primary near-retirement cohort</td></tr>
+        <tr><td class="rowhead">Tier 6</td><td>Hired Jul 1, 2011 &ndash; present</td><td>Modeled — current new-member tier</td></tr>
+      </tbody>
+    </table>
+    <div class="mini">This ledger and the calculator focus on Tiers 3, 5, and 6 — the tiers with active and near-retirement members. Tiers 1, 2, and 4 are legacy and are not modeled.</div>
+  </div>
+  <div class="card">
+    <div class="card-title">Eligibility &amp; Contact</div>
+    <p>A <b>service pension</b> (Tiers 3/5/6) requires <b>age 50 and at least 20 years of service</b> — both conditions. A member who leaves with 20+ years before age 50 may take a <b>deferred</b> pension calculated on the lower Tier 3 percentages.</p>
+    <table class="tbl">
+      <tbody>
+        <tr><td class="rowhead">Phone</td><td>(213) 279-3000 · (844) 88-LAFPP</td></tr>
+        <tr><td class="rowhead">Web</td><td>lafpp.com · lafpp.lacity.gov</td></tr>
+        <tr><td class="rowhead">Office</td><td>701 East 3rd Street, Suite 200, Los Angeles, CA 90013</td></tr>
+        <tr><td class="rowhead">Member estimate tool</td><td>MyLAFPP (member portal) produces the official benefit and DROP figures</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ============ TAB 2: SERVICE FACTORS ============ -->
+<div class="tab-content" id="tab-factors">
+  <div class="card">
+    <div class="card-title">Service-Pension Percentage by Years of Service</div>
+    <div class="card-lede">Your pension is your Final Average Salary multiplied by the percentage below for your years of service. The percentage depends on service, not on retirement age (you must still be at least age 50 with 20 years).</div>
+    <table class="tbl">
+      <thead><tr><th class="num">Years of Service</th><th class="t6 num">Tier 6 (%)</th><th class="t5 num">Tier 5 (%)</th><th class="t3 num">Tier 3 (%)</th></tr></thead>
+      <tbody>
+        <tr><td class="num">20</td><td class="num">40</td><td class="num">50</td><td class="num">40</td></tr>
+        <tr><td class="num">21</td><td class="num">43</td><td class="num">53</td><td class="num">43</td></tr>
+        <tr><td class="num">22</td><td class="num">46</td><td class="num">56</td><td class="num">46</td></tr>
+        <tr><td class="num">23</td><td class="num">49</td><td class="num">59</td><td class="num">49</td></tr>
+        <tr><td class="num">24</td><td class="num">52</td><td class="num">62</td><td class="num">52</td></tr>
+        <tr><td class="num">25</td><td class="num">55</td><td class="num">65</td><td class="num">55</td></tr>
+        <tr><td class="num">26</td><td class="num">59</td><td class="num">68</td><td class="num">58</td></tr>
+        <tr><td class="num">27</td><td class="num">63</td><td class="num">71</td><td class="num">61</td></tr>
+        <tr><td class="num">28</td><td class="num">67</td><td class="num">74</td><td class="num">64</td></tr>
+        <tr><td class="num">29</td><td class="num">71</td><td class="num">77</td><td class="num">67</td></tr>
+        <tr><td class="num">30</td><td class="num">75</td><td class="num">81</td><td class="cap num">70 (max)</td></tr>
+        <tr><td class="num">31</td><td class="num">80</td><td class="num">84</td><td class="num">70</td></tr>
+        <tr><td class="num">32</td><td class="num">85</td><td class="num">87</td><td class="num">70</td></tr>
+        <tr><td class="num">33+</td><td class="cap num">90 (max)</td><td class="cap num">90 (max)</td><td class="num">70</td></tr>
+      </tbody>
+    </table>
+    <h3 class="sub">The accrual rules behind the table</h3>
+    <ul>
+      <li><b>Tier 6</b> (24-month Final Average Salary): 40% at 20 years, then +3%/yr (years 21&ndash;25), +4%/yr (years 26&ndash;30), +5%/yr (years 31&ndash;33); ceiling 90% at 33 years.</li>
+      <li><b>Tier 5</b> (12-month Final Average Salary): 50% at 20 years, then +3%/yr, except the 30th year adds 4%; ceiling 90% at 33 years.</li>
+      <li><b>Tier 3</b> (12-month Final Average Salary): 2%/yr for the first 20 years, then 3%/yr; ceiling 70% at 30 years.</li>
+    </ul>
+    <div class="callout">The percentage is <b>prorated to your last completed pay period</b>, so a mid-year retirement lands between two whole-year rows. The calculator scenarios use whole ages and therefore whole years of service, which match the table exactly.</div>
+  </div>
+  <div class="card">
+    <div class="card-title">Worked Example</div>
+    <p>A Tier 5 member with <b>28 years</b> of service and a <b>$150,000</b> annualized Final Average Salary:</p>
+    <ul>
+      <li>Percentage for 28 years (Tier 5) = <b>74%</b></li>
+      <li>Annual pension = $150,000 &times; 74% = <b>$111,000</b></li>
+      <li>Monthly pension = $111,000 &divide; 12 = <b>$9,250</b></li>
+    </ul>
+    <div class="mini">Enter Final Average Salary as an annualized figure (12 &times; the average monthly pay) so the calculator returns an annual benefit consistent with the other systems in the suite.</div>
+  </div>
+</div>
+
+<!-- ============ TAB 3: TIER COMPARISON ============ -->
+<div class="tab-content" id="tab-tiers">
+  <div class="card">
+    <div class="card-title">Tier 3 vs. Tier 5 vs. Tier 6</div>
+    <div class="card-lede">LAFPP has no "Classic vs. PEPRA" split — PEPRA does not apply to it. The relevant comparison is across LAFPP's own tiers, which differ by hire date.</div>
+    <table class="tbl">
+      <thead><tr><th>Provision</th><th class="t3">Tier 3</th><th class="t5">Tier 5</th><th class="t6">Tier 6</th></tr></thead>
+      <tbody>
+        <tr><td class="rowhead">Hire-date range</td><td>Before 1/1/2002</td><td>1/1/2002 &ndash; 6/30/2011</td><td>7/1/2011 &ndash; present</td></tr>
+        <tr><td class="rowhead">Final Average Salary</td><td>Highest 12 months</td><td>Highest 12 months</td><td>Highest 24 months</td></tr>
+        <tr><td class="rowhead">Percentage at 20 yrs</td><td>40%</td><td>50%</td><td>40%</td></tr>
+        <tr><td class="rowhead">Accrual after 20 yrs</td><td>+3%/yr</td><td>+3%/yr (30th yr +4%)</td><td>+3% (21&ndash;25), +4% (26&ndash;30), +5% (31&ndash;33)</td></tr>
+        <tr><td class="rowhead">Maximum percentage</td><td class="cap">70% at 30 yrs</td><td class="cap">90% at 33 yrs</td><td class="cap">90% at 33 yrs</td></tr>
+        <tr><td class="rowhead">Retirement eligibility</td><td>Age 50 + 20 yrs</td><td>Age 50 + 20 yrs</td><td>Age 50 + 20 yrs</td></tr>
+        <tr><td class="rowhead">Employee contribution</td><td>8%</td><td>8% (9% if under 100% funded)</td><td>11% (2% funds retiree health)</td></tr>
+        <tr><td class="rowhead">COLA</td><td>Up to 3%</td><td>Up to 3% + COLA Bank</td><td>Up to 3% + COLA Bank</td></tr>
+        <tr><td class="rowhead">Social Security</td><td>No</td><td>No</td><td>No</td></tr>
+        <tr><td class="rowhead">Reciprocity</td><td>None</td><td>None</td><td>None</td></tr>
+      </tbody>
+    </table>
+    <div class="callout"><b>Planning read:</b> Tier 5 reaches a given percentage faster than Tier 6 (it starts at 50% vs. 40% at 20 years), but both cap at 90% at 33 years. Tier 6's 24-month Final Average Salary can pull the base slightly below a 12-month figure if the final year included a promotion.</div>
+  </div>
+</div>
+
+<!-- ============ TAB 4: DROP ============ -->
+<div class="tab-content" id="tab-drop">
+  <div class="card">
+    <div class="card-title">The Deferred Retirement Option Plan (DROP)</div>
+    <div class="card-lede">DROP lets an eligible member "retire on paper," keep working for up to five years, and accumulate the monthly pension in a nominal LAFPP account — then take that balance at exit while beginning the monthly pension.</div>
+    <h3 class="sub">Eligibility</h3>
+    <ul>
+      <li>Tier 3, 5, or 6 with at least <b>25 years of service</b> and at least <b>age 50</b>.</li>
+      <li>Available to all Fire and Police members except the <b>Chief of Police</b> and the <b>Chief Engineer</b> (also open to eligible Harbor/Airport Police).</li>
+      <li>Service credit and eligibility freeze on the DROP entry date; no further service credit is earned.</li>
+    </ul>
+    <h3 class="sub">How the account grows</h3>
+    <ul>
+      <li>Your monthly pension is calculated and <b>frozen at entry</b>, then deposited into the DROP account instead of paid to you.</li>
+      <li>The account earns a guaranteed <b>5% annual interest</b>, credited semi-annually on <b>June 30 and December 31</b>.</li>
+      <li>Your frozen pension still receives its annual <b>COLA</b> (up to 3%) during DROP.</li>
+      <li>You must complete <b>112 work hours per month</b> to earn that month's deposit.</li>
+      <li>Maximum participation is <b>5 years / 60 months</b>. Interest stops at exit and after 60 months.</li>
+    </ul>
+    <h3 class="sub">At exit</h3>
+    <ul>
+      <li>Exiting DROP ends sworn employment; the monthly pension then begins.</li>
+      <li>The DROP balance is paid as a <b>lump sum</b>, a <b>direct rollover</b>, or a <b>combination</b>. There is no surrender charge.</li>
+      <li>You have a <b>90-day</b> window after exit to elect. Miss it and the default is a cash payout with 20% federal withholding.</li>
+    </ul>
+    <h3 class="sub">Tax treatment</h3>
+    <ul>
+      <li>The DROP account is part of a governmental <b>401(a)</b> qualified plan. It is <b>not tax-free</b>: distributions are taxed as <b>ordinary income</b>, except recovery of any after-tax basis.</li>
+      <li>A <b>direct rollover</b> to an IRA or qualified plan avoids the mandatory 20% federal withholding and defers tax.</li>
+      <li>As a qualified public-safety employee separating in the year you reach <b>age 50 or later</b>, the 10% early-distribution penalty does <b>not</b> apply to a post-separation distribution.</li>
+    </ul>
+    <h3 class="sub">Where a rollover can go</h3>
+    <ul>
+      <li>Traditional or Roth IRA (an IRA may itself be an annuity), a tax-qualified plan, a 403(b), or a governmental 457(b) that accepts the funds.</li>
+      <li>The City's 457 plan <b>will not accept after-tax</b> funds.</li>
+    </ul>
+    <div class="callout"><b>Modeling note:</b> the calculator's DROP projection assumes 5% credited semi-annually on the running balance and applies COLA to the deposit annually. It is a planning estimate. The <b>official</b> DROP figure comes from MyLAFPP — confirm before relying on a number.</div>
+  </div>
+</div>
+
+<!-- ============ TAB 5: COLA ============ -->
+<div class="tab-content" id="tab-cola">
+  <div class="card">
+    <div class="card-title">Cost-of-Living Adjustments</div>
+    <div class="card-lede">LAFPP applies a COLA to pensions each July 1, based on the change in the Consumer Price Index for the Los Angeles metro area.</div>
+    <table class="tbl">
+      <thead><tr><th>Feature</th><th>Tiers 3 &amp; 4</th><th class="t5">Tiers 5 &amp; 6</th></tr></thead>
+      <tbody>
+        <tr><td class="rowhead">Annual cap</td><td>Up to 3%</td><td>Up to 3%</td></tr>
+        <tr><td class="rowhead">COLA Bank</td><td>No bank</td><td class="cap">Yes — CPI above 3% is banked</td></tr>
+        <tr><td class="rowhead">Effective date</td><td>July 1</td><td>July 1</td></tr>
+        <tr><td class="rowhead">Floor</td><td colspan="2">Base pension is never reduced below its original amount</td></tr>
+      </tbody>
+    </table>
+    <div class="callout"><b>The COLA Bank (Tiers 5 &amp; 6):</b> when CPI runs above the 3% cap, the excess is stored and paid out in later years when CPI is below 3%. It smooths, but does not fully restore, purchasing power over time.</div>
+    <p>Tiers 1 &amp; 2 receive the full CPI (uncapped); all later tiers are capped at 3%.</p>
+    <h3 class="sub">Current adjustment</h3>
+    <ul>
+      <li>Effective <b>July 1, 2026</b>, the COLA is <b>2.90%</b> for all tiers (under the 3% cap).</li>
+      <li>Because 2.90% is below the cap, <b>0.00%</b> was added to the Tier 5/6 COLA Bank in 2026 (0.10% was banked in 2025).</li>
+    </ul>
+    <div class="callout"><b>Planning read:</b> a 3% cap means real purchasing power still erodes in higher-inflation years. This is the gap a supplemental income strategy is meant to close.</div>
+  </div>
+</div>
+
+<!-- ============ TAB 6: CONTRIBUTIONS ============ -->
+<div class="tab-content" id="tab-contrib">
+  <div class="card">
+    <div class="card-title">Employee Contribution Rates</div>
+    <div class="card-lede">Contributions are pre-tax, deducted automatically, and set by the City Charter. Member contributions earn interest each June 30 and December 31 while active.</div>
+    <table class="tbl">
+      <thead><tr><th>Tier</th><th class="num">Rate</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td class="rowhead">Tier 3</td><td class="num">8%</td><td>Pre-tax; refundable with interest if you leave before retirement.</td></tr>
+        <tr><td class="rowhead">Tier 5</td><td class="num">8% (9% if the plan is under 100% actuarially funded)</td><td>Contributions cease after 33 years of service.</td></tr>
+        <tr><td class="rowhead">Tier 6</td><td class="num">11%</td><td>9% toward pension (ends at 33 yrs or retirement) + 2% toward retiree health (ends at 25 yrs or retirement).</td></tr>
+      </tbody>
+    </table>
+    <ul>
+      <li>If you terminate before retirement, your contributions and accrued interest are <b>refundable</b>; contributions no longer earn interest after termination.</li>
+      <li>Members of certain earlier tiers who elected a 2% "opt-in" health contribution continue it until they have paid it for 25 years.</li>
+      <li>During DROP, both member and City contributions continue (DROP is designed to be cost-neutral) at the rate and for the length specified for the tier.</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ============ TAB 7: PLANNING & TAX ============ -->
+<div class="tab-content" id="tab-planning">
+  <div class="card">
+    <div class="card-title">Planning &amp; Tax Considerations</div>
+    <div class="card-lede">Items that shape a sworn member's total retirement picture beyond the base pension.</div>
+
+    <h3 class="sub">Survivor &amp; continuance</h3>
+    <ul>
+      <li>A qualified surviving spouse or domestic partner may receive a continuing pension. To be "qualified," the marriage or registered partnership must generally pre-date retirement (or DROP entry) by at least one year.</li>
+      <li>A retired member may also elect the <b>Survivor Benefit Purchase Program</b> to provide (or increase) a survivor benefit by reducing the monthly pension — continuance choices run from 30% to 100% in 5% steps, vest one year after election, and are irrevocable.</li>
+    </ul>
+
+    <h3 class="sub">Retiree health &amp; dental</h3>
+    <p>LAFPP administers a retiree health and dental <b>subsidy</b> (partly funded by the Tier 6 2% health contribution). The maximum monthly subsidy is set by the Board and adjusts periodically.</p>
+    <div class="flag"><b>Confirm before quoting:</b> the current maximum monthly health/dental subsidy amount and eligibility service requirement change over time — verify the current figure with LAFPP for a specific client.</div>
+
+    <h3 class="sub">IRS limits</h3>
+    <p>Federal limits apply to qualified plans: the <b>IRC &sect;415(b)</b> annual benefit limit (for DROP, generally set by the DROP-entry year) and the <b>IRC &sect;401(a)(17)</b> compensation limit.</p>
+    <div class="flag"><b>Confirm before quoting:</b> the current-year &sect;415(b) and &sect;401(a)(17) dollar amounts are indexed annually by the IRS and are not stated here — look up the current-year figures before applying them to a client.</div>
+
+    <h3 class="sub">Social Security interaction</h3>
+    <p>Sworn LAFPP members earn no Social Security through this job, but many have Social Security from other work. The Social Security Fairness Act (signed January 2025) repealed the Windfall Elimination Provision and Government Pension Offset.</p>
+    <div class="flag"><b>Confirm before advising:</b> verify the current status and specific effect of the Social Security Fairness Act for a given client with the Social Security Administration before relying on it in a plan.</div>
+
+    <h3 class="sub">Compliance</h3>
+    <p>This ledger is educational reference for a licensed consultant's use — it is <b>not</b> financial, tax, or legal advice. Plan provisions and figures change; every client-specific number should be confirmed with LAFPP (MyLAFPP for benefit and DROP estimates) and, where taxes are involved, with a tax professional. Any insurance or annuity recommendation made alongside this material must meet the suitability and disclosure rules of the client's state (for Edwards Financial &amp; Associates: CA, TX, NV, AZ, NM, GA, NC, WA).</p>
+  </div>
+</div>
+
+<div class="cite-bar">
+  <strong>Sources &amp; methodology.</strong> Verified against LAFPP primary sources on <strong>July 9, 2026</strong>: Tier 5, Tier 6, and Tier 3 pension pages and the Tier 6 Key Benefits sheet (lafpp.com / lafpp.lacity.gov); DROP FAQs, "Enroll in DROP," "DROP Participation," and the DROP Handbook; the Historical Cost-of-Living Adjustments page; and the Los Angeles Administrative Code, Division 4, Chapter 21 (&sect;&sect; 4.2100&ndash;4.2107). Service percentages, hire-date ranges, Final Average Salary bases, contribution rates, the 90%/70% caps, the 5% DROP interest credited semi-annually, the 60-month DROP maximum, and the July 1, 2026 COLA of 2.90% are drawn from those sources. <strong>Not independently reverified here and flagged in-page:</strong> current-year IRS &sect;415(b) and &sect;401(a)(17) dollar limits; the current maximum retiree health/dental subsidy; the exact intra-period DROP interest convention used by MyLAFPP; and the specific effect of the Social Security Fairness Act. Approximate active/retiree headcounts (~13,500 / ~13,000) are order-of-magnitude. For advisor reference only — not financial, tax, or legal advice. Verify current details at <a href="https://www.lafpp.com" target="_blank" rel="noopener">lafpp.com</a>.
+</div>
+
+<div class="footer">Edwards Financial &amp; Associates · Retirement, Pension &amp; Legacy Consulting · Prepared July 9, 2026</div>
+
+<script>
+function showTab(id, btn){
+  document.querySelectorAll('.tab-content').forEach(function(t){ t.classList.remove('active'); });
+  document.querySelectorAll('.tab-btn').forEach(function(b){ b.classList.remove('active'); });
+  document.getElementById('tab-'+id).classList.add('active');
+  btn.classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+</script>
+</body>
+</html>

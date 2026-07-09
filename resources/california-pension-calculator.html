@@ -4,7 +4,7 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>California Public Pension Calculator | Edwards Financial & Associates</title>
-<meta name="description" content="Estimate your CalPERS, CalSTRS, LACERA, OCERS, or UCRP pension, project your retirement income gap, and see the capital needed to bridge it for life.">
+<meta name="description" content="Estimate your CalPERS, CalSTRS, LACERA, OCERS, UCRP, or LAFPP (LA Fire & Police) pension — including LAFPP DROP projections — project your retirement income gap, and see the capital needed to bridge it for life.">
 <link rel="canonical" href="https://edwardsfinancialandassociates.com/resources/california-pension-calculator">
 <!-- Favicons -->
 <link rel="icon" href="/favicon.ico" sizes="any">
@@ -12,7 +12,7 @@
 <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <meta property="og:title" content="California Public Pension Calculator">
-<meta property="og:description" content="Estimate your CalPERS, CalSTRS, LACERA, OCERS, or UCRP pension and the capital needed to bridge your retirement income gap for life.">
+<meta property="og:description" content="Estimate your CalPERS, CalSTRS, LACERA, OCERS, UCRP, or LAFPP pension — with LAFPP DROP projections — and the capital needed to bridge your retirement income gap for life.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://edwardsfinancialandassociates.com/resources/california-pension-calculator">
 <meta property="og:site_name" content="Edwards Financial & Associates">
@@ -145,6 +145,7 @@ select:focus,input:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 
     <button class="sys-tab" onclick="switchSystem('sdcera')">SDCERA</button>
     <button class="sys-tab" onclick="switchSystem('sdcers')">SDCERS</button>
     <button class="sys-tab" onclick="switchSystem('ucrp')">UCRP</button>
+    <button class="sys-tab" onclick="switchSystem('lafpp')">LAFPP</button>
   </div>
 </div>
 
@@ -574,6 +575,34 @@ const ALL_PLANS = {
       },
     }
   },
+
+  // ── LAFPP — Los Angeles Fire & Police Pensions (independent City of LA system; sworn only) ──
+  // Benefit is YEARS-OF-SERVICE driven, NOT age-factor driven. Age 50 is the eligibility gate only.
+  // Sources verified at lafpp.com / lafpp.lacity.gov (checked 2026-07-09) — see methodology note.
+  lafpp: {
+    name: 'LAFPP', color: '#7a1f2b', contact: '844-88-LAFPP · lafpp.com',
+    drop: true,
+    plans: {
+      LAFPP_T6: {
+        label:'Tier 6 — hired 7/1/2011 to present (current new-member tier)', system:'lafpp',
+        minAge:50, maxAge:75, fac:24, cola:'3% max (with COLA bank)', pepra:false, dropElig:'25 YOS + age 50',
+        notes:'Sworn LAPD/LAFD (and certain Harbor/Airport Police) hired 7/1/2011 or later. Final Average Salary = highest 24 consecutive months. 40% at 20 years, then +3%/yr (21-25), +4%/yr (26-30), +5%/yr (31-33); 90% ceiling reached at 33 years. There is NO age-based maximum — the benefit is set by years of service; you must be at least age 50 with 20 years to draw it. Member contributes 11% (2% funds retiree health, ends at 25 years). No Social Security. No reciprocity with other systems.',
+        factor(age,yrs){ return lafpp_t6(yrs)/100; }
+      },
+      LAFPP_T5: {
+        label:'Tier 5 — hired 1/1/2002 to 6/30/2011', system:'lafpp',
+        minAge:50, maxAge:75, fac:12, cola:'3% max (with COLA bank)', pepra:false, dropElig:'25 YOS + age 50',
+        notes:'Sworn LAPD/LAFD hired 1/1/2002 through 6/30/2011 — the primary near-retirement cohort today. Final Average Salary = highest 12 consecutive months. 50% at 20 years, then +3%/yr, except the 30th year adds 4%; 90% ceiling at 33 years. Retire at age 50 with 20 years. Member contributes 8% (9% if the plan is under 100% actuarially funded). No age-based maximum. No Social Security. No reciprocity.',
+        factor(age,yrs){ return lafpp_t5(yrs)/100; }
+      },
+      LAFPP_T3: {
+        label:'Tier 3 — hired before 1/1/2002 · also the deferred-benefit formula', system:'lafpp',
+        minAge:50, maxAge:75, fac:12, cola:'3% max', pepra:false, dropElig:'25 YOS + age 50',
+        notes:'Sworn members hired before 1/1/2002 — and the lower formula applied to a DEFERRED benefit if a Tier 5 or Tier 6 member leaves with 20+ years before age 50. Final Average Salary = highest 12 consecutive months. 2%/yr for the first 20 years, then 3%/yr; 70% ceiling at 30 years. Member contributes 8%. No Social Security. No reciprocity.',
+        factor(age,yrs){ return lafpp_t3(yrs)/100; }
+      },
+    }
+  },
 };
 
 // ══════════════════════════════════════════════════════════════════════════════
@@ -610,6 +639,18 @@ function ucrp_1976(a){const t={50:1.1,51:1.24,52:1.38,53:1.52,54:1.66,55:1.80,56
 // UCRP 2013 Tier (1.1% at 55 → 2.5% at 65, linear interpolation)
 function ucrp_2013(a){const t={55:1.1,56:1.24,57:1.38,58:1.52,59:1.66,60:1.80,61:1.94,62:2.08,63:2.22,64:2.36,65:2.5};return t[Math.round(a)]||2.5;}
 
+// ── LAFPP service-pension percentage tables — YEARS-OF-SERVICE based (age is eligibility-only) ──
+// Verified at lafpp.com Tier 5/6 pages + Tier 6 Key Benefits PDF (checked 2026-07-09).
+// Each returns the TOTAL percentage of Final Average Salary (e.g. 55 = 55%). NOT multiplied by years.
+function lafpp_t6(yrs){ // hired 7/1/2011+ : 40% @20; +3%(21-25); +4%(26-30); +5%(31-33); 90% cap @33
+  const t={20:40,21:43,22:46,23:49,24:52,25:55,26:59,27:63,28:67,29:71,30:75,31:80,32:85,33:90};
+  const y=Math.floor(yrs); if(y<20) return 0; return t[Math.min(y,33)]||90; }
+function lafpp_t5(yrs){ // hired 1/1/2002-6/30/2011 : 50% @20; +3%/yr (30th yr +4%); 90% cap @33
+  const t={20:50,21:53,22:56,23:59,24:62,25:65,26:68,27:71,28:74,29:77,30:81,31:84,32:87,33:90};
+  const y=Math.floor(yrs); if(y<20) return 0; return t[Math.min(y,33)]||90; }
+function lafpp_t3(yrs){ // pre-1/1/2002 / deferred formula : 2%/yr first 20, then 3%/yr; 70% cap @30
+  const y=Math.floor(yrs); if(y<1) return 0; const p=(y<=20)?y*2:40+(y-20)*3; return Math.min(p,70); }
+
 // ══════════════════════════════════════════════════════════════════════════════
 // STATE
 // ══════════════════════════════════════════════════════════════════════════════
@@ -629,7 +670,7 @@ function switchSystem(sys) {
   const sysData = ALL_PLANS[sys];
   // Update tabs
   document.querySelectorAll('.sys-tab').forEach((t,i) => {
-    const map={calpers:0,calstrs:1,lacera:2,ocers:3,sdcera:4,sdcers:5,ucrp:6};
+    const map={calpers:0,calstrs:1,lacera:2,ocers:3,sdcera:4,sdcers:5,ucrp:6,lafpp:7};
     t.classList.toggle('active', i===map[sys]);
   });
   // Update badge
@@ -680,6 +721,8 @@ function updatePlanInfo() {
     <div class="pi-row"><span class="pi-label">Career Factor</span><span class="pi-val">${plan.careerFactor?'+0.2% (≥30 yrs, max 2.4%)':'N/A'}</span></div>`;
   document.getElementById('facNote').textContent = plan.fac===36
     ? 'PEPRA / This plan: FAC = average of highest 36 consecutive months of compensation.'
+    : plan.fac===24
+    ? 'This plan: Final Average Salary = average of the highest 24 consecutive months of compensation.'
     : 'FAC = highest single 12-month period of your career.';
 }
 
@@ -1700,6 +1743,13 @@ const COLA_INFO = {
     detail: '2025 COLA was based on 2.89% CPI (LA & SF metro). All recipients received less than full CPI, so purchasing power still declined.',
     source: 'https://ucnet.universityofcalifornia.edu/employee-news/2025-cost-of-living-adjustments-announced/',
     sourceLabel: 'ucnet.universityofcalifornia.edu'
+  },
+  lafpp: {
+    rule: 'Up to 3% annually, effective each July 1, based on CPI (LA metro). Tiers 5 & 6 carry a COLA Bank: CPI above 3% is stored and paid out in later low-inflation years. Tiers 1 & 2 receive the full CPI (uncapped).',
+    floor: 'COLA Bank (Tiers 5 & 6) — CPI above the 3% cap accumulates and is drawn down when CPI runs below 3%. The base pension is never reduced below its original amount.',
+    detail: 'Effective 7/1/2026 the COLA is 2.90% for all tiers (under the 3% cap, so 0.00% was added to the Tier 5/6 bank this year; 0.10% was banked in 2025). A 3% cap still lets purchasing power erode in higher-inflation years — supplemental income planning matters.',
+    source: 'https://lafpp.lacity.gov/members_information/historical-cost-of-living-adjustments/',
+    sourceLabel: 'lafpp.lacity.gov'
   }
 };
 
@@ -2205,6 +2255,148 @@ const EFA_ILLUSTRATOR_URL = 'tool-retirement-illustration.html';
   applyView();   // present mode, Build Profile
 
   window.EFA_PENSION={ collectPension, goModule, setMode, applyView, refreshClientRoster };
+})();
+</script>
+
+<style id="lafpp-drop-styles">
+.drop-wrap{margin-top:14px;border:1px solid var(--gray-200);border-radius:10px;overflow:hidden;background:var(--white);box-shadow:var(--shadow);}
+.drop-head{background:linear-gradient(90deg,#7a1f2b,#9e2a38);color:#fff;padding:14px 18px;}
+.drop-head .t{font-family:'Montserrat',sans-serif;font-weight:700;font-size:1rem;letter-spacing:.02em;}
+.drop-head .s{font-size:.74rem;color:rgba(255,255,255,.82);margin-top:4px;line-height:1.5;}
+.drop-body{padding:16px 18px;}
+.drop-inputs{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;margin-bottom:14px;}
+.drop-f{display:flex;flex-direction:column;gap:4px;}
+.drop-f label{font-size:.62rem;text-transform:uppercase;letter-spacing:.06em;color:var(--gray-400);font-weight:700;}
+.drop-f select,.drop-f input{font-family:'Montserrat',sans-serif;font-size:.86rem;padding:7px 9px;border:1px solid var(--gray-200);border-radius:6px;background:var(--cream);color:var(--navy);}
+.drop-f.wide{flex:1;min-width:220px;}
+.drop-elig{font-size:.76rem;border-radius:6px;padding:9px 12px;margin-bottom:12px;line-height:1.5;}
+.drop-elig.ok{background:rgba(39,174,96,.10);border-left:3px solid var(--green);color:#1d6b3f;}
+.drop-elig.no{background:rgba(192,57,43,.09);border-left:3px solid var(--red);color:#9a2f24;}
+.drop-cards{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;}
+.drop-card{flex:1;min-width:120px;background:var(--gray-100);border-radius:8px;padding:11px 10px;text-align:center;}
+.drop-card.hero{background:var(--navy);}
+.drop-card .k{font-size:.6rem;text-transform:uppercase;letter-spacing:.06em;color:var(--gray-400);}
+.drop-card.hero .k{color:rgba(255,255,255,.65);}
+.drop-card .v{font-family:'Montserrat',sans-serif;font-weight:700;font-size:1.05rem;color:var(--navy);margin-top:4px;}
+.drop-card.hero .v{color:var(--gold-light);}
+.drop-tbl{width:100%;border-collapse:collapse;font-size:.78rem;margin-bottom:6px;}
+.drop-tbl th{background:var(--navy);color:#fff;padding:6px 8px;font-size:.66rem;text-transform:uppercase;letter-spacing:.04em;font-weight:600;text-align:right;}
+.drop-tbl th:first-child{text-align:left;}
+.drop-tbl td{padding:6px 8px;border-bottom:1px solid var(--gray-200);text-align:right;color:var(--gray-700);}
+.drop-tbl td:first-child{text-align:left;font-weight:700;color:var(--navy);}
+.drop-tbl tr:last-child td{border-top:2px solid var(--navy);font-weight:700;background:var(--gray-100);}
+.drop-note{font-size:.74rem;line-height:1.55;color:var(--gray-700);background:var(--gray-100);border-radius:8px;padding:11px 13px;margin-top:10px;}
+.drop-note b{color:var(--navy);}
+.drop-src{font-size:.67rem;color:var(--gray-400);margin-top:8px;line-height:1.5;}
+</style>
+<script id="lafpp-drop-logic">
+(function(){
+  var $=function(id){return document.getElementById(id);};
+  var money=function(n){return '$'+Math.round(n).toLocaleString('en-US');};
+  var dropScenIdx=null, dropYears=3, dropCola=2.9, dropMonthly=null, dropMonthlyTouched=false;
+
+  // Default DROP-entry scenario: the highest-YOS scenario that meets 25 yrs + age 50; else highest YOS.
+  function bestElig(){
+    if(!_results||!_results.length) return 0;
+    var tagged=_results.map(function(r,i){return {r:r,i:i};});
+    var elig=tagged.filter(function(o){return o.r.yrs>=25 && o.r.age>=50;});
+    var pool=elig.length?elig:tagged;
+    var best=pool[0];
+    pool.forEach(function(o){ if(o.r.yrs>best.r.yrs) best=o; });
+    return best.i;
+  }
+
+  // 5% APR credited semi-annually (2.5% each Jun 30 / Dec 31) on the running balance;
+  // COLA applied to the monthly pension deposit annually. Integer years 1..5 (<=60 months).
+  function projectDrop(startMonthly, years, colaPct){
+    years=Math.max(1,Math.min(5,years));
+    var months=years*12, c=colaPct/100, bal=0, totalDep=0, rows=[], yrDep=0, yrInt=0;
+    for(var m=1;m<=months;m++){
+      var y=Math.ceil(m/12);
+      var dep=startMonthly*Math.pow(1+c,y-1);
+      bal+=dep; totalDep+=dep; yrDep+=dep;
+      if(m%6===0){ var intv=bal*0.025; bal+=intv; yrInt+=intv; }
+      if(m%12===0){ rows.push({year:y, monthly:startMonthly*Math.pow(1+c,y-1), deposits:yrDep, interest:yrInt, balance:bal}); yrDep=0; yrInt=0; }
+    }
+    return {rows:rows, totalDep:totalDep, totalInt:bal-totalDep, lump:bal, months:months};
+  }
+
+  function renderDropOutput(){
+    var host=$('dropOutput'); if(!host) return;
+    var startM = dropMonthly!=null ? dropMonthly : 0;
+    var p=projectDrop(startM, dropYears, dropCola);
+    var rowsHtml=p.rows.map(function(r){
+      return '<tr><td>Year '+r.year+'</td><td>'+money(r.monthly)+'</td><td>'+money(r.deposits)+'</td><td>'+money(r.interest)+'</td><td>'+money(r.balance)+'</td></tr>';
+    }).join('');
+    host.innerHTML=
+      '<div class="drop-cards">'
+      +'<div class="drop-card"><div class="k">Pension deposited</div><div class="v">'+money(p.totalDep)+'</div></div>'
+      +'<div class="drop-card"><div class="k">Interest @ 5%</div><div class="v">'+money(p.totalInt)+'</div></div>'
+      +'<div class="drop-card hero"><div class="k">Lump sum at exit</div><div class="v">'+money(p.lump)+'</div></div>'
+      +'</div>'
+      +'<table class="drop-tbl"><thead><tr><th>DROP year</th><th>Monthly deposit</th><th>Deposits</th><th>Interest</th><th>Year-end balance</th></tr></thead><tbody>'
+      +rowsHtml
+      +'<tr><td>Total ('+dropYears+' yr'+(dropYears>1?'s':'')+')</td><td>&mdash;</td><td>'+money(p.totalDep)+'</td><td>'+money(p.totalInt)+'</td><td>'+money(p.lump)+'</td></tr>'
+      +'</tbody></table>';
+  }
+
+  function renderDrop(){
+    var old=$('dropPanelWrap'); if(old) old.remove();
+    var panelHost=$('resultsPanel');
+    if(!panelHost || _sys!=='lafpp' || !_results || !_results.length) return;
+
+    if(dropScenIdx==null || !_results[dropScenIdx]) dropScenIdx=bestElig();
+    var sc=_results[dropScenIdx];
+    if(!dropMonthlyTouched || dropMonthly==null) dropMonthly=Math.round(sc.monthly);
+
+    var eligible = sc.yrs>=25 && sc.age>=50;
+    var eligHtml = eligible
+      ? '<div class="drop-elig ok"><b>DROP-eligible.</b> This scenario has '+sc.yrs+' years of service at age '+sc.age+' &mdash; meeting the 25-year / age-50 rule. Your monthly pension is frozen at entry and paid into the DROP account instead of to you.</div>'
+      : '<div class="drop-elig no"><b>Not yet DROP-eligible in this scenario.</b> DROP requires at least 25 years of service AND age 50 (this scenario: '+sc.yrs+' years at age '+sc.age+'). The projection below is illustrative &mdash; choose a scenario that reaches 25 years to model a real DROP entry.</div>';
+
+    var scenOpts=_results.map(function(r,i){
+      return '<option value="'+i+'"'+(i===dropScenIdx?' selected':'')+'>Age '+r.age+' &middot; '+r.yrs+' yrs &middot; '+money(r.monthly)+'/mo</option>';
+    }).join('');
+
+    var wrap=document.createElement('div'); wrap.className='drop-wrap'; wrap.id='dropPanelWrap';
+    wrap.innerHTML=
+      '<div class="drop-head">'
+        +'<div class="t">&#9670; DROP Projection &mdash; Deferred Retirement Option Plan</div>'
+        +'<div class="s">Enter DROP, keep working up to 5 years, and your monthly pension accumulates in a nominal LAFPP account earning a guaranteed 5% (credited each June 30 &amp; December 31). At exit you take it as a lump sum or rollover.</div>'
+      +'</div>'
+      +'<div class="drop-body">'
+        +eligHtml
+        +'<div class="drop-inputs">'
+          +'<div class="drop-f wide"><label>DROP entry scenario</label><select id="dropScen">'+scenOpts+'</select></div>'
+          +'<div class="drop-f"><label>Years in DROP (1-5)</label><input type="number" id="dropYears" min="1" max="5" step="1" value="'+dropYears+'"></div>'
+          +'<div class="drop-f"><label>Annual COLA in DROP (%)</label><input type="number" id="dropCola" min="0" max="3" step="0.1" value="'+dropCola+'"></div>'
+          +'<div class="drop-f"><label>Monthly pension at entry ($)</label><input type="number" id="dropMonthly" min="0" step="50" value="'+dropMonthly+'"></div>'
+        +'</div>'
+        +'<div id="dropOutput"></div>'
+        +'<div class="drop-note">'
+          +'<b>At exit (ends sworn employment):</b> your DROP balance is paid as a lump sum, a direct rollover, or a combination. It is a governmental 401(a) qualified-plan balance &mdash; taxed as <b>ordinary income</b> when distributed (except recovery of any after-tax basis). A <b>direct rollover</b> to an IRA or qualified plan avoids the mandatory 20% federal withholding and defers tax. As a public-safety employee separating in the year you reach age 50 or later, the 10% early-distribution penalty does <b>not</b> apply. You have a <b>90-day</b> window after exit to elect; miss it and the default is a cash payout with 20% withheld. Interest stops at exit and after 60 months. <b>Confirm all specifics with LAFPP and your tax advisor before acting.</b>'
+          +'<div class="drop-src">Model: 5% APR credited semi-annually (2.5% each Jun 30 / Dec 31) on the running balance; COLA applied to the monthly deposit annually. This is a planning estimate &mdash; the official figure is produced by MyLAFPP. Verify at lafpp.com.</div>'
+        +'</div>'
+      +'</div>';
+    panelHost.appendChild(wrap);
+
+    $('dropScen').addEventListener('change',function(e){ dropScenIdx=parseInt(e.target.value,10); dropMonthlyTouched=false; renderDrop(); });
+    $('dropYears').addEventListener('input',function(e){ dropYears=Math.max(1,Math.min(5,parseInt(e.target.value,10)||1)); renderDropOutput(); });
+    $('dropCola').addEventListener('input',function(e){ dropCola=Math.max(0,Math.min(3,parseFloat(e.target.value)||0)); renderDropOutput(); });
+    $('dropMonthly').addEventListener('input',function(e){ dropMonthly=Math.max(0,parseFloat(e.target.value)||0); dropMonthlyTouched=true; renderDropOutput(); });
+    renderDropOutput();
+  }
+
+  // Hook calculate() (already EFA-wrapped) to (re)draw the DROP panel after each run.
+  if(typeof window.calculate==='function'){
+    var prevCalc=window.calculate;
+    window.calculate=function(){ var r=prevCalc.apply(this,arguments); try{ renderDrop(); }catch(e){ console.warn('DROP render',e); } return r; };
+  }
+  // Clear a stale DROP panel and reset DROP state when leaving LAFPP.
+  if(typeof window.switchSystem==='function'){
+    var prevSw=window.switchSystem;
+    window.switchSystem=function(){ var r=prevSw.apply(this,arguments); var w=$('dropPanelWrap'); if(w && _sys!=='lafpp') w.remove(); dropScenIdx=null; dropMonthlyTouched=false; return r; };
+  }
 })();
 </script>
 
