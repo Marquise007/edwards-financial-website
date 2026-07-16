@@ -12,7 +12,8 @@
 //     RESEND_API_KEY     your Resend API key (starts with re_...)
 //
 // OPTIONAL overrides (plain Variables, not secrets):
-//     MAIL_TO            where inquiries are sent   (default below)
+//     MAIL_TO            where inquiries are sent   (default below;
+//                        comma-separate for multiple recipients)
 //     MAIL_FROM          verified Resend sender     (default below)
 // ============================================================================
 
@@ -91,7 +92,10 @@ export async function onRequestPost(context) {
   if (!RESEND_API_KEY) {
     return json({ error: 'Email is not configured yet.' }, 500);
   }
-  const mailTo = env.MAIL_TO || DEFAULT_MAIL_TO;
+  const mailTo = (env.MAIL_TO || DEFAULT_MAIL_TO)
+    .split(',')
+    .map((addr) => addr.trim())
+    .filter(Boolean);
   const mailFrom = env.MAIL_FROM || DEFAULT_MAIL_FROM;
 
   const row = (label, value) =>
@@ -132,7 +136,7 @@ export async function onRequestPost(context) {
       },
       body: JSON.stringify({
         from: mailFrom,
-        to: [mailTo],
+        to: mailTo,
         reply_to: email,
         subject: `New partnership inquiry \u2014 ${firm}`,
         html: html,
