@@ -16,10 +16,10 @@ Before anything destructive — force-push, history rewrite, deleting files, or 
 
 ## Site facts
 - Clean URLs: Cloudflare strips `.html`, so `resources/foo.html` serves at `/resources/foo`. Use clean paths in canonical tags, internal links, and nav.
-- Domain: edwardsfinancialandassociates.com
+- Domain: edwardsfinancialassociates.com
 - Brand: navy #0d1e3a, gold #b8972e. Headings Cormorant Garamond, body Montserrat. "Protect · Grow · Legacy." Refer to me as "consultant," not "advisor."
 - New tools/pages go under /resources and should be linked from the /resources hub (resources/index.html) and carry their own <title>/meta description/canonical/OG tags matching existing pages.
 - Reuse the shared site nav/header and footer on new pages so they feel native.
 
 ## SEO defaults for any new page
-Set a unique <title>, meta description, canonical (clean URL, full https://edwardsfinancialandassociates.com/...), and Open Graph tags (og:title, og:description, og:type, og:url, og:site_name). Skip og:image unless I provide one. Add the page to the /resources hub and link it from a relevant article where it fits.
+Set a unique <title>, meta description, canonical (clean URL, full https://edwardsfinancialassociates.com/...), and Open Graph tags (og:title, og:description, og:type, og:url, og:site_name). Skip og:image unless I provide one. Add the page to the /resources hub and link it from a relevant article where it fits.

@@ -19,11 +19,11 @@
 const SUPABASE_URL = 'https://rybnzvlogmbjlgdziswj.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_HfmpHTebHafZwIOJGmFang__PEaiC85';
 
-const DEFAULT_MAIL_TO = 'joshua@edwardsfinancialandassociates.com';
+const DEFAULT_MAIL_TO = 'joshua@edwardsfinancialassociates.com';
 // IMPORTANT: the FROM address must be on a domain you have verified in Resend.
 // Before verifying your domain, you can temporarily set MAIL_FROM to
 // 'onboarding@resend.dev' (Resend's test sender) to confirm the flow works.
-const DEFAULT_MAIL_FROM = 'Edwards Financial & Associates <notifications@edwardsfinancialandassociates.com>';
+const DEFAULT_MAIL_FROM = 'Edwards Financial & Associates <notifications@edwardsfinancialassociates.com>';
 
 function json(data, status = 200) {
   return new Response(JSON.stringify(data), {
