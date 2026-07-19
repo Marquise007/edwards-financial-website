@@ -25,13 +25,15 @@ cd "$(git rev-parse --show-toplevel)"
 SRC="resources/california-pension-calculator.html"
 DST="tool-california-pension-calculator.html"
 
-HELPER_MARK="keep the on-screen print helper out of the generated PDF"
-HELPER_LINE="      document.querySelectorAll('.no-print').forEach(function(el){el.style.display='none';}); /* ${HELPER_MARK} */"
+# Detect ANY existing .no-print hide in the inject (the calculator may already ship one,
+# under any wording) so we never insert a duplicate.
+HELPER_DETECT="no-print').forEach"
+HELPER_LINE="      document.querySelectorAll('.no-print').forEach(function(el){el.style.display='none';}); /* keep the on-screen print helper out of the generated PDF */"
 
 [ -f "$SRC" ] || { echo "ERROR: $SRC not found — run from anywhere inside the repo." >&2; exit 1; }
 
 # --- 1) Public copy: ensure the PDF inject hides .no-print (idempotent) ------
-if grep -qF "$HELPER_MARK" "$SRC"; then
+if grep -qF "$HELPER_DETECT" "$SRC"; then
   echo "- public copy: helper-bar hide already present"
 else
   grep -q 'html2pdf().set({' "$SRC" || { echo "ERROR: could not find the html2pdf inject in $SRC (format changed?)." >&2; exit 1; }
@@ -59,7 +61,7 @@ fi
 gate=$(grep -cF 'resources/gate.js' "$DST" || true)
 noidx=$(grep -c 'noindex, nofollow' "$DST" || true)
 back=$(grep -c 'Back to Partner Portal' "$DST" || true)
-helper=$(grep -cF "$HELPER_MARK" "$DST" || true)
+helper=$(grep -cF "$HELPER_DETECT" "$DST" || true)
 
 echo "- verification:"
 echo "    gate.js lines      (want 0):  $gate"

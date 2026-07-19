@@ -6,6 +6,8 @@
 // Requires env var RESEND_API_KEY (same Resend account as the contact form;
 // domain edwardsfinancialassociates.com is already verified there).
 
+import puppeteer from '@cloudflare/puppeteer';
+
 const FROM = 'Joshua Edwards | Edwards Financial & Associates <joshua@edwardsfinancialassociates.com>';
 const HQ = 'jedwards.finance@gmail.com';
 const STOREFRONT = 'joshua@edwardsfinancialassociates.com';
@@ -49,6 +51,30 @@ function wrap(bodyHtml) {
   </div></body></html>`;
 }
 
+async function renderVectorPdf(env, html) {
+  const browser = await puppeteer.launch(env.BROWSER);
+  try {
+    const page = await browser.newPage();
+    await page.setContent(html, { waitUntil: 'networkidle0', timeout: 25000 }); // Chart.js CDN + fonts
+    await new Promise((r) => setTimeout(r, 2200));                              // let charts finish painting
+    await page.addStyleTag({ content: '.no-print{display:none !important;}' }); // belt + suspenders; print CSS also hides it
+    const pdf = await page.pdf({
+      format: 'letter',
+      printBackground: true,
+      margin: { top: '10mm', right: '8mm', bottom: '12mm', left: '8mm' },
+    });
+    let bin = '';
+    const bytes = new Uint8Array(pdf);
+    const chunk = 0x8000;
+    for (let i = 0; i < bytes.length; i += chunk) {
+      bin += String.fromCharCode.apply(null, bytes.subarray(i, i + chunk));
+    }
+    return btoa(bin);
+  } finally {
+    try { await browser.close(); } catch (e) {}
+  }
+}
+
 export async function onRequestPost(context) {
   const { request, env } = context;
   const key = env.RESEND_API_KEY;
@@ -74,10 +100,18 @@ export async function onRequestPost(context) {
   if (!reportPdf && !reportHtml) return json({ ok: false, error: 'Report payload missing.' }, 400);
   if (reportPdf.length > 12_000_000 || reportHtml.length > 4_000_000) return json({ ok: false, error: 'Report payload too large.' }, 400);
 
-  // PDF when the calculator could build one; HTML fallback otherwise
-  const attachment = reportPdf
-    ? { filename: pdfFileName, content: reportPdf }
-    : { filename: fileName, content: b64utf8(reportHtml) };
+  // Attachment preference: (1) crisp vector PDF rendered server-side by headless Chrome,
+  // (2) the calculator's raster PDF, (3) HTML as last resort. A send never fails on rendering.
+  let attachment = null;
+  let renderPath = 'html';
+  if (env.BROWSER && reportHtml) {
+    try {
+      const vectorB64 = await renderVectorPdf(env, reportHtml);
+      if (vectorB64) { attachment = { filename: pdfFileName, content: vectorB64 }; renderPath = 'vector'; }
+    } catch (e) { /* daily cap (429) or launch failure: fall through to raster */ }
+  }
+  if (!attachment && reportPdf) { attachment = { filename: pdfFileName, content: reportPdf }; renderPath = 'raster'; }
+  if (!attachment) attachment = { filename: fileName, content: b64utf8(reportHtml) };
   const today = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
   let payload;
 
@@ -133,5 +167,5 @@ export async function onRequestPost(context) {
     const err = await res.text().catch(() => '');
     return json({ ok: false, error: `Resend rejected the send (${res.status}). ${err.slice(0, 200)}` }, 502);
   }
-  return json({ ok: true });
+  return json({ ok: true, render: renderPath });
 }

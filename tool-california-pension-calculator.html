@@ -3025,7 +3025,8 @@ const EFA_ILLUSTRATOR_URL = 'tool-retirement-illustration.html';
 window.addEventListener('load',function(){
   setTimeout(function(){                                   /* let Chart.js paint first */
     try{
-      document.querySelectorAll('.no-print').forEach(function(el){el.style.display='none';}); /* keep the on-screen print helper out of the generated PDF */
+      /* screen-only controls must not ride along in the client PDF */
+      document.querySelectorAll('.no-print').forEach(function(el){ el.style.display='none'; });
       html2pdf().set({
         margin:[10,8,12,8],
         image:{type:'jpeg',quality:0.92},
@@ -3077,7 +3078,7 @@ window.addEventListener('load',function(){
         body:JSON.stringify({mode, clientName:name, to:opts.to||null, items:opts.items||[], note:opts.note||'',
           summary:sessionSummary(), fileName:window._lastReportName||'Pension_Review.html',
           reportPdf:pdfB64, pdfFileName:(window._lastReportName||'Pension_Review.html').replace(/\.html?$/i,'.pdf'),
-          reportHtml:pdfB64?null:window._lastReportHTML})});
+          reportHtml:window._lastReportHTML})});   /* always included: server prefers vector rendering from source */
       const j=await res.json().catch(()=>({}));
       if(res.ok && j.ok){
         if(mode==='self') rptStatus(`Saved. ${name}'s report is on its way to your inbox.`+(pdfB64?'':' (sent as HTML; PDF converter unavailable)'));

@@ -1,0 +1,9 @@
+{
+  "name": "edwards-financial-website",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Cloudflare Pages Functions dependencies for edwardsfinancialassociates.com",
+  "dependencies": {
+    "@cloudflare/puppeteer": "^1.1.0"
+  }
+}
