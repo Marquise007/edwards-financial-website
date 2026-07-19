@@ -2930,7 +2930,9 @@ const EFA_ILLUSTRATOR_URL = 'tool-retirement-illustration.html';
     if(!cb){ setTimeout(mount,150); return; }
     cb.style.display='none';                       /* Client File Suite: removed from the page */
     restyleDeliver();                              /* de-navy page 4: light report card + email actions */
-    cb.insertAdjacentElement('afterend', pathsEl);
+    /* order per spec: Generate Client Report first, the two path boxes underneath it */
+    const rb=document.getElementById('reportBar');
+    (rb||cb).insertAdjacentElement('afterend', pathsEl);
     const sync=()=>pathsEl.classList.toggle('efa-hidden', cb.classList.contains('efa-hidden'));
     new MutationObserver(sync).observe(cb,{attributes:true,attributeFilter:['class']});
     sync();
