@@ -3013,31 +3013,49 @@ const EFA_ILLUSTRATOR_URL = 'tool-retirement-illustration.html';
       return `${sys.name} · ${plan.label} · FAC $${Math.round(_salary).toLocaleString()} · Scenario age ${sc.age}: $${Math.round(sc.monthly).toLocaleString()}/mo ($${Math.round(sc.annual).toLocaleString()}/yr)`;
     }catch(e){ return ''; }
   }
-  /* Render the report HTML in a hidden iframe (charts included), then convert to PDF client-side. */
+  /* PDF generation runs INSIDE the report document itself (same-document rendering is what
+     html2canvas is reliable at; cross-document rendering produced blank pages). The report is
+     loaded in a hidden iframe with html2pdf injected; it posts the finished base64 back up. */
   async function buildPdfBase64(reportHtml){
-    if(typeof html2pdf==='undefined'||!reportHtml) return null;
+    if(!reportHtml) return null;
+    const nonce='efa_'+Math.random().toString(36).slice(2);
+    const inject=`
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"><\/script>
+<script>
+window.addEventListener('load',function(){
+  setTimeout(function(){                                   /* let Chart.js paint first */
+    try{
+      html2pdf().set({
+        margin:[10,8,12,8],
+        image:{type:'jpeg',quality:0.92},
+        html2canvas:{scale:1.5,useCORS:true,logging:false},
+        jsPDF:{unit:'mm',format:'letter',orientation:'portrait'},
+        pagebreak:{mode:['css','legacy']}
+      }).from(document.body).outputPdf('datauristring').then(function(uri){
+        var b64=String(uri).split('base64,')[1]||null;
+        parent.postMessage({t:'${nonce}',pdf:b64},'*');
+      }).catch(function(e){ parent.postMessage({t:'${nonce}',pdf:null,err:String(e)},'*'); });
+    }catch(e){ parent.postMessage({t:'${nonce}',pdf:null,err:String(e)},'*'); }
+  },2600);
+});
+<\/script>`;
+    const doc=reportHtml.includes('</body>')?reportHtml.replace('</body>',inject+'</body>'):reportHtml+inject;
     return new Promise(resolve=>{
       const fr=document.createElement('iframe');
-      fr.style.cssText='position:fixed;left:-10000px;top:0;width:900px;height:1200px;border:0;';
-      let done=false; const finish=v=>{ if(done)return; done=true; try{fr.remove();}catch(e){} resolve(v); };
-      const kill=setTimeout(()=>finish(null),25000);
-      fr.onload=()=>{ setTimeout(async()=>{           /* give Chart.js time to paint */
-        try{
-          const el=fr.contentDocument.body;
-          const uri=await html2pdf().set({
-            margin:[10,8,12,8],
-            image:{type:'jpeg',quality:0.92},
-            html2canvas:{scale:1.4,useCORS:true,windowWidth:900},
-            jsPDF:{unit:'mm',format:'letter',orientation:'portrait'},
-            pagebreak:{mode:['css','legacy']}
-          }).from(el).outputPdf('datauristring');
-          clearTimeout(kill);
-          const b64=String(uri).split('base64,')[1]||null;
-          finish(b64&&b64.length>2000?b64:null);
-        }catch(e){ clearTimeout(kill); finish(null); }
-      },2400); };
+      fr.style.cssText='position:fixed;left:-10000px;top:0;width:920px;height:1200px;border:0;';
+      let done=false;
+      const finish=v=>{ if(done)return; done=true;
+        window.removeEventListener('message',onMsg); try{fr.remove();}catch(e){} resolve(v); };
+      const kill=setTimeout(()=>finish(null),35000);
+      function onMsg(e){
+        if(!e.data||e.data.t!==nonce) return;
+        clearTimeout(kill);
+        const b64=e.data.pdf;
+        finish(b64&&b64.length>2000?b64:null);
+      }
+      window.addEventListener('message',onMsg);
       document.body.appendChild(fr);
-      fr.srcdoc=reportHtml;
+      fr.srcdoc=doc;
     });
   }
 
