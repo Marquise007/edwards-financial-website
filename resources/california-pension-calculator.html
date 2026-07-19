@@ -18,6 +18,8 @@
 <meta property="og:site_name" content="Edwards Financial & Associates">
 <meta property="og:image" content="https://edwardsfinancialassociates.com/edwards-og-image.jpg">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script src="/resources/gate.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -1614,6 +1616,9 @@ function generateReport() {
     </div>`;
   }
 
+  // Inflation assumptions strip (rendered at the bottom of the Benefit Visualization page)
+  const inflHTML=infl.on?`<div style="margin-top:18px;border-top:1px solid #e8e3dc;padding-top:14px;"><div style="font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:#9a9590;margin-bottom:8px;">Inflation Assumptions</div><div class="rpt-kpi-row" style="margin-bottom:0;"><div class="rpt-kpi"><div class="rpt-kpi-label">Inflation Rate</div><div class="rpt-kpi-val">${(infl.infl*100).toFixed(2)}%</div></div><div class="rpt-kpi"><div class="rpt-kpi-label">Salary Growth</div><div class="rpt-kpi-val">${(infl.sal*100).toFixed(2)}%</div></div><div class="rpt-kpi"><div class="rpt-kpi-label">COLA Rate</div><div class="rpt-kpi-val">${(infl.cola*100).toFixed(2)}%</div></div><div class="rpt-kpi"><div class="rpt-kpi-label">Mode</div><div class="rpt-kpi-val">Inflation-Adjusted</div></div></div></div>`:'';
+
   // Chart section for report
   const chartSection = `<div class="rpt-section">
     <div class="rpt-section-title">Benefit Visualization</div>
@@ -1631,6 +1636,7 @@ function generateReport() {
       <div style="font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:#9a9590;margin-bottom:8px;">Nominal vs. Inflation-Adjusted Pension Income</div>
       <canvas id="rpt-infl-chart" width="760" height="200"></canvas>
     </div>` : ''}
+    ${inflHTML}
   </div>`;
 
   // Script to render charts in the report HTML
@@ -1703,7 +1709,6 @@ function generateReport() {
   };
   <\/script>`;
 
-  const inflHTML=infl.on?`<div class="rpt-section"><div class="rpt-section-title">Inflation Assumptions</div><div class="rpt-kpi-row"><div class="rpt-kpi"><div class="rpt-kpi-label">Inflation Rate</div><div class="rpt-kpi-val">${(infl.infl*100).toFixed(2)}%</div></div><div class="rpt-kpi"><div class="rpt-kpi-label">Salary Growth</div><div class="rpt-kpi-val">${(infl.sal*100).toFixed(2)}%</div></div><div class="rpt-kpi"><div class="rpt-kpi-label">COLA Rate</div><div class="rpt-kpi-val">${(infl.cola*100).toFixed(2)}%</div></div><div class="rpt-kpi"><div class="rpt-kpi-label">Mode</div><div class="rpt-kpi-val">Inflation-Adjusted</div></div></div></div>`:'';
 
   const html=`<!DOCTYPE html>
 <html><head><meta charset="UTF-8">
@@ -1800,7 +1805,7 @@ body{font-family:'Montserrat',Arial,sans-serif;color:#2d2d2d;background:white;fo
     <strong>Survivor Option:</strong> ${survLabel}<br>
     <strong>Report Date:</strong> ${today}<br>
     <strong>Prepared by:</strong> Joshua Edwards · Edwards Financial &amp; Associates<br>
-    <strong>License:</strong> Life &amp; Annuities · Real Estate · Retirement Planning · Estate Strategy
+    <strong>License:</strong> Life &amp; Annuities · Retirement Planning · Estate Strategy
   </div>
   <div class="cover-disc">This report is for educational and planning purposes only. Benefit projections are estimates based on ${sys.name}'s published plan formulas and information provided. Actual benefits are determined by ${sys.name} at retirement. Not a guarantee of future benefits. Not investment, tax, or legal advice. Consult a licensed financial professional before making retirement decisions.</div>
 </div>
@@ -1829,7 +1834,6 @@ body{font-family:'Montserrat',Arial,sans-serif;color:#2d2d2d;background:white;fo
 </div>
 
 ${chartSection}
-${inflHTML}
 ${gapHTML}
 ${solutionsHTML}
 
@@ -1866,7 +1870,7 @@ ${solutionsHTML}
 </div>
 
 <div class="rpt-footer">
-  <strong>Edwards Financial &amp; Associates</strong> · Joshua Edwards · Licensed: Life &amp; Annuities, Real Estate · Prepared ${today}<br>
+  <strong>Edwards Financial &amp; Associates</strong> · Joshua Edwards · Licensed: Life &amp; Annuities, Retirement Planning · Prepared ${today}<br>
   Data sourced from ${sys.name} official publications and benefit factor tables. ${sys.contact}<br>
   For educational purposes only. Not financial, tax, or legal advice. Actual benefits determined solely by ${sys.name}.
 </div>
@@ -3010,6 +3014,34 @@ const EFA_ILLUSTRATOR_URL = 'tool-retirement-illustration.html';
       return `${sys.name} · ${plan.label} · FAC $${Math.round(_salary).toLocaleString()} · Scenario age ${sc.age}: $${Math.round(sc.monthly).toLocaleString()}/mo ($${Math.round(sc.annual).toLocaleString()}/yr)`;
     }catch(e){ return ''; }
   }
+  /* Render the report HTML in a hidden iframe (charts included), then convert to PDF client-side. */
+  async function buildPdfBase64(reportHtml){
+    if(typeof html2pdf==='undefined'||!reportHtml) return null;
+    return new Promise(resolve=>{
+      const fr=document.createElement('iframe');
+      fr.style.cssText='position:fixed;left:-10000px;top:0;width:900px;height:1200px;border:0;';
+      let done=false; const finish=v=>{ if(done)return; done=true; try{fr.remove();}catch(e){} resolve(v); };
+      const kill=setTimeout(()=>finish(null),25000);
+      fr.onload=()=>{ setTimeout(async()=>{           /* give Chart.js time to paint */
+        try{
+          const el=fr.contentDocument.body;
+          const uri=await html2pdf().set({
+            margin:[10,8,12,8],
+            image:{type:'jpeg',quality:0.92},
+            html2canvas:{scale:1.4,useCORS:true,windowWidth:900},
+            jsPDF:{unit:'mm',format:'letter',orientation:'portrait'},
+            pagebreak:{mode:['css','legacy']}
+          }).from(el).outputPdf('datauristring');
+          clearTimeout(kill);
+          const b64=String(uri).split('base64,')[1]||null;
+          finish(b64&&b64.length>2000?b64:null);
+        }catch(e){ clearTimeout(kill); finish(null); }
+      },2400); };
+      document.body.appendChild(fr);
+      fr.srcdoc=reportHtml;
+    });
+  }
+
   async function sendReport(mode,opts){
     const name=(document.getElementById('clientName').value||'').trim();
     if(!name){ rptStatus('Enter a client name first.',true); return; }
@@ -3019,15 +3051,19 @@ const EFA_ILLUSTRATOR_URL = 'tool-retirement-illustration.html';
     try{ generateReport(); } finally { window._suppressReportDownload=false; }
     if(!window._lastReportHTML){ rptStatus('Could not build the report.',true); return; }
     const btn=document.getElementById(mode==='self'?'efaSaveClientBtn':'efaMailSend');
-    const orig=btn.textContent; btn.disabled=true; btn.textContent='Sending…';
+    const orig=btn.textContent; btn.disabled=true; btn.textContent='Building PDF…';
+    const pdfB64=await buildPdfBase64(window._lastReportHTML);
+    btn.textContent='Sending…';
     try{
       const res=await fetch('/api/send-report',{method:'POST',headers:{'Content-Type':'application/json'},
         body:JSON.stringify({mode, clientName:name, to:opts.to||null, items:opts.items||[], note:opts.note||'',
-          summary:sessionSummary(), fileName:window._lastReportName||'Pension_Review.html', reportHtml:window._lastReportHTML})});
+          summary:sessionSummary(), fileName:window._lastReportName||'Pension_Review.html',
+          reportPdf:pdfB64, pdfFileName:(window._lastReportName||'Pension_Review.html').replace(/\.html?$/i,'.pdf'),
+          reportHtml:pdfB64?null:window._lastReportHTML})});
       const j=await res.json().catch(()=>({}));
       if(res.ok && j.ok){
-        if(mode==='self') rptStatus(`Saved. ${name}'s report is on its way to your inbox.`);
-        else { rptStatus(`Sent to ${opts.to}. A copy landed in your inbox.`); document.getElementById('efaMailPanel').classList.remove('open'); }
+        if(mode==='self') rptStatus(`Saved. ${name}'s report is on its way to your inbox.`+(pdfB64?'':' (sent as HTML; PDF converter unavailable)'));
+        else { rptStatus(`Sent to ${opts.to}. A copy landed in your inbox.`+(pdfB64?'':' (sent as HTML; PDF converter unavailable)')); document.getElementById('efaMailPanel').classList.remove('open'); }
       } else rptStatus(j.error||'Send failed. Check that /api/send-report is deployed with the Resend key.',true);
     }catch(e){ rptStatus('Send failed: '+(e.message||'network error'),true); }
     btn.disabled=false; btn.textContent=orig;

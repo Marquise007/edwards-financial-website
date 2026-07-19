@@ -66,12 +66,18 @@ export async function onRequestPost(context) {
   const note = String(body.note || '').slice(0, 2000).trim();
   const items = Array.isArray(body.items) ? body.items.map((x) => String(x).slice(0, 160)).slice(0, 25) : [];
   const reportHtml = String(body.reportHtml || '');
+  const reportPdf = String(body.reportPdf || '');            // base64 PDF from the calculator (preferred)
   const fileName = (String(body.fileName || 'Pension_Review.html').replace(/[^A-Za-z0-9._-]/g, '_')).slice(0, 120);
+  const pdfFileName = (String(body.pdfFileName || fileName.replace(/\.html?$/i, '.pdf')).replace(/[^A-Za-z0-9._-]/g, '_')).slice(0, 120);
 
   if (!clientName) return json({ ok: false, error: 'Client name is required.' }, 400);
-  if (!reportHtml || reportHtml.length > 4_000_000) return json({ ok: false, error: 'Report payload missing or too large.' }, 400);
+  if (!reportPdf && !reportHtml) return json({ ok: false, error: 'Report payload missing.' }, 400);
+  if (reportPdf.length > 12_000_000 || reportHtml.length > 4_000_000) return json({ ok: false, error: 'Report payload too large.' }, 400);
 
-  const attachment = { filename: fileName, content: b64utf8(reportHtml) };
+  // PDF when the calculator could build one; HTML fallback otherwise
+  const attachment = reportPdf
+    ? { filename: pdfFileName, content: reportPdf }
+    : { filename: fileName, content: b64utf8(reportHtml) };
   const today = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
   let payload;
 
@@ -96,7 +102,8 @@ export async function onRequestPost(context) {
       ? `<p style="margin:16px 0 6px;">To make the most of our follow-up appointment, please gather the following:</p>
          <ul style="margin:0 0 4px;padding-left:22px;color:#333;">
            ${items.map((i) => `<li style="margin:4px 0;">${esc(i)}</li>`).join('')}
-         </ul>`
+         </ul>
+         <p style="margin:12px 0 0;">If possible, please try to send these back at least 48 hours before our follow-up appointment. You can simply reply to this email and attach them.</p>`
       : '';
     payload = {
       from: FROM,
