@@ -6,8 +6,6 @@
 // Requires env var RESEND_API_KEY (same Resend account as the contact form;
 // domain edwardsfinancialassociates.com is already verified there).
 
-import puppeteer from '@cloudflare/puppeteer';
-
 const FROM = 'Joshua Edwards | Edwards Financial & Associates <joshua@edwardsfinancialassociates.com>';
 const HQ = 'jedwards.finance@gmail.com';
 const STOREFRONT = 'joshua@edwardsfinancialassociates.com';
@@ -51,28 +49,42 @@ function wrap(bodyHtml) {
   </div></body></html>`;
 }
 
+// Crisp vector PDF via Cloudflare Browser Rendering REST API (works on the Workers Free plan:
+// 10 browser-minutes/day, 6 requests/min). Needs env vars CF_ACCOUNT_ID + CF_BROWSER_TOKEN
+// (custom API token with "Browser Rendering - Edit" permission). Returns base64 or null.
 async function renderVectorPdf(env, html) {
-  const browser = await puppeteer.launch(env.BROWSER);
-  try {
-    const page = await browser.newPage();
-    await page.setContent(html, { waitUntil: 'networkidle0', timeout: 25000 }); // Chart.js CDN + fonts
-    await new Promise((r) => setTimeout(r, 2200));                              // let charts finish painting
-    await page.addStyleTag({ content: '.no-print{display:none !important;}' }); // belt + suspenders; print CSS also hides it
-    const pdf = await page.pdf({
-      format: 'letter',
-      printBackground: true,
-      margin: { top: '10mm', right: '8mm', bottom: '12mm', left: '8mm' },
-    });
-    let bin = '';
-    const bytes = new Uint8Array(pdf);
-    const chunk = 0x8000;
-    for (let i = 0; i < bytes.length; i += chunk) {
-      bin += String.fromCharCode.apply(null, bytes.subarray(i, i + chunk));
+  if (!env.CF_ACCOUNT_ID || !env.CF_BROWSER_TOKEN) return null;
+  // charts must be painted before print: disable Chart.js animation so networkidle0 = fully drawn
+  const noAnim = '<script>window.addEventListener("DOMContentLoaded",function(){if(window.Chart){Chart.defaults.animation=false;}});</scr' + 'ipt>';
+  const doc = html.includes('</body>') ? html.replace('</body>', noAnim + '</body>') : html + noAnim;
+  const res = await fetch(
+    `https://api.cloudflare.com/client/v4/accounts/${env.CF_ACCOUNT_ID}/browser-rendering/pdf`,
+    {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${env.CF_BROWSER_TOKEN}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        html: doc,
+        addStyleTag: [{ content: '.no-print{display:none !important;}' }],
+        gotoOptions: { waitUntil: 'networkidle0', timeout: 30000 },
+        pdfOptions: {
+          format: 'letter',
+          printBackground: true,
+          margin: { top: '10mm', right: '8mm', bottom: '12mm', left: '8mm' },
+        },
+      }),
     }
-    return btoa(bin);
-  } finally {
-    try { await browser.close(); } catch (e) {}
+  );
+  if (!res.ok) return null; // 429 daily cap / rate limit / auth issue → raster fallback
+  const bytes = new Uint8Array(await res.arrayBuffer());
+  if (bytes.length < 2000) return null;
+  // sanity: real PDFs start with %PDF
+  if (!(bytes[0] === 0x25 && bytes[1] === 0x50 && bytes[2] === 0x44 && bytes[3] === 0x46)) return null;
+  let bin = '';
+  const chunk = 0x8000;
+  for (let i = 0; i < bytes.length; i += chunk) {
+    bin += String.fromCharCode.apply(null, bytes.subarray(i, i + chunk));
   }
+  return btoa(bin);
 }
 
 export async function onRequestPost(context) {
@@ -104,7 +116,7 @@ export async function onRequestPost(context) {
   // (2) the calculator's raster PDF, (3) HTML as last resort. A send never fails on rendering.
   let attachment = null;
   let renderPath = 'html';
-  if (env.BROWSER && reportHtml) {
+  if (env.CF_ACCOUNT_ID && env.CF_BROWSER_TOKEN && reportHtml) {
     try {
       const vectorB64 = await renderVectorPdf(env, reportHtml);
       if (vectorB64) { attachment = { filename: pdfFileName, content: vectorB64 }; renderPath = 'vector'; }
