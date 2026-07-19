@@ -157,8 +157,22 @@ select:focus,input:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 
       <label>Plan / Tier</label>
       <select id="plan" onchange="updatePlanInfo()"></select>
       <div class="plan-info dark" id="planInfo"></div>
-      <label>Career Start Age</label>
-      <input type="number" id="startAge" value="28" min="18" max="65"/>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px;">
+        <div>
+          <label>Career Start Age</label>
+          <input type="number" id="startAge" value="28" min="14" max="75"/>
+        </div>
+        <div>
+          <label style="display:flex;align-items:center;justify-content:space-between;gap:6px;">Current Age
+            <span id="ageModeSwitch" style="display:inline-flex;border:1px solid var(--gray-200);border-radius:4px;overflow:hidden;">
+              <button type="button" onclick="setAgeMode('age')" id="amAge" style="border:none;padding:2px 8px;font-size:0.58rem;font-weight:700;font-family:'Montserrat',sans-serif;cursor:pointer;letter-spacing:0.05em;background:var(--gold);color:var(--navy);">AGE</button>
+              <button type="button" onclick="setAgeMode('dob')" id="amDob" style="border:none;padding:2px 8px;font-size:0.58rem;font-weight:700;font-family:'Montserrat',sans-serif;cursor:pointer;letter-spacing:0.05em;background:white;color:var(--gray-400);">DOB</button>
+            </span>
+          </label>
+          <input type="number" id="curAge" placeholder="e.g. 45" min="18" max="85" oninput="syncAssetYrs();renderGap()"/>
+          <input type="date" id="dob" onchange="setAgeFromDob()" style="display:none;"/>
+        </div>
+      </div>
       <label>Final Average Compensation (Annual $)</label>
       <input type="number" id="salary" value="90000" min="1"/>
       <div class="note-strip" id="facNote"></div>
@@ -280,6 +294,27 @@ select:focus,input:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 
       <div style="font-size:0.72rem;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:0.06em;">Projected at Retirement</div>
       <div id="totProjected" style="font-family:'Montserrat',sans-serif;font-size:1rem;font-weight:700;color:var(--gold-light);">$0</div>
     </div>
+  </div>
+
+  <!-- INCOME BUILDER -->
+  <div style="background:white;padding:18px 26px;border-top:1px solid var(--gray-200);">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:10px;">
+      <div>
+        <div style="font-weight:600;font-size:0.78rem;letter-spacing:0.07em;text-transform:uppercase;color:var(--navy);">Other Retirement Income</div>
+        <div style="font-size:0.72rem;color:var(--gray-400);margin-top:2px;">Recurring income at retirement (Social Security, spouse's pension, annuities, rentals, etc.) — reduces the gap directly.</div>
+      </div>
+      <button onclick="addIncome()" style="background:var(--gold);color:var(--navy);border:none;border-radius:5px;padding:7px 14px;font-size:0.76rem;font-weight:700;font-family:'Montserrat',sans-serif;cursor:pointer;border-bottom:2px solid #8a6012;letter-spacing:0.05em;text-transform:uppercase;">+ Add Income</button>
+    </div>
+    <div class="asset-hdr" style="display:grid;grid-template-columns:1.8fr 1.1fr 1fr 0.8fr 34px;gap:7px;margin-bottom:4px;">
+      <div class="acl">Income Source</div><div class="acl">Amount ($)</div><div class="acl">Frequency</div><div class="acl">COLA %/yr</div><div></div>
+    </div>
+    <div id="incomeRows"></div>
+    <div id="incomeTotals" style="display:none;margin-top:10px;background:var(--navy);border-radius:6px;padding:10px 14px;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+      <div style="font-size:0.72rem;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:0.06em;">Total Other Income (Today's $)</div>
+      <div id="totIncomeYr" style="font-family:'Montserrat',sans-serif;font-size:0.95rem;font-weight:700;color:var(--gold-light);">$0/yr</div>
+      <div id="totIncomeMo" style="font-family:'Montserrat',sans-serif;font-size:0.85rem;font-weight:600;color:rgba(255,255,255,0.7);">$0/mo</div>
+    </div>
+    <div class="note-strip" style="margin-top:8px;">Enter amounts in today's dollars. In Inflation-Adjusted mode, each source is grown by its COLA %/yr to the retirement date so it compares apples-to-apples with the future-dollar gap. In Nominal mode, amounts are used as entered.</div>
   </div>
   <div id="gapResults"><div class="gap-empty">Select a retirement scenario above to see the full gap analysis.</div></div>
 </div>
@@ -659,8 +694,42 @@ let _planKey = '';
 let _results = null;
 let _salary = 0;
 let _assetCount = 0;
+let _incomeCount = 0;
 let _saveGoal = 'infl';
 function setSaveGoal(g){ _saveGoal = g; renderGap(); }
+
+// ── Current Age / DOB (single field, toggled) ──
+function setAgeMode(m){
+  const a=document.getElementById('curAge'), d=document.getElementById('dob');
+  const bA=document.getElementById('amAge'), bD=document.getElementById('amDob');
+  const on='var(--gold)', off='white';
+  if(m==='dob'){ a.style.display='none'; d.style.display='block';
+    bD.style.background=on; bD.style.color='var(--navy)'; bA.style.background=off; bA.style.color='var(--gray-400)';
+  } else { d.style.display='none'; a.style.display='block';
+    bA.style.background=on; bA.style.color='var(--navy)'; bD.style.background=off; bD.style.color='var(--gray-400)'; }
+}
+function setAgeFromDob(){
+  const v = document.getElementById('dob').value;
+  if(!v) return;
+  const dob = new Date(v + 'T00:00:00');
+  const now = new Date();
+  let age = now.getFullYear() - dob.getFullYear();
+  const m = now.getMonth() - dob.getMonth();
+  if(m < 0 || (m === 0 && now.getDate() < dob.getDate())) age--;
+  if(age >= 0 && age < 120){ document.getElementById('curAge').value = age; }
+  if(typeof syncAssetYrs==='function') syncAssetYrs();
+  renderGap();
+}
+function getCurrentAge(){
+  const v = parseInt(document.getElementById('curAge')?.value);
+  return (!isNaN(v) && v > 0) ? v : null;
+}
+// Baseline age used to compute years-to-retirement: Current Age if given, else Career Start Age
+function getBaselineAge(){
+  const cur = getCurrentAge();
+  if(cur !== null) return cur;
+  return parseInt(document.getElementById('startAge').value) || 25;
+}
 
 // ══════════════════════════════════════════════════════════════════════════════
 // SYSTEM SWITCH
@@ -905,11 +974,12 @@ function getAssets(infl) {
 }
 function assetYrsDefault(){
   const gp=document.getElementById('gapPicker'); const idx=gp?gp.value:'';
-  const startAge=parseInt(document.getElementById('startAge')?.value)||25;
+  // Years of growth default = selected scenario retirement age − client's Current Age (or Career Start Age fallback)
+  const base=(typeof getBaselineAge==='function')?getBaselineAge():(parseInt(document.getElementById('startAge')?.value)||25);
   if(idx!=='' && idx!=null && typeof _results!=='undefined' && _results && _results[parseInt(idx)])
-    return Math.max(0, _results[parseInt(idx)].age - startAge);
+    return Math.max(0, _results[parseInt(idx)].age - base);
   if(typeof _results!=='undefined' && _results && _results.length)
-    return Math.max(0, _results[0].age - startAge);
+    return Math.max(0, _results[0].age - base);
   return '';
 }
 function syncAssetYrs(){
@@ -1001,6 +1071,93 @@ function toggleCustomName(id, sel) {
   updateTotals();
 }
 function removeAsset(id){const r=document.getElementById(`ar_${id}`);if(r)r.remove();updateTotals();renderGap();}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// OTHER RETIREMENT INCOME
+// ══════════════════════════════════════════════════════════════════════════════
+function addIncome() {
+  _incomeCount++;
+  const id=_incomeCount;
+  const row=document.createElement('div');
+  row.id=`ir_${id}`;
+  row.style.cssText='margin-bottom:10px;';
+  const s='padding:7px 8px;border:1.5px solid var(--gray-200);border-radius:5px;font-size:0.78rem;font-family:\'Montserrat\',sans-serif;background:var(--gray-100);width:100%;';
+  const INCOME_TYPES = [
+    '── Government Benefits ──',
+    'Social Security (Client)',
+    'Social Security (Spouse)',
+    '── Pensions ──',
+    'Spouse / Partner Pension',
+    'Pension (Other System)',
+    '── Insurance-Based Income ──',
+    'Annuity Income (FIA / SPIA / MYGA)',
+    'IUL Policy Loan Income',
+    'Whole Life Income',
+    '── Real Assets & Business ──',
+    'Rental / Real Estate Income',
+    'Business Interest / Distributions',
+    '── Other ──',
+    'Part-Time / Consulting Income',
+    'Other'
+  ];
+  const opts = INCOME_TYPES.map(t => t.startsWith('──')
+    ? `<option disabled style="color:#9a9590;font-style:italic;">${t}</option>`
+    : `<option value="${t}">${t}</option>`
+  ).join('');
+  row.innerHTML=`
+    <div style="display:grid;grid-template-columns:1.8fr 1.1fr 1fr 0.8fr 34px;gap:7px;align-items:start;">
+      <div>
+        <select onchange="toggleCustomIncomeName(${id},this)" style="${s}" oninput="updateIncomeTotals()">
+          <option value="">— Select income source —</option>
+          ${opts}
+        </select>
+        <input type="text" class="custom-income-name" placeholder="Describe this income..." style="${s};display:none;margin-top:4px;" oninput="updateIncomeTotals()"/>
+      </div>
+      <input type="number" class="income-num income-amt" placeholder="Amount ($)" min="0" style="${s}" oninput="updateIncomeTotals()"/>
+      <select class="income-freq" style="${s}" onchange="updateIncomeTotals()">
+        <option value="yr" selected>Annual</option>
+        <option value="mo">Monthly</option>
+      </select>
+      <input type="number" class="income-cola" placeholder="0" value="0" min="0" max="10" step="0.25" style="${s};text-align:center;" oninput="updateIncomeTotals()"/>
+      <button onclick="removeIncome(${id})" style="background:#fce4ec;color:#c0392b;border:none;border-radius:5px;width:34px;height:34px;font-size:1rem;cursor:pointer;font-weight:700;margin-top:1px;">×</button>
+    </div>`;
+  document.getElementById('incomeRows').appendChild(row);
+  updateIncomeTotals();
+}
+function toggleCustomIncomeName(id, sel) {
+  const row = document.getElementById('ir_'+id);
+  const custom = row.querySelector('.custom-income-name');
+  if(custom) custom.style.display = sel.value==='Other' ? 'block' : 'none';
+  updateIncomeTotals();
+}
+function removeIncome(id){const r=document.getElementById(`ir_${id}`);if(r)r.remove();updateIncomeTotals();}
+// Returns income rows. annToday = annualized today's-$ amount; annAtRet = amount at retirement
+// (grown by its COLA over ytr years when inflation mode is on, else same as annToday).
+function getIncomes(infl, ytr) {
+  infl = infl||{on:false}; ytr = ytr||0;
+  return Array.from(document.getElementById('incomeRows').querySelectorAll('[id^="ir_"]')).map(row=>{
+    const sel=row.querySelector('select');
+    const customEl=row.querySelector('.custom-income-name');
+    let name = sel.value || 'Income';
+    if(name==='Other' && customEl) name=customEl.value||'Other Income';
+    const amt=parseFloat(row.querySelector('.income-amt').value)||0;
+    const freq=row.querySelector('.income-freq').value;
+    const cola=(parseFloat(row.querySelector('.income-cola').value)||0)/100;
+    const annToday = freq==='mo' ? amt*12 : amt;
+    const annAtRet = infl.on ? annToday*Math.pow(1+cola,ytr) : annToday;
+    return {name, amt, freq, cola, annToday, annAtRet};
+  }).filter(x=>x.annToday>0 || x.name!=='Income');
+}
+function updateIncomeTotals(){
+  const incomes=getIncomes({on:false},0);
+  const el=document.getElementById('incomeTotals');
+  if(!incomes.length){el.style.display='none';renderGap();return;}
+  el.style.display='flex';
+  const totYr=incomes.reduce((s,x)=>s+x.annToday,0);
+  document.getElementById('totIncomeYr').textContent='$'+Math.round(totYr).toLocaleString()+'/yr';
+  document.getElementById('totIncomeMo').textContent='$'+Math.round(totYr/12).toLocaleString()+'/mo';
+  renderGap();
+}
 function updateTotals(){
   const infl=getInfl();
   const assets=getAssets(infl);
@@ -1027,7 +1184,8 @@ function renderGap() {
   const plan=ALL_PLANS[_sys]?.plans[_planKey];
   const sys=ALL_PLANS[_sys];
   const startAge=parseInt(document.getElementById('startAge').value)||25;
-  const ytr=Math.max(0,r.age-startAge);
+  // Years to retirement: from Current Age (or DOB) if provided, else from Career Start Age
+  const ytr=Math.max(0,r.age-getBaselineAge());
   const nomSal=_salary;
   const futureSal=infl.on?nomSal*Math.pow(1+infl.sal,ytr):nomSal;
   let futurePension=r.annual;
@@ -1037,7 +1195,9 @@ function renderGap() {
   }
   const salForGap=infl.on?futureSal:nomSal;
   const penForGap=infl.on?futurePension:r.annual;
-  const annGap=Math.max(0,salForGap-penForGap);
+  const incomes=getIncomes(infl,ytr);
+  const annInc=incomes.reduce((s,x)=>s+x.annAtRet,0);
+  const annGap=Math.max(0,salForGap-penForGap-annInc);
   const monGap=annGap/12;
   const capital=annGap/rate;
   const capitalToday=infl.on?capital/Math.pow(1+infl.infl,ytr):capital;
@@ -1061,8 +1221,8 @@ function renderGap() {
   if(noGap){
     document.getElementById('gapResults').innerHTML=`<div style="background:white;border-radius:0 0 8px 8px;padding:32px;text-align:center;box-shadow:var(--shadow);">
       <div style="font-size:2rem;">✅</div>
-      <div style="font-family:'Montserrat',sans-serif;font-size:1.1rem;color:var(--green);font-weight:700;margin-top:10px;">No Gap — Pension Fully Replaces Salary</div>
-      <div style="color:var(--gray-400);font-size:0.84rem;margin-top:5px;">At Age ${r.age}, the pension covers ${infl.on?'the inflation-adjusted ':''} salary.</div>
+      <div style="font-family:'Montserrat',sans-serif;font-size:1.1rem;color:var(--green);font-weight:700;margin-top:10px;">No Gap — ${annInc>0?'Pension + Other Income Fully Replace Salary':'Pension Fully Replaces Salary'}</div>
+      <div style="color:var(--gray-400);font-size:0.84rem;margin-top:5px;">At Age ${r.age}, the pension${annInc>0?' plus $'+Math.round(annInc).toLocaleString()+'/yr of other income':''} covers ${infl.on?'the inflation-adjusted ':''} salary.</div>
     </div>`;
     return;
   }
@@ -1093,10 +1253,34 @@ function renderGap() {
       </div>
     </div>` : '';
 
+  const incomeHTML = incomes.length>0 ? `
+    <div style="margin-top:14px;">
+      <div style="font-size:0.66rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--gray-400);margin-bottom:6px;">Other Retirement Income${infl.on?' — Grown to Retirement':''}</div>
+      <div style="border-radius:6px;overflow:hidden;border:1px solid var(--gray-200);">
+        <div style="display:grid;grid-template-columns:${infl.on?'1.6fr 1fr 0.8fr 1fr 1fr':'1.8fr 1fr 0.8fr 1fr'};background:var(--navy);padding:7px 12px;font-size:0.62rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:rgba(255,255,255,0.5);">
+          <div>Source</div><div style="text-align:right;">Today ($/yr)</div><div style="text-align:right;">COLA</div>${infl.on?'<div style="text-align:right;color:var(--gold-light);">At Retirement</div>':''}<div style="text-align:right;">Monthly${infl.on?' (Ret.)':''}</div>
+        </div>
+        ${incomes.map((x,i)=>`<div style="display:grid;grid-template-columns:${infl.on?'1.6fr 1fr 0.8fr 1fr 1fr':'1.8fr 1fr 0.8fr 1fr'};padding:7px 12px;background:${i%2===0?'white':'var(--gray-100)'};font-size:0.76rem;border-bottom:1px solid var(--gray-200);">
+          <div style="font-weight:600;color:var(--navy);">${x.name}</div>
+          <div style="text-align:right;">$${Math.round(x.annToday).toLocaleString()}</div>
+          <div style="text-align:right;color:var(--gray-400);">${x.cola>0?(x.cola*100).toFixed(1)+'%':'—'}</div>
+          ${infl.on?`<div style="text-align:right;font-weight:700;color:var(--gold);">$${Math.round(x.annAtRet).toLocaleString()}</div>`:''}
+          <div style="text-align:right;font-weight:700;color:var(--green);">$${Math.round(x.annAtRet/12).toLocaleString()}/mo</div>
+        </div>`).join('')}
+        <div style="display:grid;grid-template-columns:${infl.on?'1.6fr 1fr 0.8fr 1fr 1fr':'1.8fr 1fr 0.8fr 1fr'};padding:8px 12px;background:var(--navy);">
+          <div style="font-weight:700;font-size:0.76rem;color:white;">Total Other Income</div>
+          <div style="text-align:right;font-size:0.76rem;color:rgba(255,255,255,0.55);">$${Math.round(incomes.reduce((s,x)=>s+x.annToday,0)).toLocaleString()}</div>
+          <div></div>
+          ${infl.on?`<div style="text-align:right;font-family:'Montserrat',sans-serif;font-size:0.88rem;font-weight:700;color:var(--gold-light);">$${Math.round(annInc).toLocaleString()}</div>`:''}
+          <div style="text-align:right;font-family:'Montserrat',sans-serif;font-size:0.88rem;font-weight:700;color:var(--green);">$${Math.round(annInc/12).toLocaleString()}/mo</div>
+        </div>
+      </div>
+    </div>` : '';
+
   document.getElementById('gapResults').innerHTML = `
     <div style="background:white;border-radius:0 0 8px 8px;box-shadow:var(--shadow);overflow:hidden;">
       ${infl.on?`<div style="background:var(--gold);padding:5px 20px;font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--navy);text-align:center;">⚡ Inflation-Adjusted — All figures account for purchasing power over ${ytr} years</div>`:''}
-      <div style="display:grid;grid-template-columns:repeat(3,1fr);border-bottom:1px solid var(--gray-200);">
+      <div style="display:grid;grid-template-columns:repeat(${annInc>0?4:3},1fr);border-bottom:1px solid var(--gray-200);">
         <div style="padding:16px;text-align:center;border-right:1px solid var(--gray-200);">
           <div style="font-size:0.65rem;text-transform:uppercase;color:var(--gray-400);margin-bottom:3px;">${infl.on?'Future Salary':'Current Salary'}</div>
           <div style="font-family:'Montserrat',sans-serif;font-size:1.15rem;font-weight:700;color:var(--navy);">$${Math.round(salForGap).toLocaleString()}</div>
@@ -1107,6 +1291,11 @@ function renderGap() {
           <div style="font-family:'Montserrat',sans-serif;font-size:1.15rem;font-weight:700;color:${sysColor};">$${Math.round(penForGap).toLocaleString()}</div>
           <div style="font-size:0.7rem;color:var(--gray-400);">${r.pctSalary.toFixed(1)}% of salary</div>
         </div>
+        ${annInc>0?`<div style="padding:16px;text-align:center;border-right:1px solid var(--gray-200);">
+          <div style="font-size:0.65rem;text-transform:uppercase;color:var(--gray-400);margin-bottom:3px;">Other Income</div>
+          <div style="font-family:'Montserrat',sans-serif;font-size:1.15rem;font-weight:700;color:var(--green);">$${Math.round(annInc).toLocaleString()}</div>
+          <div style="font-size:0.7rem;color:var(--gray-400);">$${Math.round(annInc/12).toLocaleString()} / month</div>
+        </div>`:''}
         <div style="padding:16px;text-align:center;background:#fff5f5;">
           <div style="font-size:0.65rem;text-transform:uppercase;color:var(--red);margin-bottom:3px;">Annual Gap${infl.on?' (Future $)':''}</div>
           <div style="font-family:'Montserrat',sans-serif;font-size:1.15rem;font-weight:700;color:var(--red);">-$${Math.round(annGap).toLocaleString()}</div>
@@ -1129,6 +1318,7 @@ function renderGap() {
           <div><div style="font-size:0.6rem;color:rgba(255,255,255,0.4);text-transform:uppercase;">Capital Needed${infl.on?' (Future $)':''}</div><div style="font-family:'Montserrat',sans-serif;font-size:1.1rem;color:var(--gold-light);font-weight:700;">$${Math.round(capital).toLocaleString()}</div></div>
           ${infl.on?`<div style="color:rgba(255,255,255,0.3);font-size:0.85rem;">→</div><div><div style="font-size:0.6rem;color:rgba(255,255,255,0.4);text-transform:uppercase;">In Today's Dollars</div><div style="font-family:'Montserrat',sans-serif;font-size:1.1rem;color:var(--gold);font-weight:700;">$${Math.round(capitalToday).toLocaleString()}</div></div>`:`<div style="color:rgba(255,255,255,0.3);font-size:0.82rem;">(${(1/rate).toFixed(1)}× multiplier)</div>`}
         </div>
+        ${incomeHTML}
         ${assetHTML}
         ${totalNomAssets>0?(infl.on?`
         <!-- TWO-TRACK FUNDING: Future $ (real goal) and Today's $ -->
@@ -1226,40 +1416,10 @@ function renderGap() {
           <div style="font-size:0.72rem;color:var(--gray-400);margin-top:9px;line-height:1.5;">Assumes level monthly/annual contributions growing at ${(saveRor*100).toFixed(1)}% until retirement in ${n} years, on top of existing projected assets.${infl.on?` Currently showing the <strong style="color:var(--gray-700);">${useInflGoal?'inflation (future-dollar)':"today's-dollar"}</strong> goal.`:''}</div>`;
         })()}
       </div>
-      <!-- GAP SOLUTIONS SECTION -->
-      <div style="background:var(--navy);padding:16px 24px;">
-        <div style="font-family:'Montserrat',sans-serif;font-size:0.9rem;color:var(--gold-light);font-weight:700;margin-bottom:12px;">💡 Strategies to Bridge the $${Math.round(monGap).toLocaleString()}/Month Gap</div>
-        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;">
-          <div style="background:rgba(255,255,255,0.06);border-radius:6px;padding:12px;border-left:3px solid var(--gold);">
-            <div style="font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--gold-light);margin-bottom:6px;">Fixed Index Annuity (FIA)</div>
-            <div style="font-size:0.76rem;color:rgba(255,255,255,0.6);line-height:1.6;">Principal-protected growth with guaranteed income riders. Can generate $${Math.round(monGap).toLocaleString()}/mo on ~$${Math.round(monGap*12/0.055).toLocaleString()} at a 5.5% payout rate. Zero downside risk.</div>
-          </div>
-          <div style="background:rgba(255,255,255,0.06);border-radius:6px;padding:12px;border-left:3px solid #4fc3f7;">
-            <div style="font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:#4fc3f7;margin-bottom:6px;">Indexed Universal Life (IUL)</div>
-            <div style="font-size:0.76rem;color:rgba(255,255,255,0.6);line-height:1.6;">Tax-free retirement income via policy loans. No RMDs, no SS taxation impact. Doubles as tax-free legacy for beneficiaries. Best with 10–20 yr runway.</div>
-          </div>
-          <div style="background:rgba(255,255,255,0.06);border-radius:6px;padding:12px;border-left:3px solid #a5d6a7;">
-            <div style="font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:#a5d6a7;margin-bottom:6px;">457(b) / 403(b) / Roth</div>
-            <div style="font-size:0.76rem;color:rgba(255,255,255,0.6);line-height:1.6;">Maximize contributions now. 457(b): no early withdrawal penalty. Roth: tax-free at retirement. Combined with annuity creates a multi-bucket tax strategy.</div>
-          </div>
-          <div style="background:rgba(255,255,255,0.06);border-radius:6px;padding:12px;border-left:3px solid #ce93d8;">
-            <div style="font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:#ce93d8;margin-bottom:6px;">Roth Conversion Strategy</div>
-            <div style="font-size:0.76rem;color:rgba(255,255,255,0.6);line-height:1.6;">Convert pre-tax assets to Roth during lower-income years before pension starts. Reduces future RMD exposure and creates tax-free income to offset taxable pension.</div>
-          </div>
-          <div style="background:rgba(255,255,255,0.06);border-radius:6px;padding:12px;border-left:3px solid #ffcc80;">
-            <div style="font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:#ffcc80;margin-bottom:6px;">Premium Finance Strategy</div>
-            <div style="font-size:0.76rem;color:rgba(255,255,255,0.6);line-height:1.6;">Borrow to fund large IUL policies using existing assets as collateral. Access $1M+ in death benefit and cash value with minimal out-of-pocket. Ideal for HNW clients.</div>
-          </div>
-          <div style="background:rgba(255,255,255,0.06);border-radius:6px;padding:12px;border-left:3px solid #80cbc4;">
-            <div style="font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:#80cbc4;margin-bottom:6px;">Social Security Optimization</div>
-            <div style="font-size:0.76rem;color:rgba(255,255,255,0.6);line-height:1.6;">SS Fairness Act (2024) eliminated WEP/GPO — many public employees can now collect SS. Claiming at 70 vs 62 can add $500–$1,200/mo. Breakeven typically 78–82.</div>
-          </div>
-        </div>
-      </div>
       <div style="background:var(--gray-100);border-top:1px solid var(--gray-200);padding:12px 24px;font-size:0.76rem;color:var(--gray-700);line-height:1.7;">
-        <strong style="color:var(--navy);">Gap Summary:</strong> To generate <strong>$${Math.round(monGap).toLocaleString()}/month</strong> in perpetual supplemental income, approximately <strong>$${Math.round(capital).toLocaleString()}</strong> is needed earning <strong>${(rate*100).toFixed(2)}%</strong>.
-        ${assets.length>0?` Projected assets of <strong>$${Math.round(totalAssets).toLocaleString()}</strong> ${remaining>0?`leave a <strong style="color:var(--red);">$${Math.round(remaining).toLocaleString()} gap</strong> to solve through the strategies above.`:`<strong style="color:var(--green);">fully cover the capital needed</strong>.`}`:''}
-        <span style="color:var(--gray-400);"> · Schedule a consultation to build the optimal gap-filling strategy for your client.</span>
+        <strong style="color:var(--navy);">Gap Summary:</strong> ${annInc>0?`After <strong>$${Math.round(annInc).toLocaleString()}/yr</strong> ($${Math.round(annInc/12).toLocaleString()}/mo) of other retirement income, `:''}To generate the remaining <strong>$${Math.round(monGap).toLocaleString()}/month</strong> ($${Math.round(annGap).toLocaleString()}/year) in perpetual supplemental income, approximately <strong>$${Math.round(capital).toLocaleString()}</strong> is needed earning <strong>${(rate*100).toFixed(2)}%</strong>.
+        ${assets.length>0?` Projected assets of <strong>$${Math.round(totalAssets).toLocaleString()}</strong> ${remaining>0?`leave a <strong style="color:var(--red);">$${Math.round(remaining).toLocaleString()} gap</strong> to solve.`:`<strong style="color:var(--green);">fully cover the capital needed</strong>.`}`:''}
+        <span style="color:var(--gray-400);"> · Strategy options to bridge this gap are on the <strong style="color:var(--navy);">Deliver</strong> step.</span>
       </div>
     </div>`;
 }
@@ -1303,13 +1463,16 @@ function generateReport() {
   let solutionsHTML='';
   if(gapIdx!==''){
     const r=_results[parseInt(gapIdx)];
-    const ytr=Math.max(0,r.age-startAge);
+    // Years to retirement: from Current Age (or DOB) if provided, else from Career Start Age
+    const ytr=Math.max(0,r.age-getBaselineAge());
     const futureSal=infl.on?_salary*Math.pow(1+infl.sal,ytr):_salary;
     let futurePen=r.annual;
     if(infl.on){const m=plan.factor(Math.min(r.age,plan.maxAge),r.yrs);futurePen=m*futureSal*(1-r.survRed);}
     const salG=infl.on?futureSal:_salary;
     const penG=infl.on?futurePen:r.annual;
-    const annGap=Math.max(0,salG-penG);
+    const incomes=getIncomes(infl,ytr);
+    const annInc=incomes.reduce((s,x)=>s+x.annAtRet,0);
+    const annGap=Math.max(0,salG-penG-annInc);
     const monGap=annGap/12;
     const cap=annGap/gapRate;
     const capToday=infl.on?cap/Math.pow(1+infl.infl,ytr):cap;
@@ -1347,24 +1510,65 @@ function generateReport() {
     :`<div style="background:#e8e3dc;border-radius:4px;height:6px;overflow:hidden;margin-top:8px;"><div style="height:100%;width:${Math.min(covNom,100).toFixed(0)}%;background:${covNom>=100?'#27ae60':covNom>60?'#b8972e':'#c0392b'};border-radius:4px;"></div></div>
     <div style="display:flex;justify-content:space-between;margin-top:4px;font-size:0.76rem;"><span><strong>${covNom.toFixed(0)}% funded</strong></span><span style="color:${remNom>0?'#c0392b':'#27ae60'};font-weight:700;">${remNom>0?'Still need: $'+Math.round(remNom).toLocaleString():'✓ Fully Covered'}</span></div>`}`:'<p style="color:#9a9590;font-style:italic;font-size:0.82rem;">No assets entered.</p>';
 
+    const incomeTable = incomes.length>0 ? `
+      <div class="rpt-subsection-title">Other Retirement Income${infl.on?' — Grown to Retirement':''}</div>
+      <table class="rpt-table"><thead><tr><th>Source</th><th>Today ($/yr)</th><th>COLA</th>${infl.on?'<th>At Retirement ($/yr)</th>':''}<th>Monthly${infl.on?' (Ret.)':''}</th></tr></thead><tbody>
+        ${incomes.map(x=>`<tr><td><strong>${x.name}</strong></td><td>$${Math.round(x.annToday).toLocaleString()}</td><td>${x.cola>0?(x.cola*100).toFixed(1)+'%':'—'}</td>${infl.on?`<td style="color:#b8972e;font-weight:700;">$${Math.round(x.annAtRet).toLocaleString()}</td>`:''}<td style="color:#27ae60;font-weight:700;">$${Math.round(x.annAtRet/12).toLocaleString()}/mo</td></tr>`).join('')}
+        <tr style="background:#f0ede8;font-weight:700;"><td>Total Other Income</td><td>$${Math.round(incomes.reduce((s,x)=>s+x.annToday,0)).toLocaleString()}</td><td></td>${infl.on?`<td style="color:#b8972e;">$${Math.round(annInc).toLocaleString()}</td>`:''}<td style="color:#27ae60;">$${Math.round(annInc/12).toLocaleString()}/mo</td></tr>
+      </tbody></table>` : '';
+
+    // ── Savings required to meet the gap: regular goal + inflation goal ──
+    const saveRor=(parseFloat(document.getElementById('saveRor')?.value)||6)/100;
+    const nY=ytr>0?ytr:1, nMo=nY*12, mRate=saveRor/12;
+    const pmtCalc=(goal,existing)=>{
+      const net=Math.max(0,goal-existing);
+      const mo=mRate>0?net*mRate/(Math.pow(1+mRate,nMo)-1):net/nMo;
+      const yr=saveRor>0?net*saveRor/(Math.pow(1+saveRor,nY)-1):net/nY;
+      return {net,mo,yr};
+    };
+    // Regular goal: nominal capital (nominal mode) or today's-dollar capital (inflation mode)
+    const regPmt = infl.on ? pmtCalc(capToday,taReal) : pmtCalc(cap,taNom);
+    // Inflation goal: future-dollar capital (only meaningful when inflation mode is on)
+    const inflPmt = infl.on ? pmtCalc(cap,taNom) : null;
+    const saveCard=(title,color,p,goal,note)=>`
+      <div style="background:#f7f5f1;border-radius:6px;padding:13px 15px;border-top:3px solid ${color};">
+        <div style="font-size:0.64rem;text-transform:uppercase;letter-spacing:0.06em;color:${color};font-weight:700;margin-bottom:8px;">${title}</div>
+        <div style="display:flex;justify-content:space-between;font-size:0.72rem;margin-bottom:3px;"><span style="color:#9a9590;">Capital Goal</span><strong style="color:#0d1e3a;">$${Math.round(goal).toLocaleString()}</strong></div>
+        <div style="display:flex;justify-content:space-between;font-size:0.72rem;margin-bottom:7px;"><span style="color:#9a9590;">Net Still to Fund</span><strong style="color:${p.net>0?'#c0392b':'#27ae60'};">${p.net>0?'$'+Math.round(p.net).toLocaleString():'✓ Covered'}</strong></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+          <div style="background:white;border-radius:5px;padding:8px;text-align:center;"><div style="font-size:0.58rem;text-transform:uppercase;color:#9a9590;letter-spacing:0.05em;">Save / Month</div><div style="font-family:'Montserrat',sans-serif;font-size:1rem;font-weight:700;color:${color};">$${Math.round(p.mo).toLocaleString()}</div></div>
+          <div style="background:white;border-radius:5px;padding:8px;text-align:center;"><div style="font-size:0.58rem;text-transform:uppercase;color:#9a9590;letter-spacing:0.05em;">Save / Year</div><div style="font-family:'Montserrat',sans-serif;font-size:1rem;font-weight:700;color:${color};">$${Math.round(p.yr).toLocaleString()}</div></div>
+        </div>
+        <div style="font-size:0.62rem;color:#9a9590;margin-top:6px;line-height:1.5;">${note}</div>
+      </div>`;
+    const savingsHTML=`
+      <div class="rpt-subsection-title">Savings Required to Meet the Gap — ${nY} Years @ ${(saveRor*100).toFixed(1)}% Assumed Return</div>
+      <div style="display:grid;grid-template-columns:${infl.on?'1fr 1fr':'1fr'};gap:10px;margin-bottom:6px;">
+        ${saveCard(infl.on?"Regular Goal — Today's Dollars":'Regular Goal', '#0d1e3a', regPmt, infl.on?capToday:cap, infl.on?"Funds the gap measured in today's purchasing power, on top of existing projected assets.":'Funds the capital needed on top of existing projected assets, with level contributions until retirement.')}
+        ${infl.on?saveCard('Inflation Goal — Future Dollars ★', '#b8972e', inflPmt, cap, 'The true target: the actual future-dollar capital required at retirement after '+(infl.infl*100).toFixed(1)+'% annual inflation over '+nY+' years.'):''}
+      </div>`;
+
     gapHTML=`<div class="rpt-section">
       <div class="rpt-section-title">Pension Gap Analysis — Age ${r.age} Scenario</div>
       <div class="rpt-kpi-row">
         <div class="rpt-kpi"><div class="rpt-kpi-label">${infl.on?'Future Salary':'Current Salary'}</div><div class="rpt-kpi-val">$${Math.round(salG).toLocaleString()}/yr</div></div>
         <div class="rpt-kpi"><div class="rpt-kpi-label">Pension at Age ${r.age}</div><div class="rpt-kpi-val" style="color:${sys.color};">$${Math.round(penG).toLocaleString()}/yr</div></div>
+        ${annInc>0?`<div class="rpt-kpi"><div class="rpt-kpi-label">Other Income</div><div class="rpt-kpi-val" style="color:#27ae60;">$${Math.round(annInc).toLocaleString()}/yr</div></div>`:''}
         <div class="rpt-kpi red"><div class="rpt-kpi-label">Annual Gap</div><div class="rpt-kpi-val">-$${Math.round(annGap).toLocaleString()}/yr</div></div>
         <div class="rpt-kpi red"><div class="rpt-kpi-label">Monthly Gap</div><div class="rpt-kpi-val">-$${Math.round(monGap).toLocaleString()}/mo</div></div>
       </div>
       <div class="rpt-formula">
-        <div class="rpt-fi"><div class="rpt-fl">Annual Gap</div><div class="rpt-fv">$${Math.round(annGap).toLocaleString()}</div></div>
+        <div class="rpt-fi"><div class="rpt-fl">Annual Gap${annInc>0?' (After Other Income)':''}</div><div class="rpt-fv">$${Math.round(annGap).toLocaleString()}</div></div>
         <div class="rpt-fo">÷</div>
         <div class="rpt-fi"><div class="rpt-fl">Return Rate</div><div class="rpt-fv">${(gapRate*100).toFixed(2)}%</div></div>
         <div class="rpt-fo">=</div>
         <div class="rpt-fi gold"><div class="rpt-fl">Capital Needed${infl.on?' (Future $ — real goal ★)':''}</div><div class="rpt-fv">$${Math.round(cap).toLocaleString()}</div></div>
         ${infl.on?`<div class="rpt-fo">→</div><div class="rpt-fi"><div class="rpt-fl">In Today's Dollars</div><div class="rpt-fv" style="color:#d4af5a;">$${Math.round(capToday).toLocaleString()}</div></div>`:''}
       </div>
+      ${incomeTable}
       <div class="rpt-subsection-title">Asset Projections at Retirement</div>
       ${assetRows}
+      ${savingsHTML}
     </div>`;
 
     solutionsHTML=`<div class="rpt-section">
@@ -1389,10 +1593,10 @@ function generateReport() {
           <div class="rpt-sol-tags"><span>✓ Eliminates RMDs</span><span>✓ Tax Diversification</span><span>✓ Estate Planning</span></div>
         </div>
         <div class="rpt-sol pf">
-          <div class="rpt-sol-title">Premium Finance Strategy</div>
-          <div class="rpt-sol-amount">Leverage assets for $1M+ coverage</div>
-          <div class="rpt-sol-desc">Use existing assets as collateral to borrow premiums for a large IUL policy. Designed for high-net-worth individuals — accesses substantial death benefit and cash value with minimal personal capital outlay. Requires proper structuring. Best with 7+ year horizon.</div>
-          <div class="rpt-sol-tags"><span>✓ HNW Strategy</span><span>✓ Leverage Existing Assets</span><span>✓ Estate Multiplier</span></div>
+          <div class="rpt-sol-title">Qualified Plan Strategy</div>
+          <div class="rpt-sol-amount">IRA · 403(b) · 457(b) · 401(k)</div>
+          <div class="rpt-sol-desc">Coordinate all qualified accounts as one system: Traditional and Roth IRAs, 403(b), 457(b), and 401(k). Pre-tax deferrals lower current taxable income; Roth options build a tax-free bucket; catch-up contributions at age 50+ expand annual capacity. Consolidating old employer plans via rollover simplifies RMD management and creates one coordinated allocation.</div>
+          <div class="rpt-sol-tags"><span>✓ Tax-Deferred Growth</span><span>✓ Catch-Up Eligible 50+</span><span>✓ Rollover Consolidation</span></div>
         </div>
         <div class="rpt-sol ss">
           <div class="rpt-sol-title">Social Security Optimization</div>
@@ -1591,6 +1795,7 @@ body{font-family:'Montserrat',Arial,sans-serif;color:#2d2d2d;background:white;fo
     <strong>Prepared for:</strong> ${client}<br>
     <strong>Pension System:</strong> ${sys.name}<br>
     <strong>Plan / Tier:</strong> ${plan.label}<br>
+    ${getCurrentAge()!==null?`<strong>Current Age:</strong> ${getCurrentAge()}<br>`:''}
     <strong>Final Average Compensation:</strong> $${Math.round(_salary).toLocaleString()}/year<br>
     <strong>Survivor Option:</strong> ${survLabel}<br>
     <strong>Report Date:</strong> ${today}<br>
@@ -1668,11 +1873,14 @@ ${solutionsHTML}
 ${chartScript}
 </body></html>`;
 
+  window._lastReportHTML=html;
+  window._lastReportName=`${sys.name}_Report_${client.replace(/\s+/g,'_')}_${new Date().toISOString().slice(0,10)}.html`;
+  if(window._suppressReportDownload) return;
   const blob=new Blob([html],{type:'text/html;charset=utf-8'});
   const url=URL.createObjectURL(blob);
   const a=document.createElement('a');
   a.href=url;
-  a.download=`${sys.name}_Report_${client.replace(/\s+/g,'_')}_${new Date().toISOString().slice(0,10)}.html`;
+  a.download=window._lastReportName;
   document.body.appendChild(a); a.click(); document.body.removeChild(a);
   setTimeout(()=>URL.revokeObjectURL(url),5000);
 }
@@ -2219,10 +2427,11 @@ const EFA_ILLUSTRATOR_URL = 'tool-retirement-illustration.html';
     const extras = (nAcct||nSav) ? ` plus ${nAcct} account${nAcct===1?'':'s'} and ${nSav} contribution${nSav===1?'':'s'}` : '';
     note(`Hand-off staged for <code>${name}</code> — pension${extras}. Opening the illustrator… it applies automatically. If it doesn’t open, launch <code>${EFA_ILLUSTRATOR_URL}</code>.`);
     toast(`<b>${name}</b> sent → pension ${money0(pension.scenario.annual)}/yr at age ${pension.scenario.age}${extras}.`);
-    // hand off via URL hash (works on file:// and on a fresh tab) + localStorage (for an already-open tab)
+    // open the embedded illustration path (falls back to a new tab if the paths module is absent)
     let hash='';
     try{ hash='#efaport='+encodeURIComponent(btoa(unescape(encodeURIComponent(JSON.stringify(port))))); }catch(e){ hash=''; }
-    try{ window.open(EFA_ILLUSTRATOR_URL+hash,'_blank'); }catch(e){}
+    if(window.EFA_PATHS && window.EFA_PATHS.openIllustrator){ window.EFA_PATHS.openIllustrator(); }
+    else { try{ window.open(EFA_ILLUSTRATOR_URL+hash,'_blank'); }catch(e){} }
   };
   function refreshClientRoster(){
     const sel=$('efaLoadSel'); if(!sel) return; const cur=sel.value; const items=window.EFA_STORE.list();
@@ -2397,6 +2606,1232 @@ const EFA_ILLUSTRATOR_URL = 'tool-retirement-illustration.html';
     var prevSw=window.switchSystem;
     window.switchSystem=function(){ var r=prevSw.apply(this,arguments); var w=$('dropPanelWrap'); if(w && _sys!=='lafpp') w.remove(); dropScenIdx=null; dropMonthlyTouched=false; return r; };
   }
+})();
+</script>
+
+<style id="efa-paths-css">
+  /* ── Deliver page, light aesthetic (no more navy walls) ── */
+  #reportBar .report-bar{background:transparent !important;box-shadow:none !important;padding:0 !important;border:none !important;}
+  .efa-rpt-card{background:white;border-radius:12px;box-shadow:var(--shadow);border-top:4px solid var(--gold);padding:22px 26px;}
+  .efa-rpt-head h3{font-family:'Cormorant Garamond',serif;font-size:1.5rem;color:var(--navy);font-weight:700;}
+  .efa-rpt-head .sub{font-size:0.76rem;color:var(--gray-400);margin-top:2px;line-height:1.5;}
+  .efa-rpt-grid{display:grid;grid-template-columns:1fr 1fr auto;gap:14px;align-items:end;margin-top:16px;}
+  @media(max-width:900px){.efa-rpt-grid{grid-template-columns:1fr;}}
+  .efa-rpt-f label{display:block;font-size:0.62rem;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:var(--gray-400);margin-bottom:5px;}
+  .efa-rpt-f label .opt{color:var(--gold);text-transform:none;letter-spacing:0;font-weight:600;}
+  .efa-rpt-f input{width:100%;padding:9px 11px;border:1.5px solid var(--gray-200);border-radius:6px;font-family:'Montserrat',sans-serif;font-size:0.84rem;background:var(--gray-100);color:var(--navy);}
+  .efa-rpt-f input:focus{outline:none;border-color:var(--gold);background:white;}
+  .efa-rpt-btns{display:flex;gap:10px;flex-wrap:wrap;}
+  .efa-mail-panel{max-height:0;overflow:hidden;transition:max-height .3s ease;}
+  .efa-mail-panel.open{max-height:600px;margin-top:18px;border-top:1px solid var(--gray-200);padding-top:16px;}
+  .efa-mail-cols{display:grid;grid-template-columns:1.2fr 1fr;gap:20px;}
+  @media(max-width:900px){.efa-mail-cols{grid-template-columns:1fr;}}
+  .efa-mail-lbl{font-size:0.64rem;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:var(--navy);margin-bottom:8px;}
+  .efa-mail-lbl .opt{color:var(--gray-400);text-transform:none;letter-spacing:0;font-weight:600;}
+  .efa-mail-chips{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:8px;}
+  .efa-mail-custom{width:100%;padding:8px 10px;border:1.5px dashed var(--gray-200);border-radius:6px;font-family:'Montserrat',sans-serif;font-size:0.76rem;background:var(--gray-100);}
+  .efa-mail-custom:focus{outline:none;border-color:var(--gold);background:white;}
+  .efa-mail-note{width:100%;min-height:86px;padding:9px 11px;border:1.5px solid var(--gray-200);border-radius:6px;font-family:'Montserrat',sans-serif;font-size:0.78rem;background:var(--gray-100);resize:vertical;}
+  .efa-mail-note:focus{outline:none;border-color:var(--gold);background:white;}
+  .efa-mail-preview{font-size:0.68rem;color:var(--gray-400);line-height:1.6;background:var(--cream);border-left:3px solid var(--gold);border-radius:5px;padding:9px 12px;margin-top:8px;}
+  .efa-rpt-status{font-size:0.76rem;font-weight:600;color:var(--green);margin-top:12px;opacity:0;transition:opacity .25s;}
+  .efa-rpt-status.show{opacity:1;} .efa-rpt-status.err{color:var(--red);}
+  /* next-step boxes */
+  .efa-nextsteps{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  @media(max-width:860px){.efa-nextsteps{grid-template-columns:1fr;}}
+  .efa-ns-card{background:white;border:1.5px solid var(--gray-200);border-left:4px solid var(--gold);border-radius:10px;padding:18px 20px;text-align:left;cursor:pointer;font-family:'Montserrat',sans-serif;transition:all .18s;display:flex;flex-direction:column;gap:7px;}
+  .efa-ns-card:hover{transform:translateY(-2px);box-shadow:0 10px 26px rgba(10,31,60,0.14);border-left-color:var(--navy);}
+  .efa-ns-title{font-family:'Cormorant Garamond',serif;font-size:1.25rem;font-weight:700;color:var(--navy);}
+  .efa-ns-sub{font-size:0.74rem;color:var(--gray-700);line-height:1.6;}
+  .efa-ns-go{font-size:0.7rem;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:var(--gold);margin-top:2px;}
+  /* strategy picker tiles on the light plane */
+  #efaPickOverlay .efa-strat-grid{margin-top:6px;}
+  #efaPickOverlay .efa-tile{background:white;border:1.5px solid var(--gray-200);border-top:3px solid var(--tile-accent,var(--gold));}
+  #efaPickOverlay .efa-tile.sel{background:var(--gold-pale);border-color:var(--gold);}
+  /* on-brand DOB field */
+  #dob{width:100%;padding:9px 10px;border:1.5px solid var(--gray-200);border-radius:5px;
+    font-family:'Montserrat',sans-serif;font-size:0.82rem;font-weight:600;color:var(--navy);
+    background:var(--gray-100);color-scheme:light;cursor:pointer;transition:border-color .15s;}
+  #dob:focus{outline:none;border-color:var(--gold);background:white;}
+  #dob::-webkit-calendar-picker-indicator{cursor:pointer;opacity:0.55;filter:sepia(1) saturate(3) hue-rotate(5deg);}
+  #dob::-webkit-datetime-edit-fields-wrapper{color:var(--navy);}
+  #dob:invalid::-webkit-datetime-edit{color:var(--gray-400);}
+  .efa-paths{max-width:1100px;margin:0 auto 40px;padding:0 20px;}
+  .efa-paths-card{background:var(--navy);border-radius:10px;padding:26px 30px;box-shadow:var(--shadow);}
+  .efa-paths-head{display:flex;align-items:baseline;gap:12px;margin-bottom:4px;}
+  .efa-paths-head h3{font-family:'Cormorant Garamond',serif;font-size:1.5rem;color:white;font-weight:700;}
+  .efa-paths-badge{font-size:0.6rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;background:var(--gold);color:var(--navy);border-radius:3px;padding:2px 8px;}
+  .efa-paths-sub{font-size:0.78rem;color:rgba(255,255,255,0.55);line-height:1.6;margin-bottom:18px;max-width:760px;}
+  .efa-strat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px;}
+  @media(max-width:900px){.efa-strat-grid{grid-template-columns:repeat(2,1fr);}}
+  .efa-tile{background:var(--cream);border:2px solid transparent;border-top:3px solid var(--tile-accent,var(--gold));border-radius:7px;padding:13px 14px;cursor:pointer;text-align:left;transition:all .18s;position:relative;font-family:'Montserrat',sans-serif;}
+  .efa-tile:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(0,0,0,0.25);}
+  .efa-tile .tt{font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--navy);margin-bottom:4px;padding-right:20px;}
+  .efa-tile .ts{font-size:0.68rem;color:var(--gray-700);line-height:1.5;}
+  .efa-tile .ck{position:absolute;top:9px;right:10px;width:17px;height:17px;border:2px solid var(--gray-200);border-radius:50%;background:white;font-size:0.62rem;line-height:14px;text-align:center;color:transparent;font-weight:700;}
+  .efa-tile.sel{background:var(--gold-pale);border-color:var(--gold);}
+  .efa-tile.sel .ck{background:var(--gold);border-color:var(--gold);color:var(--navy);}
+  .efa-paths-row{display:grid;grid-template-columns:1fr auto;gap:14px;align-items:center;border-top:1px solid rgba(255,255,255,0.12);padding-top:16px;}
+  .efa-path-b{display:flex;align-items:center;justify-content:space-between;gap:14px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);border-left:3px solid var(--gold-light);border-radius:7px;padding:13px 16px;margin-top:14px;flex-wrap:wrap;}
+  .efa-path-b .pt{font-size:0.75rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:var(--gold-light);}
+  .efa-path-b .ps{font-size:0.72rem;color:rgba(255,255,255,0.55);line-height:1.5;max-width:560px;}
+  .efa-go{background:var(--gold);color:var(--navy);border:none;border-radius:6px;padding:11px 20px;font-family:'Montserrat',sans-serif;font-size:0.78rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;cursor:pointer;border-bottom:2px solid #8a6012;white-space:nowrap;}
+  .efa-go:disabled{opacity:0.35;cursor:not-allowed;}
+  .efa-go.ghost{background:transparent;color:var(--gold-light);border:1.5px solid var(--gold-light);border-bottom-width:1.5px;}
+  .efa-selcount{font-size:0.72rem;color:rgba(255,255,255,0.5);}
+  /* overlays */
+  .efa-overlay{position:fixed;inset:0;z-index:6000;background:var(--cream);display:none;flex-direction:column;}
+  .efa-overlay.on{display:flex;}
+  .efa-ov-head{background:var(--navy);border-bottom:3px solid var(--gold);padding:13px 26px;display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;}
+  .efa-ov-head .ot{font-family:'Cormorant Garamond',serif;font-size:1.35rem;color:white;font-weight:700;}
+  .efa-ov-head .ot em{color:var(--gold-light);font-style:normal;}
+  .efa-ov-head .os{font-size:0.68rem;color:rgba(255,255,255,0.45);letter-spacing:0.08em;text-transform:uppercase;}
+  .efa-ov-body{flex:1;overflow-y:auto;padding:26px 26px 40px;}
+  .efa-ov-foot{background:var(--navy);border-top:2px solid var(--gold);padding:11px 26px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;}
+  .efa-back{background:transparent;color:white;border:1.5px solid rgba(255,255,255,0.35);border-radius:6px;padding:9px 18px;font-family:'Montserrat',sans-serif;font-size:0.76rem;font-weight:700;letter-spacing:0.05em;cursor:pointer;}
+  .efa-back:hover{border-color:var(--gold-light);color:var(--gold-light);}
+  .efa-foot-note{font-size:0.64rem;color:rgba(255,255,255,0.4);line-height:1.5;max-width:640px;}
+  /* strategy detail panels */
+  .efa-sd{max-width:1080px;margin:0 auto 26px;background:white;border-radius:10px;box-shadow:var(--shadow);overflow:hidden;border-top:4px solid var(--sd-accent,var(--gold));}
+  .efa-sd-head{padding:18px 26px 12px;display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;}
+  .efa-sd-head h4{font-family:'Cormorant Garamond',serif;font-size:1.55rem;color:var(--navy);font-weight:700;}
+  .efa-sd-head .tag{font-size:0.66rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--sd-accent,var(--gold));}
+  .efa-sd-grid{display:grid;grid-template-columns:1.25fr 1fr;gap:0;border-top:1px solid var(--gray-200);}
+  @media(max-width:860px){.efa-sd-grid{grid-template-columns:1fr;}}
+  .efa-sd-concept{padding:18px 26px;}
+  .efa-sd-lbl{font-size:0.64rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--gray-400);margin-bottom:8px;}
+  .efa-sd-concept p{font-size:0.8rem;color:var(--gray-700);line-height:1.75;margin-bottom:10px;}
+  .efa-sd-access{padding:18px 22px;background:var(--gray-100);border-left:1px solid var(--gray-200);}
+  .efa-sd-access .efa-sd-lbl{color:var(--red);}
+  .efa-sd-access ul{list-style:none;}
+  .efa-sd-access li{font-size:0.73rem;color:var(--gray-700);line-height:1.6;padding:5px 0 5px 16px;position:relative;border-bottom:1px dashed var(--gray-200);}
+  .efa-sd-access li:before{content:'▸';position:absolute;left:0;color:var(--red);font-size:0.7rem;}
+  .efa-sd-access li b{color:var(--navy);}
+  .efa-cd{padding:12px 26px 6px;border-top:1px solid var(--gray-200);}
+  .efa-cd-chips{display:flex;flex-wrap:wrap;gap:8px;}
+  .efa-chip{background:var(--cream);border:1.5px solid var(--gray-200);border-radius:20px;padding:6px 14px;font-size:0.7rem;font-weight:600;color:var(--navy);cursor:pointer;font-family:'Montserrat',sans-serif;transition:all .15s;}
+  .efa-chip.on{background:var(--navy);color:var(--gold-light);border-color:var(--navy);}
+  .efa-calc{margin:14px 26px 20px;background:var(--cream);border:1px solid var(--gray-200);border-radius:8px;overflow:hidden;}
+  .efa-calc-head{background:var(--navy);padding:9px 16px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px;}
+  .efa-calc-head .ct{font-size:0.7rem;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:var(--gold-light);}
+  .efa-calc-head .cl{font-size:0.62rem;color:rgba(255,255,255,0.5);}
+  .efa-calc-in{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;padding:13px 16px;}
+  @media(max-width:860px){.efa-calc-in{grid-template-columns:repeat(2,1fr);}}
+  .efa-ci label{display:block;font-size:0.6rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:var(--gray-400);margin-bottom:4px;}
+  .efa-ci input,.efa-ci select{width:100%;padding:8px 9px;border:1.5px solid var(--gray-200);border-radius:5px;font-size:0.8rem;font-family:'Montserrat',sans-serif;background:white;}
+  .efa-calc-out{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:0 16px 13px;}
+  .efa-co{background:white;border-radius:6px;padding:10px;text-align:center;border-top:3px solid var(--sd-accent,var(--gold));}
+  .efa-co .ol{font-size:0.58rem;text-transform:uppercase;letter-spacing:0.05em;color:var(--gray-400);}
+  .efa-co .ov{font-family:'Montserrat',sans-serif;font-size:1.05rem;font-weight:700;color:var(--navy);margin-top:2px;}
+  .efa-lim{margin:0 16px 13px;background:#fdf6e3;border:1px solid var(--gold-pale);border-left:3px solid var(--gold);border-radius:5px;padding:9px 12px;font-size:0.7rem;color:var(--gray-700);line-height:1.6;}
+  .efa-lim.warn{background:#fdecea;border-color:#f5c6c0;border-left-color:var(--red);}
+  .efa-lim b{color:var(--navy);}
+  .efa-ctab{margin:0 16px 16px;max-height:220px;overflow-y:auto;border:1px solid var(--gray-200);border-radius:6px;}
+  .efa-ctab table{width:100%;border-collapse:collapse;font-size:0.7rem;}
+  .efa-ctab th{background:var(--navy);color:rgba(255,255,255,0.6);text-transform:uppercase;font-size:0.58rem;letter-spacing:0.05em;padding:6px 10px;text-align:right;position:sticky;top:0;}
+  .efa-ctab th:first-child{text-align:left;}
+  .efa-ctab td{padding:5px 10px;text-align:right;border-bottom:1px solid var(--gray-200);color:var(--gray-700);background:white;}
+  .efa-ctab td:first-child{text-align:left;font-weight:600;color:var(--navy);}
+  .efa-strat-disc{max-width:1080px;margin:0 auto;font-size:0.66rem;color:var(--gray-400);line-height:1.6;background:white;border-radius:8px;padding:12px 18px;border-left:3px solid var(--gold);}
+  @media print{.efa-paths,.efa-overlay{display:none !important;}}
+</style>
+
+<div class="efa-overlay" id="efaStratOverlay">
+  <div class="efa-ov-head">
+    <div><div class="ot">Strategy <em>Presentation</em></div><div class="os" id="efaStratWho">Edwards Financial &amp; Associates</div></div>
+    <button class="efa-back" onclick="EFA_PATHS.back()">&#8249; Back to Strategy Options</button>
+  </div>
+  <div class="efa-ov-body" id="efaStratBody"></div>
+  <div class="efa-ov-foot">
+    <button class="efa-back" onclick="EFA_PATHS.back()">&#8249; Back to Path Options</button>
+    <div class="efa-foot-note">Educational concepts &amp; hypothetical illustrations only — not a carrier illustration, recommendation, or tax/legal advice. 2026 limits per IRS Notice 2025-67. Verify plan-specific rules with the plan document and a tax professional.</div>
+  </div>
+</div>
+
+<!-- native illustrator overlay is injected by efa-illus-js -->
+
+<script id="efa-paths-js">
+(function(){
+  const $=id=>document.getElementById(id);
+  const M=n=>'$'+Math.round(n).toLocaleString('en-US');
+
+  /* ═══════════ 2026 LIMITS — verified against IRS Notice 2025-67 / IR-2025-111 ═══════════ */
+  const L26={ deferral:24500, catch50:8000, super6063:11250, s457Special:49000, addl415:72000,
+    ira:7500, iraCatch:1100, rothPhase:{single:[153000,168000], mfj:[242000,252000], mfs:[0,10000]},
+    rothCatchWage:150000 };
+  function qpLimit(age){ if(age>=60&&age<=63) return L26.deferral+L26.super6063;
+    if(age>=50) return L26.deferral+L26.catch50; return L26.deferral; }
+  function rothLimit(age){ return age>=50 ? L26.ira+L26.iraCatch : L26.ira; }
+
+  /* ═══════════ STRATEGY LIBRARY ═══════════ */
+  const STRATS={
+    qualified:{ t:'Qualified Plan', tag:'403(b) · 457(b) · 401(k) · IRA', accent:'#b8972e',
+      tile:'Pre-tax power now, coordinated buckets later. 403(b) + 457(b) can be funded side by side.',
+      concept:[
+        `Qualified plans are where the IRS lets your money grow with the taxes switched off — for now. Every dollar deferred into a 403(b), 457(b), or 401(k) skips today's tax bill, grows untouched, and is taxed only when it comes back out. For public employees the real headline is this: the 403(b) and the 457(b) are <b>separate buckets under separate code sections</b>. An educator with access to both can defer up to ${M(L26.deferral)} into <i>each</i> for 2026 — a combined ${M(L26.deferral*2)} of pre-tax capacity before a single catch-up provision is touched.`,
+        `The trade is control. The IRS sets the contribution ceiling, the access age, the penalty schedule, and the year it starts forcing money out. A qualified plan is a partnership where your partner — the IRS — wrote the agreement. That is exactly why it belongs in a coordinated strategy rather than being the whole strategy.`],
+      access:[
+        '<b>Age 59½ gate:</b> distributions before then generally take a 10% penalty on top of ordinary income tax (exceptions: Rule of 55 separation for 401(k)/403(b), 72(t) equal payments, and others).',
+        '<b>The 457(b) advantage:</b> governmental 457(b) money is penalty-free at <i>any</i> age once you separate from service — a major lever for early retirees.',
+        '<b>Loans are capped:</b> plan loans max at the lesser of $50,000 or 50% of the vested balance, if the plan allows them at all.',
+        '<b>RMDs force the exit:</b> required minimum distributions begin at age 73 (75 for those born 1960 or later) — taxable whether the money is wanted or not.',
+        '<b>Every dollar is taxed on the way out</b> as ordinary income (Roth accounts excepted). The account balance is not all yours — a slice belongs to the IRS.',
+        '<b>Menu control:</b> investment options are limited to what the plan sponsor offers.'],
+      cases:['403(b) Max Funding','457(b) + 403(b) Dual Deferral','Roth 403(b) Split','Rollover Consolidation','Super Catch-Up 60–63'],
+      calc:'qp' },
+    rothira:{ t:'Roth IRA', tag:'Tax-free growth · flexible basis', accent:'#27ae60',
+      tile:'After-tax in, tax-free out. Contributions stay accessible; earnings are gated.',
+      concept:[
+        `The Roth IRA flips the qualified-plan deal: pay the tax now at a known rate, and every dollar of growth comes out federal-income-tax-free in retirement. Against a fully taxable pension, Roth dollars are the pressure valve — income that raises no tax bill, triggers no bracket creep, and never appears in an RMD calculation.`,
+        `Its weakness is capacity. At ${M(L26.ira)} a year (${M(L26.ira+L26.iraCatch)} at 50+), the Roth IRA is a slow-fill vehicle — powerful, but it takes decades of discipline to become a primary income source. That is why it usually rides alongside a larger engine rather than replacing one.`],
+      access:[
+        `<b>Contribution cap:</b> ${M(L26.ira)}/yr for 2026 (${M(L26.ira+L26.iraCatch)} at age 50+) — and never more than earned income.`,
+        `<b>Income phase-out (2026):</b> single/HoH $153,000–$168,000 MAGI; married filing jointly $242,000–$252,000. Above the range, the front door closes (backdoor strategies exist but require care).`,
+        '<b>Contributions vs. earnings:</b> contributions come back anytime, tax- and penalty-free. <i>Earnings</i> are locked behind BOTH age 59½ and the 5-year rule.',
+        '<b>Conversions carry their own 5-year clocks</b> — each conversion year starts a separate countdown for penalty-free access before 59½.',
+        '<b>No plan loans.</b> A Roth IRA cannot be borrowed against.'],
+      cases:['Annual Max Funding','Spousal Roth (2 accounts)','Backdoor Roth (high MAGI)','Roth as Tax-Bracket Hedge'],
+      calc:'roth' },
+    rothconv:{ t:'Roth Conversion Ladder', tag:'Convert in the valley years', accent:'#ce93d8',
+      tile:'Move pre-tax money to Roth during low-income windows before the pension turns on.',
+      concept:[
+        `Between the last paycheck and the first pension deposit, many public employees pass through the lowest-tax window of their adult lives. A conversion ladder uses that valley deliberately: move slices of pre-tax 403(b)/457(b)/IRA money into Roth each year, pay tax at the temporarily low rate, and permanently remove those dollars — and all their future growth — from the RMD system.`,
+        `Done over several years, the ladder converts a fully taxable retirement into a two-bucket retirement: pension income that is taxed, and Roth income that is not. The client, not the IRS, decides which bucket to draw from each year.`],
+      access:[
+        '<b>Conversion tax is due now:</b> every converted dollar is ordinary income in the conversion year — sizing each slice against the bracket line is the whole craft.',
+        '<b>5-year clock per conversion</b> for penalty-free access to converted amounts before 59½.',
+        '<b>No undo:</b> recharacterization of conversions was eliminated — a conversion is final.',
+        '<b>Bracket &amp; IRMAA awareness:</b> a large conversion can spill into higher brackets and, near 65, raise Medicare premiums.'],
+      cases:['Retire-at-55 → Pension-at-60 Ladder','Bracket-Fill Annual Slices','Pre-RMD Cleanup (65–73)'],
+      calc:null },
+    fia:{ t:'Fixed Index Annuity', tag:'Principal protected · lifetime income', accent:'#d4af5a',
+      tile:'Index-linked growth with a 0% floor, plus riders that pay income for life.',
+      concept:[
+        `A fixed index annuity builds a personal pension on top of the state pension. Growth is credited from an index's performance with a floor of zero — down years cost nothing — and an income rider converts the accumulated value into a paycheck that is contractually guaranteed for life, regardless of what markets do afterward.`,
+        `For a pensioner who already understands the value of guaranteed lifetime income, the FIA speaks a familiar language: it is the same promise, purchased privately, sized exactly to the gap the pension leaves behind.`],
+      access:[
+        '<b>Surrender schedule:</b> typically 7–10 years of declining surrender charges on excess withdrawals.',
+        '<b>Free-withdrawal corridor:</b> most contracts allow ~10% of value per year without charge (contract-specific).',
+        '<b>Tax deferral, ordinary rates:</b> gains are tax-deferred and taxed as ordinary income when withdrawn; pre-59½ withdrawals of gain can take the 10% penalty.',
+        '<b>Rider terms are carrier-specific:</b> payout percentages, roll-ups, and fees vary — the numbers below are illustrative, not an offer.'],
+      cases:['Income-Now SPIA-Style','Deferred Income Rider (5–10 yr roll-up)','Qualified Rollover → FIA','Bonus Product Reposition'],
+      calc:'fia' },
+    iul:{ t:'Indexed Universal Life', tag:'Tax-free income · no IRS gates', accent:'#4fc3f7',
+      tile:'Index-linked cash value, accessed by policy loans — no contribution limit, no 59½ rule.',
+      concept:[
+        `An IUL is the mirror image of the qualified plan. There is no IRS contribution ceiling, no age-59½ gate, no RMD, and properly structured policy loans arrive income-tax-free — and never touch the Social Security taxation formula. The same premium also buys an income-tax-free death benefit, so the strategy is doing legacy work every year it is doing income work.`,
+        `Where the qualified plan's rules are written by the IRS, the IUL's rules are written into the contract: caps, participation rates, and cost of insurance. It rewards a 10–20 year runway and disciplined funding just under the MEC line.`],
+      access:[
+        '<b>Liquidity through the contract, not the IRS:</b> withdrawals to basis and policy loans are available at any age — no 10% penalty regime.',
+        '<b>MEC line:</b> overfund past the 7-pay limit and the policy becomes a Modified Endowment Contract — loans become taxable and pre-59½ penalties appear. Structure matters.',
+        '<b>Loans must be managed:</b> if a policy lapses with loans outstanding, deferred gain becomes taxable. Funding discipline protects the tax treatment.',
+        '<b>Costs are real:</b> insurance charges are heaviest early; this is a long-runway vehicle, not a parking spot.'],
+      cases:['Max-Funded Min-Death-Benefit','Pension Rescue (annuity → IUL premiums)','Legacy + Income Dual Design','1035 Exchange from Old Policy'],
+      calc:'iul' },
+    wholelife:{ t:'Whole Life', tag:'Guaranteed values · dividends', accent:'#16294D',
+      tile:'Contractually guaranteed cash value growth, dividends, and lifetime coverage.',
+      concept:[
+        `Whole life trades upside for certainty: cash value grows on a contractually guaranteed schedule, participating policies add non-guaranteed dividends, and the death benefit is permanent. Nothing about it depends on an index or a market year.`,
+        `In a retirement income plan it serves as the stability floor — a source of collateral, policy loans, and legacy that behaves the same in every market. Paired with a pension, it deepens the guaranteed layer of the household balance sheet.`],
+      access:[
+        '<b>Slow early build:</b> cash value accumulates modestly in the first years; this is a decade-plus commitment.',
+        '<b>Policy loans anytime</b> against cash value — interest accrues, and unpaid loans reduce the death benefit.',
+        '<b>Dividends are not guaranteed</b> — guaranteed values are the floor, dividends are the historical upside.',
+        '<b>MEC rules apply</b> to aggressive funding, same as IUL.'],
+      cases:['Limited-Pay (10/20-Pay) Design','Paid-Up Additions Max Funding','Legacy Anchor for Survivor Option'],
+      calc:null },
+    ss:{ t:'Social Security Optimization', tag:'WEP/GPO repealed — timing is the lever', accent:'#80cbc4',
+      tile:'The Fairness Act restored full SS for many public employees. Claiming age sets the check for life.',
+      concept:[
+        `The Social Security Fairness Act (enacted January 2025, retroactive to benefits payable after December 2023) repealed the Windfall Elimination Provision and Government Pension Offset — the two rules that cut or erased Social Security for millions of public pension recipients. Many CalSTRS and CalPERS households are now entitled to benefits they were told they would never see.`,
+        `With eligibility restored, the decision becomes timing. Every year of delay from 62 to 70 permanently raises the monthly benefit under SSA's actuarial schedule; the right claiming age depends on health, spousal benefits, and how the pension covers the early years. Pull the client's actual figures at ssa.gov/myaccount before modeling.`],
+      access:[
+        '<b>Claiming is (mostly) permanent:</b> outside a narrow 12-month withdrawal window, the claiming-age decision locks the benefit for life.',
+        '<b>Earnings test before FRA:</b> claiming early while still working can temporarily withhold benefits.',
+        '<b>Up to 85% of benefits can be taxable</b> depending on provisional income — which other strategy choices (Roth, IUL) directly influence.',
+        '<b>Spousal and survivor coordination</b> often outweighs the individual break-even math.'],
+      cases:['Delay-to-70 Bridge (fund 62–70 from assets)','Spousal Claim Sequencing','Restored-Benefit Review (post-Fairness Act)'],
+      calc:null },
+    ltc:{ t:'Hybrid LTC / Life', tag:'Protect the pension from care costs', accent:'#ffcc80',
+      tile:'One asset, three jobs: long-term care benefits, death benefit, or cash value.',
+      concept:[
+        `A long-term care event is the single expense most capable of consuming a pension. A hybrid life/LTC policy repositions one asset to stand guard: if care is needed, it pays LTC benefits; if it never is, the death benefit passes to the family; surrender it, and cash value returns. The premium is never simply "spent."`,
+        `For couples on a survivor-option pension, this is survivor protection in a second form — it keeps the healthy spouse's lifestyle intact while care costs are met from the policy instead of the pension.`],
+      access:[
+        '<b>Underwriting required:</b> health qualification is the gate — the best time to apply is before it is needed.',
+        '<b>Benefit triggers are contractual</b> (typically inability to perform activities of daily living or cognitive impairment, with an elimination period).',
+        '<b>Single-premium designs</b> commit capital up front; multi-pay designs preserve flexibility.',
+        '<b>State partnership and tax treatment vary</b> — confirm the specific product\'s LTC rider tax status.'],
+      cases:['Single-Premium Asset Reposition','Second-to-Die Legacy + LTC','Survivor-Option Companion Policy'],
+      calc:null }
+  };
+
+  /* ═══════════ Deliver-page paths section ═══════════ */
+  const selected=new Set();
+  const pathsEl=document.createElement('div');
+  pathsEl.className='efa-paths efa-hidden';
+  pathsEl.innerHTML=`<div class="efa-nextsteps">
+      <button class="efa-ns-card" id="efaIllusBtn">
+        <span class="efa-ns-title">Open Retirement Illustration</span>
+        <span class="efa-ns-sub">The deeper appointment. Spouse in the room, taxes, lifestyle, legacy, every account. Opens pre-filled with this session's pension scenario, ages, assets, and other income.</span>
+        <span class="efa-ns-go">Open &#8250;</span>
+      </button>
+      <button class="efa-ns-card" id="efaPickBtn">
+        <span class="efa-ns-title">Retirement Strategy Options</span>
+        <span class="efa-ns-sub">Choose the strategies to present in depth. Concepts first, case designs, access rules, and calculators for the ones you select.</span>
+        <span class="efa-ns-go">Choose Strategies &#8250;</span>
+      </button>
+    </div>`;
+
+  /* strategy picker lives on its own plane now */
+  const pickOv=document.createElement('div'); pickOv.className='efa-overlay'; pickOv.id='efaPickOverlay';
+  pickOv.innerHTML=`
+    <div class="efa-ov-head">
+      <div><div class="ot">Retirement <em>Strategy Options</em></div><div class="os">Select what you want to present, then continue</div></div>
+      <button class="efa-back" onclick="EFA_PATHS.back()">&#8249; Back</button>
+    </div>
+    <div class="efa-ov-body"><div class="efa-il-wrap">
+      <div class="efa-strat-grid" id="efaStratTiles"></div>
+    </div></div>
+    <div class="efa-ov-foot">
+      <span class="efa-selcount" id="efaSelCount">Select the strategies you want to present.</span>
+      <span style="display:flex;gap:10px;align-items:center;">
+        <button class="efa-back" onclick="EFA_PATHS.back()">&#8249; Back</button>
+        <button class="efa-go" id="efaPresentBtn" disabled>Present Selected Strategies &#8250;</button>
+      </span>
+    </div>`;
+  document.body.appendChild(pickOv);
+
+  /* build the strategy tiles inside the picker overlay */
+  const tilesEl=pickOv.querySelector('#efaStratTiles');
+  Object.entries(STRATS).forEach(([k,s])=>{
+    const b=document.createElement('button');
+    b.className='efa-tile'; b.style.setProperty('--tile-accent',s.accent); b.dataset.k=k;
+    b.innerHTML=`<span class="ck">✓</span><div class="tt">${s.t}</div><div class="ts">${s.tile}</div>`;
+    b.onclick=()=>{ selected.has(k)?selected.delete(k):selected.add(k);
+      b.classList.toggle('sel',selected.has(k)); syncCount(); };
+    tilesEl.appendChild(b);
+  });
+
+  function syncCount(){
+    const n=selected.size;
+    pickOv.querySelector('#efaSelCount').textContent = n? n+' selected — ready to present.' : 'Select the strategies you want to present.';
+    pickOv.querySelector('#efaPresentBtn').disabled = n===0;
+  }
+
+  /* mount after the client bar; mirror its visibility (no edits to the suite shell) */
+  /* The Client File card is retired: hidden permanently, kept in the DOM only as the visibility signal. */
+  function mount(){
+    const cb=document.querySelector('.efa-clientbar');
+    if(!cb){ setTimeout(mount,150); return; }
+    cb.style.display='none';                       /* Client File Suite: removed from the page */
+    restyleDeliver();                              /* de-navy page 4: light report card + email actions */
+    cb.insertAdjacentElement('afterend', pathsEl);
+    const sync=()=>pathsEl.classList.toggle('efa-hidden', cb.classList.contains('efa-hidden'));
+    new MutationObserver(sync).observe(cb,{attributes:true,attributeFilter:['class']});
+    sync();
+  }
+  mount();
+
+  /* ═══════════ Deliver page: light report card + email actions ═══════════ */
+  function restyleDeliver(){
+    const CHECKLIST=['Recent paystubs','Latest pension statement','Social Security statement (ssa.gov)','403(b) statement','457(b) statement','IRA statement','Brokerage account statement','Life insurance policy statement','Most recent tax return','Employer benefits summary'];
+    const rb=document.getElementById('reportBar'); if(!rb) return;
+    const prevName=(document.getElementById('clientName')||{}).value||'';
+    rb.innerHTML=`
+      <div class="efa-rpt-card">
+        <div class="efa-rpt-head">
+          <div>
+            <h3>Generate Client Report</h3>
+            <div class="sub">Full report: pension scenarios, gap analysis, solution strategies, key planning considerations.</div>
+          </div>
+        </div>
+        <div class="efa-rpt-grid">
+          <div class="efa-rpt-f"><label>Client Name</label><input type="text" id="clientName" placeholder="e.g. Maria Hernandez" value="${prevName.replace(/"/g,'&quot;')}"/></div>
+          <div class="efa-rpt-f"><label>Client Email <span class="opt">for Email to Client</span></label><input type="email" id="clientEmail" placeholder="e.g. maria@email.com"/></div>
+          <div class="efa-rpt-btns">
+            <button class="efa-btn-gold" onclick="generateReport()">&#8681; Download Report</button>
+            <button class="efa-btn-ghost" id="efaSaveClientBtn" title="Emails the report to your inbox for your records">&#65291; Save as Client</button>
+            <button class="efa-btn-ghost" id="efaEmailClientBtn">&#9993; Email to Client</button>
+          </div>
+        </div>
+        <div class="efa-mail-panel" id="efaMailPanel">
+          <div class="efa-mail-cols">
+            <div>
+              <div class="efa-mail-lbl">For the follow-up appointment, please gather:</div>
+              <div class="efa-mail-chips" id="efaMailChips">
+                ${CHECKLIST.map((c,i)=>`<button class="efa-chip" data-item="${c}">${c}</button>`).join('')}
+              </div>
+              <input type="text" id="efaMailCustom" class="efa-mail-custom" placeholder="Add anything else, then press Enter (e.g. Deferred comp login info)"/>
+              <div class="efa-mail-chips" id="efaMailCustomChips"></div>
+            </div>
+            <div>
+              <div class="efa-mail-lbl">Personal note <span class="opt">optional, added before the closing</span></div>
+              <textarea id="efaMailNote" class="efa-mail-note" placeholder="e.g. It was great meeting you and Robert today. Looking forward to Tuesday."></textarea>
+              <div class="efa-mail-preview">The email thanks them for meeting today, attaches the report, lists the items selected, and closes with your storefront signature. Sent from joshua@edwardsfinancialassociates.com with a copy to your inbox.</div>
+              <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:10px;">
+                <button class="efa-btn-ghost" id="efaMailCancel">Cancel</button>
+                <button class="efa-btn-gold" id="efaMailSend">Send to Client</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="efa-rpt-status" id="efaRptStatus"></div>
+      </div>`;
+    /* wire */
+    const chips=new Set(); const custom=[];
+    rb.querySelectorAll('#efaMailChips .efa-chip').forEach(b=>b.onclick=()=>{ b.classList.toggle('on');
+      b.classList.contains('on')?chips.add(b.dataset.item):chips.delete(b.dataset.item); });
+    const customBox=document.getElementById('efaMailCustom');
+    customBox.addEventListener('keydown',e=>{ if(e.key==='Enter'&&customBox.value.trim()){
+      const v=customBox.value.trim(); custom.push(v);
+      const b=document.createElement('button'); b.className='efa-chip on'; b.textContent=v;
+      b.onclick=()=>{ custom.splice(custom.indexOf(v),1); b.remove(); };
+      document.getElementById('efaMailCustomChips').appendChild(b); customBox.value=''; e.preventDefault(); }});
+    document.getElementById('efaEmailClientBtn').onclick=()=>{ document.getElementById('efaMailPanel').classList.toggle('open'); };
+    document.getElementById('efaMailCancel').onclick=()=>document.getElementById('efaMailPanel').classList.remove('open');
+    document.getElementById('efaSaveClientBtn').onclick=()=>sendReport('self',{});
+    document.getElementById('efaMailSend').onclick=()=>{
+      const to=(document.getElementById('clientEmail').value||'').trim();
+      if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(to)){ rptStatus('Enter the client\'s email address first.',true); return; }
+      sendReport('client',{to, items:[...chips,...custom], note:document.getElementById('efaMailNote').value.trim()});
+    };
+  }
+  function rptStatus(msg,isErr){
+    const el=document.getElementById('efaRptStatus'); if(!el) return;
+    el.textContent=msg; el.classList.toggle('err',!!isErr); el.classList.add('show');
+    clearTimeout(el._t); el._t=setTimeout(()=>el.classList.remove('show'),5000);
+  }
+  function sessionSummary(){
+    try{
+      const sys=ALL_PLANS[_sys], plan=sys.plans[_planKey];
+      const gp=document.getElementById('gapPicker');
+      const idx=(gp&&gp.value!=='')?parseInt(gp.value):0; const sc=_results[idx];
+      return `${sys.name} · ${plan.label} · FAC $${Math.round(_salary).toLocaleString()} · Scenario age ${sc.age}: $${Math.round(sc.monthly).toLocaleString()}/mo ($${Math.round(sc.annual).toLocaleString()}/yr)`;
+    }catch(e){ return ''; }
+  }
+  async function sendReport(mode,opts){
+    const name=(document.getElementById('clientName').value||'').trim();
+    if(!name){ rptStatus('Enter a client name first.',true); return; }
+    if(typeof _results==='undefined'||!_results||!_results.length){ rptStatus('Run a comparison first.',true); return; }
+    /* build the report silently */
+    window._suppressReportDownload=true;
+    try{ generateReport(); } finally { window._suppressReportDownload=false; }
+    if(!window._lastReportHTML){ rptStatus('Could not build the report.',true); return; }
+    const btn=document.getElementById(mode==='self'?'efaSaveClientBtn':'efaMailSend');
+    const orig=btn.textContent; btn.disabled=true; btn.textContent='Sending…';
+    try{
+      const res=await fetch('/api/send-report',{method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({mode, clientName:name, to:opts.to||null, items:opts.items||[], note:opts.note||'',
+          summary:sessionSummary(), fileName:window._lastReportName||'Pension_Review.html', reportHtml:window._lastReportHTML})});
+      const j=await res.json().catch(()=>({}));
+      if(res.ok && j.ok){
+        if(mode==='self') rptStatus(`Saved. ${name}'s report is on its way to your inbox.`);
+        else { rptStatus(`Sent to ${opts.to}. A copy landed in your inbox.`); document.getElementById('efaMailPanel').classList.remove('open'); }
+      } else rptStatus(j.error||'Send failed. Check that /api/send-report is deployed with the Resend key.',true);
+    }catch(e){ rptStatus('Send failed: '+(e.message||'network error'),true); }
+    btn.disabled=false; btn.textContent=orig;
+  }
+
+  /* ═══════════ calculators ═══════════ */
+  function growSeries(start,contrib,freq,yrs,rate){
+    const rows=[]; let bal=start, put=start;
+    for(let y=1;y<=yrs;y++){
+      if(freq==='mo'){ const mr=rate/12; for(let m=0;m<12;m++){ bal=bal*(1+mr)+contrib; } put+=contrib*12; }
+      else { bal=bal*(1+rate)+contrib; put+=contrib; }
+      rows.push({y,bal,put});
+    }
+    return rows;
+  }
+  function calcBlock(kind,age){
+    const uid='efaC_'+kind;
+    const defC = kind==='roth' ? Math.min(625,Math.round(rothLimit(age||45)/12)) : (kind==='qp'?800:(kind==='iul'?1000:0));
+    const inputs = kind==='fia'
+      ? `<div class="efa-ci"><label>Premium ($)</label><input id="${uid}_p" type="number" value="200000"></div>
+         <div class="efa-ci"><label>Deferral Yrs</label><input id="${uid}_y" type="number" value="7" min="0" max="30"></div>
+         <div class="efa-ci"><label>Growth %/yr</label><input id="${uid}_r" type="number" value="5" step="0.25"></div>
+         <div class="efa-ci"><label>Payout Rate %</label><input id="${uid}_po" type="number" value="5.5" step="0.1"></div>
+         <div class="efa-ci"><label>&nbsp;</label><button class="efa-go" style="width:100%;padding:8px;" onclick="EFA_PATHS.runCalc('${kind}')">Run</button></div>`
+      : `<div class="efa-ci"><label>Starting ($)</label><input id="${uid}_s" type="number" value="${kind==='qp'?25000:0}"></div>
+         <div class="efa-ci"><label>Contribution ($)</label><input id="${uid}_c" type="number" value="${defC}"></div>
+         <div class="efa-ci"><label>Frequency</label><select id="${uid}_f"><option value="mo">Monthly</option><option value="yr">Annual</option></select></div>
+         <div class="efa-ci"><label>Years</label><input id="${uid}_y" type="number" value="15" min="1" max="45"></div>
+         <div class="efa-ci"><label>Rate %/yr</label><input id="${uid}_r" type="number" value="${kind==='iul'?6:7}" step="0.25" onkeyup="EFA_PATHS.runCalc('${kind}')"></div>`;
+    const titles={qp:'Qualified Plan Growth Calculator',roth:'Roth IRA Growth Calculator',iul:'IUL Accumulation Concept',fia:'FIA Income Estimator'};
+    const subs={qp:'2026 limits enforced below',roth:'2026 limits &amp; phase-outs below',iul:'Hypothetical — not a carrier illustration',fia:'Hypothetical rider math — carrier terms govern'};
+    return `<div class="efa-calc">
+      <div class="efa-calc-head"><span class="ct">${titles[kind]}</span><span class="cl">${subs[kind]}</span></div>
+      <div class="efa-calc-in" oninput="EFA_PATHS.runCalc('${kind}')">${inputs}</div>
+      <div class="efa-calc-out" id="${uid}_out"></div>
+      <div id="${uid}_lim"></div>
+      <div class="efa-ctab" id="${uid}_tab"></div>
+    </div>`;
+  }
+  function runCalc(kind){
+    const uid='efaC_'+kind, age=(typeof getCurrentAge==='function'?getCurrentAge():null)||45;
+    const out=$(uid+'_out'), lim=$(uid+'_lim'), tab=$(uid+'_tab');
+    if(!out) return;
+    if(kind==='fia'){
+      const p=+($(uid+'_p').value)||0, y=+($(uid+'_y').value)||0, r=(+($(uid+'_r').value)||0)/100, po=(+($(uid+'_po').value)||0)/100;
+      const val=p*Math.pow(1+r,y), ann=val*po;
+      out.innerHTML=tile('Value at Income Start',M(val))+tile('Annual Income for Life',M(ann))+tile('Monthly Income',M(ann/12));
+      lim.innerHTML=`<div class="efa-lim"><b>Illustrative only.</b> Actual roll-up credits, payout percentages by age, and rider fees are set by the carrier's contract. Payout rates generally rise with income start age.</div>`;
+      tab.innerHTML=''; return;
+    }
+    const s=+($(uid+'_s').value)||0, c=+($(uid+'_c').value)||0, f=$(uid+'_f').value, y=+($(uid+'_y').value)||1, r=(+($(uid+'_r').value)||0)/100;
+    const rows=growSeries(s,c,f,y,r), last=rows[rows.length-1]||{bal:s,put:s};
+    const annC=f==='mo'?c*12:c;
+    out.innerHTML=tile('Ending Balance',M(last.bal))+tile('Total Contributed',M(last.put))+tile('Growth',M(last.bal-last.put));
+    /* limit intelligence */
+    if(kind==='qp'){
+      const cap=qpLimit(age), over=annC>cap;
+      lim.innerHTML=`<div class="efa-lim${over?' warn':''}">
+        <b>2026 employee deferral limit at age ${age}: ${M(cap)}</b> per plan
+        (${M(L26.deferral)} base${age>=60&&age<=63?` + ${M(L26.super6063)} super catch-up, ages 60–63`:(age>=50?` + ${M(L26.catch50)} catch-up at 50+`:'')}).
+        ${over?`This contribution of <b>${M(annC)}/yr exceeds the single-plan limit</b> — legitimate if split across a 403(b) <i>and</i> a 457(b), which are separate ${M(L26.deferral)} buckets (combined ${M(qpLimit(age)*2)} with catch-ups).`:''}
+        457(b) special pre-retirement catch-up can reach ${M(L26.s457Special)} in the final 3 years before normal retirement age. Total annual additions (employee + employer) cap: ${M(L26.addl415)} (§415(c)).
+        Earners over ${M(L26.rothCatchWage)} in prior-year FICA wages must make catch-ups as Roth starting 2026.</div>`;
+    } else if(kind==='roth'){
+      const cap=rothLimit(age), over=annC>cap;
+      lim.innerHTML=`<div class="efa-lim${over?' warn':''}">
+        <b>2026 Roth IRA limit at age ${age}: ${M(cap)}</b> (${M(L26.ira)}${age>=50?` + ${M(L26.iraCatch)} catch-up`:''}) — and never more than earned income.
+        ${over?`<b>${M(annC)}/yr exceeds the limit</b> — the excess belongs in a Roth 403(b)/457(b) (no income phase-out, ${M(L26.deferral)} limit) or another bucket.`:''}
+        MAGI phase-out: single/HoH $153,000–$168,000 · married filing jointly $242,000–$252,000. Above the range, direct contributions are off the table.</div>`;
+    } else if(kind==='iul'){
+      lim.innerHTML=`<div class="efa-lim"><b>No IRS contribution limit and no 59½ gate</b> — the contrast point. Funding is bounded instead by the policy's MEC line and death-benefit corridor; a properly structured design keeps loans income-tax-free. Est. sustainable loan income at 5% of ending value: <b>${M(last.bal*0.05)}/yr (${M(last.bal*0.05/12)}/mo)</b> — hypothetical, carrier illustration required.</div>`;
+    }
+    /* year table */
+    tab.innerHTML=`<table><thead><tr><th>Year</th><th>Contributed</th><th>Balance</th><th>Growth</th></tr></thead><tbody>
+      ${rows.map(x=>`<tr><td>Yr ${x.y}</td><td>${M(x.put)}</td><td>${M(x.bal)}</td><td>${M(x.bal-x.put)}</td></tr>`).join('')}</tbody></table>`;
+  }
+  function tile(l,v){ return `<div class="efa-co"><div class="ol">${l}</div><div class="ov">${v}</div></div>`; }
+
+  /* ═══════════ strategy screen ═══════════ */
+  function renderStrategies(){
+    const age=(typeof getCurrentAge==='function'?getCurrentAge():null)||45;
+    const name=($('efaCbName')&&$('efaCbName').value.trim())||($('clientName')&&$('clientName').value.trim())||'';
+    $('efaStratWho').textContent=(name?name+' · ':'')+'Edwards Financial & Associates';
+    const body=$('efaStratBody');
+    body.innerHTML = Array.from(selected).map(k=>{
+      const s=STRATS[k];
+      return `<div class="efa-sd" style="--sd-accent:${s.accent};">
+        <div class="efa-sd-head"><h4>${s.t}</h4><span class="tag">${s.tag}</span></div>
+        <div class="efa-sd-grid">
+          <div class="efa-sd-concept"><div class="efa-sd-lbl">The Concept</div>${s.concept.map(p=>`<p>${p}</p>`).join('')}</div>
+          <div class="efa-sd-access"><div class="efa-sd-lbl">Liquidity · Use · Control</div><ul>${s.access.map(a=>`<li>${a}</li>`).join('')}</ul></div>
+        </div>
+        <div class="efa-cd"><div class="efa-sd-lbl">Case Designs</div>
+          <div class="efa-cd-chips">${s.cases.map(c=>`<button class="efa-chip" onclick="this.classList.toggle('on')">${c}</button>`).join('')}</div>
+        </div>
+        ${s.calc?calcBlock(s.calc,age):'<div style="height:14px;"></div>'}
+      </div>`;
+    }).join('') + `<div class="efa-strat-disc"><b style="color:var(--navy);">Presentation notes:</b> concepts first, numbers second. Calculators are hypothetical level-rate projections for education — not carrier illustrations, plan documents, or tax advice. 2026 contribution limits and phase-outs per IRS Notice 2025-67; access rules summarized from the Internal Revenue Code — the plan document and a tax professional govern the client's specifics.</div>`;
+    Array.from(selected).forEach(k=>{ const s=STRATS[k]; if(s.calc) runCalc(s.calc); });
+  }
+
+  /* ═══════════ illustrator hand-off — native module (efa-illus-js) ═══════════ */
+  function openIllustrator(){
+    if(window.EFA_ILLUS && window.EFA_ILLUS.open){ window.EFA_ILLUS.open(); }
+    else alert('Illustrator module not loaded.');
+  }
+  function openPicker(){ $('efaPickOverlay').classList.add('on'); document.body.style.overflow='hidden'; }
+  function openStrategies(){ if(!selected.size) return; renderStrategies(); $('efaPickOverlay').classList.remove('on'); $('efaStratOverlay').classList.add('on'); document.body.style.overflow='hidden'; }
+  function back(){
+    const st=$('efaStratOverlay');
+    if(st.classList.contains('on')){ st.classList.remove('on'); $('efaPickOverlay').classList.add('on'); return; }  /* strategy screen → back to the tile picker */
+    $('efaPickOverlay').classList.remove('on');
+    const io=$('efaIllusOverlay'); if(io) io.classList.remove('on');
+    document.body.style.overflow=''; }
+
+  pickOv.querySelector('#efaPresentBtn').onclick=openStrategies;
+  pathsEl.querySelector('#efaIllusBtn').onclick=openIllustrator;
+  pathsEl.querySelector('#efaPickBtn').onclick=openPicker;
+
+  window.EFA_PATHS={runCalc, back, openStrategies, openIllustrator, _strats:STRATS, _sel:selected};
+})();
+</script>
+
+<style id="efa-illus-css">
+  .efa-il-wrap{max-width:1120px;margin:0 auto;}
+  .efa-il-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px;}
+  .efa-il-f{background:white;border-radius:8px;padding:12px 16px;box-shadow:var(--shadow);border-top:3px solid var(--gold);}
+  .efa-il-f label{display:block;font-size:0.6rem;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:var(--gray-400);margin-bottom:5px;}
+  .efa-il-f input{width:100%;border:none;border-bottom:1.5px solid var(--gray-200);font-family:'Montserrat',sans-serif;font-size:1.25rem;font-weight:700;color:var(--navy);background:transparent;outline:none;padding:2px 0;}
+  .efa-il-f .carried{font-size:0.58rem;color:var(--gold);font-weight:700;letter-spacing:0.05em;text-transform:uppercase;margin-top:4px;}
+  .efa-il-f .carried.def{color:var(--gray-400);}
+  .efa-il-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;}
+  @media(max-width:900px){.efa-il-grid,.efa-il-strip{grid-template-columns:1fr;}}
+  .efa-il-card{background:white;border-radius:8px;box-shadow:var(--shadow);overflow:hidden;}
+  .efa-il-ch{background:var(--navy);padding:9px 16px;display:flex;justify-content:space-between;align-items:center;gap:8px;}
+  .efa-il-ch .t{font-size:0.68rem;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:var(--gold-light);}
+  .efa-il-ch .v{font-family:'Montserrat',sans-serif;font-size:0.9rem;font-weight:700;color:white;font-variant-numeric:tabular-nums;}
+  .efa-il-ch .src{font-size:0.56rem;color:rgba(255,255,255,0.45);letter-spacing:0.05em;text-transform:uppercase;}
+  .efa-il-tbl{width:100%;border-collapse:collapse;}
+  .efa-il-tbl th{font-size:0.56rem;text-transform:uppercase;letter-spacing:0.05em;color:var(--gray-400);text-align:left;padding:7px 8px 4px;border-bottom:1px solid var(--gray-200);}
+  .efa-il-tbl td{padding:4px 6px;border-bottom:1px solid var(--gray-200);}
+  .efa-il-tbl input,.efa-il-tbl select{width:100%;border:1px solid transparent;border-radius:4px;padding:5px 6px;font-size:0.74rem;font-family:'Montserrat',sans-serif;background:var(--gray-100);color:var(--gray-700);}
+  .efa-il-tbl input:focus{border-color:var(--gold);background:white;outline:none;}
+  .efa-il-del{background:none;border:none;color:var(--red);cursor:pointer;font-size:0.85rem;padding:2px 6px;}
+  .efa-il-add{background:none;border:1.5px dashed var(--gray-200);border-radius:5px;color:var(--gray-400);cursor:pointer;font-size:0.68rem;font-weight:700;padding:6px;width:calc(100% - 20px);margin:8px 10px 10px;font-family:'Montserrat',sans-serif;letter-spacing:0.05em;}
+  .efa-il-add:hover{border-color:var(--gold);color:var(--gold);}
+  .efa-il-asm{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;padding:12px 16px;}
+  .efa-il-asm .af label{display:block;font-size:0.58rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:var(--gold);margin-bottom:3px;}
+  .efa-il-asm .af input{width:100%;border:none;border-bottom:1.5px solid var(--gray-200);font-family:'Montserrat',sans-serif;font-size:1.05rem;font-weight:700;color:var(--navy);background:transparent;outline:none;}
+  .efa-il-tgl{display:flex;gap:22px;padding:0 16px 12px;flex-wrap:wrap;align-items:center;}
+  .efa-il-tgl label{font-size:0.7rem;color:var(--gray-700);display:inline-flex;align-items:center;gap:7px;cursor:pointer;line-height:1;margin:0;}
+  .efa-il-tgl input[type="checkbox"]{margin:0;width:14px;height:14px;accent-color:var(--gold);flex:0 0 auto;}
+  .efa-il-life{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:12px 16px;}
+  .efa-il-life .lf .l{font-size:0.58rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:var(--gray-400);margin-bottom:3px;}
+  .efa-il-life .lf .big{font-family:'Montserrat',sans-serif;font-size:1.3rem;font-weight:700;color:var(--navy);}
+  .efa-il-life .lf input{border:none;border-bottom:1.5px solid var(--gray-200);font-family:'Montserrat',sans-serif;font-size:1.3rem;font-weight:700;color:var(--navy);background:transparent;width:150px;outline:none;}
+  .efa-il-cta{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:4px 0 10px;flex-wrap:wrap;}
+  /* illustration view — styled to match the Retirement Income Illustrator */
+  .efa-il-sheet{max-width:900px;margin:0 auto;background:white;border-radius:14px;box-shadow:0 10px 40px rgba(10,31,60,0.12);padding:26px 30px 20px;}
+  .efa-il-sheet-head{display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin-bottom:18px;flex-wrap:wrap;}
+  .efa-il-sheet-head h3{font-family:'Cormorant Garamond',serif;font-size:1.5rem;color:var(--navy);font-weight:700;}
+  .efa-il-sheet-head .echo{font-size:0.66rem;color:var(--gray-400);letter-spacing:0.04em;}
+  .efa-il-res{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px;}
+  .efa-il-rc{background:white;border:1.5px solid var(--navy);border-radius:9px;padding:13px 16px;}
+  .efa-il-rc.rev{border-color:var(--gold);}
+  .efa-il-rc .h{font-size:0.6rem;font-weight:700;letter-spacing:0.09em;text-transform:uppercase;color:var(--navy);margin-bottom:7px;}
+  .efa-il-rc.rev .h{color:var(--gold);}
+  .efa-il-rc .line{display:flex;justify-content:space-between;align-items:baseline;gap:10px;}
+  .efa-il-rc .res{font-size:0.86rem;font-weight:700;}
+  .efa-il-rc .res.good{color:var(--green);} .efa-il-rc .res.bad{color:var(--red);}
+  .efa-il-rc .bal{font-family:'Montserrat',sans-serif;font-size:1.25rem;font-weight:700;color:var(--navy);}
+  .efa-il-rc .sub{font-size:0.66rem;color:var(--gray-400);margin-top:3px;}
+  .efa-il-status{display:none;background:#fdf6e3;border:1px solid var(--gold-pale);border-left:4px solid var(--gold);border-radius:6px;padding:10px 16px;font-size:0.78rem;color:var(--gray-700);margin-bottom:14px;line-height:1.6;}
+  .efa-il-status.on{display:block;}
+  .efa-il-levers{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:18px;}
+  @media(max-width:900px){.efa-il-levers{grid-template-columns:repeat(2,1fr);}.efa-il-res{grid-template-columns:1fr;}}
+  .efa-lever{background:var(--navy);border-radius:8px;padding:12px 10px;cursor:pointer;border:none;border-top:3px solid transparent;transition:all .15s;text-align:center;font-family:'Montserrat',sans-serif;}
+  .efa-lever:hover{transform:translateY(-2px);box-shadow:0 8px 22px rgba(10,31,60,0.35);}
+  .efa-lever.touched{border-top-color:var(--gold);background:#1b2f52;}
+  .efa-lever .name{font-size:0.58rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:rgba(255,255,255,0.65);}
+  .efa-lever .val{font-family:'Montserrat',sans-serif;font-size:0.95rem;font-weight:700;color:white;margin-top:5px;line-height:1.3;}
+  .efa-lever.touched .val{color:var(--gold-light);}
+  .efa-lever .val .per{font-size:0.6rem;color:rgba(255,255,255,0.5);font-weight:600;}
+  .efa-lever .val .yr{display:block;font-size:0.62rem;color:rgba(255,255,255,0.5);font-weight:600;}
+  .efa-lever .tap{font-size:0.52rem;color:rgba(255,255,255,0.4);margin-top:5px;text-transform:uppercase;letter-spacing:0.08em;}
+  .efa-il-tblwrap{border:1px solid var(--gray-200);border-radius:9px;overflow:hidden;margin-bottom:12px;}
+  .efa-il-band{display:grid;grid-template-columns:1fr 1fr 74px 1fr 1fr;background:var(--navy);position:sticky;top:0;z-index:3;}
+  .efa-il-band .b{font-family:'Cormorant Garamond',serif;font-size:1.02rem;font-weight:700;color:white;display:flex;align-items:center;justify-content:center;height:38px;grid-column:span 2;}
+  .efa-il-band .b.rev{color:var(--gold-light);}
+  .efa-il-band .b.age{font-family:'Montserrat',sans-serif;font-size:0.6rem;letter-spacing:0.09em;text-transform:uppercase;color:var(--gold-light);background:#1b2f52;grid-column:span 1;}
+  .efa-il-thead{display:grid;grid-template-columns:1fr 1fr 74px 1fr 1fr;background:white;border-bottom:1px solid var(--gray-200);position:sticky;top:38px;z-index:2;}
+  .efa-il-thead div{font-size:0.56rem;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:var(--gray-400);padding:7px 12px;text-align:right;}
+  .efa-il-thead .age{text-align:center;background:var(--gray-100);}
+  .efa-il-thead .ls-h{cursor:pointer;color:var(--gold);}
+  .efa-il-thead .ls-h:hover{text-decoration:underline dotted;text-underline-offset:3px;}
+  .efa-il-scroll{max-height:460px;overflow-y:auto;}
+  .efa-il-r{display:grid;grid-template-columns:1fr 1fr 74px 1fr 1fr;font-size:0.76rem;border-bottom:1px solid var(--gray-200);font-family:'Montserrat',sans-serif;}
+  .efa-il-r>div{padding:5px 12px;text-align:right;color:var(--navy);font-weight:600;background:white;font-variant-numeric:tabular-nums;font-feature-settings:'tnum';}
+  .efa-il-r.alt>div{background:#fbf7ee;}
+  .efa-il-r.alt .age{background:#f2ecdd;}
+  .efa-il-r .ls{color:var(--gray-400);font-weight:500;}
+  .efa-il-r .ls.click{cursor:pointer;color:var(--navy);font-weight:700;}
+  .efa-il-r .ls.rv.click{color:var(--gold);}
+  .efa-il-r .age{text-align:center;font-weight:700;color:var(--navy);background:var(--gray-100);}
+  
+  .efa-il-r.retire>div{border-top:2px solid var(--gold);border-bottom:2px solid var(--gold);}
+  .efa-il-r .depleted{color:var(--red);}
+  .efa-il-legend{font-size:0.66rem;color:var(--gray-400);line-height:1.7;margin-bottom:8px;}
+  .efa-il-legend b{color:var(--navy);}
+  .efa-il-legend .goldrule{color:var(--gold);font-weight:700;}
+  .efa-il-foot{font-size:0.64rem;color:var(--gray-400);line-height:1.65;border-top:1px solid var(--gray-200);padding-top:10px;}
+  .efa-il-btnrow{max-width:900px;margin:12px auto 0;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;}
+  .efa-il-btnrow .grp{display:flex;gap:10px;flex-wrap:wrap;}
+  .efa-btn-ghost{background:white;border:1.5px solid var(--gray-200);border-radius:7px;padding:10px 18px;font-family:'Montserrat',sans-serif;font-size:0.7rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:var(--navy);cursor:pointer;transition:all .15s;}
+  .efa-btn-ghost:hover{border-color:var(--gold);color:var(--gold);}
+  .efa-btn-gold{background:var(--gold);border:none;border-bottom:2px solid #8a6012;border-radius:7px;padding:10px 20px;font-family:'Montserrat',sans-serif;font-size:0.7rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:var(--navy);cursor:pointer;}
+  .efa-il-modal.wide{max-width:760px;}
+  .efa-il-modal table td,.efa-il-modal table th{font-variant-numeric:tabular-nums;font-feature-settings:'tnum';}
+  .efa-money{text-align:right;font-variant-numeric:tabular-nums;}
+  /* modal */
+  .efa-il-modalbg{position:fixed;inset:0;background:rgba(10,20,40,0.55);z-index:7000;display:none;align-items:center;justify-content:center;padding:20px;}
+  .efa-il-modalbg.on{display:flex;}
+  .efa-il-modal{background:white;border-radius:10px;max-width:520px;width:100%;box-shadow:0 24px 80px rgba(0,0,0,0.4);overflow:hidden;}
+  .efa-il-mh{background:var(--navy);padding:12px 18px;display:flex;justify-content:space-between;align-items:center;}
+  .efa-il-mh h3{font-family:'Cormorant Garamond',serif;font-size:1.2rem;color:white;font-weight:700;}
+  .efa-il-mh .x{background:none;border:none;color:rgba(255,255,255,0.6);font-size:1.3rem;cursor:pointer;}
+  .efa-il-mb{padding:16px 18px;}
+  .efa-il-mb p{font-size:0.76rem;color:var(--gray-700);line-height:1.6;margin-bottom:10px;}
+  .efa-il-tabs{display:flex;gap:6px;margin-bottom:12px;}
+  .efa-il-tab{flex:1;background:var(--gray-100);border:1.5px solid var(--gray-200);border-radius:5px;padding:7px;font-size:0.66rem;font-weight:700;color:var(--gray-400);cursor:pointer;font-family:'Montserrat',sans-serif;letter-spacing:0.04em;text-transform:uppercase;}
+  .efa-il-tab.on{background:var(--gold);border-color:var(--gold);color:var(--navy);}
+  .efa-il-panel{display:none;} .efa-il-panel.on{display:block;}
+  .efa-il-inrow{display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap;}
+  .efa-il-bigin{border:none;border-bottom:2px solid var(--gold);font-family:'Montserrat',sans-serif;font-size:1.3rem;font-weight:700;color:var(--navy);width:130px;outline:none;background:transparent;}
+  .efa-il-calcbtn{background:var(--gold);color:var(--navy);border:none;border-radius:6px;padding:9px 18px;font-family:'Montserrat',sans-serif;font-size:0.74rem;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;cursor:pointer;border-bottom:2px solid #8a6012;}
+  .efa-il-chk{font-size:0.72rem;color:var(--gray-700);display:flex;align-items:center;gap:5px;}
+  body.efa-il-print .efa-topbar,body.efa-il-print .efa-rail,body.efa-il-print .header,body.efa-il-print .system-bar{display:none!important;}
+  @media print{
+    body.efa-il-print *{visibility:hidden;}
+    body.efa-il-print #efaIllusOverlay,body.efa-il-print #efaIllusOverlay *{visibility:visible;}
+    body.efa-il-print #efaIllusOverlay{position:absolute;inset:0;overflow:visible;}
+    body.efa-il-print .efa-ov-foot,body.efa-il-print .efa-ov-head button,body.efa-il-print .efa-il-levers,body.efa-il-print .no-print{display:none!important;}
+    body.efa-il-print .efa-il-rows{max-height:none;overflow:visible;}
+  }
+</style>
+<script id="efa-illus-js">
+(function(){
+  const $=id=>document.getElementById(id);
+  const money=n=>'$'+Math.round(n).toLocaleString('en-US');
+  const num=v=>parseFloat(String(v).replace(/[^0-9.\-]/g,''))||0;
+  const pctv=v=>num(v)/100;
+  const esc=s=>String(s).replace(/"/g,'&quot;').replace(/</g,'&lt;');
+
+  /* ═══ state: rebuilt LIVE from the calculator session on every open ═══ */
+  const ID={incomes:[],annualSavings:[],accounts:[],dbs:[],futureAssets:[],futureExpenses:[],legacy:0};
+  const F={curAge:0,retAge:65,lifeExp:90,accRate:'6%',distRate:'5%',infl:'3%',tax:'25%',retLife:0,inflateSave:true,cola:true};
+  const rev={accRate:null,distRate:null,saving:null,retAge:null,retLife:null,infl:null};
+  let statusMsg='', view='assume', clientName='';
+  const sum=a=>a.reduce((t,x)=>t+(+x.amount||0),0);
+
+  function pullSession(){
+    if(typeof _results==='undefined'||!_results||!_results.length) return false;
+    const gp=$('gapPicker');
+    const idx=(gp&&gp.value!=='')?parseInt(gp.value):_results.reduce((b,r,i)=>r.annual>_results[b].annual?i:b,0);
+    const sc=_results[idx];
+    const sys=ALL_PLANS[_sys], plan=sys.plans[_planKey];
+    const colaM=String(plan.cola||'').match(/(\d+(?:\.\d+)?)/);
+    clientName=($('efaCbName')&&$('efaCbName').value.trim())||($('clientName')&&$('clientName').value.trim())||'';
+
+    /* carried: ages */
+    const cur=(typeof getCurrentAge==='function'&&getCurrentAge()!=null)?getCurrentAge():(parseInt($('startAge').value)||45);
+    F.curAge=cur; F.retAge=sc.age;
+    /* carried: income = FAC */
+    ID.incomes=[{desc:'Annual Earned Income (FAC)',amount:Math.round(_salary)}];
+    /* carried: assets & contributions */
+    ID.accounts=[]; ID.annualSavings=[];
+    try{(typeof getAssets==='function'?getAssets({on:false,infl:0}):[]).forEach(a=>{
+      let nm=a.name||'Account'; if(/^─/.test(nm)) nm='Account';
+      const tax=/roth|hsa|529/i.test(nm)?'Tax-Free':(/brokerage|real estate|rental|business/i.test(nm)?'Taxable':'Tax Def.');
+      if(a.bal>0) ID.accounts.push({name:nm,amount:Math.round(a.bal),tax});
+      if(a.con>0) ID.annualSavings.push({desc:nm+' contribution',amount:Math.round(a.con)});
+    });}catch(e){}
+    /* carried: pension + other income → defined benefits */
+    ID.dbs=[{desc:sys.name+' Pension — '+plan.label,amount:Math.round(sc.annual),cola:colaM?parseFloat(colaM[1]):2,
+      startAge:sc.age,endAge:99,taxable:100,excl:false}];
+    try{(typeof getIncomes==='function'?getIncomes({on:false},0):[]).forEach(x=>{
+      const t=/social security/i.test(x.name)?50:(/roth|iul|whole life/i.test(x.name)?0:100);
+      ID.dbs.push({desc:x.name,amount:Math.round(x.annToday),cola:+(x.cola*100).toFixed(2),startAge:sc.age,endAge:99,taxable:t,excl:false});
+    });}catch(e){}
+    /* carried: retirement lifestyle = FAC; inflation = session inflation when enabled, else 3% default */
+    F.retLife=Math.round(_salary);
+    const gi=(typeof getInfl==='function')?getInfl():{on:false};
+    F.infl=gi.on?((gi.infl*100).toFixed(1)+'%'):'3%';
+    /* generic defaults ONLY: acc/dist/tax/lifeExp */
+    F.accRate='6%'; F.distRate='5%'; F.tax='25%'; F.lifeExp=90;
+    ID.futureAssets=[]; ID.futureExpenses=[]; ID.legacy=0;
+    Object.keys(rev).forEach(k=>rev[k]=null); statusMsg=''; view='assume';
+    return true;
+  }
+
+  /* ═══ engine (ported faithfully from the Retirement Income Illustrator) ═══ */
+  function dbIncomeAt(age){let t=0;ID.dbs.forEach(d=>{if(d.excl)return;
+    if(age>=d.startAge&&age<=d.endAge)t+=(+d.amount||0)*Math.pow(1+(+d.cola||0)/100,age-d.startAge);});return t;}
+  const faAt=a=>ID.futureAssets.reduce((t,x)=>t+(+x.age===a?(+x.amount||0):0),0);
+  const feAt=a=>ID.futureExpenses.reduce((t,x)=>t+(+x.age===a?(+x.amount||0):0),0);
+  function baseInputs(){return{curAge:+F.curAge,retAge:+F.retAge,lifeExp:+F.lifeExp,
+    income:sum(ID.incomes),saving:sum(ID.annualSavings),inflateSave:F.inflateSave,accum:sum(ID.accounts),
+    accRate:pctv(F.accRate),distRate:pctv(F.distRate),infl:pctv(F.infl),tax:pctv(F.tax),
+    retLife:+F.retLife,cola:F.cola,legacy:+ID.legacy||0};}
+  function applyRev(b){const a={...b};
+    if(rev.accRate!=null)a.accRate=rev.accRate; if(rev.distRate!=null)a.distRate=rev.distRate;
+    if(rev.saving!=null)a.saving=rev.saving; if(rev.retAge!=null)a.retAge=rev.retAge;
+    if(rev.retLife!=null)a.retLife=rev.retLife; if(rev.infl!=null)a.infl=rev.infl; return a;}
+  function project(a){const rows=[];let bal=a.accum,depletedAt=null;
+    const ytr=Math.max(0,a.retAge-a.curAge),needAtRet=a.retLife*Math.pow(1+a.infl,ytr);
+    for(let age=a.curAge;age<=a.lifeExp;age++){
+      const yr=age-a.curAge,working=age<a.retAge;let lifestyle=0;
+      if(working){const c=a.inflateSave?a.saving*Math.pow(1+a.infl,yr):a.saving;bal=bal*(1+a.accRate)+c;}
+      else{const ry=age-a.retAge;const need=a.cola?needAtRet*Math.pow(1+a.infl,ry):needAtRet;
+        lifestyle=need;bal=(bal-Math.max(0,need-dbIncomeAt(age)))*(1+a.distRate);}
+      bal+=faAt(age)-feAt(age);
+      if(bal<0){if(depletedAt===null)depletedAt=age;bal=0;}
+      rows.push({age,bal,lifestyle,retire:age===a.retAge});}
+    return{rows,depletedAt,endBal:bal,a};}
+  function balanceAtAge(a,target){let bal=a.accum;
+    const ytr=Math.max(0,a.retAge-a.curAge),needAtRet=a.retLife*Math.pow(1+a.infl,ytr);
+    for(let age=a.curAge;age<=target;age++){
+      const yr=age-a.curAge,working=age<a.retAge;
+      if(working){const c=a.inflateSave?a.saving*Math.pow(1+a.infl,yr):a.saving;bal=bal*(1+a.accRate)+c;}
+      else{const ry=age-a.retAge;const need=a.cola?needAtRet*Math.pow(1+a.infl,ry):needAtRet;
+        bal=(bal-Math.max(0,need-dbIncomeAt(age)))*(1+a.distRate);}
+      bal+=faAt(age)-feAt(age);}
+    return bal;}
+  function solveROR(b,la,inc){let lo=-0.5,hi=0.6;for(let i=0;i<90;i++){const m=(lo+hi)/2;
+    (balanceAtAge({...b,accRate:m,distRate:inc?m:b.distRate},la)>b.legacy)?hi=m:lo=m;}return(lo+hi)/2;}
+  function solveSave(b,la){let lo=0,hi=1e7;for(let i=0;i<90;i++){const m=(lo+hi)/2;
+    (balanceAtAge({...b,saving:m},la)>b.legacy)?hi=m:lo=m;}return(lo+hi)/2;}
+  function solveSpend(b,la){let lo=0,hi=Math.max(b.income*4,500000);for(let i=0;i<90;i++){const m=(lo+hi)/2;
+    (balanceAtAge({...b,retLife:m},la)>b.legacy)?lo=m:hi=m;}return(lo+hi)/2;}
+  function solveWork(b,la){for(let age=b.curAge+1;age<=la;age++){
+    if(balanceAtAge({...b,retAge:age},la)>=b.legacy)return age;}return la;}
+
+  /* ═══ overlay skeleton ═══ */
+  const ov=document.createElement('div'); ov.className='efa-overlay'; ov.id='efaIllusOverlay';
+  ov.innerHTML=`
+    <div class="efa-ov-head">
+      <div><div class="ot">Full Retirement <em>Illustration</em></div><div class="os" id="efaIlWho">An extension of this session</div></div>
+      <div style="display:flex;gap:8px;">
+        <button class="efa-back no-print" id="efaIlPrint">Print / Save PDF</button>
+        <button class="efa-back" onclick="EFA_PATHS.back()">&#8249; Back to Path Options</button>
+      </div>
+    </div>
+    <div class="efa-ov-body"><div class="efa-il-wrap" id="efaIlBody"></div></div>
+    <div class="efa-ov-foot">
+      <button class="efa-back" onclick="EFA_PATHS.back()">&#8249; Back to Path Options</button>
+      <div class="efa-foot-note">Pension scenario, ages, assets, contributions, and other income are pulled live from this session each time this opens. Only the return, inflation, tax, and life-expectancy assumptions are defaults — everything else is the client's actual picture.</div>
+    </div>
+    <div class="efa-il-modalbg" id="efaIlModalBg"><div class="efa-il-modal" id="efaIlModal"></div></div>`;
+  document.body.appendChild(ov);
+  /* category suggestion lists — pick one or type anything */
+  const DLISTS={
+    dl_annualSavings:['403(b) contribution','457(b) contribution','401(k) contribution','Roth IRA contribution','Traditional IRA contribution','IUL premium','Whole Life premium','Brokerage investing','HSA contribution','Emergency fund savings'],
+    dl_accounts:['403(b)','457(b)','401(k)','Traditional IRA','Roth IRA','Pension lump sum / DROP','Brokerage account','Savings / CD / Money Market','HSA','Deferred annuity','IUL cash value','Whole Life cash value','Real estate equity','Business interest'],
+    dl_dbs:['Social Security (Client)','Social Security (Spouse)','CalSTRS Pension','CalPERS Pension','LACERA Pension','Spouse / Partner Pension','Annuity income (FIA / SPIA)','IUL policy loan income','Rental income','Part-time / consulting income'],
+    dl_futureAssets:['Home sale proceeds','Downsize proceeds','Inheritance','DROP lump sum','Business sale','Life insurance proceeds','457(b) lump distribution','Investment property sale'],
+    dl_futureExpenses:['Wedding','Roof / major home repair','New vehicle','College tuition','Long-term care event','Major medical expense','Travel fund','Home purchase / down payment']
+  };
+  Object.entries(DLISTS).forEach(([id,items])=>{
+    const dl=document.createElement('datalist'); dl.id=id;
+    dl.innerHTML=items.map(x=>`<option value="${x}">`).join('');
+    document.body.appendChild(dl);
+  });
+  $('efaIlModalBg').addEventListener('click',e=>{if(e.target.id==='efaIlModalBg')closeModal();});
+  $('efaIlPrint').onclick=()=>{document.body.classList.add('efa-il-print');window.print();
+    setTimeout(()=>document.body.classList.remove('efa-il-print'),400);};
+
+  /* ═══ assumptions view (edit-in-place lists) ═══ */
+  function listCard(title,src,rows,cols,addFn){
+    return `<div class="efa-il-card">
+      <div class="efa-il-ch"><span class="t">${title}</span><span style="display:flex;align-items:baseline;gap:8px;"><span class="src">${src}</span><span class="v" data-tot="${addFn}">${money(sum(rows))}</span></span></div>
+      <table class="efa-il-tbl"><thead><tr>${cols.map(c=>`<th${c.w?` style="width:${c.w}"`:''}>${c.h}</th>`).join('')}<th style="width:30px"></th></tr></thead>
+      <tbody>${rows.map((r,i)=>`<tr>${cols.map(c=>`<td>${c.cell(r,i)}</td>`).join('')}
+        <td><button class="efa-il-del" data-list="${addFn}" data-del="${i}">×</button></td></tr>`).join('')}</tbody></table>
+      <button class="efa-il-add" data-add="${addFn}">+ Add row</button>
+    </div>`;
+  }
+  const DL_FOR={annualSavings:'dl_annualSavings',accounts:'dl_accounts',dbs:'dl_dbs',futureAssets:'dl_futureAssets',futureExpenses:'dl_futureExpenses'};
+  const fmtMoney=v=>{const n=+v||0;return n?Math.round(n).toLocaleString('en-US'):(v===0||v==='0'?'0':String(v||''));};
+  const inp=(list,i,f,v,type,extra)=>{
+    const dl=(f==='desc'||f==='name')&&DL_FOR[list]?` list="${DL_FOR[list]}"`:'';
+    if(f==='amount')  /* money fields: text input with commas, numeric keypad */
+      return `<input data-list="${list}" data-i="${i}" data-f="amount" value="${fmtMoney(v)}" type="text" inputmode="numeric" class="efa-money"${extra||''}>`;
+    return `<input data-list="${list}" data-i="${i}" data-f="${f}" value="${esc(v)}"${type?` type="${type}"`:''}${dl}${extra||''}>`;
+  };
+  function renderAssume(){
+    const b=baseInputs();
+    $('efaIlWho').textContent=(clientName?clientName+' · ':'')+'An extension of this session';
+    $('efaIlBody').innerHTML=`
+      <div class="efa-il-strip">
+        <div class="efa-il-f"><label>Current Age</label><input id="efaIlCur" type="number" value="${F.curAge}"><div class="carried">← carried from calculator</div></div>
+        <div class="efa-il-f"><label>Retirement Age</label><input id="efaIlRet" type="number" value="${F.retAge}"><div class="carried">← chosen pension scenario</div></div>
+        <div class="efa-il-f"><label>Life Expectancy</label><input id="efaIlLife" type="number" value="${F.lifeExp}"><div class="carried def">default assumption</div></div>
+      </div>
+      <div class="efa-il-grid">
+        ${listCard('Current Incomes','carried · FAC',ID.incomes,[
+          {h:'Description',cell:(r,i)=>inp('incomes',i,'desc',r.desc)},
+          {h:'Amount ($/yr)',w:'130px',cell:(r,i)=>inp('incomes',i,'amount',r.amount,'number')}],'incomes')}
+        ${listCard('Annual Savings','carried · asset contributions',ID.annualSavings,[
+          {h:'Description',cell:(r,i)=>inp('annualSavings',i,'desc',r.desc)},
+          {h:'Amount ($/yr)',w:'130px',cell:(r,i)=>inp('annualSavings',i,'amount',r.amount,'number')}],'annualSavings')}
+        ${listCard('Accumulated Savings','carried · asset balances',ID.accounts,[
+          {h:'Account',cell:(r,i)=>inp('accounts',i,'name',r.name)},
+          {h:'Balance ($)',w:'120px',cell:(r,i)=>inp('accounts',i,'amount',r.amount,'number')},
+          {h:'Taxation',w:'100px',cell:(r,i)=>`<select data-list="accounts" data-i="${i}" data-f="tax">${['Taxable','Tax Def.','Tax-Free'].map(o=>`<option${o===r.tax?' selected':''}>${o}</option>`).join('')}</select>`}],'accounts')}
+        ${listCard('Defined Benefits','carried · pension + other income',ID.dbs,[
+          {h:'Source',cell:(r,i)=>inp('dbs',i,'desc',r.desc)},
+          {h:'$/yr',w:'100px',cell:(r,i)=>inp('dbs',i,'amount',r.amount,'number')},
+          {h:'COLA%',w:'62px',cell:(r,i)=>inp('dbs',i,'cola',r.cola,'number',' step="0.1"')},
+          {h:'Start',w:'58px',cell:(r,i)=>inp('dbs',i,'startAge',r.startAge,'number')},
+          {h:'End',w:'58px',cell:(r,i)=>inp('dbs',i,'endAge',r.endAge,'number')}],'dbs')}
+        ${listCard('Future Assets','one-time inflows (sale, inheritance)',ID.futureAssets,[
+          {h:'Description',cell:(r,i)=>inp('futureAssets',i,'desc',r.desc)},
+          {h:'Amount ($)',w:'110px',cell:(r,i)=>inp('futureAssets',i,'amount',r.amount,'number')},
+          {h:'Age',w:'60px',cell:(r,i)=>inp('futureAssets',i,'age',r.age,'number')}],'futureAssets')}
+        ${listCard('Future Expenses','one-time outflows (wedding, roof)',ID.futureExpenses,[
+          {h:'Description',cell:(r,i)=>inp('futureExpenses',i,'desc',r.desc)},
+          {h:'Amount ($)',w:'110px',cell:(r,i)=>inp('futureExpenses',i,'amount',r.amount,'number')},
+          {h:'Age',w:'60px',cell:(r,i)=>inp('futureExpenses',i,'age',r.age,'number')}],'futureExpenses')}
+      </div>
+      <div class="efa-il-card" style="margin-bottom:16px;">
+        <div class="efa-il-ch"><span class="t">Assumptions</span><span class="src">defaults — the only generic inputs</span></div>
+        <div class="efa-il-asm">
+          <div class="af"><label>Accumulation Rate (pre-ret.)</label><input id="efaIlAcc" value="${F.accRate}"></div>
+          <div class="af"><label>Distribution Rate (in ret.)</label><input id="efaIlDist" value="${F.distRate}"></div>
+          <div class="af"><label>Inflation</label><input id="efaIlInfl" value="${F.infl}"></div>
+          <div class="af"><label>Effective Tax</label><input id="efaIlTax" value="${F.tax}"></div>
+        </div>
+        <div class="efa-il-tgl">
+          <label><input type="checkbox" id="efaIlInflSave" ${F.inflateSave?'checked':''}> Inflate savings each year</label>
+          <label><input type="checkbox" id="efaIlCola" ${F.cola?'checked':''}> Lifestyle rises with inflation (COLA)</label>
+        </div>
+        <div class="efa-il-life">
+          <div class="lf"><div class="l">Current Lifestyle (income − tax − savings)</div><div class="big" id="efaIlCurLS">${money(b.income-b.income*b.tax-b.saving)}</div></div>
+          <div class="lf"><div class="l">Retirement Lifestyle (today's $) <span style="color:var(--gold);text-transform:none;letter-spacing:0;">← carried from FAC, adjust to fit</span></div>
+            <input id="efaIlRetLS" value="${money(F.retLife)}"> <span style="font-size:0.68rem;color:var(--gray-400);">/yr</span>
+            <span style="font-size:0.68rem;color:var(--gray-400);margin-left:8px;">Desired legacy: $</span><input id="efaIlLegacy" style="width:90px;font-size:0.9rem;" value="${Math.round(ID.legacy)}">
+          </div>
+        </div>
+      </div>
+      <div class="efa-il-cta">
+        <span style="font-size:0.7rem;color:var(--gray-400);">Adjust anything above — then illustrate.</span>
+        <button class="efa-go" id="efaIlToIll">See the Illustration &#8250;</button>
+      </div>`;
+    /* wire */
+    $('efaIlBody').querySelectorAll('input[data-list],select[data-list]').forEach(el=>{
+      el.addEventListener('input',()=>{const L=ID[el.dataset.list],r=L[+el.dataset.i];if(!r)return;
+        const f=el.dataset.f;r[f]=(f==='desc'||f==='name'||f==='tax')?el.value:num(el.value);
+        if(f==='amount'){ /* live header total — edits show immediately, not just on re-render */
+          const tot=$('efaIlBody').querySelector(`[data-tot="${el.dataset.list}"]`);
+          if(tot) tot.textContent=money(sum(ID[el.dataset.list]));
+        }});
+      el.addEventListener('blur',()=>{ if(el.dataset.f==='amount'){ el.value=fmtMoney(ID[el.dataset.list][+el.dataset.i]?.amount||0); } });
+      el.addEventListener('change',renderAssumeSoft);
+    });
+    $('efaIlBody').querySelectorAll('[data-add]').forEach(b=>b.onclick=()=>{
+      const k=b.dataset.add;
+      const blanks={incomes:{desc:'',amount:0},annualSavings:{desc:'',amount:0},accounts:{name:'',amount:0,tax:'Tax Def.'},
+        dbs:{desc:'',amount:0,cola:2,startAge:F.retAge,endAge:99,taxable:100,excl:false},
+        futureAssets:{desc:'',amount:0,age:F.retAge},futureExpenses:{desc:'',amount:0,age:F.retAge}};
+      ID[k].push({...blanks[k]}); renderAssume();});
+    $('efaIlBody').querySelectorAll('.efa-il-del').forEach(b=>b.onclick=()=>{
+      ID[b.dataset.list].splice(+b.dataset.del,1); renderAssume();});
+    [['efaIlCur','curAge'],['efaIlRet','retAge'],['efaIlLife','lifeExp'],['efaIlAcc','accRate'],
+     ['efaIlDist','distRate'],['efaIlInfl','infl'],['efaIlTax','tax']].forEach(([id,k])=>{
+      $(id).addEventListener('input',()=>{F[k]=(k==='curAge'||k==='retAge'||k==='lifeExp')?num($(id).value):$(id).value;
+        if(k==='tax')updateCurLS();});});
+    $('efaIlInflSave').onchange=e=>F.inflateSave=e.target.checked;
+    $('efaIlCola').onchange=e=>F.cola=e.target.checked;
+    $('efaIlRetLS').addEventListener('input',()=>F.retLife=num($('efaIlRetLS').value));
+    $('efaIlRetLS').addEventListener('blur',()=>{$('efaIlRetLS').value=money(F.retLife);});
+    $('efaIlLegacy').addEventListener('input',()=>ID.legacy=num($('efaIlLegacy').value));
+    $('efaIlToIll').onclick=()=>{view='illustrate';Object.keys(rev).forEach(k=>rev[k]=null);statusMsg='';renderIll();};
+    function updateCurLS(){const b2=baseInputs();$('efaIlCurLS').textContent=money(b2.income-b2.income*b2.tax-b2.saving);}
+    function renderAssumeSoft(){updateCurLS();}
+  }
+
+  /* ═══ illustration view — visual parity with the Retirement Income Illustrator ═══ */
+  let lsToday=false;
+  function lastsText(p){return p.depletedAt===null?{ok:true,txt:'Funds last through age '+p.a.lifeExp}:{ok:false,txt:'Funds run out at age '+p.depletedAt};}
+  const moYr=a=>money(a/12)+'<span class="per">/m</span><span class="yr">'+money(a)+'/yr</span>';
+  /* displayed "Annual Lifestyle": income you can live on — the funded need, dropping to DB income once the account is spent */
+  function shownLS(row,proj,inflRate,curAge,useToday){
+    if(!row.lifestyle && !(proj.depletedAt!==null&&row.age>=proj.depletedAt)) return null;   /* working years */
+    let v = (proj.depletedAt!==null && row.age>=proj.depletedAt) ? dbIncomeAt(row.age) : row.lifestyle;
+    if(useToday) v = v/Math.pow(1+inflRate, Math.max(0,row.age-curAge));
+    return v;
+  }
+  let _ilToastTimer=null;
+  function ilToast(msg){
+    const t=document.getElementById('efaToast'), m=document.getElementById('efaToastMsg');
+    if(!t||!m) return;
+    m.textContent=msg; t.classList.add('show');
+    clearTimeout(_ilToastTimer); _ilToastTimer=setTimeout(()=>t.classList.remove('show'),2600);
+  }
+  function renderIll(){
+    /* preserve scroll positions across re-render — no jump to top */
+    const ovBody=document.querySelector('#efaIllusOverlay .efa-ov-body');
+    const prevOv=ovBody?ovBody.scrollTop:0;
+    const prevTbl=(function(){const s=document.querySelector('#efaIlBody .efa-il-scroll');return s?s.scrollTop:0;})();
+    const base=baseInputs(),a=applyRev(base),present=project(base),revised=project(a);
+    const futLife=a.retLife*Math.pow(1+a.infl,Math.max(0,a.retAge-a.curAge));
+    const pl=lastsText(present),rl=lastsText(revised);
+    const legacyP=base.legacy>0?' · Legacy '+money(base.legacy)+(present.endBal>=base.legacy?' ✓':' ✗'):'';
+    const legacyR=base.legacy>0?' · Legacy '+money(base.legacy)+(revised.endBal>=base.legacy?' ✓':' ✗'):'';
+    $('efaIlBody').innerHTML=`
+      <div class="efa-il-sheet">
+        <div class="efa-il-sheet-head"><h3>Your Retirement Illustration</h3><span class="echo">${clientName?esc(clientName)+' · ':''}Edwards Financial &amp; Associates</span></div>
+        <div class="efa-il-res">
+          <div class="efa-il-rc"><div class="h">Present Projection</div>
+            <div class="line"><span class="res ${pl.ok?'good':'bad'}">${pl.txt}</span><span class="bal">${money(present.endBal)}</span></div>
+            <div class="sub">Ending balance at age ${base.lifeExp}${legacyP}</div></div>
+          <div class="efa-il-rc rev"><div class="h">Revised Projection</div>
+            <div class="line"><span class="res ${rl.ok?'good':'bad'}">${rl.txt}</span><span class="bal">${money(revised.endBal)}</span></div>
+            <div class="sub">Ending balance at age ${base.lifeExp}${legacyR}</div></div>
+        </div>
+        <div class="efa-il-status ${statusMsg?'on':''}" id="efaIlStatus">${statusMsg}</div>
+        <div class="efa-il-levers">
+          <button class="efa-lever ${rev.accRate!=null||rev.distRate!=null?'touched':''}" data-k="ror"><div class="name">Increase ROR</div><div class="val">${(a.accRate*100).toFixed(0)}% / ${(a.distRate*100).toFixed(0)}%</div><div class="tap">Tap to adjust</div></button>
+          <button class="efa-lever ${rev.saving!=null?'touched':''}" data-k="save"><div class="name">Save More</div><div class="val">${moYr(a.saving)}</div><div class="tap">Tap to adjust</div></button>
+          <button class="efa-lever ${rev.retAge!=null?'touched':''}" data-k="work"><div class="name">Work Longer</div><div class="val">Age ${a.retAge}</div><div class="tap">Tap to adjust</div></button>
+          <button class="efa-lever ${rev.retLife!=null?'touched':''}" data-k="spend"><div class="name">Decrease Lifestyle</div><div class="val">${moYr(futLife)}</div><div class="tap">Tap to adjust</div></button>
+          <button class="efa-lever ${rev.infl!=null?'touched':''}" data-k="infl"><div class="name">Change Inflation</div><div class="val">${(a.infl*100).toFixed(1)}%</div><div class="tap">Tap to adjust</div></button>
+        </div>
+        <div class="efa-il-tblwrap">
+          <div class="efa-il-scroll">
+          <div class="efa-il-band"><div class="b">Present Projection</div><div class="b age">Age</div><div class="b rev">Revised Projection</div></div>
+          <div class="efa-il-thead">
+            <div>Account Balance</div><div>Annual Lifestyle</div>
+            <div class="age">Age</div>
+            <div>Account Balance</div><div class="ls-h" id="efaIlLsH2" title="Click to toggle today's dollars">Annual Lifestyle${lsToday?" &middot; Today's $":''}</div>
+          </div>
+          ${present.rows.map((pr,i)=>{
+            const rr=revised.rows[i]||{age:pr.age,bal:0,lifestyle:0};
+            const pD=(present.depletedAt!==null&&pr.age>=present.depletedAt&&pr.bal===0)?' depleted':'';
+            const rD=(revised.depletedAt!==null&&rr.age>=revised.depletedAt&&rr.bal===0)?' depleted':'';
+            const pls=shownLS(pr,present,base.infl,base.curAge,false), rls=shownLS(rr,revised,a.infl,a.curAge,lsToday);
+            return `<div class="efa-il-r${pr.retire?' retire':''}${i%2===1?' alt':''}">
+              <div class="${pD}">${money(pr.bal)}</div><div class="ls${pls!=null?' click':''}" ${pls!=null?`data-side="p" data-i="${i}" title="Click for the funding breakdown"`:''}>${pls!=null?money(pls):'&mdash;'}</div>
+              <div class="age">${pr.age}</div>
+              <div class="rv${rD}">${money(rr.bal)}</div><div class="ls rv${rls!=null?' click':''}" ${rls!=null?`data-side="r" data-i="${i}" title="Click for the funding breakdown"`:''}>${rls!=null?money(rls):'&mdash;'}</div></div>`;}).join('')}
+          </div>
+        </div>
+        <div class="efa-il-legend"><span class="goldrule">&mdash;</span> Gold rule marks the retirement year.<br>
+          <b>Annual Lifestyle</b> = total annual income you can live on; drops to pension/DB income once the account is spent. Click the right column's header to view it in today's dollars.</div>
+        <div class="efa-il-foot">Assumptions: accumulation ${(base.accRate*100).toFixed(1)}%, distribution ${(base.distRate*100).toFixed(1)}%, inflation ${(base.infl*100).toFixed(1)}%. Retirement lifestyle ${money(base.retLife)} in today's dollars, ${base.cola?'grown with COLA':'held flat'} from age ${base.retAge}. Defined benefits begin at each source's start age and grow by its own COLA. For illustration only &mdash; not a guarantee of future results, and not tax or legal advice. Edwards Financial &amp; Associates &middot; Protect &middot; Grow &middot; Legacy.</div>
+      </div>
+      <div class="efa-il-btnrow no-print">
+        <div class="grp"><button class="efa-btn-ghost" id="efaIlBackAsm">&larr; Edit Assumptions</button>
+          <button class="efa-btn-ghost" id="efaIlDbBtn">Defined Benefits</button></div>
+        <div class="grp"><button class="efa-btn-ghost" id="efaIlResetLev">Reset Levers</button>
+          <button class="efa-btn-gold" id="efaIlPrint2">Print / Save PDF</button></div>
+      </div>`;
+    $('efaIlBackAsm').onclick=()=>{view='assume';renderAssume();};
+    $('efaIlResetLev').onclick=()=>{Object.keys(rev).forEach(k=>rev[k]=null);statusMsg='';renderIll();};
+    $('efaIlPrint2').onclick=()=>$('efaIlPrint').click();
+    $('efaIlDbBtn').onclick=openDbModal;
+    $('efaIlLsH2').onclick=()=>{
+      lsToday=!lsToday;
+      renderIll();
+      ilToast(lsToday?"Revised lifestyle shown in today's dollars — what it will feel like.":"Revised lifestyle shown in future dollars.");
+    };
+    _lastProj={present,revised,base,a};
+    $('efaIlBody').querySelectorAll('.efa-il-r .ls.click').forEach(c=>c.onclick=()=>openBreakdown(c.dataset.side,+c.dataset.i));
+    $('efaIlBody').querySelectorAll('.efa-lever').forEach(b=>b.onclick=()=>openLever(b.dataset.k));
+    if(ovBody) ovBody.scrollTop=prevOv;
+    const tblS=document.querySelector('#efaIlBody .efa-il-scroll'); if(tblS) tblS.scrollTop=prevTbl;
+  }
+
+  /* ═══ lifestyle funding breakdown — proof of numbers ═══ */
+  let _lastProj=null;
+  function openBreakdown(side,i){
+    if(!_lastProj) return;
+    _lastBd={side,i};
+    const proj = side==='p' ? _lastProj.present : _lastProj.revised;
+    const P    = side==='p' ? _lastProj.base    : _lastProj.a;
+    const row=proj.rows[i]; if(!row) return;
+    const age=row.age, ry=age-P.retAge, ytr=Math.max(0,P.retAge-P.curAge);
+    const deflate=v=>v/Math.pow(1+P.infl, Math.max(0,age-P.curAge));
+    /* the need, exactly as the engine computes it */
+    const needAtRet=P.retLife*Math.pow(1+P.infl,ytr);
+    const need=P.cola?needAtRet*Math.pow(1+P.infl,ry):needAtRet;
+    /* each defined-benefit source at this age */
+    const srcs=ID.dbs.filter(d=>!d.excl && age>=d.startAge && age<=d.endAge)
+      .map(d=>({desc:d.desc||'Defined benefit', base:+d.amount||0, cola:+d.cola||0, yrs:age-d.startAge,
+                amt:(+d.amount||0)*Math.pow(1+(+d.cola||0)/100, age-d.startAge)}));
+    const dbTot=srcs.reduce((t,x)=>t+x.amt,0);
+    const depleted=(proj.depletedAt!==null && age>=proj.depletedAt);
+    const draw=depleted?0:Math.max(0,need-dbTot);
+    const funded=depleted?dbTot:need;
+    const shortfall=depleted?Math.max(0,need-dbTot):0;
+    /* balance before this year's draw = prior row balance (or starting accum at first retirement year) */
+    const prevBal=i>0?proj.rows[i-1].bal:P.accum;
+    const td=(v,cls)=>`<td style="text-align:right;${cls||''}">${money(v)}</td>`;
+    $('efaIlModal').className='efa-il-modal wide';
+    $('efaIlModal').innerHTML=`
+      <div class="efa-il-mh"><h3>Where the Age-${age} Lifestyle Comes From</h3><button class="x" id="efaIlMx">&times;</button></div>
+      <div class="efa-il-mb">
+        <p style="margin-bottom:12px;"><b style="color:var(--navy)">${side==='p'?'Present':'Revised'} projection.</b>
+          Lifestyle need: ${money(P.retLife)} in today's dollars ${P.cola?'grown with '+(P.infl*100).toFixed(1)+'% inflation':'inflated '+(P.infl*100).toFixed(1)+'% to retirement, then held flat'} &rarr; <b style="color:var(--navy)">${money(need)}</b> at age ${age}.</p>
+        <table class="efa-il-tbl" style="font-size:0.76rem;">
+          <thead><tr><th>Source</th><th style="text-align:right">Base ($/yr)</th><th style="text-align:right">COLA</th><th style="text-align:right">Yrs Grown</th><th style="text-align:right">At Age ${age}</th></tr></thead>
+          <tbody>
+            ${srcs.map(s=>`<tr><td style="font-weight:600;color:var(--navy)">${esc(s.desc)}</td>${td(s.base)}<td style="text-align:right">${s.cola.toFixed(1)}%</td><td style="text-align:right">${s.yrs}</td>${td(s.amt,'font-weight:700;color:var(--green);')}</tr>`).join('')||'<tr><td colspan="5" style="color:var(--gray-400)">No defined-benefit income at this age.</td></tr>'}
+            <tr style="background:var(--gray-100);"><td style="font-weight:700;color:var(--navy)">Total Defined Benefits</td><td></td><td></td><td></td>${td(dbTot,'font-weight:700;color:var(--green);')}</tr>
+            <tr><td style="font-weight:600;color:var(--navy)">Withdrawal from Savings${depleted?' — account depleted':''}</td>
+              <td colspan="3" style="font-size:0.66rem;color:var(--gray-400);text-align:right;">${depleted?'balance reached $0 at age '+proj.depletedAt:'need &minus; defined benefits'}</td>
+              ${td(draw,'font-weight:700;color:'+(depleted?'var(--red)':'var(--gold)')+';')}</tr>
+            <tr style="background:var(--navy);"><td style="font-weight:700;color:white;">Annual Lifestyle Funded</td><td></td><td></td><td></td>
+              <td style="text-align:right;font-family:'Montserrat',sans-serif;font-weight:700;color:var(--gold-light);">${money(funded)}</td></tr>
+            ${shortfall>0?`<tr><td style="font-weight:700;color:var(--red);">Unfunded Shortfall vs. Need</td><td></td><td></td><td></td>${td(shortfall,'font-weight:700;color:var(--red);')}</tr>`:''}
+          </tbody>
+        </table>
+        <div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-top:12px;font-size:0.7rem;color:var(--gray-700);">
+          <span>Balance entering the year: <b style="color:var(--navy)">${money(prevBal)}</b> &rarr; after withdrawal &amp; ${(P.distRate*100).toFixed(1)}% growth: <b style="color:var(--navy)">${money(row.bal)}</b></span>
+          <span>In today's dollars: lifestyle <b style="color:var(--navy)">${money(deflate(funded))}</b></span>
+        </div>
+        <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:14px;">
+          <button class="efa-btn-ghost" id="efaIlBdLedger">Full Distribution Ledger &rarr;</button>
+          <button class="efa-il-calcbtn" id="efaIlBdClose">&#10003; Close</button>
+        </div>
+      </div>`;
+    $('efaIlMx').onclick=()=>{$('efaIlModal').className='efa-il-modal';closeModal();};
+    $('efaIlBdClose').onclick=()=>{$('efaIlModal').className='efa-il-modal';closeModal();};
+    $('efaIlBdLedger').onclick=()=>openLedger(side);
+    $('efaIlModalBg').classList.add('on');
+  }
+
+  /* ═══ full distribution ledger — year-by-year spreadsheet through age 99 ═══ */
+  let _lastBd=null;   /* remembers which breakdown launched the ledger, for the Back button */
+  function ledgerRows(P){
+    const rows=[]; let bal=P.accum, depletedAt=null;
+    const ytr=Math.max(0,P.retAge-P.curAge), needAtRet=P.retLife*Math.pow(1+P.infl,ytr);
+    for(let age=P.curAge; age<=99; age++){
+      const yr=age-P.curAge, working=age<P.retAge;
+      if(working){
+        const c=P.inflateSave?P.saving*Math.pow(1+P.infl,yr):P.saving;
+        bal=bal*(1+P.accRate)+c;
+        bal+=faAt(age)-feAt(age);
+        if(bal<0){if(depletedAt===null)depletedAt=age;bal=0;}
+        continue;                                   /* accumulation years not shown in the ledger */
+      }
+      const ry=age-P.retAge;
+      const need=P.cola?needAtRet*Math.pow(1+P.infl,ry):needAtRet;
+      const db=dbIncomeAt(age);
+      const draw=Math.max(0,need-db);
+      const balIn=bal;
+      const funded=Math.min(draw,Math.max(0,balIn)); /* what savings can actually cover this year */
+      bal=(bal-draw)*(1+P.distRate);
+      bal+=faAt(age)-feAt(age);
+      if(bal<0){if(depletedAt===null)depletedAt=age;bal=0;}
+      rows.push({age,balIn,need,db,funded,short:draw-funded,balOut:bal,retire:age===P.retAge,
+        depleted:depletedAt!==null&&age>=depletedAt});
+    }
+    return rows;
+  }
+  function openLedger(side){
+    const P = side==='p' ? _lastProj.base : _lastProj.a;
+    const rows=ledgerRows(P);
+    const td=(v,cls)=>`<td style="text-align:right;padding:5px 10px;${cls||''}">${money(v)}</td>`;
+    $('efaIlModal').className='efa-il-modal wide';
+    $('efaIlModal').style.maxWidth='860px';
+    $('efaIlModal').innerHTML=`
+      <div class="efa-il-mh"><h3>Distribution Ledger — ${side==='p'?'Present':'Revised'} Plan, to Age 99</h3><button class="x" id="efaIlMx">&times;</button></div>
+      <div class="efa-il-mb" style="padding:0;">
+        <div style="max-height:62vh;overflow-y:auto;">
+        <table style="width:100%;border-collapse:collapse;font-size:0.73rem;font-family:'Montserrat',sans-serif;">
+          <thead><tr style="position:sticky;top:0;z-index:2;">
+            ${['Age','Balance In','Lifestyle Need','Defined Benefits','Withdrawal','Shortfall','Growth','Balance End'].map((h,i)=>`<th style="background:var(--navy);color:${i===0?'var(--gold-light)':'rgba(255,255,255,0.6)'};font-size:0.56rem;letter-spacing:0.06em;text-transform:uppercase;padding:8px 10px;text-align:${i===0?'center':'right'};">${h}</th>`).join('')}
+          </tr></thead>
+          <tbody>
+          ${rows.map((r,i)=>`<tr style="background:${r.retire?'#f6efe0':(i%2===1?'#fbf7ee':'white')};${r.retire?'border-top:2px solid var(--gold);border-bottom:2px solid var(--gold);':'border-bottom:1px solid var(--gray-200);'}">
+            <td style="text-align:center;font-weight:700;color:var(--navy);padding:5px 10px;">${r.age}</td>
+            ${td(r.balIn,'color:var(--navy);')}
+            ${td(r.need,'color:var(--gray-700);')}
+            ${td(r.db,'color:var(--green);font-weight:600;')}
+            ${td(r.funded,'color:var(--gold);font-weight:700;')}
+            ${r.short>0.5?td(r.short,'color:var(--red);font-weight:700;'):'<td style="text-align:right;padding:5px 10px;color:var(--gray-400);">&mdash;</td>'}
+            <td style="text-align:right;padding:5px 10px;color:var(--gray-400);">${(P.distRate*100).toFixed(1)}%</td>
+            ${td(r.balOut,r.depleted?'color:var(--red);font-weight:700;':'color:var(--navy);font-weight:700;')}
+          </tr>`).join('')}
+          </tbody>
+        </table>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;padding:12px 16px;border-top:1px solid var(--gray-200);">
+          <span style="font-size:0.64rem;color:var(--gray-400);line-height:1.5;">Gold rule = retirement year. Withdrawal = the amount savings actually cover; Shortfall = unfunded need once the account is spent. Mirrors the illustration engine exactly.</span>
+          <span style="display:flex;gap:8px;">
+            ${_lastBd?`<button class="efa-btn-ghost" id="efaIlLgBack">&larr; Back to Breakdown</button>`:''}
+            <button class="efa-il-calcbtn" id="efaIlLgClose">&#10003; Close</button>
+          </span>
+        </div>
+      </div>`;
+    $('efaIlMx').onclick=()=>{$('efaIlModal').className='efa-il-modal';$('efaIlModal').style.maxWidth='';closeModal();};
+    $('efaIlLgClose').onclick=()=>{$('efaIlModal').className='efa-il-modal';$('efaIlModal').style.maxWidth='';closeModal();};
+    if($('efaIlLgBack'))$('efaIlLgBack').onclick=()=>{$('efaIlModal').style.maxWidth='';openBreakdown(_lastBd.side,_lastBd.i);};
+    $('efaIlModalBg').classList.add('on');
+  }
+
+  /* Defined Benefits quick-edit modal (same rows as the assumptions card) */
+  function openDbModal(){
+    const rowsHTML=()=>ID.dbs.map((r,i)=>`<tr>
+      <td><input data-i="${i}" data-f="desc" value="${esc(r.desc)}" list="dl_dbs"></td>
+      <td style="width:100px"><input data-i="${i}" data-f="amount" type="text" inputmode="numeric" class="efa-money" value="${(+r.amount||0).toLocaleString('en-US')}"></td>
+      <td style="width:64px"><input data-i="${i}" data-f="cola" type="number" step="0.1" value="${r.cola}"></td>
+      <td style="width:58px"><input data-i="${i}" data-f="startAge" type="number" value="${r.startAge}"></td>
+      <td style="width:58px"><input data-i="${i}" data-f="endAge" type="number" value="${r.endAge}"></td>
+      <td style="width:28px"><button class="efa-il-del" data-del="${i}">&times;</button></td></tr>`).join('');
+    $('efaIlModal').className='efa-il-modal wide';
+    $('efaIlModal').innerHTML=`<div class="efa-il-mh"><h3>Defined Benefits</h3><button class="x" id="efaIlMx">&times;</button></div>
+      <div class="efa-il-mb">
+        <table class="efa-il-tbl"><thead><tr><th>Source</th><th>$/yr</th><th>COLA%</th><th>Start</th><th>End</th><th></th></tr></thead>
+        <tbody id="efaIlDbRows">${rowsHTML()}</tbody></table>
+        <div style="display:flex;justify-content:space-between;margin-top:12px;">
+          <button class="efa-btn-ghost" id="efaIlDbAdd">+ Add</button>
+          <button class="efa-il-calcbtn" id="efaIlDbSave">&#10003; Save &amp; Return</button>
+        </div></div>`;
+    function wire(){
+      $('efaIlDbRows').querySelectorAll('input').forEach(el=>el.oninput=()=>{
+        const r=ID.dbs[+el.dataset.i]; if(!r)return; const f=el.dataset.f;
+        r[f]=f==='desc'?el.value:num(el.value);});
+      $('efaIlDbRows').querySelectorAll('.efa-il-del').forEach(b=>b.onclick=()=>{
+        ID.dbs.splice(+b.dataset.del,1); $('efaIlDbRows').innerHTML=rowsHTML(); wire();});
+    }
+    wire();
+    $('efaIlDbAdd').onclick=()=>{ID.dbs.push({desc:'',amount:0,cola:2,startAge:+F.retAge,endAge:99,taxable:100,excl:false});
+      $('efaIlDbRows').innerHTML=rowsHTML(); wire();};
+    $('efaIlDbSave').onclick=()=>{$('efaIlModal').className='efa-il-modal';closeModal();renderIll();};
+    $('efaIlMx').onclick=()=>{$('efaIlModal').className='efa-il-modal';closeModal();renderIll();};
+    $('efaIlModalBg').classList.add('on');
+  }
+
+  /* ═══ lever modals with Specify / Calculate solvers ═══ */
+  function closeModal(){$('efaIlModalBg').classList.remove('on');$('efaIlModal').innerHTML='';}
+  function leverModal(title,specTab,calcTab,specHTML,calcHTML,onSpec,onCalc){
+    $('efaIlModal').innerHTML=`<div class="efa-il-mh"><h3>${title}</h3><button class="x" id="efaIlMx">&times;</button></div>
+      <div class="efa-il-mb">
+        <div class="efa-il-tabs"><button class="efa-il-tab on" data-t="spec">${specTab}</button><button class="efa-il-tab" data-t="calc">${calcTab}</button></div>
+        <div class="efa-il-panel on" id="efaIlPSpec">${specHTML}</div>
+        <div class="efa-il-panel" id="efaIlPCalc">${calcHTML}</div>
+      </div>`;
+    $('efaIlMx').onclick=closeModal;
+    $('efaIlModal').querySelectorAll('.efa-il-tab').forEach(t=>t.onclick=()=>{
+      $('efaIlModal').querySelectorAll('.efa-il-tab').forEach(x=>x.classList.toggle('on',x===t));
+      $('efaIlPSpec').classList.toggle('on',t.dataset.t==='spec');$('efaIlPCalc').classList.toggle('on',t.dataset.t==='calc');});
+    if($('efaIlSpecGo'))$('efaIlSpecGo').onclick=onSpec;
+    if($('efaIlCalcGo'))$('efaIlCalcGo').onclick=onCalc;
+    $('efaIlModalBg').classList.add('on');
+  }
+  function rorMsg(req,base){if(base>0){const rel=(req/base-1)*100;
+    return rel>=0?`<b>Required ROR is ${rel.toFixed(2)}% higher!</b> Reaching this goal on returns alone needs ${(req*100).toFixed(2)}% instead of ${(base*100).toFixed(0)}%.`
+      :`<b>Required ROR is ${Math.abs(rel).toFixed(2)}% lower.</b> This goal needs only ${(req*100).toFixed(2)}% instead of ${(base*100).toFixed(0)}%.`;}
+    return `<b>Required ROR: ${(req*100).toFixed(2)}%.</b>`;}
+  const goBtn=id=>`<button class="efa-il-calcbtn" id="${id}">Calculate</button>`;
+  function openLever(key){
+    const base=baseInputs(),last=base.lifeExp;
+    if(key==='ror'){
+      leverModal('Increase Rate of Return','Specify the return','Calculate required return',
+        `<p>Enter the revised rate of return.</p><div class="efa-il-inrow"><label class="efa-il-chk"><input type="checkbox" id="efaIlRorIncS"> Include distribution years</label><input class="efa-il-bigin" id="efaIlRorRate" value="${((rev.accRate!=null?rev.accRate:base.accRate)*100).toFixed(1)}"><b style="color:var(--navy)">%</b></div>${goBtn('efaIlSpecGo')}`,
+        `<p>Enter the last age at which a withdrawal will occur; I'll solve for the return that funds it.</p><div class="efa-il-inrow"><label class="efa-il-chk"><input type="checkbox" id="efaIlRorIncC"> Include distribution years</label><input class="efa-il-bigin" id="efaIlRorLast" value="${last}"></div>${goBtn('efaIlCalcGo')}`,
+        ()=>{const r=num($('efaIlRorRate').value)/100,inc=$('efaIlRorIncS').checked;rev.accRate=r;rev.distRate=inc?r:null;statusMsg=rorMsg(r,base.accRate);closeModal();renderIll();},
+        ()=>{const la=num($('efaIlRorLast').value),inc=$('efaIlRorIncC').checked;const req=solveROR(base,la,inc);rev.accRate=req;rev.distRate=inc?req:null;statusMsg=rorMsg(req,base.accRate);closeModal();renderIll();});
+    } else if(key==='save'){
+      leverModal('Save More','Specify the savings','Calculate savings requirement',
+        `<p>Enter the revised annual savings.</p><div class="efa-il-inrow"><b style="color:var(--navy)">$</b><input class="efa-il-bigin" id="efaIlSaveAmt" value="${Math.round(rev.saving!=null?rev.saving:base.saving)}"><span style="color:var(--gray-400)">/yr</span></div>${goBtn('efaIlSpecGo')}`,
+        `<p>Enter the last age at which a withdrawal will occur; I'll solve for the annual savings required.</p><div class="efa-il-inrow"><input class="efa-il-bigin" id="efaIlSaveLast" value="${last}"></div>${goBtn('efaIlCalcGo')}`,
+        ()=>{const v=num($('efaIlSaveAmt').value);rev.saving=v;statusMsg=`<b>Revised savings: ${money(v)}/yr</b> (${money(v/12)}/mo).`;closeModal();renderIll();},
+        ()=>{const la=num($('efaIlSaveLast').value);const req=solveSave(base,la);rev.saving=req;const d=req-base.saving;statusMsg=`<b>Required savings: ${money(req)}/yr</b> (${money(req/12)}/mo) to fund the plan through age ${la} — ${d>=0?money(d)+'/yr more':money(-d)+'/yr less'} than today.`;closeModal();renderIll();});
+    } else if(key==='work'){
+      leverModal('Work Longer','Specify retirement age','Calculate retirement age',
+        `<p>Enter the revised retirement age.</p><div class="efa-il-inrow"><input class="efa-il-bigin" id="efaIlWorkAge" value="${rev.retAge!=null?rev.retAge:base.retAge}"></div>${goBtn('efaIlSpecGo')}`,
+        `<p>Enter the last age at which a withdrawal will occur; I'll find the earliest retirement age that funds it.</p><div class="efa-il-inrow"><input class="efa-il-bigin" id="efaIlWorkLast" value="${last}"></div>${goBtn('efaIlCalcGo')}`,
+        ()=>{rev.retAge=num($('efaIlWorkAge').value);statusMsg=`<b>Revised retirement age: ${rev.retAge}.</b>`;closeModal();renderIll();},
+        ()=>{const la=num($('efaIlWorkLast').value);const req=solveWork(base,la);rev.retAge=req;const diff=req-base.retAge;statusMsg=`<b>Retire by age ${req}</b> to fund the plan through age ${la}${diff>0?` — ${diff} year${diff===1?'':'s'} longer than planned`:(diff<0?` — ${-diff} year${diff===-1?'':'s'} sooner than planned`:'')}.`;closeModal();renderIll();});
+    } else if(key==='spend'){
+      const ytr=Math.max(0,base.retAge-base.curAge);
+      leverModal('Decrease Lifestyle',"Specify lifestyle (today's $)",'Calculate sustainable lifestyle',
+        `<p>Enter the revised retirement lifestyle in today's dollars.</p><div class="efa-il-inrow"><b style="color:var(--navy)">$</b><input class="efa-il-bigin" id="efaIlSpendAmt" value="${Math.round(rev.retLife!=null?rev.retLife:base.retLife)}"><span style="color:var(--gray-400)">/yr</span></div>${goBtn('efaIlSpecGo')}`,
+        `<p>Enter the last age at which a withdrawal will occur; I'll solve for the highest sustainable lifestyle.</p><div class="efa-il-inrow"><input class="efa-il-bigin" id="efaIlSpendLast" value="${last}"></div>${goBtn('efaIlCalcGo')}`,
+        ()=>{rev.retLife=num($('efaIlSpendAmt').value);statusMsg=`<b>Revised lifestyle: ${money(rev.retLife)}/yr</b> in today's dollars (${money(rev.retLife*Math.pow(1+base.infl,ytr))} in year one of retirement).`;closeModal();renderIll();},
+        ()=>{const la=num($('efaIlSpendLast').value);const req=solveSpend(base,la);rev.retLife=req;statusMsg=`<b>Sustainable lifestyle: ${money(req)}/yr</b> in today's dollars through age ${la} (${money(req/12)}/mo).`;closeModal();renderIll();});
+    } else if(key==='infl'){
+      leverModal('Change Inflation','Specify inflation','About this assumption',
+        `<p>Enter the revised inflation rate.</p><div class="efa-il-inrow"><input class="efa-il-bigin" id="efaIlInflRate" value="${((rev.infl!=null?rev.infl:base.infl)*100).toFixed(1)}"><b style="color:var(--navy)">%</b></div>${goBtn('efaIlSpecGo')}`,
+        `<p>Inflation compounds against the lifestyle every year of the plan. Small changes move the ending balance dramatically — a powerful conversation lever.</p>`,
+        ()=>{rev.infl=num($('efaIlInflRate').value)/100;statusMsg=`<b>Revised inflation: ${(rev.infl*100).toFixed(1)}%.</b>`;closeModal();renderIll();},null);
+    }
+  }
+
+  /* ═══ open ═══ */
+  function open(){
+    if(!pullSession()){alert('Run a comparison first — the illustration is built from the chosen pension scenario.');return;}
+    view==='assume'?renderAssume():renderAssume();
+    ov.classList.add('on'); document.body.style.overflow='hidden';
+  }
+  window.EFA_ILLUS={open, _ID:ID, _F:F, _project:project, _base:baseInputs};
 })();
 </script>
 
