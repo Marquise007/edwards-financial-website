@@ -29,6 +29,7 @@
       '#efaGate input{width:100%;box-sizing:border-box;padding:10px 12px;border:1.5px solid #e0dbd2;border-radius:6px;font-family:Montserrat,Arial,sans-serif;font-size:.86rem;background:#f5f2ec;color:#0d1e3a;margin-bottom:13px;}' +
       '#efaGate input:focus{outline:none;border-color:#b8972e;background:#fff;}' +
       '#efaGate .gbtn{width:100%;padding:12px;background:#b8972e;color:#0d1e3a;border:none;border-radius:7px;border-bottom:3px solid #8a6012;font-family:Montserrat,Arial,sans-serif;font-size:.8rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;cursor:pointer;}' +
+      '#efaGate form{margin:0;}' +
       '#efaGate .gerr{color:#c0392b;font-size:.72rem;font-weight:600;margin-top:10px;text-align:center;min-height:16px;}' +
       '#efaGate .gnote{color:#9a9590;font-size:.62rem;text-align:center;margin-top:12px;line-height:1.5;}' +
       '#efaGate .gcard.shake{animation:efaShake .35s;}' +
@@ -40,9 +41,11 @@
       '<div class="gbody">' +
       '<div class="gt">Client &amp; Partner Access</div>' +
       '<div class="gsub">These planning tools are provided for clients and partners of Edwards Financial &amp; Associates. Sign in to continue.</div>' +
-      '<label>Email</label><input type="email" id="efaGateEmail" placeholder="you@email.com" autocomplete="email">' +
-      '<label>Access Password</label><input type="password" id="efaGatePw" placeholder="Enter access password" autocomplete="current-password">' +
-      '<button class="gbtn" id="efaGateGo">Unlock Tools</button>' +
+      '<form id="efaGateForm" method="post" action="#" autocomplete="on">' +
+      '<label for="efaGateEmail">Email</label><input type="email" id="efaGateEmail" name="username" placeholder="you@email.com" autocomplete="username email">' +
+      '<label for="efaGatePw">Access Password</label><input type="password" id="efaGatePw" name="password" placeholder="Enter access password" autocomplete="current-password">' +
+      '<button class="gbtn" id="efaGateGo" type="submit">Unlock Tools</button>' +
+      '</form>' +
       '<div class="gerr" id="efaGateErr"></div>' +
       '<div class="gnote">Access is provided by Edwards Financial &amp; Associates.<br>Need the password? Email joshua@edwardsfinancialassociates.com</div>' +
       '</div></div>';
@@ -50,22 +53,45 @@
 
     var pw = document.getElementById('efaGatePw');
     var email = document.getElementById('efaGateEmail');
-    function attempt() {
-      var ok = false;
-      try { ok = btoa(pw.value) === PW_B64; } catch (e) { ok = false; } // case-sensitive exact match
-      if (ok) {
-        try { sessionStorage.setItem(KEY, '1'); } catch (e) {}
-        ov.remove();
-      } else {
-        document.getElementById('efaGateErr').textContent = 'That password is not correct. Passwords are case sensitive.';
-        var card = ov.querySelector('.gcard');
-        card.classList.remove('shake'); void card.offsetWidth; card.classList.add('shake');
-        pw.select();
-      }
+    var form = document.getElementById('efaGateForm');
+
+    function unlock() {
+      try { sessionStorage.setItem(KEY, '1'); } catch (e) {}
+      /* Chromium: explicitly ask the password manager to save/update this login */
+      try {
+        if (window.PasswordCredential && navigator.credentials && navigator.credentials.store) {
+          navigator.credentials.store(new PasswordCredential({
+            id: email.value || 'client', name: 'EFA Resource Access', password: pw.value
+          })).catch(function () {});
+        }
+      } catch (e) {}
+      ov.remove();
     }
-    document.getElementById('efaGateGo').addEventListener('click', attempt);
-    pw.addEventListener('keydown', function (e) { if (e.key === 'Enter') attempt(); });
-    email.addEventListener('keydown', function (e) { if (e.key === 'Enter') pw.focus(); });
+    function fail() {
+      document.getElementById('efaGateErr').textContent = 'That password is not correct. Passwords are case sensitive.';
+      var card = ov.querySelector('.gcard');
+      card.classList.remove('shake'); void card.offsetWidth; card.classList.add('shake');
+      pw.select();
+    }
+    /* real form submission is what makes browsers offer to save the login */
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var ok = false;
+      try { ok = btoa(pw.value) === PW_B64; } catch (er) { ok = false; } // case-sensitive exact match
+      ok ? unlock() : fail();
+    });
+
+    /* return visits: if a login is saved, ask the browser for it and unlock without typing */
+    try {
+      if (navigator.credentials && navigator.credentials.get && window.PasswordCredential) {
+        navigator.credentials.get({ password: true, mediation: 'optional' }).then(function (cred) {
+          if (cred && cred.password && btoa(cred.password) === PW_B64) {
+            email.value = cred.id || ''; pw.value = cred.password;
+            unlock();
+          }
+        }).catch(function () {});
+      }
+    } catch (e) {}
     setTimeout(function () { email.focus(); }, 60);
   }
 
