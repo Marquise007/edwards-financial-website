@@ -115,6 +115,30 @@ select:focus,input:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 
 .asset-hdr{display:grid;grid-template-columns:1.6fr 1.1fr 1.1fr 0.7fr 0.7fr 34px;gap:7px;margin-bottom:5px;padding:0 2px;}
 .acl{font-size:0.64rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--gray-400);}
 
+/* GAP CARD LISTS — client-readable income & asset presentation */
+.gc-block{margin-top:16px;}
+.gc-title{font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--navy);margin-bottom:8px;display:flex;align-items:baseline;justify-content:space-between;gap:10px;}
+.gc-title .gc-sub{font-size:0.62rem;color:var(--gray-400);font-weight:600;letter-spacing:0.03em;text-transform:none;}
+.gc-row{background:white;border:1px solid var(--gray-200);border-left:3px solid var(--gold);border-radius:8px;padding:10px 16px;display:flex;align-items:center;gap:18px;flex-wrap:wrap;margin-bottom:7px;box-shadow:0 1px 4px rgba(10,31,60,0.05);}
+.gc-row.asset{border-left-color:var(--navy);}
+.gc-main{flex:1;min-width:170px;}
+.gc-name{font-size:0.86rem;font-weight:700;color:var(--navy);line-height:1.3;}
+.gc-chips{display:flex;gap:5px;flex-wrap:wrap;margin-top:4px;}
+.gc-chip{font-size:0.6rem;font-weight:600;color:var(--gray-400);background:var(--gray-100);border-radius:20px;padding:2px 9px;letter-spacing:0.02em;white-space:nowrap;}
+.gc-col{text-align:right;min-width:92px;}
+.gc-l{display:block;font-size:0.56rem;text-transform:uppercase;letter-spacing:0.06em;color:var(--gray-400);font-weight:700;margin-bottom:1px;}
+.gc-v{font-family:'Montserrat',sans-serif;font-size:0.92rem;font-weight:700;color:var(--gray-700);}
+.gc-v.big{font-size:1.04rem;}
+.gc-v.muted{color:var(--gray-400);font-weight:600;font-size:0.84rem;}
+.gc-v.gold{color:var(--gold);} .gc-v.green{color:var(--green);} .gc-v.goldl{color:var(--gold-light);}
+.gc-total{background:var(--navy);border-radius:8px;padding:12px 16px;display:flex;align-items:center;gap:18px;flex-wrap:wrap;margin-top:4px;}
+.gc-total .gc-main{min-width:150px;}
+.gc-total .gc-name{color:white;font-size:0.74rem;text-transform:uppercase;letter-spacing:0.06em;}
+.gc-total .gc-l{color:rgba(255,255,255,0.45);}
+.gc-total .gc-v{color:rgba(255,255,255,0.65);}
+.gc-total .gc-v.green{color:#7ce0a3;} .gc-total .gc-v.goldl{color:var(--gold-light);}
+@media(max-width:700px){.gc-row,.gc-total{gap:12px;}.gc-col{min-width:80px;}}
+
 /* REPORT BAR */
 .report-bar{background:var(--navy);border-radius:8px;padding:18px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;border-bottom:4px solid var(--gold);}
 
@@ -726,6 +750,14 @@ function getCurrentAge(){
   const v = parseInt(document.getElementById('curAge')?.value);
   return (!isNaN(v) && v > 0) ? v : null;
 }
+// Pretty-printed DOB for reports (empty string when not entered)
+function getDobPretty(){
+  const v = document.getElementById('dob')?.value;
+  if(!v) return '';
+  const d = new Date(v + 'T00:00:00');
+  if(isNaN(d.getTime())) return '';
+  return d.toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
+}
 // Baseline age used to compute years-to-retirement: Current Age if given, else Career Start Age
 function getBaselineAge(){
   const cur = getCurrentAge();
@@ -1227,52 +1259,40 @@ function renderGap() {
   }
 
   const assetHTML = assets.length>0 ? `
-    <div style="margin-top:14px;">
-      <div style="font-size:0.66rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--gray-400);margin-bottom:6px;">Asset Projections at Retirement</div>
-      <div style="border-radius:6px;overflow:hidden;border:1px solid var(--gray-200);">
-        <div style="display:grid;grid-template-columns:${infl.on?'1.4fr 1fr 1fr 1fr 1fr 1fr':'1.6fr 1fr 1fr 1fr 1fr'};background:var(--navy);padding:7px 12px;font-size:0.62rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:rgba(255,255,255,0.5);">
-          <div>Account</div><div style="text-align:right;">Today</div><div style="text-align:right;">Contrib/yr</div><div style="text-align:right;">ROR·Yrs</div>${infl.on?'<div style="text-align:right;">Real ROR</div>':''}<div style="text-align:right;">Projected${infl.on?' (Nom)':''}</div>${infl.on?'<div style="text-align:right;color:var(--gold-light);">Today\'s $</div>':''}
+    <div class="gc-block">
+      <div class="gc-title"><span>Asset Projections at Retirement</span><span class="gc-sub">${assets.length} account${assets.length===1?'':'s'} · growth to age ${r.age}</span></div>
+      ${assets.map(a=>`<div class="gc-row asset">
+        <div class="gc-main"><div class="gc-name">${a.name}</div>
+          <div class="gc-chips"><span class="gc-chip">${(a.ror*100).toFixed(1)}% ROR · ${a.yrs} yrs</span>${a.con>0?`<span class="gc-chip">+$${Math.round(a.con).toLocaleString()}/yr contrib${a.step>0?' ↗ +'+(a.step*100).toFixed(1)+'%/yr':''}</span>`:''}${infl.on?`<span class="gc-chip">Real ROR ${(a.rRor*100).toFixed(1)}%</span>`:''}</div>
         </div>
-        ${assets.map((a,i)=>`<div style="display:grid;grid-template-columns:${infl.on?'1.4fr 1fr 1fr 1fr 1fr 1fr':'1.6fr 1fr 1fr 1fr 1fr'};padding:7px 12px;background:${i%2===0?'white':'var(--gray-100)'};font-size:0.76rem;border-bottom:1px solid var(--gray-200);">
-          <div style="font-weight:600;color:var(--navy);">${a.name}</div>
-          <div style="text-align:right;">$${Math.round(a.bal).toLocaleString()}</div>
-          <div style="text-align:right;color:var(--gray-400);">${a.con>0?'+$'+Math.round(a.con).toLocaleString()+(a.step>0?`<br><span style="font-size:0.6rem;color:var(--gold);">↗ +${(a.step*100).toFixed(1)}%/yr</span>`:''):'—'}</div>
-          <div style="text-align:right;color:var(--gray-400);">${(a.ror*100).toFixed(1)}%·${a.yrs}yr</div>
-          ${infl.on?`<div style="text-align:right;color:var(--gold);">${(a.rRor*100).toFixed(1)}%</div>`:''}
-          <div style="text-align:right;font-weight:700;color:var(--green);">$${Math.round(a.proj).toLocaleString()}</div>
-          ${infl.on?`<div style="text-align:right;font-weight:700;color:var(--gold);">$${Math.round(a.realProj).toLocaleString()}</div>`:''}
-        </div>`).join('')}
-        <div style="display:grid;grid-template-columns:${infl.on?'1.4fr 1fr 1fr 1fr 1fr 1fr':'1.6fr 1fr 1fr 1fr 1fr'};padding:8px 12px;background:var(--navy);">
-          <div style="font-weight:700;font-size:0.76rem;color:white;">Total</div>
-          <div style="text-align:right;font-size:0.76rem;color:rgba(255,255,255,0.55);">$${Math.round(assets.reduce((s,a)=>s+a.bal,0)).toLocaleString()}</div>
-          <div></div><div></div>${infl.on?'<div></div>':''}
-          <div style="text-align:right;font-family:'Montserrat',sans-serif;font-size:0.88rem;font-weight:700;color:var(--green);">$${Math.round(totalNomAssets).toLocaleString()}</div>
-          ${infl.on?`<div style="text-align:right;font-family:'Montserrat',sans-serif;font-size:0.88rem;font-weight:700;color:var(--gold-light);">$${Math.round(totalAssets).toLocaleString()}</div>`:''}
-        </div>
+        <div class="gc-col"><span class="gc-l">Today</span><span class="gc-v muted">$${Math.round(a.bal).toLocaleString()}</span></div>
+        <div class="gc-col"><span class="gc-l">Projected${infl.on?' (Nom)':''}</span><span class="gc-v green big">$${Math.round(a.proj).toLocaleString()}</span></div>
+        ${infl.on?`<div class="gc-col"><span class="gc-l">Today's $</span><span class="gc-v gold big">$${Math.round(a.realProj).toLocaleString()}</span></div>`:''}
+      </div>`).join('')}
+      <div class="gc-total">
+        <div class="gc-main"><div class="gc-name">Total Assets</div></div>
+        <div class="gc-col"><span class="gc-l">Today</span><span class="gc-v">$${Math.round(assets.reduce((s,a)=>s+a.bal,0)).toLocaleString()}</span></div>
+        <div class="gc-col"><span class="gc-l">Projected${infl.on?' (Nom)':''}</span><span class="gc-v green big">$${Math.round(totalNomAssets).toLocaleString()}</span></div>
+        ${infl.on?`<div class="gc-col"><span class="gc-l">Today's $</span><span class="gc-v goldl big">$${Math.round(totalAssets).toLocaleString()}</span></div>`:''}
       </div>
     </div>` : '';
 
   const incomeHTML = incomes.length>0 ? `
-    <div style="margin-top:14px;">
-      <div style="font-size:0.66rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--gray-400);margin-bottom:6px;">Other Retirement Income${infl.on?' — Grown to Retirement':''}</div>
-      <div style="border-radius:6px;overflow:hidden;border:1px solid var(--gray-200);">
-        <div style="display:grid;grid-template-columns:${infl.on?'1.6fr 1fr 0.8fr 1fr 1fr':'1.8fr 1fr 0.8fr 1fr'};background:var(--navy);padding:7px 12px;font-size:0.62rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:rgba(255,255,255,0.5);">
-          <div>Source</div><div style="text-align:right;">Today ($/yr)</div><div style="text-align:right;">COLA</div>${infl.on?'<div style="text-align:right;color:var(--gold-light);">At Retirement</div>':''}<div style="text-align:right;">Monthly${infl.on?' (Ret.)':''}</div>
+    <div class="gc-block">
+      <div class="gc-title"><span>Other Retirement Income${infl.on?' — Grown to Retirement':''}</span><span class="gc-sub">${incomes.length} source${incomes.length===1?'':'s'} · reduces the gap directly</span></div>
+      ${incomes.map(x=>`<div class="gc-row">
+        <div class="gc-main"><div class="gc-name">${x.name}</div>
+          <div class="gc-chips"><span class="gc-chip">${x.cola>0?'COLA '+(x.cola*100).toFixed(1)+'%/yr':'No COLA'}</span>${x.freq==='mo'?`<span class="gc-chip">Entered as $${Math.round(x.amt).toLocaleString()}/mo</span>`:''}</div>
         </div>
-        ${incomes.map((x,i)=>`<div style="display:grid;grid-template-columns:${infl.on?'1.6fr 1fr 0.8fr 1fr 1fr':'1.8fr 1fr 0.8fr 1fr'};padding:7px 12px;background:${i%2===0?'white':'var(--gray-100)'};font-size:0.76rem;border-bottom:1px solid var(--gray-200);">
-          <div style="font-weight:600;color:var(--navy);">${x.name}</div>
-          <div style="text-align:right;">$${Math.round(x.annToday).toLocaleString()}</div>
-          <div style="text-align:right;color:var(--gray-400);">${x.cola>0?(x.cola*100).toFixed(1)+'%':'—'}</div>
-          ${infl.on?`<div style="text-align:right;font-weight:700;color:var(--gold);">$${Math.round(x.annAtRet).toLocaleString()}</div>`:''}
-          <div style="text-align:right;font-weight:700;color:var(--green);">$${Math.round(x.annAtRet/12).toLocaleString()}/mo</div>
-        </div>`).join('')}
-        <div style="display:grid;grid-template-columns:${infl.on?'1.6fr 1fr 0.8fr 1fr 1fr':'1.8fr 1fr 0.8fr 1fr'};padding:8px 12px;background:var(--navy);">
-          <div style="font-weight:700;font-size:0.76rem;color:white;">Total Other Income</div>
-          <div style="text-align:right;font-size:0.76rem;color:rgba(255,255,255,0.55);">$${Math.round(incomes.reduce((s,x)=>s+x.annToday,0)).toLocaleString()}</div>
-          <div></div>
-          ${infl.on?`<div style="text-align:right;font-family:'Montserrat',sans-serif;font-size:0.88rem;font-weight:700;color:var(--gold-light);">$${Math.round(annInc).toLocaleString()}</div>`:''}
-          <div style="text-align:right;font-family:'Montserrat',sans-serif;font-size:0.88rem;font-weight:700;color:var(--green);">$${Math.round(annInc/12).toLocaleString()}/mo</div>
-        </div>
+        <div class="gc-col"><span class="gc-l">Today</span><span class="gc-v muted">$${Math.round(x.annToday).toLocaleString()}/yr</span></div>
+        ${infl.on?`<div class="gc-col"><span class="gc-l">At Retirement</span><span class="gc-v gold big">$${Math.round(x.annAtRet).toLocaleString()}</span></div>`:''}
+        <div class="gc-col"><span class="gc-l">Monthly${infl.on?' (Ret.)':''}</span><span class="gc-v green big">$${Math.round(x.annAtRet/12).toLocaleString()}/mo</span></div>
+      </div>`).join('')}
+      <div class="gc-total">
+        <div class="gc-main"><div class="gc-name">Total Other Income</div></div>
+        <div class="gc-col"><span class="gc-l">Today</span><span class="gc-v">$${Math.round(incomes.reduce((s,x)=>s+x.annToday,0)).toLocaleString()}/yr</span></div>
+        ${infl.on?`<div class="gc-col"><span class="gc-l">At Retirement</span><span class="gc-v goldl big">$${Math.round(annInc).toLocaleString()}</span></div>`:''}
+        <div class="gc-col"><span class="gc-l">Monthly</span><span class="gc-v green big">$${Math.round(annInc/12).toLocaleString()}/mo</span></div>
       </div>
     </div>` : '';
 
@@ -1414,6 +1434,13 @@ function renderGap() {
           </div>
           <div style="font-size:0.72rem;color:var(--gray-400);margin-top:9px;line-height:1.5;">Assumes level monthly/annual contributions growing at ${(saveRor*100).toFixed(1)}% until retirement in ${n} years, on top of existing projected assets.${infl.on?` Currently showing the <strong style="color:var(--gray-700);">${useInflGoal?'inflation (future-dollar)':"today's-dollar"}</strong> goal.`:''}</div>`;
         })()}
+        <div style="margin-top:14px;border-top:1px solid var(--gray-200);padding-top:12px;">
+          <label style="margin-top:0;">Select Retirement Scenario</label>
+          <select id="gapPicker2" onchange="var g=document.getElementById('gapPicker');g.value=this.value;syncAssetYrs();renderGap();">
+            ${_results.map((sc,i)=>`<option value="${i}"${String(i)===String(idx)?' selected':''}>Scenario ${i+1} — Age ${sc.age} (${sc.yrs} yrs) · $${Math.round(sc.monthly).toLocaleString()}/mo</option>`).join('')}
+          </select>
+          <div class="gap-hint">Switch scenarios right here — no need to scroll back to the top. Both selectors stay in sync.</div>
+        </div>
       </div>
       <div style="background:var(--gray-100);border-top:1px solid var(--gray-200);padding:12px 24px;font-size:0.76rem;color:var(--gray-700);line-height:1.7;">
         <strong style="color:var(--navy);">Gap Summary:</strong> ${annInc>0?`After <strong>$${Math.round(annInc).toLocaleString()}/yr</strong> ($${Math.round(annInc/12).toLocaleString()}/mo) of other retirement income, `:''}To generate the remaining <strong>$${Math.round(monGap).toLocaleString()}/month</strong> ($${Math.round(annGap).toLocaleString()}/year) in perpetual supplemental income, approximately <strong>$${Math.round(capital).toLocaleString()}</strong> is needed earning <strong>${(rate*100).toFixed(2)}%</strong>.
@@ -1460,6 +1487,7 @@ function generateReport() {
 
   let gapHTML='';
   let solutionsHTML='';
+  let taxHTML='';
   if(gapIdx!==''){
     const r=_results[parseInt(gapIdx)];
     // Years to retirement: from Current Age (or DOB) if provided, else from Career Start Age
@@ -1611,7 +1639,10 @@ function generateReport() {
         </div>
       </div>
     </div>`;
+
+    if(window.EFA_TAX){ try{ taxHTML=window.EFA_TAX.sectionHTML(assets, incomes, penG, {sysName:sys.name}); }catch(e){ taxHTML=''; } }
   }
+  if(!taxHTML && window.EFA_TAX && assets.length){ try{ taxHTML=window.EFA_TAX.sectionHTML(assets, getIncomes(infl,0), _results[bestIdx].annual, {sysName:sys.name}); }catch(e){ taxHTML=''; } }
 
   // Inflation assumptions strip (rendered at the bottom of the Benefit Visualization page)
   const inflHTML=infl.on?`<div style="margin-top:18px;border-top:1px solid #e8e3dc;padding-top:14px;"><div style="font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:#9a9590;margin-bottom:8px;">Inflation Assumptions</div><div class="rpt-kpi-row" style="margin-bottom:0;"><div class="rpt-kpi"><div class="rpt-kpi-label">Inflation Rate</div><div class="rpt-kpi-val">${(infl.infl*100).toFixed(2)}%</div></div><div class="rpt-kpi"><div class="rpt-kpi-label">Salary Growth</div><div class="rpt-kpi-val">${(infl.sal*100).toFixed(2)}%</div></div><div class="rpt-kpi"><div class="rpt-kpi-label">COLA Rate</div><div class="rpt-kpi-val">${(infl.cola*100).toFixed(2)}%</div></div><div class="rpt-kpi"><div class="rpt-kpi-label">Mode</div><div class="rpt-kpi-val">Inflation-Adjusted</div></div></div></div>`:'';
@@ -1797,6 +1828,7 @@ body{font-family:'Montserrat',Arial,sans-serif;color:#2d2d2d;background:white;fo
     <strong>Prepared for:</strong> ${client}<br>
     <strong>Pension System:</strong> ${sys.name}<br>
     <strong>Plan / Tier:</strong> ${plan.label}<br>
+    ${getDobPretty()?`<strong>Date of Birth:</strong> ${getDobPretty()}<br>`:''}
     ${getCurrentAge()!==null?`<strong>Current Age:</strong> ${getCurrentAge()}<br>`:''}
     <strong>Final Average Compensation:</strong> $${Math.round(_salary).toLocaleString()}/year<br>
     <strong>Survivor Option:</strong> ${survLabel}<br>
@@ -1832,6 +1864,7 @@ body{font-family:'Montserrat',Arial,sans-serif;color:#2d2d2d;background:white;fo
 
 ${chartSection}
 ${gapHTML}
+${taxHTML}
 ${solutionsHTML}
 
 <div class="rpt-section">
@@ -2638,7 +2671,8 @@ const EFA_ILLUSTRATOR_URL = 'tool-retirement-illustration.html';
   .efa-rpt-status{font-size:0.76rem;font-weight:600;color:var(--green);margin-top:12px;opacity:0;transition:opacity .25s;}
   .efa-rpt-status.show{opacity:1;} .efa-rpt-status.err{color:var(--red);}
   /* next-step boxes */
-  .efa-nextsteps{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  .efa-nextsteps{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
+  @media(max-width:1000px){.efa-nextsteps{grid-template-columns:1fr 1fr;}}
   @media(max-width:860px){.efa-nextsteps{grid-template-columns:1fr;}}
   .efa-ns-card{background:white;border:1.5px solid var(--gray-200);border-left:4px solid var(--gold);border-radius:10px;padding:18px 20px;text-align:left;cursor:pointer;font-family:'Montserrat',sans-serif;transition:all .18s;display:flex;flex-direction:column;gap:7px;}
   .efa-ns-card:hover{transform:translateY(-2px);box-shadow:0 10px 26px rgba(10,31,60,0.14);border-left-color:var(--navy);}
@@ -2882,6 +2916,11 @@ const EFA_ILLUSTRATOR_URL = 'tool-retirement-illustration.html';
         <span class="efa-ns-sub">Choose the strategies to present in depth. Concepts first, case designs, access rules, and calculators for the ones you select.</span>
         <span class="efa-ns-go">Choose Strategies &#8250;</span>
       </button>
+      <button class="efa-ns-card" id="efaBaBtn">
+        <span class="efa-ns-title">Before &amp; After<span id="efaBaBadge" style="display:none;font-family:'Montserrat',sans-serif;font-size:0.56rem;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;background:var(--gold-pale);color:#8a6012;border-radius:20px;padding:2px 8px;vertical-align:middle;margin-left:8px;">In report ✓</span></span>
+        <span class="efa-ns-sub">Optional follow-up step. Start from today's Gap &amp; Capital position, apply what you've put in place, and show the measurable change — powers the Strategy Impact Report.</span>
+        <span class="efa-ns-go">Build &#8250;</span>
+      </button>
     </div>`;
 
   /* strategy picker lives on its own plane now */
@@ -3069,15 +3108,22 @@ window.addEventListener('load',function(){
     window._suppressReportDownload=true;
     try{ generateReport(); } finally { window._suppressReportDownload=false; }
     if(!window._lastReportHTML){ rptStatus('Could not build the report.',true); return; }
+    /* saving to yourself also snapshots the whole session to this browser for one-click restore */
+    if(mode==='self' && window.EFA_SESSION){ try{ window.EFA_SESSION.saveLocal(name); }catch(e){} }
     const btn=document.getElementById(mode==='self'?'efaSaveClientBtn':'efaMailSend');
     const orig=btn.textContent; btn.disabled=true; btn.textContent='Building PDF…';
     const pdfB64=await buildPdfBase64(window._lastReportHTML);
     btn.textContent='Sending…';
     try{
+      const _kind=(window.EFA_BA && window.EFA_BA.ready() && window.EFA_BA.reportKind==='impact')?'impact':'standard';
       const res=await fetch('/api/send-report',{method:'POST',headers:{'Content-Type':'application/json'},
         body:JSON.stringify({mode, clientName:name, to:opts.to||null, items:opts.items||[], note:opts.note||'',
           summary:sessionSummary(), fileName:window._lastReportName||'Pension_Review.html',
           reportPdf:pdfB64, pdfFileName:(window._lastReportName||'Pension_Review.html').replace(/\.html?$/i,'.pdf'),
+          reportKind:_kind,
+          preliminary:!!(window.EFA_BA && window.EFA_BA.prelim),
+          sessionJson:(mode==='self' && window.EFA_SESSION)?window.EFA_SESSION.toJson(name):null,
+          sessionFileName:(mode==='self' && window.EFA_SESSION)?window.EFA_SESSION.fileName(name):null,
           reportHtml:window._lastReportHTML})});   /* always included: server prefers vector rendering from source */
       const j=await res.json().catch(()=>({}));
       if(res.ok && j.ok){
@@ -3201,6 +3247,7 @@ window.addEventListener('load',function(){
   pickOv.querySelector('#efaPresentBtn').onclick=openStrategies;
   pathsEl.querySelector('#efaIllusBtn').onclick=openIllustrator;
   pathsEl.querySelector('#efaPickBtn').onclick=openPicker;
+  pathsEl.querySelector('#efaBaBtn').onclick=()=>{ if(window.EFA_BA) window.EFA_BA.open(); };
 
   window.EFA_PATHS={runCalc, back, openStrategies, openIllustrator, _strats:STRATS, _sel:selected};
 })();
@@ -3887,6 +3934,942 @@ window.addEventListener('load',function(){
     ov.classList.add('on'); document.body.style.overflow='hidden';
   }
   window.EFA_ILLUS={open, _ID:ID, _F:F, _project:project, _base:baseInputs};
+})();
+</script>
+
+<style id="efa-ba-css">
+  /* ── Before & After (Strategy Impact) module ── */
+  .efa-ba-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;}
+  @media(max-width:900px){.efa-ba-grid{grid-template-columns:1fr;}}
+  .efa-ba-pos{background:white;border-radius:10px;box-shadow:var(--shadow);overflow:hidden;border-top:4px solid var(--navy);}
+  .efa-ba-pos.after{border-top-color:var(--gold);}
+  .efa-ba-pos .ph{padding:11px 18px;background:var(--navy);display:flex;justify-content:space-between;align-items:center;gap:8px;}
+  .efa-ba-pos.after .ph{background:linear-gradient(135deg,#8a6012,#b8972e);}
+  .efa-ba-pos .ph .t{font-size:0.68rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:white;}
+  .efa-ba-pos .ph .s{font-size:0.58rem;color:rgba(255,255,255,0.55);letter-spacing:0.05em;text-transform:uppercase;}
+  .efa-ba-kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border-bottom:1px solid var(--gray-200);}
+  .efa-ba-kpi{padding:11px 12px;border-right:1px solid var(--gray-200);text-align:center;}
+  .efa-ba-kpi:last-child{border-right:none;}
+  .efa-ba-kpi .l{font-size:0.56rem;text-transform:uppercase;letter-spacing:0.06em;color:var(--gray-400);font-weight:700;}
+  .efa-ba-kpi .v{font-family:'Montserrat',sans-serif;font-size:1.02rem;font-weight:700;color:var(--navy);margin-top:2px;}
+  .efa-ba-kpi .v.red{color:var(--red);} .efa-ba-kpi .v.green{color:var(--green);} .efa-ba-kpi .v.gold{color:var(--gold);}
+  .efa-ba-body{padding:12px 18px 14px;}
+  .efa-ba-line{display:flex;justify-content:space-between;font-size:0.72rem;color:var(--gray-400);margin-bottom:4px;}
+  .efa-ba-line b{color:var(--navy);}
+  .efa-ba-barbg{background:var(--gray-200);border-radius:20px;height:8px;overflow:hidden;}
+  .efa-ba-bar{height:100%;border-radius:20px;transition:width .4s;}
+  .efa-ba-deltas{display:flex;gap:8px;flex-wrap:wrap;margin:2px 0 16px;}
+  .efa-ba-delta{background:white;border:1.5px solid var(--gray-200);border-radius:20px;padding:5px 13px;font-size:0.68rem;font-weight:700;font-family:'Montserrat',sans-serif;color:var(--gray-400);}
+  .efa-ba-delta.up{border-color:rgba(39,174,96,0.5);color:var(--green);background:#f2fbf5;}
+  .efa-ba-delta.dn{border-color:rgba(192,57,43,0.4);color:var(--red);background:#fdf4f3;}
+  .efa-ba-edit-grid{display:grid;grid-template-columns:1.15fr 1fr;gap:14px;margin-bottom:14px;}
+  @media(max-width:980px){.efa-ba-edit-grid{grid-template-columns:1fr;}}
+  .efa-ba-rates{display:flex;gap:18px;flex-wrap:wrap;align-items:flex-end;background:white;border-radius:10px;box-shadow:var(--shadow);padding:13px 18px;margin-bottom:14px;border-left:4px solid var(--gold);}
+  .efa-ba-rates .rf label{display:block;font-size:0.58rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:var(--gray-400);margin-bottom:3px;}
+  .efa-ba-rates .rf input{width:76px;padding:7px 9px;border:1.5px solid var(--gray-200);border-radius:5px;font-family:'Montserrat',sans-serif;font-size:0.86rem;font-weight:700;color:var(--navy);text-align:center;background:var(--gray-100);}
+  .efa-ba-rates .rf input:focus{outline:none;border-color:var(--gold);background:white;}
+  .efa-ba-rates .hint{font-size:0.66rem;color:var(--gray-400);line-height:1.5;max-width:420px;}
+  .efa-ba-prelim{background:transparent;border:1px solid rgba(255,255,255,0.25);color:rgba(255,255,255,0.5);border-radius:20px;padding:4px 12px;font-family:'Montserrat',sans-serif;font-size:0.58rem;font-weight:600;letter-spacing:0.07em;text-transform:uppercase;cursor:pointer;transition:all .15s;}
+  .efa-ba-prelim:hover{border-color:rgba(255,255,255,0.5);color:rgba(255,255,255,0.8);}
+  .efa-ba-taxband{background:white;border-radius:10px;box-shadow:var(--shadow);padding:14px 18px;margin-bottom:14px;}
+  .efa-ba-taxband .tt{font-size:0.66rem;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:var(--navy);margin-bottom:9px;display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;}
+  .efa-ba-taxband .tt .sub{color:var(--gray-400);text-transform:none;letter-spacing:0.02em;font-weight:600;}
+  .efa-ba-mixrow{display:flex;align-items:center;gap:10px;margin-bottom:7px;}
+  .efa-ba-mixrow .ml{width:64px;font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--gray-400);text-align:right;}
+  .efa-ba-mixbar{flex:1;display:flex;height:20px;border-radius:5px;overflow:hidden;background:var(--gray-100);}
+  .efa-ba-mixbar div{display:flex;align-items:center;justify-content:center;color:white;font-size:0.6rem;font-weight:700;font-family:'Montserrat',sans-serif;white-space:nowrap;overflow:hidden;}
+  #efaResumeCard .efa-resume-ghost{background:white;border:1.5px solid var(--gray-200);border-radius:6px;padding:9px 12px;font-family:'Montserrat',sans-serif;font-size:0.72rem;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:var(--navy);cursor:pointer;}
+  #efaResumeCard .efa-resume-ghost:hover{border-color:var(--gold);color:var(--gold);}
+</style>
+<script id="efa-ba-js">
+/* ════════════════════════════════════════════════════════════════════════════
+   EFA BEFORE & AFTER (STRATEGY IMPACT) + TAX DIVERSIFICATION + SESSION FILES
+   Additive module: reads the untouched engine (getAssets/getIncomes/_results),
+   never rewrites its math. Adds:
+     • EFA_TAX     — tax-status classification + report section (2026 figures)
+     • EFA_BA      — Before & After builder on Deliver + Strategy Impact Report
+     • EFA_SESSION — full-session snapshot: browser store + email session file
+   ════════════════════════════════════════════════════════════════════════════ */
+(function(){
+  const $=id=>document.getElementById(id);
+  const M=n=>'$'+Math.round(n).toLocaleString('en-US');
+  const esc=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  const num=v=>{const n=parseFloat(String(v==null?'':v).replace(/[^0-9.\-]/g,''));return isNaN(n)?0:n;};
+  const deep=o=>JSON.parse(JSON.stringify(o));
+  let _tT=null; function toast(msg){const t=$('efaToast'),m=$('efaToastMsg');if(!t||!m)return;
+    m.innerHTML=msg;t.classList.add('show');clearTimeout(_tT);_tT=setTimeout(()=>t.classList.remove('show'),4200);}
+
+  /* ═══════════ 2026 TAX FACTS — verified against primary sources (July 2026) ═══════════
+     SS taxation tiers ($25k/$34k single · $32k/$44k MFJ): IRS Publication 915.
+     2026 Part B $202.90 std / IRMAA table / Part D adders: CMS fact sheet, "2026 Medicare
+       Parts A & B Premiums and Deductibles"; two-year MAGI lookback: SSA, "Medicare
+       Premiums: Rules for Higher-Income Beneficiaries."
+     RMD age 73 + 25%/10% excise: IRS, Retirement Topics — RMDs. Age 75 (2033, born 1960+):
+       SECURE 2.0 Act §107 (statutory; not yet restated on IRS pages).
+     Inherited-account 10-year rule + yrs 1–9 RMDs: IRS, Retirement Topics — Beneficiary.
+     Senior deduction $6,000 (2025–2028, $75k/$150k MAGI phase-out): IRS Newsroom,
+       "Working Families Tax Cuts" (OBBBA).
+     2026 std deduction $16,100/$32,200: IRS IR-2025-103. 0% LTCG $49,450/$98,900 and
+       65+ additional deduction $1,650/$2,050: Rev. Proc. 2025-32.
+     NIIT 3.8% at $200k/$250k MAGI: IRS, Net Investment Income Tax.
+     CA: pension/pre-tax distributions taxed, Social Security exempt: FTB Pub. 1005 (2024). */
+  const CLS={pretax:{t:'Pre-Tax / Tax-Deferred',c:'#c0392b'},free:{t:'Tax-Free Access',c:'#27ae60'},taxable:{t:'Taxable (Already-Taxed)',c:'#b8972e'}};
+  function taxClass(name){
+    const n=String(name||'').toLowerCase();
+    if(/roth|\bhsa\b|529|\biul\b|whole life|life insurance|muni/.test(n)) return 'free';
+    if(/brokerage|real estate|rental|business|savings|\bcds?\b|money market|checking/.test(n)) return 'taxable';
+    return 'pretax';
+  }
+  function taxMix(assets){
+    const m={pretax:{t:0,p:0},free:{t:0,p:0},taxable:{t:0,p:0}};
+    (assets||[]).forEach(a=>{const k=taxClass(a.name);m[k].t+=(a.bal||0);m[k].p+=(a.proj||0);});
+    const totP=m.pretax.p+m.free.p+m.taxable.p, totT=m.pretax.t+m.free.t+m.taxable.t;
+    const pc=k=>totP>0?(m[k].p/totP*100):0;
+    return {m,totP,totT,pretaxPct:pc('pretax'),freePct:pc('free'),taxablePct:pc('taxable')};
+  }
+  function mixBarHTML(mix,h){
+    const seg=(p,c)=>p>0.4?`<div style="width:${p.toFixed(1)}%;background:${c};display:flex;align-items:center;justify-content:center;color:white;font-size:0.62rem;font-weight:700;white-space:nowrap;overflow:hidden;">${p>=11?p.toFixed(0)+'%':''}</div>`:'';
+    return `<div style="display:flex;height:${h||24}px;border-radius:6px;overflow:hidden;background:#f0ede8;">${seg(mix.pretaxPct,CLS.pretax.c)}${seg(mix.freePct,CLS.free.c)}${seg(mix.taxablePct,CLS.taxable.c)}</div>`;
+  }
+  const IRMAA_ROWS=[
+    ['$109,000 or less','$218,000 or less','$202.90','—'],
+    ['$109,001 – $137,000','$218,001 – $274,000','$284.10','+ $14.50'],
+    ['$137,001 – $171,000','$274,001 – $342,000','$405.80','+ $37.50'],
+    ['$171,001 – $205,000','$342,001 – $410,000','$527.50','+ $60.40'],
+    ['$205,001 – $499,999','$410,001 – $749,999','$649.20','+ $83.30'],
+    ['$500,000 and above','$750,000 and above','$689.90','+ $91.00']
+  ];
+  function sectionHTML(assets,incomes,penAnnual,opts){
+    opts=opts||{};
+    if(!assets||!assets.length) return '';
+    const mix=taxMix(assets);
+    const pct=mix.pretaxPct;
+    const level=pct>=70?'alert':(pct>=45?'watch':'ok');
+    const AL={alert:{c:'#c0392b',bg:'#fdecea',t:'Pre-Tax Concentration Alert'},watch:{c:'#b8972e',bg:'#fdf6e3',t:'Pre-Tax Concentration Watch'},ok:{c:'#27ae60',bg:'#edf9f1',t:'Healthy Tax Diversification'}}[level];
+    const dot=k=>`<span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:${CLS[k].c};margin-right:6px;vertical-align:baseline;"></span>`;
+    const rows=assets.map(a=>{const k=taxClass(a.name);
+      return `<tr><td><strong>${esc(a.name)}</strong></td><td>${M(a.bal)}</td><td>${M(a.proj)}</td><td>${dot(k)}${CLS[k].t}</td></tr>`;}).join('');
+    const legend=['pretax','free','taxable'].map(k=>`<span style="font-size:0.68rem;color:#6b6560;">${dot(k)}<strong style="color:#36332e;">${CLS[k].t}</strong> — ${M(mix.m[k].p)} projected</span>`).join('<span style="color:#ddd9d2;">&nbsp;·&nbsp;</span>');
+    const alertTxt = level==='ok'
+      ? `${pct.toFixed(0)}% of projected retirement assets are in pre-tax accounts, balanced by ${(mix.freePct+mix.taxablePct).toFixed(0)}% in tax-free and already-taxed positions. This spread preserves the ability to choose which tax treatment each retirement dollar comes from — keep it as balances grow.`
+      : `${pct.toFixed(0)}% of projected retirement assets — ${M(mix.m.pretax.p)} of ${M(mix.totP)} — sit in pre-tax accounts. Every dollar withdrawn from that pool is taxed as ordinary income in the year it comes out${penAnnual>0?`, stacked on top of a pension that is already fully taxable (${M(penAnnual)}/yr)`:''}. Diversification includes tax status, not just investments: if tax rates rise, or retirement income matches or exceeds today's income, a pre-tax-heavy portfolio concentrates the entire plan in the one tax treatment that gets more expensive. The table below shows everything that pool touches.`;
+    const cmp = opts.compare ? `
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0 2px;">
+        <div style="background:#f7f5f1;border-radius:6px;padding:10px 13px;border-top:3px solid #0d1e3a;">
+          <div style="font-size:0.6rem;text-transform:uppercase;letter-spacing:0.06em;color:#9a9590;font-weight:700;margin-bottom:6px;">Present Position — Pre-Tax Share</div>
+          ${mixBarHTML(opts.compare.before,18)}
+          <div style="font-family:'Montserrat',sans-serif;font-weight:700;font-size:0.95rem;color:#c0392b;margin-top:5px;">${opts.compare.before.pretaxPct.toFixed(0)}% pre-tax</div>
+        </div>
+        <div style="background:#fffbf0;border-radius:6px;padding:10px 13px;border-top:3px solid #b8972e;">
+          <div style="font-size:0.6rem;text-transform:uppercase;letter-spacing:0.06em;color:#b8972e;font-weight:700;margin-bottom:6px;">Proposed Plan — Pre-Tax Share</div>
+          ${mixBarHTML(opts.compare.after,18)}
+          <div style="font-family:'Montserrat',sans-serif;font-weight:700;font-size:0.95rem;color:${opts.compare.after.pretaxPct<opts.compare.before.pretaxPct?'#27ae60':'#0d1e3a'};margin-top:5px;">${opts.compare.after.pretaxPct.toFixed(0)}% pre-tax</div>
+        </div>
+      </div>`:'';
+    return `<div class="rpt-section">
+      <div class="rpt-section-title">Tax Diversification — How Your Retirement Dollars Are Taxed</div>
+      <p style="font-size:0.78rem;color:#6b6560;line-height:1.65;margin-bottom:10px;">Every retirement dollar lives in one of three tax treatments. <strong style="color:#0d1e3a;">Pre-tax</strong> dollars (401(k), 403(b), 457(b), traditional IRA) are taxed as ordinary income when withdrawn. <strong style="color:#0d1e3a;">Tax-free</strong> dollars (Roth, properly structured life-insurance cash value, qualified HSA) come out with no federal income tax. <strong style="color:#0d1e3a;">Already-taxed</strong> dollars (brokerage, real estate) owe tax only on gains. A balanced plan holds all three — because tax status is a form of diversification.</p>
+      <table class="rpt-table"><thead><tr><th>Account</th><th>Today</th><th>Projected at Retirement</th><th>Tax Status</th></tr></thead>
+        <tbody>${rows}
+        <tr style="background:#f0ede8;font-weight:700;"><td>Total</td><td>${M(mix.totT)}</td><td>${M(mix.totP)}</td><td></td></tr>
+      </tbody></table>
+      <div style="margin:4px 0 6px;">${mixBarHTML(mix,26)}</div>
+      <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:12px;">${legend}</div>
+      ${cmp}
+      <div style="background:${AL.bg};border-left:4px solid ${AL.c};border-radius:6px;padding:12px 15px;margin:10px 0 16px;">
+        <div style="font-size:0.66rem;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:${AL.c};margin-bottom:4px;">${AL.t}</div>
+        <div style="font-size:0.78rem;color:#36332e;line-height:1.65;">${alertTxt}</div>
+      </div>
+      <div class="rpt-subsection-title">What the Pre-Tax Pool Touches — Social Security Taxation</div>
+      <p style="font-size:0.75rem;color:#6b6560;line-height:1.6;margin-bottom:8px;">Whether Social Security is taxed depends on <em>combined income</em>: adjusted gross income + tax-exempt interest + half of Social Security. Withdrawals and required distributions from pre-tax accounts raise it dollar-for-dollar. These thresholds are fixed by law and have never been indexed for inflation.</p>
+      <table class="rpt-table"><thead><tr><th>Portion of Benefits Taxable</th><th>Single Filer — Combined Income</th><th>Married Filing Jointly — Combined Income</th></tr></thead><tbody>
+        <tr><td><strong>0%</strong> — no benefits taxed</td><td>Under $25,000</td><td>Under $32,000</td></tr>
+        <tr><td><strong>Up to 50%</strong> taxable</td><td>$25,000 – $34,000</td><td>$32,000 – $44,000</td></tr>
+        <tr><td><strong>Up to 85%</strong> taxable</td><td>Over $34,000</td><td>Over $44,000</td></tr>
+      </tbody></table>
+      <div class="rpt-subsection-title">What the Pre-Tax Pool Touches — 2026 Medicare Premiums (IRMAA)</div>
+      <p style="font-size:0.75rem;color:#6b6560;line-height:1.6;margin-bottom:8px;">Medicare premiums are means-tested. Cross an income line by a single dollar and the higher premium applies to the whole year — <strong style="color:#0d1e3a;">per person</strong>, so a married couple pays it twice. Surcharges are set from the tax return filed <strong style="color:#0d1e3a;">two years earlier</strong> (2026 premiums use 2024 income), so one large withdrawal echoes into Medicare costs two years later.</p>
+      <table class="rpt-table"><thead><tr><th>2026 Income — Single</th><th>2026 Income — Married Filing Jointly</th><th>Part B Premium / Person / Month</th><th>Part D Surcharge</th></tr></thead><tbody>
+        ${IRMAA_ROWS.map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td><td><strong>${r[2]}</strong></td><td>${r[3]}</td></tr>`).join('')}
+      </tbody></table>
+      <div class="rpt-subsection-title">Everything Else the Pre-Tax Pool Touches</div>
+      <div class="rpt-facts-grid">
+        <div class="rpt-fact"><strong>Forced Income — RMDs at 73</strong>Required minimum distributions from pre-tax accounts begin at age 73 under current law (rising to 75 in 2033 for those born in 1960 or later), whether the income is needed or not. Each RMD raises combined income for Social Security taxation and the income Medicare looks at. The penalty for missing one is a 25% excise tax on the shortfall (10% if corrected within two years).</div>
+        <div class="rpt-fact"><strong>The Survivor's Tax Penalty</strong>When one spouse passes, the survivor files single on roughly the same income: the 2026 standard deduction drops from $32,200 to $16,100, Medicare surcharges start at $109,000 instead of $218,000, and the 85% Social Security tier starts at $34,000 instead of $44,000. A pre-tax-heavy plan hands the surviving spouse the same withdrawals through half the thresholds.</div>
+        <div class="rpt-fact"><strong>The Legacy Tax Bill</strong>Heirs who inherit pre-tax accounts must generally empty them within 10 years, paying ordinary income tax at <em>their</em> rates — often their peak earning years — with annual required distributions in years 1–9 when the owner had already reached RMD age. Roth assets and life-insurance death benefits pass income-tax-free instead.</div>
+        <div class="rpt-fact"><strong>Capital Gains Stacking</strong>Long-term gains enjoy a 0% federal rate up to $49,450 (single) / $98,900 (married filing jointly) of 2026 taxable income — but pre-tax withdrawals fill the income stack first and push gains that would have been tax-free into the 15% bracket.</div>
+        <div class="rpt-fact"><strong>The New Senior Deduction (2025–2028)</strong>Taxpayers 65+ currently receive an extra $6,000 deduction per person ($12,000 per qualifying couple) — but it phases out above $75,000 (single) / $150,000 (joint) of MAGI. Large pre-tax withdrawals can erase a deduction that tax-free income would have preserved.</div>
+        <div class="rpt-fact"><strong>3.8% Investment Income Surtax</strong>Investment income above $200,000 (single) / $250,000 (joint) MAGI picks up an additional 3.8% federal surtax. Pre-tax withdrawals are not investment income themselves, but they raise the income that pushes interest, dividends, and gains over the line.</div>
+        <div class="rpt-fact"><strong>California Taxes It All Again</strong>California taxes pensions and pre-tax retirement distributions as ordinary income at full state rates, just like the federal treatment. (Social Security is exempt from California tax — one more reason not to let pre-tax withdrawals drag more of it into the federal formula.)</div>
+        <div class="rpt-fact"><strong>What Balances the Plan</strong>Income that appears in none of these formulas: qualified Roth distributions, properly structured life-insurance policy loans, and qualified HSA withdrawals. Building those buckets before retirement is what turns a tax problem into a tax choice.</div>
+      </div>
+      <p style="font-size:0.66rem;color:#9a9590;line-height:1.6;margin-top:12px;">Figures are for tax year 2026 unless noted. Sources: IRS Publication 915; CMS, 2026 Medicare Parts A &amp; B Premiums and Deductibles; Social Security Administration, Medicare Premiums: Rules for Higher-Income Beneficiaries; IRS Retirement Topics (Required Minimum Distributions; Beneficiary); SECURE 2.0 Act of 2022 §107; IRS IR-2025-103 and Rev. Proc. 2025-32; IRS Working Families Tax Cuts guidance; IRS Net Investment Income Tax; California FTB Publication 1005. Tax treatment classifications are based on account type as entered and general federal rules — individual circumstances vary; consult a tax professional before acting.</p>
+    </div>`;
+  }
+  window.EFA_TAX={sectionHTML, taxClass, taxMix, mixBarHTML};
+
+  /* ═══════════ pure-math mirror of the gap engine (works on arrays, not DOM) ═══════════ */
+  function fvAsset(a){
+    const bal=+a.bal||0, con=+a.con||0, ror=+a.ror||0, yrs=+a.yrs||0, step=+a.step||0;
+    const fvBal=bal*Math.pow(1+ror,yrs);
+    let fvCon;
+    if(yrs<=0){ fvCon=0; }
+    else if(Math.abs(ror-step)<1e-9){ fvCon=con*yrs*Math.pow(1+ror,yrs-1); }
+    else if(step>0){ fvCon=con*((Math.pow(1+ror,yrs)-Math.pow(1+step,yrs))/(ror-step)); }
+    else { fvCon=ror>0?con*((Math.pow(1+ror,yrs)-1)/ror):con*yrs; }
+    return fvBal+fvCon;
+  }
+  function baCompute(st){
+    const infl=st.infl||{on:false,infl:0,sal:0,cola:0};
+    const futureSal=infl.on?st.salary*Math.pow(1+infl.sal,st.ytr):st.salary;
+    const salForGap=infl.on?futureSal:st.salary;
+    const penForGap=infl.on?st.penFactor*futureSal:st.penNominal;
+    const incomes=(st.incomes||[]).map(x=>{
+      const amt=+x.amt||0, cola=+x.cola||0;
+      const annToday=x.freq==='mo'?amt*12:amt;
+      const annAtRet=infl.on?annToday*Math.pow(1+cola,st.ytr):annToday;
+      return {name:x.name||'Income',amt,freq:x.freq||'yr',cola,annToday,annAtRet};
+    }).filter(x=>x.annToday>0);
+    const annInc=incomes.reduce((s,x)=>s+x.annAtRet,0);
+    const annGap=Math.max(0,salForGap-penForGap-annInc);
+    const monGap=annGap/12;
+    const rate=st.gapRate>0?st.gapRate:0.05;
+    const capital=annGap/rate;
+    const capitalToday=infl.on?capital/Math.pow(1+infl.infl,st.ytr):capital;
+    const assets=(st.assets||[]).map(a=>{
+      const proj=fvAsset(a);
+      const realProj=infl.on?proj/Math.pow(1+infl.infl,(+a.yrs||0)):proj;
+      return {name:a.name||'Asset',bal:+a.bal||0,con:+a.con||0,ror:+a.ror||0,yrs:+a.yrs||0,step:+a.step||0,proj,realProj};
+    }).filter(a=>a.bal>0||a.con>0);
+    const totalNom=assets.reduce((s,a)=>s+a.proj,0);
+    const totalReal=assets.reduce((s,a)=>s+a.realProj,0);
+    const remNom=Math.max(0,capital-totalNom);
+    const covNom=capital>0?Math.min(100,(totalNom/capital)*100):100;
+    const remReal=Math.max(0,capitalToday-totalReal);
+    const covReal=capitalToday>0?Math.min(100,(totalReal/capitalToday)*100):100;
+    const useInflGoal=infl.on&&st.saveGoal!=='reg';
+    const goalCapital=useInflGoal?capital:(infl.on?capitalToday:capital);
+    const existing=infl.on?(useInflGoal?totalNom:totalReal):totalNom;
+    const netGoal=Math.max(0,goalCapital-existing);
+    const n=st.ytr>0?st.ytr:1, months=n*12, sr=st.saveRor>0?st.saveRor:0.06, mr=sr/12;
+    const monthlySave=mr>0?netGoal*mr/(Math.pow(1+mr,months)-1):netGoal/months;
+    const annualSave=sr>0?netGoal*sr/(Math.pow(1+sr,n)-1):netGoal/n;
+    return {infl,salForGap,penForGap,incomes,annInc,annGap,monGap,rate,capital,capitalToday,
+      assets,totalNom,totalReal,remNom,covNom,remReal,covReal,netGoal,monthlySave,annualSave,
+      age:st.age,ytr:st.ytr,saveRor:sr,mix:taxMix(assets)};
+  }
+  function snapshot(){
+    if(typeof _results==='undefined'||!_results||!_results.length) return null;
+    const gp=$('gapPicker');
+    const idx=(gp&&gp.value!=='')?parseInt(gp.value):_results.reduce((b,r,i)=>r.annual>_results[b].annual?i:b,0);
+    const r=_results[idx];
+    const sys=ALL_PLANS[_sys], plan=sys.plans[_planKey];
+    const infl=getInfl();
+    const rawM=plan.factor(Math.min(r.age,plan.maxAge),r.yrs);
+    const ytr=Math.max(0,r.age-getBaselineAge());
+    return {
+      idx, age:r.age, yrs:r.yrs, monthly:r.monthly, salary:_salary,
+      penNominal:r.annual, penFactor:rawM*(1-r.survRed),
+      sysName:sys.name, planLabel:plan.label, sysColor:sys.color,
+      infl, ytr,
+      gapRate:(parseFloat($('gapRate')?.value)||5)/100,
+      saveRor:(parseFloat($('saveRor')?.value)||6)/100,
+      saveGoal:(typeof _saveGoal!=='undefined')?_saveGoal:'infl',
+      assets:getAssets(infl).map(a=>({name:a.name,bal:a.bal,con:a.con,ror:a.ror,yrs:a.yrs,step:a.step})),
+      incomes:getIncomes(infl,ytr).map(x=>({name:x.name,amt:x.amt,freq:x.freq,cola:x.cola}))
+    };
+  }
+
+  /* ═══════════ retirement income & legacy ledger (report section) ═══════════ */
+  function ledgerRows(p){
+    const rows=[]; let bal=p.assets;
+    const horizon=p.horizon||90;
+    for(let k=0;k<=horizon-p.retAge;k++){
+      const age=p.retAge+k;
+      const target=p.inflOn?p.salTarget*Math.pow(1+p.inflRate,k):p.salTarget;
+      const pen=p.inflOn?p.pension*Math.pow(1+(p.pensionCola||0),k):p.pension;
+      const incs=p.incomes.map(x=>p.inflOn?x.annAtRet*Math.pow(1+(x.cola||0),k):x.annAtRet);
+      const incTot=incs.reduce((s,v)=>s+v,0);
+      const need=Math.max(0,target-pen-incTot);
+      const grown=bal*(1+p.rate);            /* capital earns the target return, then funds the year's draw */
+      const draw=Math.min(need,Math.max(0,grown));
+      bal=grown-draw;
+      const short=need-draw;
+      rows.push({age,target,pen,incs,incTot,draw,short,totalInc:pen+incTot+draw,balOut:bal,depleted:bal<=0.5&&short>0.5});
+    }
+    return rows;
+  }
+  function ledgerHTML(c,label,accent){
+    /* c = baCompute() result */
+    const p={retAge:c.age,horizon:90,salTarget:c.salForGap,pension:c.penForGap,
+      pensionCola:c.infl.on?c.infl.cola:0,incomes:c.incomes,assets:c.totalNom,rate:c.rate,
+      inflOn:c.infl.on,inflRate:c.infl.infl};
+    const rows=ledgerRows(p);
+    const shown=c.incomes.slice(0,3), extra=c.incomes.length>3;
+    const short=s=>{s=String(s||'');return s.length>18?s.slice(0,17)+'…':s;};
+    const th=(t,first)=>`<th style="background:#0d1e3a;color:${first?'#d4af5a':'rgba(255,255,255,0.65)'};font-size:0.55rem;letter-spacing:0.05em;text-transform:uppercase;padding:7px 8px;text-align:${first?'center':'right'};position:sticky;top:0;">${t}</th>`;
+    const td=(v,cls)=>`<td style="text-align:right;padding:4px 8px;${cls||''}">${typeof v==='number'?M(v):v}</td>`;
+    const headers=[th('Age',1),th('Pension')]
+      .concat(shown.map(x=>th(esc(short(x.name)))))
+      .concat(extra?[th('Other Income')]:[])
+      .concat([th('From Assets'),th('Total Income'),th('Income Target'),th('Assets Remaining — Legacy')]).join('');
+    const body=rows.map((r,i)=>{
+      const extraInc=extra?r.incs.slice(3).reduce((s,v)=>s+v,0):0;
+      return `<tr style="background:${r.age===p.retAge?'#f6efe0':(i%2===1?'#fbf7ee':'white')};${r.age===p.retAge?'border-top:2px solid #b8972e;border-bottom:2px solid #b8972e;':'border-bottom:1px solid #e8e3dc;'}">
+        <td style="text-align:center;font-weight:700;color:#0d1e3a;padding:4px 8px;">${r.age}</td>
+        ${td(r.pen,'color:#36332e;')}
+        ${shown.map((x,j)=>td(r.incs[j],'color:#36332e;')).join('')}
+        ${extra?td(extraInc,'color:#36332e;'):''}
+        ${td(r.draw,'color:#b8972e;font-weight:600;')}
+        ${r.short>0.5?td(r.totalInc,'color:#c0392b;font-weight:700;'):td(r.totalInc,'color:#27ae60;font-weight:700;')}
+        ${td(r.target,'color:#9a9590;')}
+        ${td(r.balOut,r.depleted?'color:#c0392b;font-weight:700;':'color:#0d1e3a;font-weight:700;')}
+      </tr>`;}).join('');
+    const endBal=rows.length?rows[rows.length-1].balOut:0;
+    const firstShort=rows.find(r=>r.short>0.5);
+    return `<div class="rpt-section ledger">
+      <div class="rpt-section-title">Retirement Income &amp; Legacy Ledger — ${esc(label)}</div>
+      <p style="font-size:0.75rem;color:#6b6560;line-height:1.6;margin-bottom:10px;">Year by year from retirement at age ${p.retAge} through age ${p.horizon}: every income source, what is drawn from capital to reach the income target, and the capital still standing — the <strong style="color:#0d1e3a;">legacy</strong> position that passes to beneficiaries at each age, before any life-insurance death benefits.</p>
+      <div style="border:1px solid #e8e3dc;border-radius:8px;overflow:hidden;">
+      <table style="width:100%;border-collapse:collapse;font-size:0.68rem;font-family:'Montserrat',Arial,sans-serif;">
+        <thead><tr>${headers}</tr></thead><tbody>${body}</tbody>
+      </table>
+      </div>
+      <div style="display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-top:9px;">
+        <span style="font-size:0.66rem;color:#9a9590;line-height:1.6;max-width:620px;">Gold rule marks the first retirement year. Capital earns ${(p.rate*100).toFixed(2)}% and funds the draw each year${p.inflOn?`; the income target grows ${(p.inflRate*100).toFixed(1)}%/yr, the pension by its ${((p.pensionCola||0)*100).toFixed(1)}% COLA, and each income source by its own COLA`:'; amounts are level, as entered'}. ${firstShort?`<strong style="color:#c0392b;">Red totals mark years the income target is not fully funded${firstShort?` (first at age ${firstShort.age})`:''}.</strong>`:'Every year of the plan meets the income target.'}</span>
+        <span style="font-size:0.72rem;color:#36332e;white-space:nowrap;"><strong style="color:#0d1e3a;">Legacy at ${p.horizon}:</strong> <strong style="color:${endBal>0?'#27ae60':'#c0392b'};font-family:'Montserrat',sans-serif;">${M(endBal)}</strong></span>
+      </div>
+    </div>`;
+  }
+  /* ═══════════ BEFORE & AFTER state + overlay ═══════════ */
+  const BA={before:null, after:null, prelim:true, reportKind:'standard'};
+  function ready(){ return !!(BA.before&&BA.after); }
+  function afterFull(){ return {...BA.before, assets:BA.after.assets, incomes:BA.after.incomes,
+    gapRate:BA.after.gapRate, saveRor:BA.after.saveRor}; }
+  const fmtN=n=>Math.round(+n||0)?Math.round(+n||0).toLocaleString('en-US'):'0';
+  const pctIn=v=>{const n=+v;return isNaN(n)?'':(Math.round(n*10000)/100);};
+
+  const BA_ASSET_TYPES=['403(b)','457(b) Deferred Compensation','401(k)','401(a)','Traditional IRA','Roth IRA','SEP IRA','SIMPLE IRA','Fixed Index Annuity (FIA)','Multi-Year Guaranteed Annuity (MYGA)','Variable Annuity','IUL Cash Value','Whole Life Cash Value','Brokerage Account','HSA (Health Savings Account)','529 Education Account','Real Estate Equity','Rental Income (Annualized)','Business Interest','Pension (Other System)','Social Security Estimate'];
+  const BA_INCOME_TYPES=['Social Security (Client)','Social Security (Spouse)','Spouse / Partner Pension','Pension (Other System)','Annuity Income (FIA / SPIA / MYGA)','IUL Policy Loan Income','Whole Life Income','Rental / Real Estate Income','Business Interest / Distributions','Part-Time / Consulting Income'];
+  [['dl_ba_assets',BA_ASSET_TYPES],['dl_ba_incomes',BA_INCOME_TYPES]].forEach(([id,items])=>{
+    if($(id)) return; const dl=document.createElement('datalist'); dl.id=id;
+    dl.innerHTML=items.map(x=>`<option value="${esc(x)}">`).join(''); document.body.appendChild(dl);
+  });
+
+  const ov=document.createElement('div'); ov.className='efa-overlay'; ov.id='efaBaOverlay';
+  ov.innerHTML=`
+    <div class="efa-ov-head">
+      <div><div class="ot">Before <em>&amp; After</em></div><div class="os" id="efaBaWho">Strategy Impact · Edwards Financial &amp; Associates</div></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="efa-back" id="efaBaReset" title="Re-mirror the Proposed Plan from the current Gap &amp; Capital inputs">&#8634; Reset to Mirror</button>
+        <button class="efa-back" id="efaBaClose">&#8249; Back to Deliver</button>
+      </div>
+    </div>
+    <div class="efa-ov-body"><div class="efa-il-wrap" id="efaBaBody"></div></div>
+    <div class="efa-ov-foot">
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+        <button id="efaBaPrelim" class="efa-ba-prelim" title="Marks the Strategy Impact Report and client email"></button>
+        <span class="efa-foot-note">The Present Position mirrors the Gap &amp; Capital step and stays locked. Edit only the Proposed Plan — assets, income, and return assumptions.</span>
+      </div>
+      <button class="efa-go" id="efaBaDone">&#10003; Done — Use in Report</button>
+    </div>`;
+  document.body.appendChild(ov);
+  $('efaBaClose').onclick=close;
+  $('efaBaDone').onclick=()=>{ BA.reportKind='impact'; updateDeliverUI(); close();
+    toast('<b>Before &amp; After saved.</b> The Deliver page will now generate the Strategy Impact Report'+(BA.prelim?' (marked Preliminary).':' (marked Final).')); };
+  $('efaBaReset').onclick=()=>{ BA.before=snapshot(); BA.after={assets:deep(BA.before.assets),incomes:deep(BA.before.incomes),gapRate:BA.before.gapRate,saveRor:BA.before.saveRor}; render(); };
+  $('efaBaPrelim').onclick=()=>{ BA.prelim=!BA.prelim; setPrelimBtn(); updateDeliverUI(); };
+  function setPrelimBtn(){ const b=$('efaBaPrelim'); if(b) b.textContent=BA.prelim?'● Preliminary':'○ Final Recommendations'; }
+
+  function open(){
+    if(typeof _results==='undefined'||!_results||!_results.length){ alert('Run a comparison first — the Before & After starts from the chosen scenario.'); return; }
+    const snap=snapshot(); if(!snap){ alert('Run a comparison first.'); return; }
+    BA.before=snap;
+    if(!BA.after){ BA.after={assets:deep(snap.assets),incomes:deep(snap.incomes),gapRate:snap.gapRate,saveRor:snap.saveRor}; BA.reportKind='impact'; }
+    const who=($('clientName')&&$('clientName').value.trim())||'';
+    $('efaBaWho').textContent=(who?who+' · ':'')+'Strategy Impact · Edwards Financial & Associates';
+    render(); setPrelimBtn(); updateDeliverUI();
+    ov.classList.add('on'); document.body.style.overflow='hidden';
+  }
+  function close(){ ov.classList.remove('on'); document.body.style.overflow=''; updateDeliverUI(); }
+
+  function kpi(l,v,cls){ return `<div class="efa-ba-kpi"><div class="l">${l}</div><div class="v ${cls||''}">${v}</div></div>`; }
+  function posCard(c,after){
+    const barC=c.covNom>=100?'var(--green)':c.covNom>60?'var(--gold)':'var(--red)';
+    return `<div class="efa-ba-pos ${after?'after':''}">
+      <div class="ph"><span class="t">${after?'Proposed Plan':'Present Position'}</span><span class="s">${after?'recommendations applied':'as entered · locked'}</span></div>
+      <div class="efa-ba-kpis">
+        ${kpi('Monthly Gap', c.monGap>0?'-'+M(c.monGap):'None', c.monGap>0?'red':'green')}
+        ${kpi('Capital Needed', M(c.capital), '')}
+        ${kpi('Projected Assets', M(c.totalNom), 'green')}
+      </div>
+      <div class="efa-ba-body">
+        <div class="efa-ba-line"><span>Gap Funded</span><b style="color:${barC};">${c.covNom.toFixed(0)}%</b></div>
+        <div class="efa-ba-barbg"><div class="efa-ba-bar" style="width:${Math.min(100,c.covNom).toFixed(0)}%;background:${barC};"></div></div>
+        <div class="efa-ba-line" style="margin-top:8px;"><span>Still to Fund</span><b style="color:${c.remNom>0?'var(--red)':'var(--green)'};">${c.remNom>0?'-'+M(c.remNom):'✓ Covered'}</b></div>
+        <div class="efa-ba-line"><span>Required Savings (${c.ytr>0?c.ytr:1} yrs @ ${(c.saveRor*100).toFixed(1)}%)</span><b>${M(c.monthlySave)}/mo</b></div>
+        <div class="efa-ba-line"><span>Pre-Tax Share of Assets</span><b style="color:${c.mix.pretaxPct>=70?'var(--red)':c.mix.pretaxPct>=45?'var(--gold)':'var(--green)'};">${c.mix.pretaxPct.toFixed(0)}%</b></div>
+      </div>
+    </div>`;
+  }
+  function deltaChip(label,bv,av,lowerBetter,kind){
+    const d=av-bv;
+    if(Math.abs(d)<(kind==='pct'?0.5:1)) return '';
+    const good=lowerBetter?d<0:d>0;
+    const txt=kind==='pct'?Math.abs(d).toFixed(0)+' pts':M(Math.abs(d));
+    return `<span class="efa-ba-delta ${good?'up':'dn'}">${label} ${d<0?'↓':'↑'} ${txt}</span>`;
+  }
+  function stripHTML(){
+    const b=baCompute(BA.before), a=baCompute(afterFull());
+    return `<div class="efa-ba-grid">${posCard(b,false)}${posCard(a,true)}</div>
+      <div class="efa-ba-deltas">
+        ${deltaChip('Monthly gap',b.monGap,a.monGap,true,'money')}
+        ${deltaChip('Funded',b.covNom,a.covNom,false,'pct')}
+        ${deltaChip('Still to fund',b.remNom,a.remNom,true,'money')}
+        ${deltaChip('Projected assets',b.totalNom,a.totalNom,false,'money')}
+        ${deltaChip('Required savings/mo',b.monthlySave,a.monthlySave,true,'money')}
+        ${deltaChip('Pre-tax share',b.mix.pretaxPct,a.mix.pretaxPct,true,'pct')}
+      </div>`;
+  }
+  function taxBandInner(){
+    const b=baCompute(BA.before), a=baCompute(afterFull());
+    return `<div class="efa-ba-mixrow"><span class="ml">Before</span><div class="efa-ba-mixbar">${mixBarHTML(b.mix,20).replace(/^<div[^>]*>|<\/div>$/g,'')}</div><b style="font-family:'Montserrat',sans-serif;font-size:0.78rem;color:var(--red);min-width:86px;text-align:right;">${b.mix.pretaxPct.toFixed(0)}% pre-tax</b></div>
+      <div class="efa-ba-mixrow"><span class="ml">After</span><div class="efa-ba-mixbar">${mixBarHTML(a.mix,20).replace(/^<div[^>]*>|<\/div>$/g,'')}</div><b style="font-family:'Montserrat',sans-serif;font-size:0.78rem;color:${a.mix.pretaxPct<b.mix.pretaxPct?'var(--green)':'var(--navy)'};min-width:86px;text-align:right;">${a.mix.pretaxPct.toFixed(0)}% pre-tax</b></div>
+      <div style="font-size:0.64rem;color:var(--gray-400);margin-top:6px;line-height:1.5;">Red = pre-tax / tax-deferred · Green = tax-free access · Gold = already-taxed. Based on projected values at retirement.</div>`;
+  }
+  function editorTables(){
+    const A=BA.after;
+    const aRows=A.assets.map((x,i)=>`<tr>
+      <td><input data-l="assets" data-i="${i}" data-f="name" value="${esc(x.name)}" list="dl_ba_assets" placeholder="Account"></td>
+      <td style="width:92px;"><input data-l="assets" data-i="${i}" data-f="bal" type="text" inputmode="numeric" class="efa-money" value="${fmtN(x.bal)}"></td>
+      <td style="width:84px;"><input data-l="assets" data-i="${i}" data-f="con" type="text" inputmode="numeric" class="efa-money" value="${fmtN(x.con)}"></td>
+      <td style="width:58px;"><input data-l="assets" data-i="${i}" data-f="ror" type="number" step="0.25" value="${pctIn(x.ror)}"></td>
+      <td style="width:50px;"><input data-l="assets" data-i="${i}" data-f="yrs" type="number" value="${x.yrs}"></td>
+      <td style="width:54px;"><input data-l="assets" data-i="${i}" data-f="step" type="number" step="0.25" value="${pctIn(x.step)}"></td>
+      <td style="width:26px;"><button class="efa-il-del" data-dl="assets" data-del="${i}">×</button></td></tr>`).join('');
+    const iRows=A.incomes.map((x,i)=>`<tr>
+      <td><input data-l="incomes" data-i="${i}" data-f="name" value="${esc(x.name)}" list="dl_ba_incomes" placeholder="Source"></td>
+      <td style="width:92px;"><input data-l="incomes" data-i="${i}" data-f="amt" type="text" inputmode="numeric" class="efa-money" value="${fmtN(x.amt)}"></td>
+      <td style="width:86px;"><select data-l="incomes" data-i="${i}" data-f="freq"><option value="yr"${x.freq!=='mo'?' selected':''}>Annual</option><option value="mo"${x.freq==='mo'?' selected':''}>Monthly</option></select></td>
+      <td style="width:58px;"><input data-l="incomes" data-i="${i}" data-f="cola" type="number" step="0.25" value="${pctIn(x.cola)}"></td>
+      <td style="width:26px;"><button class="efa-il-del" data-dl="incomes" data-del="${i}">×</button></td></tr>`).join('');
+    return `<div class="efa-ba-edit-grid">
+      <div class="efa-il-card">
+        <div class="efa-il-ch"><span class="t">Proposed Plan — Assets</span><span class="src">balance · contrib/yr · ROR% · yrs · +%/yr</span></div>
+        <table class="efa-il-tbl"><thead><tr><th>Account</th><th>Balance ($)</th><th>Contrib/yr</th><th>ROR %</th><th>Yrs</th><th>+%/yr</th><th></th></tr></thead>
+        <tbody>${aRows||''}</tbody></table>
+        <button class="efa-il-add" data-add="assets">+ Add asset</button>
+      </div>
+      <div class="efa-il-card">
+        <div class="efa-il-ch"><span class="t">Proposed Plan — Other Income</span><span class="src">amount · frequency · COLA %/yr</span></div>
+        <table class="efa-il-tbl"><thead><tr><th>Source</th><th>Amount ($)</th><th>Frequency</th><th>COLA %</th><th></th></tr></thead>
+        <tbody>${iRows||''}</tbody></table>
+        <button class="efa-il-add" data-add="incomes">+ Add income</button>
+      </div>
+    </div>`;
+  }
+  function render(){
+    const body=$('efaBaBody');
+    body.innerHTML=`
+      <div id="efaBaStrip">${stripHTML()}</div>
+      <div class="efa-ba-rates">
+        <div class="rf"><label>Target Return %</label><input id="efaBaRate" type="number" step="0.25" min="1" max="15" value="${pctIn(BA.after.gapRate)}"></div>
+        <div class="rf"><label>Savings ROR %</label><input id="efaBaSror" type="number" step="0.25" min="1" max="15" value="${pctIn(BA.after.saveRor)}"></div>
+        <div class="hint"><b style="color:var(--navy);">Target Return</b> drives the Proposed Plan's capital requirement (gap ÷ return). <b style="color:var(--navy);">Savings ROR</b> drives its required savings. The Present Position keeps the rates from the Gap &amp; Capital step.</div>
+      </div>
+      <div id="efaBaEditors">${editorTables()}</div>
+      <div class="efa-ba-taxband">
+        <div class="tt"><span>Tax Status of the Plan — Diversification by Tax Treatment</span><span class="sub">carried into the report automatically</span></div>
+        <div id="efaBaTax">${taxBandInner()}</div>
+      </div>`;
+    wire();
+  }
+  function updateStrip(){ const s=$('efaBaStrip'); if(s) s.innerHTML=stripHTML(); const t=$('efaBaTax'); if(t) t.innerHTML=taxBandInner(); }
+  function wire(){
+    const body=$('efaBaBody');
+    body.querySelectorAll('input[data-l],select[data-l]').forEach(el=>{
+      el.addEventListener('input',()=>{
+        const L=BA.after[el.dataset.l]; const r=L&&L[+el.dataset.i]; if(!r) return;
+        const f=el.dataset.f;
+        if(f==='name') r.name=el.value;
+        else if(f==='freq') r.freq=el.value;
+        else if(f==='ror'||f==='step'||f==='cola') r[f]=num(el.value)/100;
+        else r[f]=num(el.value);
+        updateStrip();
+      });
+      el.addEventListener('blur',()=>{ if(el.classList.contains('efa-money')){ const r=BA.after[el.dataset.l][+el.dataset.i]; if(r) el.value=fmtN(r[el.dataset.f]); } });
+    });
+    body.querySelectorAll('[data-add]').forEach(b=>b.onclick=()=>{
+      if(b.dataset.add==='assets') BA.after.assets.push({name:'',bal:0,con:0,ror:0.06,yrs:(BA.before&&BA.before.ytr)||10,step:0});
+      else BA.after.incomes.push({name:'',amt:0,freq:'yr',cola:0});
+      const ed=$('efaBaEditors'); ed.innerHTML=editorTables(); wire2(ed); updateStrip();
+      const inputs=ed.querySelectorAll('input[data-f="name"]'); const last=inputs[inputs.length-1]; if(last) last.focus();
+    });
+    body.querySelectorAll('.efa-il-del[data-dl]').forEach(b=>b.onclick=()=>{
+      BA.after[b.dataset.dl].splice(+b.dataset.del,1);
+      const ed=$('efaBaEditors'); ed.innerHTML=editorTables(); wire2(ed); updateStrip();
+    });
+    const gr=$('efaBaRate'), sr=$('efaBaSror');
+    if(gr) gr.addEventListener('input',()=>{ BA.after.gapRate=Math.max(0.005,num(gr.value)/100||0.05); updateStrip(); });
+    if(sr) sr.addEventListener('input',()=>{ BA.after.saveRor=Math.max(0.005,num(sr.value)/100||0.06); updateStrip(); });
+  }
+  function wire2(scope){ /* rewire just the editors after a re-render */
+    scope.querySelectorAll('input[data-l],select[data-l]').forEach(el=>{
+      el.addEventListener('input',()=>{
+        const L=BA.after[el.dataset.l]; const r=L&&L[+el.dataset.i]; if(!r) return;
+        const f=el.dataset.f;
+        if(f==='name') r.name=el.value;
+        else if(f==='freq') r.freq=el.value;
+        else if(f==='ror'||f==='step'||f==='cola') r[f]=num(el.value)/100;
+        else r[f]=num(el.value);
+        updateStrip();
+      });
+      el.addEventListener('blur',()=>{ if(el.classList.contains('efa-money')){ const r=BA.after[el.dataset.l][+el.dataset.i]; if(r) el.value=fmtN(r[el.dataset.f]); } });
+    });
+    scope.querySelectorAll('[data-add]').forEach(b=>b.onclick=()=>{
+      if(b.dataset.add==='assets') BA.after.assets.push({name:'',bal:0,con:0,ror:0.06,yrs:(BA.before&&BA.before.ytr)||10,step:0});
+      else BA.after.incomes.push({name:'',amt:0,freq:'yr',cola:0});
+      scope.innerHTML=editorTables(); wire2(scope); updateStrip();
+    });
+    scope.querySelectorAll('.efa-il-del[data-dl]').forEach(b=>b.onclick=()=>{
+      BA.after[b.dataset.dl].splice(+b.dataset.del,1);
+      scope.innerHTML=editorTables(); wire2(scope); updateStrip();
+    });
+  }
+
+  /* ═══════════ Deliver-page indicators (badge on the card + report-type row) ═══════════ */
+  function updateDeliverUI(){
+    const badge=$('efaBaBadge'); if(badge) badge.style.display=(ready()&&BA.reportKind==='impact')?'inline-block':'none';
+    let row=$('efaKindRow');
+    if(!row){
+      const card=document.querySelector('.efa-rpt-card'); if(!card) return;
+      row=document.createElement('div'); row.id='efaKindRow';
+      row.style.cssText='display:none;margin-top:14px;border-top:1px dashed var(--gray-200);padding-top:12px;align-items:center;gap:12px;flex-wrap:wrap;';
+      row.innerHTML=`<span style="font-size:0.62rem;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:var(--gray-400);">Report Type</span>
+        <span style="display:inline-flex;border:1.5px solid var(--gray-200);border-radius:6px;overflow:hidden;">
+          <button id="efaKindStd" style="border:none;padding:7px 13px;font-size:0.66rem;font-weight:700;font-family:'Montserrat',sans-serif;letter-spacing:0.05em;text-transform:uppercase;cursor:pointer;"></button>
+          <button id="efaKindImp" style="border:none;padding:7px 13px;font-size:0.66rem;font-weight:700;font-family:'Montserrat',sans-serif;letter-spacing:0.05em;text-transform:uppercase;cursor:pointer;"></button>
+        </span>
+        <span id="efaKindNote" style="font-size:0.66rem;color:var(--gray-400);line-height:1.4;"></span>`;
+      const grid=card.querySelector('.efa-rpt-grid');
+      (grid||card).insertAdjacentElement('afterend',row);
+      row.querySelector('#efaKindStd').onclick=()=>{ BA.reportKind='standard'; updateDeliverUI(); };
+      row.querySelector('#efaKindImp').onclick=()=>{ BA.reportKind='impact'; updateDeliverUI(); };
+    }
+    if(!ready()){ row.style.display='none'; return; }
+    row.style.display='flex';
+    const std=row.querySelector('#efaKindStd'), imp=row.querySelector('#efaKindImp');
+    const onS=BA.reportKind!=='impact';
+    std.style.background=onS?'var(--navy)':'white'; std.style.color=onS?'white':'var(--gray-400)'; std.textContent='Standard Review';
+    imp.style.background=!onS?'var(--gold)':'white'; imp.style.color=!onS?'var(--navy)':'var(--gray-400)'; imp.textContent='Strategy Impact';
+    row.querySelector('#efaKindNote').innerHTML=!onS
+      ? `Before &amp; After applied · income &amp; legacy ledgers · tax diversification · marked <b style="color:var(--navy);">${BA.prelim?'Preliminary':'Final Recommendations'}</b>`
+      : 'The standard pension review — the Before &amp; After stays saved and can be switched back on.';
+  }
+  /* ═══════════ STRATEGY IMPACT REPORT (before & after client deliverable) ═══════════ */
+  function rptPos(c,label,sub){
+    const barC=c.covNom>=100?'#27ae60':c.covNom>60?'#b8972e':'#c0392b';
+    return `<div class="rpt-section">
+      <div class="rpt-section-title">${label}</div>
+      ${sub?`<p style="font-size:0.75rem;color:#9a9590;margin-bottom:12px;">${sub}</p>`:''}
+      <div class="rpt-kpi-row">
+        <div class="rpt-kpi"><div class="rpt-kpi-label">Income Target${c.infl.on?' (Future $)':''}</div><div class="rpt-kpi-val">${M(c.salForGap)}/yr</div></div>
+        <div class="rpt-kpi"><div class="rpt-kpi-label">Pension at Age ${c.age}</div><div class="rpt-kpi-val">${M(c.penForGap)}/yr</div></div>
+        ${c.annInc>0?`<div class="rpt-kpi"><div class="rpt-kpi-label">Other Income</div><div class="rpt-kpi-val" style="color:#27ae60;">${M(c.annInc)}/yr</div></div>`:''}
+        <div class="rpt-kpi red"><div class="rpt-kpi-label">Annual Gap</div><div class="rpt-kpi-val">${c.annGap>0?'-'+M(c.annGap):'None'}</div></div>
+        <div class="rpt-kpi red"><div class="rpt-kpi-label">Monthly Gap</div><div class="rpt-kpi-val">${c.monGap>0?'-'+M(c.monGap):'None'}</div></div>
+      </div>
+      <div class="rpt-formula">
+        <div class="rpt-fi"><div class="rpt-fl">Annual Gap</div><div class="rpt-fv">${M(c.annGap)}</div></div>
+        <div class="rpt-fo">÷</div>
+        <div class="rpt-fi"><div class="rpt-fl">Return Rate</div><div class="rpt-fv">${(c.rate*100).toFixed(2)}%</div></div>
+        <div class="rpt-fo">=</div>
+        <div class="rpt-fi gold"><div class="rpt-fl">Capital Needed${c.infl.on?' (Future $)':''}</div><div class="rpt-fv">${M(c.capital)}</div></div>
+        ${c.infl.on?`<div class="rpt-fo">→</div><div class="rpt-fi"><div class="rpt-fl">In Today's Dollars</div><div class="rpt-fv" style="color:#d4af5a;">${M(c.capitalToday)}</div></div>`:''}
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;">
+        <div style="background:#f7f5f1;border-radius:6px;padding:11px 13px;border-top:3px solid #27ae60;">
+          <div style="font-size:0.6rem;text-transform:uppercase;letter-spacing:0.05em;color:#9a9590;font-weight:700;">Projected Assets at Retirement</div>
+          <div style="font-family:'Montserrat',sans-serif;font-size:1.05rem;font-weight:700;color:#27ae60;margin-top:3px;">${M(c.totalNom)}</div>
+        </div>
+        <div style="background:#f7f5f1;border-radius:6px;padding:11px 13px;border-top:3px solid ${barC};">
+          <div style="font-size:0.6rem;text-transform:uppercase;letter-spacing:0.05em;color:#9a9590;font-weight:700;">Gap Funded</div>
+          <div style="font-family:'Montserrat',sans-serif;font-size:1.05rem;font-weight:700;color:${barC};margin-top:3px;">${c.covNom.toFixed(0)}%</div>
+          <div style="background:#e8e3dc;border-radius:4px;height:6px;overflow:hidden;margin-top:5px;"><div style="height:100%;width:${Math.min(100,c.covNom).toFixed(0)}%;background:${barC};border-radius:4px;"></div></div>
+        </div>
+        <div style="background:#f7f5f1;border-radius:6px;padding:11px 13px;border-top:3px solid #0d1e3a;">
+          <div style="font-size:0.6rem;text-transform:uppercase;letter-spacing:0.05em;color:#9a9590;font-weight:700;">Still to Fund · Required Savings</div>
+          <div style="font-family:'Montserrat',sans-serif;font-size:1.05rem;font-weight:700;color:${c.remNom>0?'#c0392b':'#27ae60'};margin-top:3px;">${c.remNom>0?M(c.remNom):'✓ Covered'}</div>
+          <div style="font-size:0.68rem;color:#6b6560;margin-top:3px;">${c.remNom>0?M(c.monthlySave)+'/mo for '+(c.ytr>0?c.ytr:1)+' yrs @ '+(c.saveRor*100).toFixed(1)+'%':'No additional savings required'}</div>
+        </div>
+      </div>
+    </div>`;
+  }
+  function impactTableHTML(b,a){
+    const D=(bv,av,lower,kind,suf)=>{
+      const d=av-bv;
+      if(Math.abs(d)<(kind==='pct'?0.5:1)) return '<span style="color:#9a9590;">No change</span>';
+      const good=lower?d<0:d>0;
+      const txt=kind==='pct'?Math.abs(d).toFixed(0)+' pts':M(Math.abs(d))+(suf||'');
+      return `<span style="color:${good?'#27ae60':'#c0392b'};font-weight:700;">${d<0?'▼':'▲'} ${txt}</span>`;
+    };
+    const V=(v,kind,suf)=>kind==='pct'?v.toFixed(0)+'%':M(v)+(suf||'');
+    const rows=[
+      ['Monthly Income Gap', b.monGap, a.monGap, true, 'money','/mo'],
+      ['Annual Income Gap', b.annGap, a.annGap, true, 'money','/yr'],
+      ['Capital Required'+(b.infl.on?' (Future $)':''), b.capital, a.capital, true, 'money',''],
+      ['Projected Assets at Retirement', b.totalNom, a.totalNom, false, 'money',''],
+      ['Gap Funded', b.covNom, a.covNom, false, 'pct',''],
+      ['Still to Fund', b.remNom, a.remNom, true, 'money',''],
+      ['Required Savings', b.monthlySave, a.monthlySave, true, 'money','/mo'],
+      ['Pre-Tax Share of Assets', b.mix.pretaxPct, a.mix.pretaxPct, true, 'pct','']
+    ].map(r=>`<tr><td><strong>${r[0]}</strong></td><td>${V(r[1],r[4],r[5])}</td><td style="font-weight:700;color:#0d1e3a;">${V(r[2],r[4],r[5])}</td><td>${D(r[1],r[2],r[3],r[4],r[5])}</td></tr>`).join('');
+    return `<div class="rpt-section">
+      <div class="rpt-section-title">The Impact — Side by Side</div>
+      <table class="rpt-table"><thead><tr><th style="width:32%;">Measure</th><th>Present Position</th><th>Proposed Plan</th><th>Change</th></tr></thead><tbody>${rows}</tbody></table>
+    </div>`;
+  }
+  function changedHTML(b,a){
+    const tag=(t,c)=>`<span class="best-tag" style="background:${c};">${t}</span>`;
+    const mapBy=l=>{const m=new Map();l.forEach(x=>m.set(x.name,x));return m;};
+    const bA=mapBy(b.assets), aA=mapBy(a.assets);
+    const diffA=(x,y)=>Math.round(x.bal)!==Math.round(y.bal)||Math.round(x.con)!==Math.round(y.con)||Math.abs(x.ror-y.ror)>1e-9||x.yrs!==y.yrs;
+    const rowsBA=b.assets.map(x=>`<tr><td><strong>${esc(x.name)}</strong>${!aA.has(x.name)?' '+tag('Repositioned','#9a9590'):''}</td><td>${M(x.bal)}</td><td>${M(x.proj)}</td></tr>`).join('');
+    const rowsAA=a.assets.map(x=>{const was=bA.get(x.name);
+      return `<tr${!was?' class="best-row"':''}><td><strong>${esc(x.name)}</strong>${!was?' '+tag('New','#b8972e'):(diffA(was,x)?' '+tag('Adjusted','#6aa9c9'):'')}</td><td>${M(x.bal)}</td><td>${M(x.proj)}</td></tr>`;}).join('');
+    const bI=mapBy(b.incomes), aI=mapBy(a.incomes);
+    const diffI=(x,y)=>Math.round(x.annToday)!==Math.round(y.annToday)||Math.abs((x.cola||0)-(y.cola||0))>1e-9;
+    const rowsBI=b.incomes.map(x=>`<tr><td><strong>${esc(x.name)}</strong>${!aI.has(x.name)?' '+tag('Repositioned','#9a9590'):''}</td><td>${M(x.annToday)}/yr</td><td>${M(x.annAtRet/12)}/mo</td></tr>`).join('');
+    const rowsAI=a.incomes.map(x=>{const was=bI.get(x.name);
+      return `<tr${!was?' class="best-row"':''}><td><strong>${esc(x.name)}</strong>${!was?' '+tag('New','#b8972e'):(diffI(was,x)?' '+tag('Adjusted','#6aa9c9'):'')}</td><td>${M(x.annToday)}/yr</td><td>${M(x.annAtRet/12)}/mo</td></tr>`;}).join('');
+    const tot=(l,f)=>M(l.reduce((s,x)=>s+(x[f]||0),0));
+    return `<div class="rpt-section">
+      <div class="rpt-section-title">What Changed</div>
+      <div class="rpt-subsection-title">Assets</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+        <div><div style="font-size:0.66rem;font-weight:700;color:#9a9590;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:5px;">Present</div>
+          <table class="rpt-table"><thead><tr><th>Account</th><th>Today</th><th>Projected</th></tr></thead><tbody>${rowsBA||'<tr><td colspan="3" style="color:#9a9590;font-style:italic;">None entered</td></tr>'}
+          <tr style="background:#f0ede8;font-weight:700;"><td>Total</td><td>${tot(b.assets,'bal')}</td><td>${tot(b.assets,'proj')}</td></tr></tbody></table></div>
+        <div><div style="font-size:0.66rem;font-weight:700;color:#b8972e;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:5px;">Proposed</div>
+          <table class="rpt-table"><thead><tr><th>Account</th><th>Today</th><th>Projected</th></tr></thead><tbody>${rowsAA||'<tr><td colspan="3" style="color:#9a9590;font-style:italic;">None</td></tr>'}
+          <tr style="background:#f0ede8;font-weight:700;"><td>Total</td><td>${tot(a.assets,'bal')}</td><td>${tot(a.assets,'proj')}</td></tr></tbody></table></div>
+      </div>
+      <div class="rpt-subsection-title">Retirement Income Sources</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+        <div><div style="font-size:0.66rem;font-weight:700;color:#9a9590;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:5px;">Present</div>
+          <table class="rpt-table"><thead><tr><th>Source</th><th>Today</th><th>Monthly (Ret.)</th></tr></thead><tbody>${rowsBI||'<tr><td colspan="3" style="color:#9a9590;font-style:italic;">None entered</td></tr>'}
+          <tr style="background:#f0ede8;font-weight:700;"><td>Total</td><td>${tot(b.incomes,'annToday')}/yr</td><td>${M(b.annInc/12)}/mo</td></tr></tbody></table></div>
+        <div><div style="font-size:0.66rem;font-weight:700;color:#b8972e;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:5px;">Proposed</div>
+          <table class="rpt-table"><thead><tr><th>Source</th><th>Today</th><th>Monthly (Ret.)</th></tr></thead><tbody>${rowsAI||'<tr><td colspan="3" style="color:#9a9590;font-style:italic;">None</td></tr>'}
+          <tr style="background:#f0ede8;font-weight:700;"><td>Total</td><td>${tot(a.incomes,'annToday')}/yr</td><td>${M(a.annInc/12)}/mo</td></tr></tbody></table></div>
+      </div>
+    </div>`;
+  }
+  function generateImpactReport(){
+    if(typeof _results==='undefined'||!_results||!_results.length||!_salary){ alert('Please run the pension comparison first.'); return; }
+    BA.before=snapshot();                              /* the Present Position always mirrors the live inputs */
+    if(!BA.after){ BA.after={assets:deep(BA.before.assets),incomes:deep(BA.before.incomes),gapRate:BA.before.gapRate,saveRor:BA.before.saveRor}; }
+    const b=baCompute(BA.before), a=baCompute(afterFull());
+    const S=BA.before, prelim=BA.prelim;
+    const client=($('clientName')&&$('clientName').value.trim())||'Client';
+    const today=new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
+    const dob=(typeof getDobPretty==='function')?getDobPretty():'';
+    const curAge=(typeof getCurrentAge==='function')?getCurrentAge():null;
+    const survSel=$('survivor');
+    const survLabel=survSel?survSel.options[survSel.selectedIndex].text:'';
+    const taxSec=sectionHTML(a.assets, a.incomes, a.penForGap, {sysName:S.sysName, compare:{before:b.mix, after:a.mix}});
+    const html=`<!DOCTYPE html>
+<html><head><meta charset="UTF-8">
+<title>Strategy Impact Report — ${esc(client)}</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Montserrat',Arial,sans-serif;color:#2d2d2d;background:white;font-size:10pt;line-height:1.5;}
+.no-print{background:#0d1e3a;padding:12px 48px;display:flex;align-items:center;justify-content:space-between;}
+@media print{.no-print{display:none;}body{-webkit-print-color-adjust:exact;print-color-adjust:exact;}.rpt-section{page-break-inside:avoid;}.rpt-section.ledger{page-break-inside:auto;}.rpt-section.ledger tr{page-break-inside:avoid;}}
+.cover{background:#0d1e3a;color:white;padding:48px 52px 36px;}
+.cover-logo{font-family:'Montserrat',sans-serif;font-size:1.2rem;color:white;letter-spacing:0.04em;margin-bottom:32px;}
+.cover-logo span{color:#d4af5a;}
+.cover h1{font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:700;line-height:1.15;margin-bottom:8px;}
+.cover-badge{display:inline-block;background:${S.sysColor||'#b8972e'};color:white;font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.09em;padding:4px 14px;border-radius:4px;margin-bottom:20px;}
+.cover-meta{font-size:0.82rem;color:rgba(255,255,255,0.55);line-height:2.1;}
+.cover-meta strong{color:white;}
+.cover-disc{margin-top:24px;font-size:0.68rem;color:rgba(255,255,255,0.3);line-height:1.65;border-top:1px solid rgba(255,255,255,0.08);padding-top:14px;}
+.prelim-strip{background:${prelim?'#b8972e':'#0d1e3a'};color:${prelim?'#0d1e3a':'#d4af5a'};text-align:center;padding:8px 14px;font-size:0.72rem;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;border-bottom:${prelim?'none':'3px solid #b8972e'};}
+.rpt-section{padding:24px 52px;border-bottom:1px solid #e8e3dc;}
+.rpt-section:last-child{border-bottom:none;}
+.rpt-section-title{font-family:'Cormorant Garamond',serif;font-size:1.05rem;font-weight:700;color:#0d1e3a;padding-bottom:6px;border-bottom:2px solid #b8972e;margin-bottom:14px;}
+.rpt-subsection-title{font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:#9a9590;margin:14px 0 8px;}
+.rpt-kpi-row{display:flex;gap:0;border:1px solid #e8e3dc;border-radius:5px;overflow:hidden;margin-bottom:14px;flex-wrap:wrap;}
+.rpt-kpi{flex:1;min-width:110px;padding:10px 13px;border-right:1px solid #e8e3dc;}
+.rpt-kpi:last-child{border-right:none;}
+.rpt-kpi.red{background:#fff5f5;}
+.rpt-kpi-label{font-size:0.63rem;text-transform:uppercase;letter-spacing:0.06em;color:#9a9590;margin-bottom:2px;}
+.rpt-kpi-val{font-family:'Montserrat',sans-serif;font-size:0.92rem;font-weight:700;color:#0d1e3a;}
+.rpt-kpi.red .rpt-kpi-val{color:#c0392b;}
+.rpt-table{width:100%;border-collapse:collapse;font-size:0.76rem;margin-bottom:12px;}
+.rpt-table th{background:#0d1e3a;color:white;padding:6px 8px;text-align:left;font-weight:600;font-size:0.65rem;letter-spacing:0.06em;text-transform:uppercase;}
+.rpt-table td{padding:6px 8px;border-bottom:1px solid #e8e3dc;}
+.rpt-table tr:nth-child(even) td{background:#f7f5f1;}
+.rpt-table tr.best-row td{background:#fffbf0;border-left:3px solid #b8972e;}
+.best-tag{background:#b8972e;color:white;font-size:0.58rem;font-weight:700;text-transform:uppercase;padding:1px 6px;border-radius:10px;margin-left:4px;vertical-align:middle;white-space:nowrap;}
+.rpt-formula{background:#0d1e3a;border-radius:6px;padding:12px 16px;display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;text-align:center;margin-bottom:14px;}
+.rpt-fi{text-align:center;}
+.rpt-fi.gold .rpt-fv{color:#d4af5a;}
+.rpt-fl{font-size:0.6rem;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:2px;}
+.rpt-fv{font-family:'Montserrat',sans-serif;font-size:0.95rem;font-weight:700;color:white;}
+.rpt-fo{color:#d4af5a;font-size:1.15rem;}
+.rpt-facts-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.rpt-fact{background:#f7f5f1;border-radius:5px;border-left:3px solid #b8972e;padding:9px 12px;font-size:0.76rem;line-height:1.55;}
+.rpt-fact strong{color:#0d1e3a;display:block;margin-bottom:1px;font-size:0.78rem;}
+.rpt-footer{background:#f0ede8;padding:14px 52px;font-size:0.67rem;color:#9a9590;line-height:1.7;border-top:2px solid #e8e3dc;}
+.rpt-footer strong{color:#36332e;}
+</style>
+</head><body>
+
+<div class="no-print">
+  <span style="color:rgba(255,255,255,0.6);font-size:0.8rem;">To save as PDF: Print → Change destination → Save as PDF</span>
+  <button onclick="window.print()" style="background:#b8972e;color:#0d1e3a;border:none;border-radius:5px;padding:8px 18px;font-weight:700;font-size:0.82rem;cursor:pointer;font-family:'Montserrat',sans-serif;">🖨 Print / Save as PDF</button>
+</div>
+
+<div class="cover">
+  <div class="cover-logo">Edwards <span>Financial &amp; Associates</span></div>
+  <h1>Strategy Impact Report</h1>
+  <div class="cover-badge">${esc(S.sysName)} — ${esc(S.planLabel)}</div>
+  <div class="cover-meta">
+    <strong>Prepared for:</strong> ${esc(client)}<br>
+    ${dob?`<strong>Date of Birth:</strong> ${dob}<br>`:''}
+    ${curAge!==null?`<strong>Current Age:</strong> ${curAge}<br>`:''}
+    <strong>Pension System:</strong> ${esc(S.sysName)} · ${esc(S.planLabel)}<br>
+    <strong>Retirement Scenario:</strong> Age ${S.age} · ${M(S.penNominal/12)}/mo pension<br>
+    <strong>Final Average Compensation:</strong> ${M(S.salary)}/year<br>
+    <strong>Survivor Option:</strong> ${esc(survLabel)}<br>
+    <strong>Report Date:</strong> ${today}<br>
+    <strong>Prepared by:</strong> Joshua Edwards · Edwards Financial &amp; Associates<br>
+    <strong>License:</strong> Life &amp; Annuities · Retirement Planning · Estate Strategy
+  </div>
+  <div class="cover-disc">This report compares your position as originally reviewed with a proposed plan based on the strategies discussed. Projections are estimates from the information provided and stated assumptions — not a guarantee of future results, an insurance illustration, or investment, tax, or legal advice. Product guarantees are subject to the claims-paying ability of the issuing carrier. Consult your tax professional regarding your specific situation.</div>
+</div>
+<div class="prelim-strip">${prelim?'Preliminary Recommendations — For Discussion':'Final Recommendations'}</div>
+
+${rptPos(b,'Where You Started — Present Position','Your position as entered at the '+(prelim?'initial review':'start of our work together')+': pension scenario age '+S.age+', existing assets, and income sources.')}
+${rptPos(a,'The Proposed Plan — With Recommendations Applied','The same scenario and assumptions, with the recommended repositioning of assets and income in place.')}
+${impactTableHTML(b,a)}
+${changedHTML(b,a)}
+${ledgerHTML(b,'Present Plan')}
+${ledgerHTML(a,'Proposed Plan')}
+${taxSec}
+
+<div class="rpt-section" style="text-align:center;padding:28px 52px;">
+  <div style="font-family:'Montserrat',sans-serif;font-size:1.1rem;font-weight:700;color:#0d1e3a;margin-bottom:8px;">${prelim?'Ready to Finalize Your Plan?':'Your Plan Is in Place — Keeping It on Track'}</div>
+  <div style="font-size:0.78rem;color:#6b6560;margin-bottom:14px;">${prelim?'These recommendations are preliminary — we will refine and finalize them together at our next appointment.':'We review this plan together on a regular schedule and adjust as life, markets, and tax law change.'}</div>
+  <div style="font-size:0.82rem;font-weight:600;color:#b8972e;">📅 calendly.com/jedwards-finance/30min</div>
+</div>
+
+<div class="rpt-footer">
+  <strong>Edwards Financial &amp; Associates</strong> · Joshua Edwards · Licensed: Life &amp; Annuities, Retirement Planning · Prepared ${today}<br>
+  Pension figures are estimates based on ${esc(S.sysName)}'s published formulas and information provided; actual benefits are determined solely by ${esc(S.sysName)}.<br>
+  For educational purposes only. Not financial, tax, or legal advice.
+</div>
+</body></html>`;
+    window._lastReportHTML=html;
+    window._lastReportName=`Strategy_Impact_${prelim?'Preliminary_':''}${client.replace(/\s+/g,'_')}_${new Date().toISOString().slice(0,10)}.html`;
+    if(window._suppressReportDownload) return;
+    const blob=new Blob([html],{type:'text/html;charset=utf-8'});
+    const url=URL.createObjectURL(blob);
+    const el=document.createElement('a'); el.href=url; el.download=window._lastReportName;
+    document.body.appendChild(el); el.click(); document.body.removeChild(el);
+    setTimeout(()=>URL.revokeObjectURL(url),5000);
+  }
+  /* ═══════════ SESSION SNAPSHOT — save everything, repopulate at the follow-up ═══════════ */
+  function readAssetRowsRaw(){
+    return Array.from(document.querySelectorAll('#assetRows [id^="ar_"]')).map(row=>{
+      const sel=row.querySelector('select'); const cust=row.querySelector('.custom-name');
+      const inps=row.querySelectorAll('input.asset-num'); const st=row.querySelector('.asset-stepup');
+      return { type:sel?sel.value:'', custom:cust?cust.value:'', bal:inps[0]?inps[0].value:'', con:inps[1]?inps[1].value:'',
+        ror:inps[2]?inps[2].value:'', yrs:inps[3]?inps[3].value:'', auto:(inps[3]&&inps[3].dataset.auto)||'0', step:st?st.value:'0' };
+    });
+  }
+  function readIncomeRowsRaw(){
+    return Array.from(document.querySelectorAll('#incomeRows [id^="ir_"]')).map(row=>{
+      const sel=row.querySelector('select'); const cust=row.querySelector('.custom-income-name');
+      return { type:sel?sel.value:'', custom:cust?cust.value:'',
+        amt:row.querySelector('.income-amt')?row.querySelector('.income-amt').value:'',
+        freq:row.querySelector('.income-freq')?row.querySelector('.income-freq').value:'yr',
+        cola:row.querySelector('.income-cola')?row.querySelector('.income-cola').value:'0' };
+    });
+  }
+  function writeAssetRows(list){
+    const host=$('assetRows'); if(!host) return; host.innerHTML='';
+    (list||[]).forEach(x=>{
+      addAsset();
+      const row=host.lastElementChild; if(!row) return;
+      const sel=row.querySelector('select'); const cust=row.querySelector('.custom-name');
+      const opts=Array.from(sel.options).map(o=>o.value);
+      if(x.type&&opts.includes(x.type)&&x.type!=='Other'){ sel.value=x.type; }
+      else if(x.type||x.custom){ sel.value='Other'; if(cust){ cust.style.display='block'; cust.value=x.custom||x.type||''; } }
+      const inps=row.querySelectorAll('input.asset-num');
+      if(inps[0]) inps[0].value=x.bal||''; if(inps[1]) inps[1].value=x.con||'';
+      if(inps[2]) inps[2].value=x.ror||6; if(inps[3]){ inps[3].value=x.yrs||''; inps[3].dataset.auto=x.auto||'0'; }
+      const st=row.querySelector('.asset-stepup'); if(st) st.value=x.step||0;
+    });
+    if(typeof updateMatchInflBtns==='function') updateMatchInflBtns();
+    if(typeof updateTotals==='function') updateTotals();
+  }
+  function writeIncomeRows(list){
+    const host=$('incomeRows'); if(!host) return; host.innerHTML='';
+    (list||[]).forEach(x=>{
+      addIncome();
+      const row=host.lastElementChild; if(!row) return;
+      const sel=row.querySelector('select'); const cust=row.querySelector('.custom-income-name');
+      const opts=Array.from(sel.options).map(o=>o.value);
+      if(x.type&&opts.includes(x.type)&&x.type!=='Other'){ sel.value=x.type; }
+      else if(x.type||x.custom){ sel.value='Other'; if(cust){ cust.style.display='block'; cust.value=x.custom||x.type||''; } }
+      const amt=row.querySelector('.income-amt'); if(amt) amt.value=x.amt||'';
+      const fr=row.querySelector('.income-freq'); if(fr) fr.value=x.freq||'yr';
+      const co=row.querySelector('.income-cola'); if(co) co.value=x.cola||0;
+    });
+    if(typeof updateIncomeTotals==='function') updateIncomeTotals();
+  }
+  function collectSession(name){
+    const val=id=>{const e=$(id);return e?e.value:'';};
+    return {
+      kind:'efa-pension-session', v:1, savedAt:new Date().toISOString(),
+      clientName:(name||val('clientName')||'').trim(), clientEmail:val('clientEmail'),
+      system:_sys, planKey:val('plan')||_planKey,
+      startAge:val('startAge'), curAge:val('curAge'), dob:val('dob'),
+      ageMode:($('dob')&&$('dob').style.display!=='none')?'dob':'age',
+      salary:val('salary'),
+      scen:[0,1,2,3,4].map(i=>val('r'+i)),
+      survivor:val('survivor'), mAge:val('mAge'), bAge:val('bAge'),
+      infl:{on:!!($('inflToggle')&&$('inflToggle').checked), rate:val('inflRate'), sal:val('salGrowth'), cola:val('colaRate')},
+      gapIdx:val('gapPicker'), gapRate:val('gapRate')||'5', saveRor:val('saveRor')||'6',
+      saveGoal:(typeof _saveGoal!=='undefined')?_saveGoal:'infl',
+      assets:readAssetRowsRaw(), incomes:readIncomeRowsRaw(),
+      ba: BA.after ? {after:deep(BA.after), prelim:BA.prelim, reportKind:BA.reportKind} : null
+    };
+  }
+  function restoreSession(s){
+    if(!s||s.kind!=='efa-pension-session'){ alert('That file is not an Edwards Financial session file.'); return false; }
+    try{
+      switchSystem(s.system||'calpers');
+      if(s.planKey&&$('plan')){ $('plan').value=s.planKey; updatePlanInfo(); }
+      if($('startAge')) $('startAge').value=s.startAge||'';
+      if($('salary')) $('salary').value=s.salary||'';
+      if(s.ageMode==='dob'&&s.dob){ setAgeMode('dob'); $('dob').value=s.dob; setAgeFromDob(); }
+      else { setAgeMode('age'); if($('curAge')) $('curAge').value=s.curAge||''; }
+      (s.scen||[]).forEach((v,i)=>{ if($('r'+i)) $('r'+i).value=v; });
+      if($('survivor')){ $('survivor').value=s.survivor||'unmod'; toggleSurvivor(); }
+      if(s.mAge&&$('mAge')) $('mAge').value=s.mAge;
+      if(s.bAge&&$('bAge')) $('bAge').value=s.bAge;
+      const it=$('inflToggle');
+      if(it){ it.checked=!!(s.infl&&s.infl.on); toggleInflation(); }
+      if(s.infl){ if($('inflRate')) $('inflRate').value=s.infl.rate||3; if($('salGrowth')) $('salGrowth').value=s.infl.sal||2.5; if($('colaRate')) $('colaRate').value=s.infl.cola||2; }
+      writeAssetRows(s.assets); writeIncomeRows(s.incomes);
+      if($('clientName')) $('clientName').value=s.clientName||'';
+      if($('clientEmail')) $('clientEmail').value=s.clientEmail||'';
+      const cb=$('efaCbName'); if(cb) cb.value=s.clientName||'';
+      calculate();
+      if(s.gapIdx!==''&&s.gapIdx!=null&&$('gapPicker')&&_results&&_results[parseInt(s.gapIdx)]) $('gapPicker').value=String(s.gapIdx);
+      if($('gapRate')) $('gapRate').value=s.gapRate||5;
+      if($('saveRor')) $('saveRor').value=s.saveRor||6;
+      if(s.saveGoal&&typeof window._saveGoal!=='undefined') window._saveGoal=s.saveGoal;
+      if(typeof syncAssetYrs==='function') syncAssetYrs();
+      renderGap();
+      BA.before=null; BA.after=null; BA.prelim=true; BA.reportKind='standard';
+      if(s.ba&&s.ba.after){
+        BA.before=snapshot();
+        BA.after=deep(s.ba.after);
+        BA.prelim=s.ba.prelim!==false;
+        BA.reportKind=s.ba.reportKind||'impact';
+      }
+      updateDeliverUI();
+      const when=s.savedAt?new Date(s.savedAt).toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}):'';
+      toast(`<b>${esc(s.clientName||'Session')}</b> restored${when?' — saved '+when:''}. Every input is back, including ${s.ba&&s.ba.after?'the Before &amp; After work':'the full profile'}.`);
+      return true;
+    }catch(e){ console.warn('restoreSession',e); alert('Could not restore this session: '+(e.message||e)); return false; }
+  }
+  const slugName=n=>(String(n||'client').trim().replace(/[^A-Za-z0-9]+/g,'_').replace(/^_+|_+$/g,'')||'Client');
+  const SESSION_API={
+    collect:collectSession,
+    toJson:name=>JSON.stringify(collectSession(name),null,1),
+    fileName:name=>`${slugName(name)}_Session_${new Date().toISOString().slice(0,10)}.efa-session.json`,
+    saveLocal(name){
+      if(!window.EFA_STORE) return;
+      const s=collectSession(name);
+      if(!s.clientName){ return; }
+      window.EFA_STORE.upsert({name:s.clientName, session:s});
+      refreshResumeRoster();
+    },
+    restore:restoreSession
+  };
+  window.EFA_SESSION=SESSION_API;
+
+  /* Resume card — injected at the top of the Build Profile column */
+  function buildResumeCard(){
+    const left=document.querySelector('.main > div:first-child');
+    if(!left||$('efaResumeCard')) return;
+    const card=document.createElement('div'); card.className='card'; card.id='efaResumeCard';
+    card.style.cssText='margin-bottom:18px;border-top:3px solid var(--gold);';
+    card.innerHTML=`<div class="card-title">Resume a Saved Session</div>
+      <div style="display:grid;gap:9px;">
+        <select id="efaResumeSel"><option value="">— saved sessions on this browser —</option></select>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button id="efaResumeBtn" class="calc-btn" style="margin-top:0;padding:10px 12px;flex:1;min-width:150px;">&#8634; Restore Session</button>
+          <button id="efaResumeImport" class="efa-resume-ghost" title="Load the session file attached to a Save-as-Client email">Import file…</button>
+          <input type="file" id="efaResumeFile" accept=".json,application/json" style="display:none;">
+        </div>
+        <div style="font-size:0.68rem;color:var(--gray-400);line-height:1.55;">Brings back every input from a previous appointment — profile, assets, income, and any Before &amp; After work. A session file also rides along on every “Save as Client” email.</div>
+      </div>`;
+    left.insertBefore(card,left.firstChild);
+    $('efaResumeBtn').onclick=()=>{
+      const id=$('efaResumeSel').value;
+      if(!id){ toast('Pick a saved session first, or use <b>Import file…</b>'); return; }
+      const rec=window.EFA_STORE?window.EFA_STORE.get(id):null;
+      if(rec&&rec.session) restoreSession(rec.session);
+      else toast('That client has no saved session yet.');
+    };
+    $('efaResumeImport').onclick=()=>$('efaResumeFile').click();
+    $('efaResumeFile').onchange=function(){
+      const f=this.files&&this.files[0]; this.value=''; if(!f) return;
+      const rd=new FileReader();
+      rd.onload=()=>{ try{ restoreSession(JSON.parse(rd.result)); }catch(e){ alert('Could not read that file — it does not look like a session file.'); } };
+      rd.readAsText(f);
+    };
+    refreshResumeRoster();
+  }
+  function refreshResumeRoster(){
+    const sel=$('efaResumeSel'); if(!sel||!window.EFA_STORE) return;
+    const cur=sel.value;
+    const items=window.EFA_STORE.list().filter(r=>r.session);
+    sel.innerHTML='<option value="">'+(items.length?'— pick a saved session —':'— none saved on this browser yet —')+'</option>'
+      +items.map(r=>{
+        const d=r.session&&r.session.savedAt?new Date(r.session.savedAt):null;
+        const when=d?d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):'';
+        const ba=r.session&&r.session.ba?' · Before &amp; After':'';
+        return `<option value="${esc(r.id)}">${esc(r.name)}${when?' — '+when:''}${ba}</option>`;
+      }).join('');
+    if(cur) sel.value=cur;
+  }
+
+  /* ═══════════ route Download/Send through the chosen report type ═══════════ */
+  if(typeof window.generateReport==='function'){
+    const __origGen=window.generateReport;
+    window.generateReport=function(){
+      if(ready()&&BA.reportKind==='impact'){ return generateImpactReport(); }
+      return __origGen.apply(this,arguments);
+    };
+  }
+
+  window.EFA_BA={
+    open, close, ready, generateImpactReport,
+    get prelim(){ return BA.prelim; }, set prelim(v){ BA.prelim=!!v; setPrelimBtn(); updateDeliverUI(); },
+    get reportKind(){ return BA.reportKind; }, set reportKind(v){ BA.reportKind=(v==='impact'?'impact':'standard'); updateDeliverUI(); },
+    _state:BA, _compute:baCompute, _snapshot:snapshot
+  };
+
+  buildResumeCard();
+  updateDeliverUI();
 })();
 </script>
 

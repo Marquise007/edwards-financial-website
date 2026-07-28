@@ -107,6 +107,15 @@ export async function onRequestPost(context) {
   const reportPdf = String(body.reportPdf || '');            // base64 PDF from the calculator (preferred)
   const fileName = (String(body.fileName || 'Pension_Review.html').replace(/[^A-Za-z0-9._-]/g, '_')).slice(0, 120);
   const pdfFileName = (String(body.pdfFileName || fileName.replace(/\.html?$/i, '.pdf')).replace(/[^A-Za-z0-9._-]/g, '_')).slice(0, 120);
+  // Strategy Impact (before & after) support
+  const reportKind = body.reportKind === 'impact' ? 'impact' : 'standard';
+  const preliminary = body.preliminary === true;
+  const kindLabel = reportKind === 'impact'
+    ? `Strategy Impact Report (${preliminary ? 'Preliminary' : 'Final Recommendations'})`
+    : 'Pension Review';
+  // Session file (self sends only): full calculator state for the follow-up appointment
+  const sessionJson = typeof body.sessionJson === 'string' ? body.sessionJson.slice(0, 2_000_000) : '';
+  const sessionFileName = (String(body.sessionFileName || 'Session.efa-session.json').replace(/[^A-Za-z0-9._-]/g, '_')).slice(0, 140);
 
   if (!clientName) return json({ ok: false, error: 'Client name is required.' }, 400);
   if (!reportPdf && !reportHtml) return json({ ok: false, error: 'Report payload missing.' }, 400);
@@ -128,17 +137,20 @@ export async function onRequestPost(context) {
   let payload;
 
   if (mode === 'self') {
+    const attachments = [attachment];
+    if (sessionJson) attachments.push({ filename: sessionFileName, content: b64utf8(sessionJson) });
     payload = {
       from: FROM,
       to: [HQ, STOREFRONT],
-      subject: `Client File Saved: ${clientName} | Pension Review ${today}`,
+      subject: `Client File Saved: ${clientName} | ${kindLabel} ${today}`,
       html: wrap(`
         <p style="margin:0 0 12px;">Client file saved from the California Pension Calculator.</p>
         <p style="margin:0 0 6px;"><b style="color:#0d1e3a;">Client:</b> ${esc(clientName)}</p>
+        <p style="margin:0 0 6px;"><b style="color:#0d1e3a;">Report type:</b> ${esc(kindLabel)}</p>
         ${summary ? `<p style="margin:0 0 6px;"><b style="color:#0d1e3a;">Session:</b> ${esc(summary)}</p>` : ''}
         <p style="margin:0 0 6px;"><b style="color:#0d1e3a;">Saved:</b> ${today}</p>
-        <p style="margin:14px 0 0;color:#6b6b6b;font-size:13px;">The full report is attached. Open it in a browser to review or rebuild this pension analysis later.</p>`),
-      attachments: [attachment],
+        <p style="margin:14px 0 0;color:#6b6b6b;font-size:13px;">The full report is attached.${sessionJson ? ' The <b>session file</b> is attached too — at the follow-up appointment, use “Resume a Saved Session → Import file” on the calculator to bring back every number from this meeting.' : ''}</p>`),
+      attachments,
     };
   } else {
     const to = String(body.to || '').trim();
@@ -151,16 +163,25 @@ export async function onRequestPost(context) {
          </ul>
          <p style="margin:12px 0 0;">If possible, please try to send these back at least 48 hours before our follow-up appointment. You can simply reply to this email and attach them.</p>`
       : '';
+    const subjectLine = reportKind === 'impact'
+      ? `Thank You, ${firstName} | Your Strategy Impact Report${preliminary ? ' (Preliminary)' : ''} and Next Steps`
+      : `Thank You, ${firstName} | Your Pension Review and Next Steps`;
+    const reportPara = reportKind === 'impact'
+      ? `<p style="margin:0 0 12px;">Your <b style="color:#0d1e3a;">Strategy Impact Report</b> is attached. It shows where things stood when we started, the plan we've designed, and the difference between the two — side by side, year by year.</p>
+         ${preliminary
+           ? `<p style="margin:0 0 12px;">The recommendations inside are <b style="color:#0d1e3a;">preliminary</b> — a working picture for our discussion. We'll refine and finalize them together at our next appointment.</p>`
+           : `<p style="margin:0 0 12px;">These are the <b style="color:#0d1e3a;">final recommendations</b> from our planning work together. Keep this report with your records — it's the blueprint we'll measure against going forward.</p>`}`
+      : `<p style="margin:0 0 12px;">Your personalized pension review is attached for your records. Feel free to open it any time; it captures everything we covered.</p>`;
     payload = {
       from: FROM,
       to: [to],
       bcc: [HQ],
       reply_to: STOREFRONT,
-      subject: `Thank You, ${firstName} | Your Pension Review and Next Steps`,
+      subject: subjectLine,
       html: wrap(`
         <p style="margin:0 0 12px;">Hi ${firstName},</p>
         <p style="margin:0 0 12px;">Thank you for meeting with me today. It was a pleasure walking through your pension and retirement picture together.</p>
-        <p style="margin:0 0 12px;">Your personalized pension review is attached for your records. Feel free to open it any time; it captures everything we covered.</p>
+        ${reportPara}
         ${list}
         ${note ? `<p style="margin:16px 0 0;">${esc(note)}</p>` : ''}
         <p style="margin:16px 0 0;">If anything comes up before we talk again, just reply to this email.</p>
