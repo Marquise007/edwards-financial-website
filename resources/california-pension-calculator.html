@@ -1124,6 +1124,8 @@ function addIncome() {
     'Annuity Income (FIA / SPIA / MYGA)',
     'IUL Policy Loan Income',
     'Whole Life Income',
+    '── Tax-Free Accounts ──',
+    'Roth IRA',
     '── Real Assets & Business ──',
     'Rental / Real Estate Income',
     'Business Interest / Distributions',
@@ -1249,14 +1251,7 @@ function renderGap() {
   const noGap=annGap===0;
   const sysColor=sys.color;
 
-  if(noGap){
-    document.getElementById('gapResults').innerHTML=`<div style="background:white;border-radius:0 0 8px 8px;padding:32px;text-align:center;box-shadow:var(--shadow);">
-      <div style="font-size:2rem;">✅</div>
-      <div style="font-family:'Montserrat',sans-serif;font-size:1.1rem;color:var(--green);font-weight:700;margin-top:10px;">No Gap — ${annInc>0?'Pension + Other Income Fully Replace Salary':'Pension Fully Replaces Salary'}</div>
-      <div style="color:var(--gray-400);font-size:0.84rem;margin-top:5px;">At Age ${r.age}, the pension${annInc>0?' plus $'+Math.round(annInc).toLocaleString()+'/yr of other income':''} covers ${infl.on?'the inflation-adjusted ':''} salary.</div>
-    </div>`;
-    return;
-  }
+  // (surplus mode is rendered below, after the income & asset sections are built)
 
   const assetHTML = assets.length>0 ? `
     <div class="gc-block">
@@ -1296,6 +1291,78 @@ function renderGap() {
       </div>
     </div>` : '';
 
+  // ── SURPLUS MODE — income meets or beats the target: the gap tile flips to ANNUAL SURPLUS ──
+  if(noGap){
+    const surplus=Math.max(0,penForGap+annInc-salForGap);
+    let metaCards='';
+    if(window.efaFundedMeta){
+      try{
+        const meta=window.efaFundedMeta({retAge:r.age,endAge:100,salForGap,pension:penForGap,
+          pensionCola:infl.on?infl.cola:0,incomes,assets:totalNomAssets,rate,inflOn:infl.on,inflRate:infl.infl});
+        const ftTxt=meta.fundedThrough===null?'—':('Age '+(meta.allFunded?meta.endAge:meta.fundedThrough));
+        metaCards=`<div style="margin-top:14px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+          <div style="background:#edf9f1;border-radius:7px;padding:11px 18px;min-width:170px;text-align:center;"><div style="font-size:0.6rem;text-transform:uppercase;letter-spacing:0.06em;color:var(--gray-400);font-weight:700;">Annual Surplus</div><div style="font-family:'Montserrat',sans-serif;font-size:1.1rem;font-weight:700;color:var(--green);margin-top:2px;">+$${Math.round(surplus).toLocaleString()}/yr</div><div style="font-size:0.7rem;color:var(--green);font-weight:600;">+$${Math.round(surplus/12).toLocaleString()}/mo</div></div>
+          <div style="background:var(--gray-100);border-radius:7px;padding:11px 18px;min-width:170px;text-align:center;"><div style="font-size:0.6rem;text-transform:uppercase;letter-spacing:0.06em;color:var(--gray-400);font-weight:700;">Income Holds Target Through</div><div style="font-family:'Montserrat',sans-serif;font-size:1.1rem;font-weight:700;color:var(--navy);margin-top:2px;">${ftTxt}</div><div style="font-size:0.7rem;color:var(--gray-400);">modeled to age 100</div></div>
+          ${totalNomAssets>0?`<div style="background:#fffbf0;border-radius:7px;padding:11px 18px;min-width:170px;text-align:center;"><div style="font-size:0.6rem;text-transform:uppercase;letter-spacing:0.06em;color:var(--gray-400);font-weight:700;">Assets Untouched — Legacy at 100</div><div style="font-family:'Montserrat',sans-serif;font-size:1.1rem;font-weight:700;color:var(--gold);margin-top:2px;">$${Math.round(meta.endBal).toLocaleString()}</div><div style="font-size:0.7rem;color:var(--gray-400);">compounding at ${(rate*100).toFixed(2)}%</div></div>`:''}
+        </div>`;
+      }catch(e){}
+    }
+    document.getElementById('gapResults').innerHTML=`
+    <div style="background:white;border-radius:0 0 8px 8px;box-shadow:var(--shadow);overflow:hidden;">
+      ${infl.on?`<div style="background:var(--gold);padding:5px 20px;font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--navy);text-align:center;">⚡ Inflation-Adjusted — All figures account for purchasing power over ${ytr} years</div>`:''}
+      <div style="display:grid;grid-template-columns:repeat(${annInc>0?4:3},1fr);border-bottom:1px solid var(--gray-200);">
+        <div style="padding:16px;text-align:center;border-right:1px solid var(--gray-200);">
+          <div style="font-size:0.65rem;text-transform:uppercase;color:var(--gray-400);margin-bottom:3px;">${infl.on?'Future Salary':'Current Salary'}</div>
+          <div style="font-family:'Montserrat',sans-serif;font-size:1.15rem;font-weight:700;color:var(--navy);">$${Math.round(salForGap).toLocaleString()}</div>
+          ${infl.on?`<div style="font-size:0.7rem;color:var(--gray-400);">Today: $${Math.round(nomSal).toLocaleString()}</div>`:'<div style="font-size:0.7rem;color:var(--gray-400);">per year</div>'}
+        </div>
+        <div style="padding:16px;text-align:center;border-right:1px solid var(--gray-200);">
+          <div style="font-size:0.65rem;text-transform:uppercase;color:var(--gray-400);margin-bottom:3px;">Pension at Age ${r.age}</div>
+          <div style="font-family:'Montserrat',sans-serif;font-size:1.15rem;font-weight:700;color:${sysColor};">$${Math.round(penForGap).toLocaleString()}</div>
+          <div style="font-size:0.7rem;color:var(--gray-400);">${r.pctSalary.toFixed(1)}% of salary</div>
+        </div>
+        ${annInc>0?`<div style="padding:16px;text-align:center;border-right:1px solid var(--gray-200);">
+          <div style="font-size:0.65rem;text-transform:uppercase;color:var(--gray-400);margin-bottom:3px;">Other Income</div>
+          <div style="font-family:'Montserrat',sans-serif;font-size:1.15rem;font-weight:700;color:var(--green);">$${Math.round(annInc).toLocaleString()}</div>
+          <div style="font-size:0.7rem;color:var(--gray-400);">$${Math.round(annInc/12).toLocaleString()} / month</div>
+        </div>`:''}
+        <div style="padding:16px;text-align:center;background:#f0faf4;">
+          <div style="font-size:0.65rem;text-transform:uppercase;color:var(--green);margin-bottom:3px;">Annual Surplus${infl.on?' (Future $)':''}</div>
+          <div style="font-family:'Montserrat',sans-serif;font-size:1.15rem;font-weight:700;color:var(--green);">+$${Math.round(surplus).toLocaleString()}</div>
+          <div style="font-size:0.7rem;color:var(--green);">+$${Math.round(surplus/12).toLocaleString()} / month</div>
+        </div>
+      </div>
+      <div style="padding:18px 24px 20px;">
+        ${infl.on?`<div style="background:var(--navy);border-radius:6px;padding:11px 15px;margin-bottom:13px;display:grid;grid-template-columns:repeat(4,1fr);gap:8px;text-align:center;">
+          <div><div style="font-size:0.6rem;color:rgba(255,255,255,0.4);text-transform:uppercase;">Inflation</div><div style="font-family:'Montserrat',sans-serif;font-size:0.9rem;color:var(--gold-light);font-weight:700;">${(infl.infl*100).toFixed(1)}%</div></div>
+          <div><div style="font-size:0.6rem;color:rgba(255,255,255,0.4);text-transform:uppercase;">Sal Growth</div><div style="font-family:'Montserrat',sans-serif;font-size:0.9rem;color:var(--gold-light);font-weight:700;">${(infl.sal*100).toFixed(1)}%</div></div>
+          <div><div style="font-size:0.6rem;color:rgba(255,255,255,0.4);text-transform:uppercase;">COLA</div><div style="font-family:'Montserrat',sans-serif;font-size:0.9rem;color:var(--gold-light);font-weight:700;">${(infl.cola*100).toFixed(1)}%</div></div>
+          <div><div style="font-size:0.6rem;color:rgba(255,255,255,0.4);text-transform:uppercase;">Yrs to Retire</div><div style="font-family:'Montserrat',sans-serif;font-size:0.9rem;color:var(--gold-light);font-weight:700;">${ytr}</div></div>
+        </div>`:''}
+        <div style="text-align:center;padding:6px 0 2px;">
+          <div style="font-size:1.6rem;">✅</div>
+          <div style="font-family:'Montserrat',sans-serif;font-size:1.05rem;color:var(--green);font-weight:700;margin-top:6px;">No Gap — ${annInc>0?'Pension + Other Income Fully Replace Salary':'Pension Fully Replaces Salary'}</div>
+          <div style="color:var(--gray-400);font-size:0.82rem;margin-top:4px;">At Age ${r.age}, the pension${annInc>0?' plus $'+Math.round(annInc).toLocaleString()+'/yr of other income':''} covers ${infl.on?'the inflation-adjusted ':''}salary — with room to spare.</div>
+          ${metaCards}
+        </div>
+        ${incomeHTML}
+        ${assetHTML}
+      </div>
+    </div>`;
+    return;
+  }
+
+  // When the capital goal is fully covered: surplus + how long the income holds + legacy (shown in the Gap Summary)
+  let fundedLine='';
+  if(assets.length>0 && remaining<=0 && window.efaFundedMeta){
+    try{
+      const meta=window.efaFundedMeta({retAge:r.age,endAge:100,salForGap,pension:penForGap,
+        pensionCola:infl.on?infl.cola:0,incomes,assets:totalNomAssets,rate,inflOn:infl.on,inflRate:infl.infl});
+      const surplus2=Math.max(0,penForGap+annInc-salForGap);
+      const ftTxt=meta.fundedThrough===null?String(r.age):String(meta.allFunded?meta.endAge:meta.fundedThrough);
+      fundedLine=` <strong style="color:var(--green);">The plan holds the income target through age ${ftTxt}</strong>${surplus2>0?` with a surplus of <strong style="color:var(--green);">$${Math.round(surplus2).toLocaleString()}/yr ($${Math.round(surplus2/12).toLocaleString()}/mo)</strong> at retirement`:''}${meta.endBal>0?` — projected legacy of <strong style="color:var(--gold);">$${Math.round(meta.endBal).toLocaleString()}</strong> at age 100`:''}.`;
+    }catch(e){}
+  }
   document.getElementById('gapResults').innerHTML = `
     <div style="background:white;border-radius:0 0 8px 8px;box-shadow:var(--shadow);overflow:hidden;">
       ${infl.on?`<div style="background:var(--gold);padding:5px 20px;font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--navy);text-align:center;">⚡ Inflation-Adjusted — All figures account for purchasing power over ${ytr} years</div>`:''}
@@ -1444,7 +1511,7 @@ function renderGap() {
       </div>
       <div style="background:var(--gray-100);border-top:1px solid var(--gray-200);padding:12px 24px;font-size:0.76rem;color:var(--gray-700);line-height:1.7;">
         <strong style="color:var(--navy);">Gap Summary:</strong> ${annInc>0?`After <strong>$${Math.round(annInc).toLocaleString()}/yr</strong> ($${Math.round(annInc/12).toLocaleString()}/mo) of other retirement income, `:''}To generate the remaining <strong>$${Math.round(monGap).toLocaleString()}/month</strong> ($${Math.round(annGap).toLocaleString()}/year) in perpetual supplemental income, approximately <strong>$${Math.round(capital).toLocaleString()}</strong> is needed earning <strong>${(rate*100).toFixed(2)}%</strong>.
-        ${assets.length>0?` Projected assets of <strong>$${Math.round(totalAssets).toLocaleString()}</strong> ${remaining>0?`leave a <strong style="color:var(--red);">$${Math.round(remaining).toLocaleString()} gap</strong> to solve.`:`<strong style="color:var(--green);">fully cover the capital needed</strong>.`}`:''}
+        ${assets.length>0?` Projected assets of <strong>$${Math.round(totalAssets).toLocaleString()}</strong> ${remaining>0?`leave a <strong style="color:var(--red);">$${Math.round(remaining).toLocaleString()} gap</strong> to solve.`:`<strong style="color:var(--green);">fully cover the capital needed</strong>.`}`:''}${fundedLine}
         <span style="color:var(--gray-400);"> · Strategy options to bridge this gap are on the <strong style="color:var(--navy);">Deliver</strong> step.</span>
       </div>
     </div>`;
@@ -2385,8 +2452,13 @@ const EFA_ILLUSTRATOR_URL = 'tool-retirement-illustration.html';
         autoSelectGap(prevPick);
         refreshClientRoster();
         syncAdjustFromReal();
-        if(unlocked<3){ unlocked=3; active=1; }   // first run → jump to Compare
+        const firstRun = unlocked<3;
+        if(firstRun){ unlocked=3; active=1; }     // first run → jump to Compare
         applyView();                              // re-run → refresh in place
+        if(firstRun && mode==='present'){         // land at the TOP of Compare, not mid-page
+          setTimeout(()=>window.scrollTo({top:0,behavior:'auto'}),80);
+          setTimeout(()=>window.scrollTo({top:0,behavior:'auto'}),380);
+        }
       }
       return r;
     };
@@ -3493,7 +3565,7 @@ window.addEventListener('load',function(){
   const DLISTS={
     dl_annualSavings:['403(b) contribution','457(b) contribution','401(k) contribution','Roth IRA contribution','Traditional IRA contribution','IUL premium','Whole Life premium','Brokerage investing','HSA contribution','Emergency fund savings'],
     dl_accounts:['403(b)','457(b)','401(k)','Traditional IRA','Roth IRA','Pension lump sum / DROP','Brokerage account','Savings / CD / Money Market','HSA','Deferred annuity','IUL cash value','Whole Life cash value','Real estate equity','Business interest'],
-    dl_dbs:['Social Security (Client)','Social Security (Spouse)','CalSTRS Pension','CalPERS Pension','LACERA Pension','Spouse / Partner Pension','Annuity income (FIA / SPIA)','IUL policy loan income','Rental income','Part-time / consulting income'],
+    dl_dbs:['Social Security (Client)','Social Security (Spouse)','CalSTRS Pension','CalPERS Pension','LACERA Pension','Spouse / Partner Pension','Annuity income (FIA / SPIA)','IUL policy loan income','Roth IRA','Rental income','Part-time / consulting income'],
     dl_futureAssets:['Home sale proceeds','Downsize proceeds','Inheritance','DROP lump sum','Business sale','Life insurance proceeds','457(b) lump distribution','Investment property sale'],
     dl_futureExpenses:['Wedding','Roof / major home repair','New vehicle','College tuition','Long-term care event','Major medical expense','Travel fund','Home purchase / down payment']
   };
@@ -4027,6 +4099,14 @@ window.addEventListener('load',function(){
     const pc=k=>totP>0?(m[k].p/totP*100):0;
     return {m,totP,totT,pretaxPct:pc('pretax'),freePct:pc('free'),taxablePct:pc('taxable')};
   }
+  /* income sources get a tax status too — IUL/WL policy loans and Roth are income-tax-free */
+  function incomeTaxClass(name){
+    const n=String(name||'').toLowerCase();
+    if(/roth|\biul\b|indexed universal|whole life|life insurance|policy loan/.test(n)) return 'free';
+    if(/social security/.test(n)) return 'ss';
+    return 'ord';
+  }
+  function freeIncomeYr(incomes){ return (incomes||[]).reduce((s,x)=>s+(incomeTaxClass(x.name)==='free'?(x.annAtRet||0):0),0); }
   function mixBarHTML(mix,h){
     const seg=(p,c)=>p>0.4?`<div style="width:${p.toFixed(1)}%;background:${c};display:flex;align-items:center;justify-content:center;color:white;font-size:0.62rem;font-weight:700;white-space:nowrap;overflow:hidden;">${p>=11?p.toFixed(0)+'%':''}</div>`:'';
     return `<div style="display:flex;height:${h||24}px;border-radius:6px;overflow:hidden;background:#f0ede8;">${seg(mix.pretaxPct,CLS.pretax.c)}${seg(mix.freePct,CLS.free.c)}${seg(mix.taxablePct,CLS.taxable.c)}</div>`;
@@ -4059,11 +4139,13 @@ window.addEventListener('load',function(){
           <div style="font-size:0.6rem;text-transform:uppercase;letter-spacing:0.06em;color:#9a9590;font-weight:700;margin-bottom:6px;">Present Position — Pre-Tax Share</div>
           ${mixBarHTML(opts.compare.before,18)}
           <div style="font-family:'Montserrat',sans-serif;font-weight:700;font-size:0.95rem;color:#c0392b;margin-top:5px;">${opts.compare.before.pretaxPct.toFixed(0)}% pre-tax</div>
+          ${opts.compare.beforeFree!=null?`<div style="font-size:0.7rem;color:#36332e;margin-top:4px;">Tax-free income: <b style="color:${opts.compare.beforeFree>0?'#27ae60':'#9a9590'};">${opts.compare.beforeFree>0?M(opts.compare.beforeFree)+'/yr':'—'}</b></div>`:''}
         </div>
         <div style="background:#fffbf0;border-radius:6px;padding:10px 13px;border-top:3px solid #b8972e;">
           <div style="font-size:0.6rem;text-transform:uppercase;letter-spacing:0.06em;color:#b8972e;font-weight:700;margin-bottom:6px;">Proposed Plan — Pre-Tax Share</div>
           ${mixBarHTML(opts.compare.after,18)}
           <div style="font-family:'Montserrat',sans-serif;font-weight:700;font-size:0.95rem;color:${opts.compare.after.pretaxPct<opts.compare.before.pretaxPct?'#27ae60':'#0d1e3a'};margin-top:5px;">${opts.compare.after.pretaxPct.toFixed(0)}% pre-tax</div>
+          ${opts.compare.afterFree!=null?`<div style="font-size:0.7rem;color:#36332e;margin-top:4px;">Tax-free income: <b style="color:${opts.compare.afterFree>0?'#27ae60':'#9a9590'};">${opts.compare.afterFree>0?M(opts.compare.afterFree)+'/yr':'—'}</b></div>`:''}
         </div>
       </div>`:'';
     return `<div class="rpt-section">
@@ -4075,6 +4157,18 @@ window.addEventListener('load',function(){
       </tbody></table>
       <div style="margin:4px 0 6px;">${mixBarHTML(mix,26)}</div>
       <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:12px;">${legend}</div>
+      ${(incomes&&incomes.length)||penAnnual>0?`
+      <div class="rpt-subsection-title">Income Sources — Tax Status</div>
+      <table class="rpt-table"><thead><tr><th>Source</th><th>At Retirement ($/yr)</th><th>Tax Status</th></tr></thead><tbody>
+        ${penAnnual>0?`<tr><td><strong>${esc(opts.sysName||'')} Pension</strong></td><td>${M(penAnnual)}</td><td>${dot('pretax')}Taxable as ordinary income — federal &amp; California</td></tr>`:''}
+        ${(incomes||[]).map(x=>{const k=incomeTaxClass(x.name);
+          const lbl=k==='free'?dot('free')+'Income-tax-free when properly structured'
+            :k==='ss'?`<span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:#6aa9c9;margin-right:6px;"></span>0–85% taxable — thresholds below`
+            :dot('pretax')+'Taxable as ordinary income';
+          return `<tr><td><strong>${esc(x.name)}</strong></td><td>${M(x.annAtRet)}</td><td>${lbl}</td></tr>`;}).join('')}
+        ${(()=>{const f=freeIncomeYr(incomes);const tot=(incomes||[]).reduce((s,x)=>s+(x.annAtRet||0),0)+(penAnnual||0);
+          return f>0?`<tr style="background:#f0ede8;font-weight:700;"><td>Tax-Free Income</td><td style="color:#27ae60;">${M(f)} of ${M(tot)}</td><td>${tot>0?(f/tot*100).toFixed(0):0}% of retirement income arrives with no federal income tax</td></tr>`:'';})()}
+      </tbody></table>`:''}
       ${cmp}
       <div style="background:${AL.bg};border-left:4px solid ${AL.c};border-radius:6px;padding:12px 15px;margin:10px 0 16px;">
         <div style="font-size:0.66rem;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:${AL.c};margin-bottom:4px;">${AL.t}</div>
@@ -4180,69 +4274,105 @@ window.addEventListener('load',function(){
     };
   }
 
-  /* ═══════════ retirement income & legacy ledger (report section) ═══════════ */
+  /* ═══════════ retirement income & legacy ledger — engine, table, live modal ═══════════ */
   function ledgerRows(p){
     const rows=[]; let bal=p.assets;
-    const horizon=p.horizon||90;
-    for(let k=0;k<=horizon-p.retAge;k++){
+    const endAge=Math.max(p.retAge,(p.endAge||100));
+    for(let k=0;k<=endAge-p.retAge;k++){
       const age=p.retAge+k;
       const target=p.inflOn?p.salTarget*Math.pow(1+p.inflRate,k):p.salTarget;
       const pen=p.inflOn?p.pension*Math.pow(1+(p.pensionCola||0),k):p.pension;
       const incs=p.incomes.map(x=>p.inflOn?x.annAtRet*Math.pow(1+(x.cola||0),k):x.annAtRet);
       const incTot=incs.reduce((s,v)=>s+v,0);
       const need=Math.max(0,target-pen-incTot);
-      const grown=bal*(1+p.rate);            /* capital earns the target return, then funds the year's draw */
-      const draw=Math.min(need,Math.max(0,grown));
-      bal=grown-draw;
-      const short=need-draw;
-      rows.push({age,target,pen,incs,incTot,draw,short,totalInc:pen+incTot+draw,balOut:bal,depleted:bal<=0.5&&short>0.5});
+      const grown=bal*(1+p.rate);            /* capital earns the target return first… */
+      let fromAssets;
+      if(p.mode==='yield'){ fromAssets=Math.max(0,bal*p.rate); bal=grown-fromAssets; }   /* …yield only: principal preserved */
+      else { fromAssets=Math.min(need,Math.max(0,grown)); bal=grown-fromAssets; }        /* …or fund the target, draining if needed */
+      const totalInc=pen+incTot+fromAssets;
+      const short=Math.max(0,target-totalInc);
+      rows.push({age,target,pen,incs,incTot,draw:fromAssets,short,totalInc,
+        surplus:Math.max(0,totalInc-target),balOut:bal,depleted:bal<=0.5&&short>0.5});
     }
     return rows;
   }
-  function ledgerHTML(c,label,accent){
-    /* c = baCompute() result */
-    const p={retAge:c.age,horizon:90,salTarget:c.salForGap,pension:c.penForGap,
+  function fundedThroughOf(rows){
+    let ft=null;
+    for(const r of rows){ if(r.short<=0.5) ft=r.age; else break; }
+    return ft;
+  }
+  function ledgerCore(c,opts){
+    opts=opts||{};
+    const mode=opts.mode||'target';
+    const endAge=Math.min(120,Math.max(c.age+1,parseInt(BA.ledgerEnd,10)||100));
+    const startAge=Math.min(endAge,Math.max(c.age,parseInt(BA.ledgerStart,10)||c.age));
+    const p={retAge:c.age,endAge,salTarget:c.salForGap,pension:c.penForGap,
       pensionCola:c.infl.on?c.infl.cola:0,incomes:c.incomes,assets:c.totalNom,rate:c.rate,
-      inflOn:c.infl.on,inflRate:c.infl.infl};
-    const rows=ledgerRows(p);
+      inflOn:c.infl.on,inflRate:c.infl.infl,mode};
+    const all=ledgerRows(p);
+    const rows=all.filter(r=>r.age>=startAge);
+    const ft=fundedThroughOf(all);
     const shown=c.incomes.slice(0,3), extra=c.incomes.length>3;
-    const short=s=>{s=String(s||'');return s.length>18?s.slice(0,17)+'…':s;};
-    const th=(t,first)=>`<th style="background:#0d1e3a;color:${first?'#d4af5a':'rgba(255,255,255,0.65)'};font-size:0.55rem;letter-spacing:0.05em;text-transform:uppercase;padding:7px 8px;text-align:${first?'center':'right'};position:sticky;top:0;">${t}</th>`;
-    const td=(v,cls)=>`<td style="text-align:right;padding:4px 8px;${cls||''}">${typeof v==='number'?M(v):v}</td>`;
+    const shortName=s=>{s=String(s||'');return s.length>16?s.slice(0,15)+'…':s;};
+    const totalCols=6+shown.length+(extra?1:0);
+    const colW=(94.5/(totalCols-1)).toFixed(2);
+    const colgroup=`<colgroup><col style="width:5.5%;">${Array(totalCols-1).fill(`<col style="width:${colW}%;">`).join('')}</colgroup>`;
+    const th=(t,first)=>`<th style="background:#0d1e3a;color:${first?'#d4af5a':'rgba(255,255,255,0.68)'};font-size:0.54rem;font-weight:600;letter-spacing:0.05em;text-transform:uppercase;padding:8px 10px;text-align:${first?'center':'right'};vertical-align:bottom;line-height:1.35;position:sticky;top:0;z-index:2;">${t}</th>`;
+    const td=(v,css)=>`<td style="text-align:right;padding:4.5px 10px;font-variant-numeric:tabular-nums;font-feature-settings:'tnum';white-space:nowrap;${css||''}">${typeof v==='number'?M(v):v}</td>`;
     const headers=[th('Age',1),th('Pension')]
-      .concat(shown.map(x=>th(esc(short(x.name)))))
-      .concat(extra?[th('Other Income')]:[])
-      .concat([th('From Assets'),th('Total Income'),th('Income Target'),th('Assets Remaining — Legacy')]).join('');
+      .concat(shown.map(x=>th(esc(shortName(x.name)))))
+      .concat(extra?[th('Other<br>Income')]:[])
+      .concat([th('From<br>Assets'),th('Total<br>Income'),th('Income<br>Target'),th('Assets Remaining<br>— Legacy')]).join('');
     const body=rows.map((r,i)=>{
       const extraInc=extra?r.incs.slice(3).reduce((s,v)=>s+v,0):0;
-      return `<tr style="background:${r.age===p.retAge?'#f6efe0':(i%2===1?'#fbf7ee':'white')};${r.age===p.retAge?'border-top:2px solid #b8972e;border-bottom:2px solid #b8972e;':'border-bottom:1px solid #e8e3dc;'}">
-        <td style="text-align:center;font-weight:700;color:#0d1e3a;padding:4px 8px;">${r.age}</td>
+      const isRet=r.age===p.retAge;
+      return `<tr style="background:${isRet?'#f6efe0':(i%2===1?'#fbf7ee':'#ffffff')};${isRet?'border-top:2px solid #b8972e;border-bottom:2px solid #b8972e;':'border-bottom:1px solid #eee9e1;'}">
+        <td style="text-align:center;font-weight:700;color:#0d1e3a;padding:4.5px 6px;font-variant-numeric:tabular-nums;font-feature-settings:'tnum';">${r.age}</td>
         ${td(r.pen,'color:#36332e;')}
         ${shown.map((x,j)=>td(r.incs[j],'color:#36332e;')).join('')}
         ${extra?td(extraInc,'color:#36332e;'):''}
         ${td(r.draw,'color:#b8972e;font-weight:600;')}
-        ${r.short>0.5?td(r.totalInc,'color:#c0392b;font-weight:700;'):td(r.totalInc,'color:#27ae60;font-weight:700;')}
+        ${td(r.totalInc,r.short>0.5?'color:#c0392b;font-weight:700;':'color:#27ae60;font-weight:700;')}
         ${td(r.target,'color:#9a9590;')}
         ${td(r.balOut,r.depleted?'color:#c0392b;font-weight:700;':'color:#0d1e3a;font-weight:700;')}
       </tr>`;}).join('');
-    const endBal=rows.length?rows[rows.length-1].balOut:0;
-    const firstShort=rows.find(r=>r.short>0.5);
+    const tableHTML=`<table style="width:100%;table-layout:fixed;border-collapse:collapse;font-size:0.66rem;font-family:'Montserrat',Arial,sans-serif;">${colgroup}<thead><tr>${headers}</tr></thead><tbody>${body}</tbody></table>`;
+    return {tableHTML,rows,all,ft,p,startAge,endAge,mode,endBal:all.length?all[all.length-1].balOut:0};
+  }
+  function ledgerNotes(L){
+    const p=L.p;
+    return `${L.mode==='yield'
+      ?`Capital pays out only its ${(p.rate*100).toFixed(2)}% yield each year — <strong style="color:#0d1e3a;">principal is preserved</strong>; income above or below the target shows in Total Income.`
+      :`Capital earns ${(p.rate*100).toFixed(2)}% and funds the draw needed to reach the target each year.`}
+      ${p.inflOn?` The income target grows ${(p.inflRate*100).toFixed(1)}%/yr, the pension by its ${((p.pensionCola||0)*100).toFixed(1)}% COLA, and each income source by its own COLA.`:' Amounts are level, as entered.'}
+      ${L.startAge>p.retAge?` Ages ${p.retAge}–${L.startAge-1} are simulated but hidden by the ledger start age.`:''}
+      ${L.ft===null?`<strong style="color:#c0392b;">The income target is not met from the first year.</strong>`
+        :L.ft>=L.endAge?`<strong style="color:#27ae60;">Every year through age ${L.endAge} meets the income target.</strong>`
+        :`<strong style="color:#c0392b;">Red totals mark years the target is not fully funded (first at age ${L.ft+1}).</strong>`}`;
+  }
+  function ledgerHTML(c,label,opts){
+    const L=ledgerCore(c,opts);
     return `<div class="rpt-section ledger">
-      <div class="rpt-section-title">Retirement Income &amp; Legacy Ledger — ${esc(label)}</div>
-      <p style="font-size:0.75rem;color:#6b6560;line-height:1.6;margin-bottom:10px;">Year by year from retirement at age ${p.retAge} through age ${p.horizon}: every income source, what is drawn from capital to reach the income target, and the capital still standing — the <strong style="color:#0d1e3a;">legacy</strong> position that passes to beneficiaries at each age, before any life-insurance death benefits.</p>
-      <div style="border:1px solid #e8e3dc;border-radius:8px;overflow:hidden;">
-      <table style="width:100%;border-collapse:collapse;font-size:0.68rem;font-family:'Montserrat',Arial,sans-serif;">
-        <thead><tr>${headers}</tr></thead><tbody>${body}</tbody>
-      </table>
-      </div>
+      <div class="rpt-section-title">Retirement Income &amp; Legacy Ledger — ${esc(label)}${L.mode==='yield'?' · Living on the Yield':''}</div>
+      <p style="font-size:0.75rem;color:#6b6560;line-height:1.6;margin-bottom:10px;">Year by year from age ${L.startAge} through age ${L.endAge}: every income source, what comes from capital, and the capital still standing — the <strong style="color:#0d1e3a;">legacy</strong> position that passes to beneficiaries at each age, before any life-insurance death benefits.</p>
+      <div style="border:1px solid #e8e3dc;border-radius:8px;overflow:hidden;">${L.tableHTML}</div>
       <div style="display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-top:9px;">
-        <span style="font-size:0.66rem;color:#9a9590;line-height:1.6;max-width:620px;">Gold rule marks the first retirement year. Capital earns ${(p.rate*100).toFixed(2)}% and funds the draw each year${p.inflOn?`; the income target grows ${(p.inflRate*100).toFixed(1)}%/yr, the pension by its ${((p.pensionCola||0)*100).toFixed(1)}% COLA, and each income source by its own COLA`:'; amounts are level, as entered'}. ${firstShort?`<strong style="color:#c0392b;">Red totals mark years the income target is not fully funded${firstShort?` (first at age ${firstShort.age})`:''}.</strong>`:'Every year of the plan meets the income target.'}</span>
-        <span style="font-size:0.72rem;color:#36332e;white-space:nowrap;"><strong style="color:#0d1e3a;">Legacy at ${p.horizon}:</strong> <strong style="color:${endBal>0?'#27ae60':'#c0392b'};font-family:'Montserrat',sans-serif;">${M(endBal)}</strong></span>
+        <span style="font-size:0.66rem;color:#9a9590;line-height:1.6;max-width:640px;">Gold rule marks the first retirement year. ${ledgerNotes(L)}</span>
+        <span style="font-size:0.72rem;color:#36332e;white-space:nowrap;"><strong style="color:#0d1e3a;">Legacy at ${L.endAge}:</strong> <strong style="color:${L.endBal>0?'#27ae60':'#c0392b'};font-family:'Montserrat',sans-serif;">${M(L.endBal)}</strong></span>
       </div>
     </div>`;
   }
+  /* meta used by the base calculator's surplus / funded-through readouts */
+  window.efaFundedMeta=function(st){
+    const rows=ledgerRows({retAge:st.retAge,endAge:st.endAge||100,salTarget:st.salForGap,pension:st.pension,
+      pensionCola:st.pensionCola||0,incomes:st.incomes||[],assets:st.assets||0,rate:st.rate||0.05,
+      inflOn:!!st.inflOn,inflRate:st.inflRate||0,mode:'target'});
+    const ft=fundedThroughOf(rows);
+    return {fundedThrough:ft,endAge:st.endAge||100,endBal:rows.length?rows[rows.length-1].balOut:0,
+      allFunded:ft!==null&&ft>=(st.endAge||100)};
+  };
   /* ═══════════ BEFORE & AFTER state + overlay ═══════════ */
-  const BA={before:null, after:null, prelim:true, reportKind:'standard'};
+  const BA={before:null, after:null, prelim:true, reportKind:'standard', ledgerStart:'', ledgerEnd:100, yieldMode:false};
   function ready(){ return !!(BA.before&&BA.after); }
   function afterFull(){ return {...BA.before, assets:BA.after.assets, incomes:BA.after.incomes,
     gapRate:BA.after.gapRate, saveRor:BA.after.saveRor}; }
@@ -4250,7 +4380,7 @@ window.addEventListener('load',function(){
   const pctIn=v=>{const n=+v;return isNaN(n)?'':(Math.round(n*10000)/100);};
 
   const BA_ASSET_TYPES=['403(b)','457(b) Deferred Compensation','401(k)','401(a)','Traditional IRA','Roth IRA','SEP IRA','SIMPLE IRA','Fixed Index Annuity (FIA)','Multi-Year Guaranteed Annuity (MYGA)','Variable Annuity','IUL Cash Value','Whole Life Cash Value','Brokerage Account','HSA (Health Savings Account)','529 Education Account','Real Estate Equity','Rental Income (Annualized)','Business Interest','Pension (Other System)','Social Security Estimate'];
-  const BA_INCOME_TYPES=['Social Security (Client)','Social Security (Spouse)','Spouse / Partner Pension','Pension (Other System)','Annuity Income (FIA / SPIA / MYGA)','IUL Policy Loan Income','Whole Life Income','Rental / Real Estate Income','Business Interest / Distributions','Part-Time / Consulting Income'];
+  const BA_INCOME_TYPES=['Social Security (Client)','Social Security (Spouse)','Spouse / Partner Pension','Pension (Other System)','Annuity Income (FIA / SPIA / MYGA)','IUL Policy Loan Income','Whole Life Income','Roth IRA','Rental / Real Estate Income','Business Interest / Distributions','Part-Time / Consulting Income'];
   [['dl_ba_assets',BA_ASSET_TYPES],['dl_ba_incomes',BA_INCOME_TYPES]].forEach(([id,items])=>{
     if($(id)) return; const dl=document.createElement('datalist'); dl.id=id;
     dl.innerHTML=items.map(x=>`<option value="${esc(x)}">`).join(''); document.body.appendChild(dl);
@@ -4293,22 +4423,76 @@ window.addEventListener('load',function(){
   }
   function close(){ ov.classList.remove('on'); document.body.style.overflow=''; updateDeliverUI(); }
 
+  /* ── live Distribution Ledger modal — real-time, Present ⇄ Proposed ── */
+  const lm=document.createElement('div'); lm.id='efaBaLedgerModal';
+  lm.style.cssText='position:fixed;inset:0;z-index:7600;background:rgba(10,20,40,0.6);display:none;align-items:center;justify-content:center;padding:18px;';
+  lm.innerHTML=`<div style="background:white;border-radius:12px;max-width:1180px;width:100%;max-height:92vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 24px 80px rgba(0,0,0,0.45);">
+      <div style="background:var(--navy);padding:12px 20px;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;">
+        <div style="font-family:'Cormorant Garamond',serif;color:white;font-size:1.3rem;font-weight:700;">Distribution Ledger<em id="efaBaLmSub" style="color:var(--gold-light);font-style:normal;font-size:0.88rem;"></em></div>
+        <span style="display:flex;gap:10px;align-items:center;">
+          <span style="display:inline-flex;border:1px solid rgba(255,255,255,0.3);border-radius:6px;overflow:hidden;">
+            <button id="efaBaLmB" style="border:none;padding:7px 14px;font-family:'Montserrat',sans-serif;font-size:0.66rem;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;cursor:pointer;background:transparent;color:rgba(255,255,255,0.65);">Present</button>
+            <button id="efaBaLmA" style="border:none;padding:7px 14px;font-family:'Montserrat',sans-serif;font-size:0.66rem;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;cursor:pointer;background:transparent;color:rgba(255,255,255,0.65);">Proposed</button>
+          </span>
+          <button id="efaBaLmX" style="background:none;border:none;color:rgba(255,255,255,0.7);font-size:1.5rem;cursor:pointer;line-height:1;">×</button>
+        </span>
+      </div>
+      <div id="efaBaLmBody" style="overflow:auto;"></div>
+      <div id="efaBaLmFoot" style="border-top:1px solid var(--gray-200);padding:10px 18px;font-size:0.66rem;color:var(--gray-400);line-height:1.6;background:var(--gray-100);"></div>
+    </div>`;
+  document.body.appendChild(lm);
+  lm.addEventListener('click',e=>{ if(e.target===lm) lm.style.display='none'; });
+  lm.querySelector('#efaBaLmX').onclick=()=>{ lm.style.display='none'; };
+  let _lmSide='after';
+  function renderLiveLedger(){
+    if(!ready()) return;
+    const side=_lmSide;
+    const c=side==='before'?baCompute(BA.before):baCompute(afterFull());
+    const L=ledgerCore(c,{mode:(side==='after'&&BA.yieldMode)?'yield':'target'});
+    lm.querySelector('#efaBaLmSub').textContent=' — '+(side==='before'?'Present Plan':'Proposed Plan')+((side==='after'&&BA.yieldMode)?' · living on the yield':'');
+    const bB=lm.querySelector('#efaBaLmB'), bA=lm.querySelector('#efaBaLmA');
+    bB.style.background=side==='before'?'var(--gold)':'transparent'; bB.style.color=side==='before'?'var(--navy)':'rgba(255,255,255,0.65)';
+    bA.style.background=side==='after'?'var(--gold)':'transparent'; bA.style.color=side==='after'?'var(--navy)':'rgba(255,255,255,0.65)';
+    lm.querySelector('#efaBaLmBody').innerHTML=L.tableHTML;
+    lm.querySelector('#efaBaLmFoot').innerHTML=`<span style="float:right;margin-left:14px;color:var(--gray-700);"><b style="color:var(--navy);">Legacy at ${L.endAge}:</b> <b style="color:${L.endBal>0?'var(--green)':'var(--red)'};">${M(L.endBal)}</b></span>${ledgerNotes(L)}`;
+  }
+  lm.querySelector('#efaBaLmB').onclick=()=>{ _lmSide='before'; renderLiveLedger(); };
+  lm.querySelector('#efaBaLmA').onclick=()=>{ _lmSide='after'; renderLiveLedger(); };
+  function openLiveLedger(){ if(!ready()){ toast('Run the Before &amp; After first.'); return; } _lmSide='after'; renderLiveLedger(); lm.style.display='flex'; }
+  function fundedMetaFor(c,after){
+    const L=ledgerCore(c,{mode:(after&&BA.yieldMode)?'yield':'target'});
+    return {ft:L.ft,endAge:L.endAge,endBal:L.endBal,allFunded:L.ft!==null&&L.ft>=L.endAge};
+  }
+
   function kpi(l,v,cls){ return `<div class="efa-ba-kpi"><div class="l">${l}</div><div class="v ${cls||''}">${v}</div></div>`; }
   function posCard(c,after){
     const barC=c.covNom>=100?'var(--green)':c.covNom>60?'var(--gold)':'var(--red)';
+    const freeInc=freeIncomeYr(c.incomes);
+    let goalLine='';
+    if(c.annGap===0||c.covNom>=100){
+      const meta=fundedMetaFor(c,after);
+      const s=Math.max(0,(c.penForGap+c.annInc)-c.salForGap);
+      const ftTxt=meta.ft===null?String(c.age):(meta.allFunded?meta.endAge:meta.ft);
+      goalLine=`<div style="margin-top:10px;background:var(--gold-pale);border-left:3px solid var(--gold);border-radius:5px;padding:8px 11px;font-size:0.7rem;color:var(--gray-700);line-height:1.6;">
+        <b style="color:var(--navy);">✓ Goal reached.</b> ${s>0?`Surplus <b style="color:var(--green);">${M(s)}/yr</b> (<b style="color:var(--green);">${M(s/12)}/mo</b>) above the target at retirement. `:''}Funded through <b style="color:var(--navy);">age ${ftTxt}</b>${meta.endBal>0?` · legacy <b style="color:var(--green);">${M(meta.endBal)}</b> at ${meta.endAge}`:''}.
+      </div>`;
+    }
     return `<div class="efa-ba-pos ${after?'after':''}">
       <div class="ph"><span class="t">${after?'Proposed Plan':'Present Position'}</span><span class="s">${after?'recommendations applied':'as entered · locked'}</span></div>
       <div class="efa-ba-kpis">
-        ${kpi('Monthly Gap', c.monGap>0?'-'+M(c.monGap):'None', c.monGap>0?'red':'green')}
-        ${kpi('Capital Needed', M(c.capital), '')}
+        ${(()=>{const s=Math.max(0,(c.penForGap+c.annInc)-c.salForGap);
+          return c.monGap>0?kpi('Monthly Gap','-'+M(c.monGap),'red'):kpi('Monthly Surplus',s>0?'+'+M(s/12):'—','green');})()}
+        ${kpi('Capital Needed', M(c.capital), 'gold')}
         ${kpi('Projected Assets', M(c.totalNom), 'green')}
       </div>
       <div class="efa-ba-body">
         <div class="efa-ba-line"><span>Gap Funded</span><b style="color:${barC};">${c.covNom.toFixed(0)}%</b></div>
         <div class="efa-ba-barbg"><div class="efa-ba-bar" style="width:${Math.min(100,c.covNom).toFixed(0)}%;background:${barC};"></div></div>
         <div class="efa-ba-line" style="margin-top:8px;"><span>Still to Fund</span><b style="color:${c.remNom>0?'var(--red)':'var(--green)'};">${c.remNom>0?'-'+M(c.remNom):'✓ Covered'}</b></div>
-        <div class="efa-ba-line"><span>Required Savings (${c.ytr>0?c.ytr:1} yrs @ ${(c.saveRor*100).toFixed(1)}%)</span><b>${M(c.monthlySave)}/mo</b></div>
+        <div class="efa-ba-line"><span>Required Savings (${c.ytr>0?c.ytr:1} yrs @ ${(c.saveRor*100).toFixed(1)}%)</span><b style="color:var(--gold);">${M(c.monthlySave)}/mo</b></div>
+        <div class="efa-ba-line"><span>Tax-Free Income at Retirement</span><b style="color:${freeInc>0?'var(--green)':'var(--gray-400)'};">${freeInc>0?M(freeInc)+'/yr':'—'}</b></div>
         <div class="efa-ba-line"><span>Pre-Tax Share of Assets</span><b style="color:${c.mix.pretaxPct>=70?'var(--red)':c.mix.pretaxPct>=45?'var(--gold)':'var(--green)'};">${c.mix.pretaxPct.toFixed(0)}%</b></div>
+        ${goalLine}
       </div>
     </div>`;
   }
@@ -4329,13 +4513,32 @@ window.addEventListener('load',function(){
         ${deltaChip('Projected assets',b.totalNom,a.totalNom,false,'money')}
         ${deltaChip('Required savings/mo',b.monthlySave,a.monthlySave,true,'money')}
         ${deltaChip('Pre-tax share',b.mix.pretaxPct,a.mix.pretaxPct,true,'pct')}
+        ${deltaChip('Tax-free income/yr',freeIncomeYr(b.incomes),freeIncomeYr(a.incomes),false,'money')}
       </div>`;
   }
   function taxBandInner(){
     const b=baCompute(BA.before), a=baCompute(afterFull());
-    return `<div class="efa-ba-mixrow"><span class="ml">Before</span><div class="efa-ba-mixbar">${mixBarHTML(b.mix,20).replace(/^<div[^>]*>|<\/div>$/g,'')}</div><b style="font-family:'Montserrat',sans-serif;font-size:0.78rem;color:var(--red);min-width:86px;text-align:right;">${b.mix.pretaxPct.toFixed(0)}% pre-tax</b></div>
-      <div class="efa-ba-mixrow"><span class="ml">After</span><div class="efa-ba-mixbar">${mixBarHTML(a.mix,20).replace(/^<div[^>]*>|<\/div>$/g,'')}</div><b style="font-family:'Montserrat',sans-serif;font-size:0.78rem;color:${a.mix.pretaxPct<b.mix.pretaxPct?'var(--green)':'var(--navy)'};min-width:86px;text-align:right;">${a.mix.pretaxPct.toFixed(0)}% pre-tax</b></div>
-      <div style="font-size:0.64rem;color:var(--gray-400);margin-top:6px;line-height:1.5;">Red = pre-tax / tax-deferred · Green = tax-free access · Gold = already-taxed. Based on projected values at retirement.</div>`;
+    const seg=(w,color,txt)=>w>0.4?`<div style="width:${w.toFixed(1)}%;background:${color};">${w>=11?txt:''}</div>`:'';
+    const incBar=(c)=>{
+      const free=freeIncomeYr(c.incomes);
+      const ss=c.incomes.reduce((s,x)=>s+(incomeTaxClass(x.name)==='ss'?(x.annAtRet||0):0),0);
+      const tot=c.penForGap+c.annInc;
+      const ord=Math.max(0,tot-free-ss);
+      const pc=v=>tot>0?v/tot*100:0;
+      return {tot,free,freePct:pc(free),bar:seg(pc(ord),'#c0392b',pc(ord).toFixed(0)+'%')+seg(pc(ss),'#6aa9c9',pc(ss).toFixed(0)+'%')+seg(pc(free),'#27ae60',pc(free).toFixed(0)+'%')};
+    };
+    const bi=incBar(b), ai=incBar(a);
+    return `<div style="font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--gray-400);margin-bottom:5px;">Assets — projected at retirement</div>
+      <div class="efa-ba-mixrow"><span class="ml">Before</span><div class="efa-ba-mixbar">${mixBarHTML(b.mix,20).replace(/^<div[^>]*>|<\/div>$/g,'')}</div><b style="font-family:'Montserrat',sans-serif;font-size:0.78rem;color:var(--red);min-width:96px;text-align:right;">${b.mix.pretaxPct.toFixed(0)}% pre-tax</b></div>
+      <div class="efa-ba-mixrow"><span class="ml">After</span><div class="efa-ba-mixbar">${mixBarHTML(a.mix,20).replace(/^<div[^>]*>|<\/div>$/g,'')}</div><b style="font-family:'Montserrat',sans-serif;font-size:0.78rem;color:${a.mix.pretaxPct<b.mix.pretaxPct?'var(--green)':'var(--navy)'};min-width:96px;text-align:right;">${a.mix.pretaxPct.toFixed(0)}% pre-tax</b></div>
+      <div style="font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--gray-400);margin:10px 0 5px;">Income — pension + sources at retirement</div>
+      <div class="efa-ba-mixrow"><span class="ml">Before</span><div class="efa-ba-mixbar">${bi.bar}</div><b style="font-family:'Montserrat',sans-serif;font-size:0.78rem;color:${bi.freePct>0?'var(--green)':'var(--gray-400)'};min-width:96px;text-align:right;">${bi.freePct.toFixed(0)}% post-tax</b></div>
+      <div class="efa-ba-mixrow"><span class="ml">After</span><div class="efa-ba-mixbar">${ai.bar}</div><b style="font-family:'Montserrat',sans-serif;font-size:0.78rem;color:${ai.freePct>bi.freePct?'var(--green)':'var(--navy)'};min-width:96px;text-align:right;">${ai.freePct.toFixed(0)}% post-tax</b></div>
+      ${(bi.free>0||ai.free>0)?`<div style="display:flex;gap:22px;flex-wrap:wrap;margin-top:9px;padding-top:8px;border-top:1px dashed var(--gray-200);">
+        <span style="font-size:0.7rem;color:var(--gray-700);">Tax-free income — Before: <b style="font-family:'Montserrat',sans-serif;color:${bi.free>0?'var(--green)':'var(--gray-400)'};">${bi.free>0?M(bi.free)+'/yr':'—'}</b></span>
+        <span style="font-size:0.7rem;color:var(--gray-700);">Tax-free income — After: <b style="font-family:'Montserrat',sans-serif;color:${ai.free>0?'var(--green)':'var(--gray-400)'};">${ai.free>0?M(ai.free)+'/yr':'—'}</b></span>
+      </div>`:''}
+      <div style="font-size:0.64rem;color:var(--gray-400);margin-top:6px;line-height:1.5;">Assets: red = pre-tax / tax-deferred · green = tax-free access · gold = already-taxed. Income: red = taxed as ordinary income (pension &amp; most sources) · blue = Social Security (0–85% taxable) · green = post-tax / tax-free (IUL &amp; Whole Life policy loans, Roth).</div>`;
   }
   function editorTables(){
     const A=BA.after;
@@ -4377,6 +4580,16 @@ window.addEventListener('load',function(){
         <div class="rf"><label>Savings ROR %</label><input id="efaBaSror" type="number" step="0.25" min="1" max="15" value="${pctIn(BA.after.saveRor)}"></div>
         <div class="hint"><b style="color:var(--navy);">Target Return</b> drives the Proposed Plan's capital requirement (gap ÷ return). <b style="color:var(--navy);">Savings ROR</b> drives its required savings. The Present Position keeps the rates from the Gap &amp; Capital step.</div>
       </div>
+      <div class="efa-ba-rates" style="border-left-color:var(--navy);">
+        <div class="rf"><label>Ledger Start Age</label><input id="efaBaLstart" type="number" min="40" max="119" placeholder="${BA.before?BA.before.age:''}" value="${esc(BA.ledgerStart||'')}"></div>
+        <div class="rf"><label>Ledger End Age</label><input id="efaBaLend" type="number" min="60" max="120" value="${parseInt(BA.ledgerEnd,10)||100}"></div>
+        <button class="efa-go" id="efaBaLedgerBtn" style="padding:10px 16px;margin-bottom:5px;">⊞ Distribution Ledger</button>
+        <label style="display:flex;align-items:center;gap:8px;font-size:0.72rem;color:var(--gray-700);cursor:pointer;margin:0 0 9px;text-transform:none;letter-spacing:0;font-weight:500;">
+          <input type="checkbox" id="efaBaYield" ${BA.yieldMode?'checked':''} style="width:15px;height:15px;accent-color:var(--gold);margin:0;flex:0 0 auto;">
+          <span>Proposed Plan lives on the <b id="efaBaYieldPct" style="color:var(--navy);">${pctIn(BA.after.gapRate)}%</b> yield — principal preserved, never drained</span>
+        </label>
+        <div class="hint">The ledger defaults to the chosen retirement age (${BA.before?BA.before.age:'—'}) through 100 — override with the start/end ages. Settings apply to the live ledger and the report.</div>
+      </div>
       <div id="efaBaEditors">${editorTables()}</div>
       <div class="efa-ba-taxband">
         <div class="tt"><span>Tax Status of the Plan — Diversification by Tax Treatment</span><span class="sub">carried into the report automatically</span></div>
@@ -4410,8 +4623,14 @@ window.addEventListener('load',function(){
       const ed=$('efaBaEditors'); ed.innerHTML=editorTables(); wire2(ed); updateStrip();
     });
     const gr=$('efaBaRate'), sr=$('efaBaSror');
-    if(gr) gr.addEventListener('input',()=>{ BA.after.gapRate=Math.max(0.005,num(gr.value)/100||0.05); updateStrip(); });
+    if(gr) gr.addEventListener('input',()=>{ BA.after.gapRate=Math.max(0.005,num(gr.value)/100||0.05);
+      const yp=$('efaBaYieldPct'); if(yp) yp.textContent=pctIn(BA.after.gapRate)+'%'; updateStrip(); });
     if(sr) sr.addEventListener('input',()=>{ BA.after.saveRor=Math.max(0.005,num(sr.value)/100||0.06); updateStrip(); });
+    const ls=$('efaBaLstart'), le=$('efaBaLend'), yl=$('efaBaYield'), lb=$('efaBaLedgerBtn');
+    if(ls) ls.addEventListener('input',()=>{ BA.ledgerStart=ls.value; updateStrip(); if(lm.style.display==='flex') renderLiveLedger(); });
+    if(le) le.addEventListener('input',()=>{ BA.ledgerEnd=le.value; updateStrip(); if(lm.style.display==='flex') renderLiveLedger(); });
+    if(yl) yl.onchange=()=>{ BA.yieldMode=yl.checked; updateStrip(); if(lm.style.display==='flex') renderLiveLedger(); };
+    if(lb) lb.onclick=openLiveLedger;
   }
   function wire2(scope){ /* rewire just the editors after a re-render */
     scope.querySelectorAll('input[data-l],select[data-l]').forEach(el=>{
@@ -4467,7 +4686,7 @@ window.addEventListener('load',function(){
       : 'The standard pension review — the Before &amp; After stays saved and can be switched back on.';
   }
   /* ═══════════ STRATEGY IMPACT REPORT (before & after client deliverable) ═══════════ */
-  function rptPos(c,label,sub){
+  function rptPos(c,label,sub,opts){
     const barC=c.covNom>=100?'#27ae60':c.covNom>60?'#b8972e':'#c0392b';
     return `<div class="rpt-section">
       <div class="rpt-section-title">${label}</div>
@@ -4476,8 +4695,12 @@ window.addEventListener('load',function(){
         <div class="rpt-kpi"><div class="rpt-kpi-label">Income Target${c.infl.on?' (Future $)':''}</div><div class="rpt-kpi-val">${M(c.salForGap)}/yr</div></div>
         <div class="rpt-kpi"><div class="rpt-kpi-label">Pension at Age ${c.age}</div><div class="rpt-kpi-val">${M(c.penForGap)}/yr</div></div>
         ${c.annInc>0?`<div class="rpt-kpi"><div class="rpt-kpi-label">Other Income</div><div class="rpt-kpi-val" style="color:#27ae60;">${M(c.annInc)}/yr</div></div>`:''}
-        <div class="rpt-kpi red"><div class="rpt-kpi-label">Annual Gap</div><div class="rpt-kpi-val">${c.annGap>0?'-'+M(c.annGap):'None'}</div></div>
-        <div class="rpt-kpi red"><div class="rpt-kpi-label">Monthly Gap</div><div class="rpt-kpi-val">${c.monGap>0?'-'+M(c.monGap):'None'}</div></div>
+        ${(()=>{const s=Math.max(0,(c.penForGap+c.annInc)-c.salForGap);
+          return c.annGap>0
+            ?`<div class="rpt-kpi red"><div class="rpt-kpi-label">Annual Gap</div><div class="rpt-kpi-val">-${M(c.annGap)}</div></div>
+               <div class="rpt-kpi red"><div class="rpt-kpi-label">Monthly Gap</div><div class="rpt-kpi-val">-${M(c.monGap)}</div></div>`
+            :`<div class="rpt-kpi" style="background:#f0faf4;"><div class="rpt-kpi-label" style="color:#27ae60;">Annual Surplus</div><div class="rpt-kpi-val" style="color:#27ae60;">+${M(s)}</div></div>
+               <div class="rpt-kpi" style="background:#f0faf4;"><div class="rpt-kpi-label" style="color:#27ae60;">Monthly Surplus</div><div class="rpt-kpi-val" style="color:#27ae60;">+${M(s/12)}</div></div>`;})()}
       </div>
       <div class="rpt-formula">
         <div class="rpt-fi"><div class="rpt-fl">Annual Gap</div><div class="rpt-fv">${M(c.annGap)}</div></div>
@@ -4500,9 +4723,14 @@ window.addEventListener('load',function(){
         <div style="background:#f7f5f1;border-radius:6px;padding:11px 13px;border-top:3px solid #0d1e3a;">
           <div style="font-size:0.6rem;text-transform:uppercase;letter-spacing:0.05em;color:#9a9590;font-weight:700;">Still to Fund · Required Savings</div>
           <div style="font-family:'Montserrat',sans-serif;font-size:1.05rem;font-weight:700;color:${c.remNom>0?'#c0392b':'#27ae60'};margin-top:3px;">${c.remNom>0?M(c.remNom):'✓ Covered'}</div>
-          <div style="font-size:0.68rem;color:#6b6560;margin-top:3px;">${c.remNom>0?M(c.monthlySave)+'/mo for '+(c.ytr>0?c.ytr:1)+' yrs @ '+(c.saveRor*100).toFixed(1)+'%':'No additional savings required'}</div>
+          <div style="font-size:0.68rem;color:${c.remNom>0?'#b8972e':'#6b6560'};font-weight:${c.remNom>0?'700':'400'};margin-top:3px;">${c.remNom>0?M(c.monthlySave)+'/mo for '+(c.ytr>0?c.ytr:1)+' yrs @ '+(c.saveRor*100).toFixed(1)+'%':'No additional savings required'}</div>
         </div>
       </div>
+      ${(c.annGap===0||c.covNom>=100)?(()=>{
+        const meta=fundedMetaFor(c,!!(opts&&opts.after));
+        const s=Math.max(0,(c.penForGap+c.annInc)-c.salForGap);
+        const ftTxt=meta.ft===null?String(c.age):(meta.allFunded?String(meta.endAge):String(meta.ft));
+        return `<div style="margin-top:10px;background:#fffbf0;border-left:4px solid #b8972e;border-radius:6px;padding:10px 14px;font-size:0.76rem;color:#36332e;line-height:1.6;"><strong style="color:#0d1e3a;">✓ Goal reached.</strong> ${s>0?`Income runs <strong style="color:#27ae60;">${M(s)}/yr</strong> (<strong style="color:#27ae60;">${M(s/12)}/mo</strong>) above the target at retirement. `:''}The plan holds the income target through <strong style="color:#0d1e3a;">age ${ftTxt}</strong>${meta.endBal>0?`, with a projected legacy of <strong style="color:#27ae60;">${M(meta.endBal)}</strong> at age ${meta.endAge}`:''}.</div>`;})():''}
     </div>`;
   }
   function impactTableHTML(b,a){
@@ -4524,9 +4752,19 @@ window.addEventListener('load',function(){
       ['Required Savings', b.monthlySave, a.monthlySave, true, 'money','/mo'],
       ['Pre-Tax Share of Assets', b.mix.pretaxPct, a.mix.pretaxPct, true, 'pct','']
     ].map(r=>`<tr><td><strong>${r[0]}</strong></td><td>${V(r[1],r[4],r[5])}</td><td style="font-weight:700;color:#0d1e3a;">${V(r[2],r[4],r[5])}</td><td>${D(r[1],r[2],r[3],r[4],r[5])}</td></tr>`).join('');
+    const mb=fundedMetaFor(b,false), ma=fundedMetaFor(a,true);
+    const ftV=m=>m.ft===null?'—':String(m.allFunded?m.endAge:m.ft);
+    const ftRow=(()=>{
+      const x=mb.ft===null?(b.age-1):mb.ft, y=ma.ft===null?(a.age-1):ma.ft, d=y-x;
+      const delta=d===0?'<span style="color:#9a9590;">No change</span>':`<span style="color:${d>0?'#27ae60':'#c0392b'};font-weight:700;">${d>0?'▲':'▼'} ${Math.abs(d)} yr${Math.abs(d)===1?'':'s'}</span>`;
+      return `<tr><td><strong>Income Funded Through Age</strong></td><td>${ftV(mb)}</td><td style="font-weight:700;color:#0d1e3a;">${ftV(ma)}</td><td>${delta}</td></tr>`;})();
+    const freeRow=(()=>{
+      const bf=freeIncomeYr(b.incomes), af=freeIncomeYr(a.incomes), d=af-bf;
+      const delta=Math.abs(d)<1?'<span style="color:#9a9590;">No change</span>':`<span style="color:${d>0?'#27ae60':'#c0392b'};font-weight:700;">${d>0?'▲':'▼'} ${M(Math.abs(d))}/yr</span>`;
+      return `<tr><td><strong>Tax-Free Income at Retirement</strong></td><td>${bf>0?M(bf)+'/yr':'—'}</td><td style="font-weight:700;color:#0d1e3a;">${af>0?M(af)+'/yr':'—'}</td><td>${delta}</td></tr>`;})();
     return `<div class="rpt-section">
       <div class="rpt-section-title">The Impact — Side by Side</div>
-      <table class="rpt-table"><thead><tr><th style="width:32%;">Measure</th><th>Present Position</th><th>Proposed Plan</th><th>Change</th></tr></thead><tbody>${rows}</tbody></table>
+      <table class="rpt-table"><thead><tr><th style="width:32%;">Measure</th><th>Present Position</th><th>Proposed Plan</th><th>Change</th></tr></thead><tbody>${rows}${ftRow}${freeRow}</tbody></table>
     </div>`;
   }
   function changedHTML(b,a){
@@ -4577,7 +4815,8 @@ window.addEventListener('load',function(){
     const curAge=(typeof getCurrentAge==='function')?getCurrentAge():null;
     const survSel=$('survivor');
     const survLabel=survSel?survSel.options[survSel.selectedIndex].text:'';
-    const taxSec=sectionHTML(a.assets, a.incomes, a.penForGap, {sysName:S.sysName, compare:{before:b.mix, after:a.mix}});
+    const taxSec=sectionHTML(a.assets, a.incomes, a.penForGap, {sysName:S.sysName,
+      compare:{before:b.mix, after:a.mix, beforeFree:freeIncomeYr(b.incomes), afterFree:freeIncomeYr(a.incomes)}});
     const html=`<!DOCTYPE html>
 <html><head><meta charset="UTF-8">
 <title>Strategy Impact Report — ${esc(client)}</title>
@@ -4653,11 +4892,11 @@ body{font-family:'Montserrat',Arial,sans-serif;color:#2d2d2d;background:white;fo
 <div class="prelim-strip">${prelim?'Preliminary Recommendations — For Discussion':'Final Recommendations'}</div>
 
 ${rptPos(b,'Where You Started — Present Position','Your position as entered at the '+(prelim?'initial review':'start of our work together')+': pension scenario age '+S.age+', existing assets, and income sources.')}
-${rptPos(a,'The Proposed Plan — With Recommendations Applied','The same scenario and assumptions, with the recommended repositioning of assets and income in place.')}
+${rptPos(a,'The Proposed Plan — With Recommendations Applied','The same scenario and assumptions, with the recommended repositioning of assets and income in place.',{after:true})}
 ${impactTableHTML(b,a)}
 ${changedHTML(b,a)}
 ${ledgerHTML(b,'Present Plan')}
-${ledgerHTML(a,'Proposed Plan')}
+${ledgerHTML(a,'Proposed Plan',{mode:BA.yieldMode?'yield':'target'})}
 ${taxSec}
 
 <div class="rpt-section" style="text-align:center;padding:28px 52px;">
@@ -4746,7 +4985,8 @@ ${taxSec}
       gapIdx:val('gapPicker'), gapRate:val('gapRate')||'5', saveRor:val('saveRor')||'6',
       saveGoal:(typeof _saveGoal!=='undefined')?_saveGoal:'infl',
       assets:readAssetRowsRaw(), incomes:readIncomeRowsRaw(),
-      ba: BA.after ? {after:deep(BA.after), prelim:BA.prelim, reportKind:BA.reportKind} : null
+      ba: BA.after ? {after:deep(BA.after), prelim:BA.prelim, reportKind:BA.reportKind,
+        ledgerStart:BA.ledgerStart, ledgerEnd:BA.ledgerEnd, yieldMode:BA.yieldMode} : null
     };
   }
   function restoreSession(s){
@@ -4777,11 +5017,15 @@ ${taxSec}
       if(typeof syncAssetYrs==='function') syncAssetYrs();
       renderGap();
       BA.before=null; BA.after=null; BA.prelim=true; BA.reportKind='standard';
+      BA.ledgerStart=''; BA.ledgerEnd=100; BA.yieldMode=false;
       if(s.ba&&s.ba.after){
         BA.before=snapshot();
         BA.after=deep(s.ba.after);
         BA.prelim=s.ba.prelim!==false;
         BA.reportKind=s.ba.reportKind||'impact';
+        BA.ledgerStart=s.ba.ledgerStart||'';
+        BA.ledgerEnd=s.ba.ledgerEnd||100;
+        BA.yieldMode=!!s.ba.yieldMode;
       }
       updateDeliverUI();
       const when=s.savedAt?new Date(s.savedAt).toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}):'';
