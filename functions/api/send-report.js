@@ -87,6 +87,53 @@ async function renderVectorPdf(env, html) {
   return btoa(bin);
 }
 
+// ── Endpoint hardening ───────────────────────────────────────────────────────
+// This endpoint sends email through the firm's Resend account and renders submitted
+// HTML to PDF, so it must not be an open relay. Defenses (in order):
+//   1. Origin/Referer allowlist — browser calls must come from the firm's site.
+//   2. Required custom header (X-EFA-App) — forces a CORS preflight, blocking
+//      simple cross-site POSTs and casual scripts.
+//   3. Optional Cloudflare Turnstile — set TURNSTILE_SECRET_KEY (and add the widget
+//      client-side) to require a human token per send.
+//   4. Soft per-IP rate limit (per isolate) — backstop; configure a Cloudflare WAF
+//      rate rule on /api/send-report for real enforcement.
+// Residual risk: non-browser clients can forge headers. For full protection, move
+// the calculator behind the authenticated partner portal and check its session here.
+const ALLOWED_ORIGINS = [
+  'https://edwardsfinancialassociates.com',
+  'https://www.edwardsfinancialassociates.com',
+];
+const RATE = { max: 6, windowMs: 10 * 60 * 1000, map: new Map() };
+function rateLimited(ip) {
+  const now = Date.now();
+  const arr = (RATE.map.get(ip) || []).filter((t) => now - t < RATE.windowMs);
+  if (arr.length >= RATE.max) { RATE.map.set(ip, arr); return true; }
+  arr.push(now); RATE.map.set(ip, arr);
+  if (RATE.map.size > 5000) RATE.map.clear(); // memory backstop
+  return false;
+}
+function originAllowed(request, env) {
+  const origin = request.headers.get('Origin') || '';
+  const referer = request.headers.get('Referer') || '';
+  const allowPreview = env.ALLOW_PREVIEW === '1';
+  const okList = (v) => ALLOWED_ORIGINS.some((o) => v === o || v.startsWith(o + '/'))
+    || (allowPreview && /^https:\/\/[a-z0-9-]+\.edwards-financial-website(-[a-z0-9]+)?\.pages\.dev(\/|$)/.test(v));
+  if (origin) return okList(origin);
+  if (referer) return okList(referer);
+  return false; // no origin/referer at all → not a browser call from our site
+}
+
+export async function onRequestOptions(context) {
+  const origin = context.request.headers.get('Origin') || '';
+  const ok = ALLOWED_ORIGINS.includes(origin);
+  return new Response(null, { status: ok ? 204 : 403, headers: ok ? {
+    'Access-Control-Allow-Origin': origin,
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type, X-EFA-App',
+    'Access-Control-Max-Age': '86400',
+  } : {} });
+}
+
 export async function onRequestPost(context) {
   const { request, env } = context;
   const key = env.RESEND_API_KEY;
@@ -95,8 +142,29 @@ export async function onRequestPost(context) {
 
   if (!key) return json({ ok: false, error: 'RESEND_API_KEY is not configured.' }, 500);
 
+  // ── security gate ──
+  if (!originAllowed(request, env)) return json({ ok: false, error: 'Forbidden.' }, 403);
+  if (request.headers.get('X-EFA-App') !== 'pension-calculator') return json({ ok: false, error: 'Forbidden.' }, 403);
+  const ip = request.headers.get('CF-Connecting-IP') || 'unknown';
+  if (rateLimited(ip)) return json({ ok: false, error: 'Too many requests — try again shortly.' }, 429);
+
   let body;
   try { body = await request.json(); } catch { return json({ ok: false, error: 'Bad request.' }, 400); }
+
+  // Optional Turnstile human-check: enforced whenever the secret is configured.
+  if (env.TURNSTILE_SECRET_KEY) {
+    const token = String(body.turnstileToken || '');
+    if (!token) return json({ ok: false, error: 'Verification required.' }, 403);
+    try {
+      const vr = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({ secret: env.TURNSTILE_SECRET_KEY, response: token, remoteip: ip }),
+      });
+      const vj = await vr.json();
+      if (!vj.success) return json({ ok: false, error: 'Verification failed.' }, 403);
+    } catch { return json({ ok: false, error: 'Verification unavailable.' }, 403); }
+  }
 
   const mode = body.mode === 'client' ? 'client' : 'self';
   const clientName = String(body.clientName || '').slice(0, 120).trim();
