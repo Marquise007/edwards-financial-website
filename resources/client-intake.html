@@ -614,6 +614,29 @@ footer .views{opacity:.7}
 @media(max-width:560px){
   #review .actions .next{min-height:48px}
 }
+
+/* ============================================================
+   A chip answered "no" should visibly recede: handled, and out
+   of the way. The base sheet only shifts its text colour, which
+   reads as no change at all once every chip is dismissed.
+   ============================================================ */
+.chip.no{
+  background:#f1efe9;
+  border-color:#e5e1d5;
+  color:#aaa497;
+  font-weight:400;
+  box-shadow:none;
+  opacity:.6;
+  transition:opacity .16s ease,background .16s ease,color .16s ease;
+}
+.chip.no:hover{
+  background:#f1efe9;
+  border-color:#e5e1d5;
+  color:#aaa497;
+  box-shadow:none;
+  transform:none;
+  opacity:.6;
+}
 </style>
 </head>
 <body>
