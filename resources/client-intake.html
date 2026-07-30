@@ -59,6 +59,8 @@ label{font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:#5b6472
 input[type=text],input[type=email],select{font-family:'DM Sans',sans-serif;font-size:15px;color:var(--navy);background:var(--field);border:1px solid var(--line);border-bottom:2px solid #d5c68f;border-radius:6px;height:var(--ctl);padding:0 10px;width:100%}
 textarea{font-family:'DM Sans',sans-serif;font-size:15px;color:var(--navy);background:var(--field);border:1px solid var(--line);border-bottom:2px solid #d5c68f;border-radius:6px;padding:9px 10px;width:100%}
 input:focus,select:focus,textarea:focus{outline:2px solid rgba(184,151,46,.45);outline-offset:1px}
+/* placeholders must never read as a filled-in answer */
+input::placeholder,textarea::placeholder{color:#aaa393;font-style:italic;opacity:1}
 textarea{min-height:74px;resize:vertical}
 .hint{font-size:12.5px;color:var(--mut)}
 .optional{font-weight:400;text-transform:none;letter-spacing:0;color:#9a947f}
@@ -77,7 +79,7 @@ textarea{min-height:74px;resize:vertical}
 .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
 .chip{font:500 13.5px 'DM Sans';display:inline-flex;align-items:center;height:36px;line-height:1;padding:0 14px;border-radius:999px;border:1.4px solid var(--line);background:var(--white);color:#3a4258;cursor:pointer;transition:all .12s}
 .chip.yes{background:var(--gold);border-color:var(--gold);color:var(--navy);font-weight:700}
-.chip.no{background:#fbfaf6;border-color:#e2dcc8;color:#9a947f;text-decoration:line-through}
+.chip.no{background:#fbfaf6;border-color:#e2dcc8;color:#9a947f}
 .noneBtn{margin-top:12px;font:700 13.5px 'DM Sans';color:var(--navy);background:var(--cream);border:1.4px solid var(--gold);border-radius:8px;padding:10px 16px;cursor:pointer;width:100%}
 .noneBtn:hover{background:#f2edda}
 .noneBtn.used{background:var(--navy);color:var(--cream);border-color:var(--navy)}
@@ -175,7 +177,7 @@ footer .who{font-family:'Cormorant Garamond',serif;font-size:17px;color:var(--na
         <div class="f c2"><label>Middle <span class="optional">optional</span></label><input type="text" data-m="middle" name="middle_name" autocomplete="additional-name"></div>
         <div class="f c2"><label>Last name</label><input type="text" data-m="last" name="last_name" autocomplete="family-name"></div>
         <div class="f c2"><label>Date of birth</label><input type="text" data-m="dob" name="birth_date" autocomplete="bday" placeholder="mm/dd/yyyy" inputmode="numeric"></div>
-        <div class="f c2"><label>Birth state / country</label><input type="text" data-m="birth" name="birth_place" placeholder="CA, USA"></div>
+        <div class="f c2"><label>Birth state / country</label><input type="text" data-m="birth" name="birth_place" placeholder="e.g. California, USA"></div>
         <div class="f c2"><label>Gender <span class="optional">as listed on the application</span></label>
           <span class="yn" data-seg="gender" data-a="M" data-b="F"><button type="button">M</button><button type="button">F</button></span>
         </div>
@@ -194,7 +196,7 @@ footer .who{font-family:'Cormorant Garamond',serif;font-size:17px;color:var(--na
         <div class="f c2"><label>Driver's license #</label><input type="text" data-m="dl" name="drivers_license"></div>
         <div class="f c1"><label>State</label><input type="text" data-m="dl_state" name="license_state" maxlength="2"></div>
       </div>
-      <p class="hint" style="margin-top:2px">Social Security and tax ID numbers are deliberately not collected on this form. Joshua will take those from you directly when the application is signed.</p>
+      <p class="hint" style="margin-top:2px">For your security, Social Security and tax ID numbers are not collected on this form. That information is taken from you directly when your application is prepared for signature.</p>
       <div class="qrow"><p>Are you a United States citizen?</p><span class="yn" data-yn="cit"><button type="button">Yes</button><button type="button">No</button></span></div>
       <div class="grid" id="citWrap" style="display:none">
         <div class="f c2"><label>Country of citizenship</label><input type="text" data-m="cit_country"></div>
@@ -486,11 +488,11 @@ footer .who{font-family:'Cormorant Garamond',serif;font-size:17px;color:var(--na
       <h4>Before you submit</h4>
       <p id="finalGapsLede"></p>
       <div id="finalGapsList"></div>
-      <p style="margin-top:7pt">You can submit now and send the rest later. Joshua will see exactly what is still open and will follow up with you.</p>
+      <p style="margin-top:7pt">You can submit now and send the rest later. Our team will see exactly what is still open and will follow up with you.</p>
     </div>
     <div class="attest">
       <input type="checkbox" id="attest">
-      <label for="attest" style="text-transform:none;letter-spacing:0;font:400 14.5px 'DM Sans';color:var(--ink)"><span id="attestFull">Everything above is complete and true to the best of my knowledge, and I understand Joshua will review it with me before any application is submitted.</span><span id="attestPartial" style="display:none">Everything I have answered is true to the best of my knowledge. I understand some items are still open, that I will provide them to Joshua, and that he will review everything with me before any application is submitted.</span></label>
+      <label for="attest" style="text-transform:none;letter-spacing:0;font:400 14.5px 'DM Sans';color:var(--ink)"><span id="attestFull">Everything above is complete and true to the best of my knowledge, and I understand it will be reviewed with me before any application is submitted.</span><span id="attestPartial" style="display:none">Everything I have answered is true to the best of my knowledge. I understand some items are still open, that I will provide them, and that everything will be reviewed with me before any application is submitted.</span></label>
     </div>
     <div class="actions" id="actionRow">
       <button type="button" class="next" id="submitBtn">Submit</button>
@@ -501,7 +503,9 @@ footer .who{font-family:'Cormorant Garamond',serif;font-size:17px;color:var(--na
     </div>
     <div id="sentBox" style="display:none;background:#f4f0e2;border:1px solid var(--gold);border-radius:10px;padding:18px">
       <h3 class="serif" style="font-size:21px;color:var(--navy);margin-bottom:6px">Received. Thank you.</h3>
-      <p style="font-size:14.5px;color:#3a4258">Your questionnaire is with Joshua, and a copy just downloaded for your records. He will reach out to schedule your review.</p>
+      <p style="font-size:14.5px;color:#3a4258">Your intake questionnaire has been submitted. Our team will reach out regarding application processing and signatures.</p>
+      <button type="button" class="next alt" id="sentDl" style="margin-top:14px">Download a copy for my records</button>
+      <p class="hint" id="sentNote" style="margin-top:8px"></p>
     </div>
     <p style="margin-top:14px;font-size:13px;color:var(--mut)">Need to begin again? <a href="#" id="startOver" style="color:var(--gold);font-weight:700;text-decoration:none">Start over</a></p>
   </section>
@@ -830,7 +834,8 @@ const store={get(k){try{return localStorage.getItem(k)}catch(e){return this._m&&
              set(k,v){try{localStorage.setItem(k,v)}catch(e){(this._m=this._m||{})[k]=v}},
              del(k){try{localStorage.removeItem(k)}catch(e){if(this._m)delete this._m[k]}}};
 let S=newState();
-/* SSNs and tax IDs are no longer collected here — Joshua takes them directly. A session
+/* SSNs and tax IDs are no longer collected here — they are taken from the client
+   directly when the application is prepared for signature. A session
    saved by an earlier build can still hold them, and Object.assign would merge them back
    into the submitted payload, so strip them (and rewrite storage) before anything reads S. */
 function scrubIds(o){
@@ -914,7 +919,11 @@ $$('[data-flag]').forEach(g=>{
   g.querySelectorAll('.chip').forEach(c=>{
     const k=c.dataset.k;
     const paint=()=>{const v=objFor()[k];c.classList.toggle('yes',v===true);c.classList.toggle('no',v===false);};
-    c.onclick=()=>{const o=objFor();o[k]=o[k]===true?false:true;paint();flagSideEffects(grp);save();};
+    /* tapping a chip on selects it; tapping again undoes it. Once "none of these apply"
+       has been used, undoing returns the chip to an explicit no rather than unanswered. */
+    c.onclick=()=>{const o=objFor();
+      o[k]=o[k]===true?(S.derived.includes(grp)?false:null):true;
+      paint();flagSideEffects(grp);save();};
     paint();
   });
 });
@@ -1151,7 +1160,7 @@ function buildReview(){
 }
 
 /* actions */
-const JOSH_EMAIL='jedwards.finance@gmail.com';
+const INTAKE_EMAIL='jedwards.finance@gmail.com';
 function needAttest(){if(!document.getElementById('attest').checked){document.getElementById('pdfNote').textContent='Check the confirmation box above first.';return true;}return false;}
 function dl(blob,name){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),4000);}
 async function makePdf(){
@@ -1193,10 +1202,11 @@ async function packageFile(){
           name:'EFA_Intake_'+(S.last||'answers')+'.json',filled:0,fallback:true};
 }
 const ENDPOINT='/api/intake-submit';
+let _lastPackage=null;   /* the packaged submission, kept so it can be re-downloaded after submitting */
 function b64(u8){let out='';const CH=0x8000;for(let i=0;i<u8.length;i+=CH)out+=String.fromCharCode.apply(null,u8.subarray(i,i+CH));return btoa(out);}
 async function submitIntake(){
   if(needAttest())return;
-  if(!(S.first&&S.last)){document.getElementById('pdfNote').textContent='We need at least your first and last name before this can go to Joshua. Everything else can follow later.';return;}
+  if(!(S.first&&S.last)){document.getElementById('pdfNote').textContent='We need at least your first and last name before this can be submitted. Everything else can follow later.';return;}
   const note=document.getElementById('pdfNote');
   const btn=document.getElementById('submitBtn');
   btn.disabled=true;note.textContent='Preparing and submitting your questionnaire…';
@@ -1211,9 +1221,9 @@ async function submitIntake(){
     if(!r.ok)throw new Error('HTTP '+r.status);
     const j=await r.json().catch(()=>({ok:true}));
     if(j&&j.ok===false)throw new Error(j.error||'rejected');
+    _lastPackage=p;                       /* so the copy stays downloadable after submitting */
     document.getElementById('actionRow').style.display='none';
     document.getElementById('sentBox').style.display='block';
-    dl(p.blob,p.name);
     note.textContent='';
     return;
   }catch(e){
@@ -1221,10 +1231,18 @@ async function submitIntake(){
     dl(p.blob,p.name);
     const sub=encodeURIComponent('Completed intake: '+(fullName(S)||'client'));
     const body=encodeURIComponent('My completed questionnaire just downloaded as "'+p.name+'". Please attach it to this email before sending.');
-    location.href='mailto:'+encodeURIComponent(JOSH_EMAIL)+'?subject='+sub+'&body='+body;
-    note.textContent='Direct submit was unavailable here, so your questionnaire downloaded and an email to Joshua opened. Attach the file and send.';
+    location.href='mailto:'+encodeURIComponent(INTAKE_EMAIL)+'?subject='+sub+'&body='+body;
+    note.textContent='Direct submit was unavailable here, so your questionnaire downloaded and an email to our office opened. Attach the file and send.';
   }
 }
+document.getElementById('sentDl').onclick=async()=>{
+  const n=document.getElementById('sentNote');
+  n.textContent='Preparing your copy…';
+  let p=_lastPackage;
+  if(!p){try{p=await packageFile();}catch(e){n.textContent='The copy could not be built here. Reply to our email and we will send you one.';return;}}
+  dl(p.blob,p.name);
+  n.textContent='Downloaded '+p.name+'.';
+};
 document.getElementById('submitBtn').onclick=submitIntake;
 document.getElementById('dlPdf').onclick=async()=>{
   if(needAttest())return;
