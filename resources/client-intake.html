@@ -191,10 +191,10 @@ footer .who{font-family:'Cormorant Garamond',serif;font-size:17px;color:var(--na
         <div class="f c2"><label>Home phone <span class="optional">optional</span></label><input type="tel" data-m="home" name="home_phone" autocomplete="home tel"></div>
         <div class="f c2"><label>Work phone <span class="optional">optional</span></label><input type="tel" data-m="workph" name="work_phone" autocomplete="work tel"></div>
         <div class="f c3"><label>Email</label><input type="email" data-m="email" name="email" autocomplete="email"></div>
-        <div class="f c3"><label>Social Security number</label><input type="text" data-m="ssn" name="ssn" inputmode="numeric" placeholder="Needed for the application"></div>
-        <div class="f c3"><label>Driver's license #</label><input type="text" data-m="dl" name="drivers_license"></div>
+        <div class="f c2"><label>Driver's license #</label><input type="text" data-m="dl" name="drivers_license"></div>
         <div class="f c1"><label>State</label><input type="text" data-m="dl_state" name="license_state" maxlength="2"></div>
       </div>
+      <p class="hint" style="margin-top:2px">Social Security and tax ID numbers are deliberately not collected on this form. Joshua will take those from you directly when the application is signed.</p>
       <div class="qrow"><p>Are you a United States citizen?</p><span class="yn" data-yn="cit"><button type="button">Yes</button><button type="button">No</button></span></div>
       <div class="grid" id="citWrap" style="display:none">
         <div class="f c2"><label>Country of citizenship</label><input type="text" data-m="cit_country"></div>
@@ -229,9 +229,8 @@ footer .who{font-family:'Cormorant Garamond',serif;font-size:17px;color:var(--na
         </div>
         <div class="grid">
           <div class="f c6"><label>Owner's full name <span class="optional">trust: trust name, trustees, grantors, date of agreement</span></label><input type="text" data-m="own_name" name="owner_name" autocomplete="section-owner name"></div>
-          <div class="f c2"><label>Date of birth</label><input type="text" data-m="own_dob" name="owner_birth_date" autocomplete="section-owner bday"></div>
-          <div class="f c2"><label>SSN or tax ID</label><input type="text" data-m="own_ssn" name="owner_ssn"></div>
-          <div class="f c2"><label>Relationship to you</label><input type="text" data-m="own_rel" name="owner_relationship"></div>
+          <div class="f c3"><label>Date of birth</label><input type="text" data-m="own_dob" name="owner_birth_date" autocomplete="section-owner bday"></div>
+          <div class="f c3"><label>Relationship to you</label><input type="text" data-m="own_rel" name="owner_relationship"></div>
           <div class="f c4"><label>Mailing address</label><input type="text" data-m="own_addr" name="owner_address" autocomplete="section-owner street-address"></div>
           <div class="f c2"><label>Phone</label><input type="tel" data-m="own_phone" name="owner_phone" autocomplete="section-owner tel"></div>
           <div class="f c6"><label>Email</label><input type="email" data-m="own_email" name="owner_email" autocomplete="section-owner email"></div>
@@ -245,8 +244,7 @@ footer .who{font-family:'Cormorant Garamond',serif;font-size:17px;color:var(--na
           <div class="grid">
             <div class="f c3"><label>Full name</label><input type="text" data-m="jc_name" name="joint_owner_name" autocomplete="section-jowner name"></div>
             <div class="f c1"><label>DOB</label><input type="text" data-m="jc_dob"></div>
-            <div class="f c1"><label>SSN / tax ID</label><input type="text" data-m="jc_ssn"></div>
-            <div class="f c1"><label>Relationship</label><input type="text" data-m="jc_rel"></div>
+            <div class="f c2"><label>Relationship</label><input type="text" data-m="jc_rel"></div>
           </div>
         </div>
       </div>
@@ -549,10 +547,10 @@ const PDF_B64 = "JVBERi0xLjcKJfCflqQKNSAwIG9iago8PC9GaWx0ZXIgL0ZsYXRlRGVjb2RlL0x
 /* ---------- pure state + mapping (no DOM) ---------- */
 function newState(){return{
   first:'',middle:'',last:'',dob:'',birth:'',gender:null,street:'',city:'',state:'',zip:'',
-  mail_diff:false,mail_addr:'',mobile:'',home:'',workph:'',email:'',ssn:'',dl:'',dl_state:'',
+  mail_diff:false,mail_addr:'',mobile:'',home:'',workph:'',email:'',dl:'',dl_state:'',
   cit:null,cit_country:'',prc:'',visa:'',employer:'',emp_years:'',occupation:'',industry:'',income:'',networth:'',
-  own_self:true,own_type:null,own_name:'',own_dob:'',own_ssn:'',own_rel:'',own_addr:'',own_phone:'',own_email:'',
-  jc_on:false,jc_kind:null,jc_name:'',jc_dob:'',jc_ssn:'',jc_rel:'',
+  own_self:true,own_type:null,own_name:'',own_dob:'',own_rel:'',own_addr:'',own_phone:'',own_email:'',
+  jc_on:false,jc_kind:null,jc_name:'',jc_dob:'',jc_rel:'',
   pben:[],cb_on:false,cben:[],
   coverage:'',premium:'',freq:null,draft:'',notify:false,
   src:{income:false,home:false,third:false,loan:false,other:false},src_other:'',
@@ -583,7 +581,6 @@ function gapsFor(key,S){
     need(_has(S.street)&&_has(S.city)&&_has(S.state)&&_has(S.zip),'home address');
     need(_has(S.mobile)||_has(S.home)||_has(S.workph),'a phone number');
     need(_has(S.email),'email address');
-    need(_has(S.ssn),'Social Security number');
     need(_has(S.dl)&&_has(S.dl_state),"driver's license number and state");
     need(S.cit!==null,'the citizenship question');
     if(S.cit===false)need(_has(S.cit_country),'country of citizenship');
@@ -597,7 +594,6 @@ function gapsFor(key,S){
     need(S.own_type!==null,'what kind of owner this is');
     need(_has(S.own_name),"the owner's full name");
     need(_has(S.own_dob),"the owner's date of birth");
-    need(_has(S.own_ssn),"the owner's SSN or tax ID");
     need(_has(S.own_rel),"the owner's relationship to you");
     need(_has(S.own_addr),"the owner's address");
     if(S.jc_on){need(S.jc_kind!==null,'joint or contingent owner type');need(_has(S.jc_name),'the joint or backup owner name');}
@@ -609,7 +605,6 @@ function gapsFor(key,S){
       need(_has(b.rel),'relationship for '+b.name);
       need(_has(b.share),'share percentage for '+b.name);
       need(_has(b.dob),'date of birth for '+b.name);
-      need(_has(b.ssn),'SSN or tax ID for '+b.name);
       need(b.lives||_has(b.addr),'address for '+b.name);
     });
     if(S.cb_on)need(S.cben.filter(b=>_has(b.name)).length>0,'a backup beneficiary name');
@@ -681,7 +676,7 @@ function gapsFor(key,S){
   if(key==='kids'&&S.kids===true){
     const kn=S.kRows.filter(r=>_has(r.name));
     need(kn.length>0,"each child's name");
-    kn.forEach(r=>{need(_has(r.dob),'date of birth for '+r.name);need(_has(r.ssn),'SSN for '+r.name);});
+    kn.forEach(r=>{need(_has(r.dob),'date of birth for '+r.name);});
     need(S.kq1!==null&&S.kq2!==null&&S.kq3!==null&&S.kq4!==null,'the four questions about the children');
     if(S.juv)need(S.guard!==null,'whether the child lives with a parent or guardian');
   }
@@ -713,7 +708,7 @@ function buildFields(S){
   if(S.street)F.c_addr_street=S.street; if(S.city)F.c_addr_city=S.city; if(S.state)F.c_addr_state=S.state; if(S.zip)F.c_addr_zip=S.zip;
   if(S.mail_diff&&S.mail_addr)F.c_mail_addr=S.mail_addr;
   if(S.mobile)F.c_phone_mobile=S.mobile; if(S.home)F.c_phone_home=S.home; if(S.workph)F.c_phone_work=S.workph;
-  if(S.email)F.c_email=S.email; if(S.ssn)F.c_ssn=S.ssn; if(S.dl)F.c_dl_number=S.dl; if(S.dl_state)F.c_dl_state=S.dl_state;
+  if(S.email)F.c_email=S.email; if(S.dl)F.c_dl_number=S.dl; if(S.dl_state)F.c_dl_state=S.dl_state;
   yn(F,'cit_us',S.cit);
   if(S.cit===false){if(S.cit_country)F.c_cit_country=S.cit_country; if(S.prc)F.c_prc=S.prc; if(S.visa)F.c_visa_type=S.visa;}
   if(S.employer)F.c_employer=S.employer; if(S.emp_years)F.c_employer_years=S.emp_years;
@@ -728,11 +723,11 @@ function buildFields(S){
     if(S.own_type==='partnership')F.c_own_partnership=true;
     if(S.own_type==='trust')F.c_own_trust=true;
     if(S.own_name)F.c_owner_name=S.own_name; if(S.own_dob)F.c_owner_dob=S.own_dob;
-    if(S.own_ssn)F.c_owner_ssn=S.own_ssn; if(S.own_rel)F.c_owner_rel=S.own_rel;
+    if(S.own_rel)F.c_owner_rel=S.own_rel;
     if(S.own_addr)F.c_owner_addr=S.own_addr; if(S.own_phone)F.c_owner_phone=S.own_phone; if(S.own_email)F.c_owner_email=S.own_email;
     if(S.jc_on){
       if(S.jc_kind==='joint')F.c_jc_joint=true; if(S.jc_kind==='contingent')F.c_jc_contingent=true;
-      if(S.jc_name)F.c_jc_name=S.jc_name; if(S.jc_dob)F.c_jc_dob=S.jc_dob; if(S.jc_ssn)F.c_jc_ssn=S.jc_ssn; if(S.jc_rel)F.c_jc_rel=S.jc_rel;
+      if(S.jc_name)F.c_jc_name=S.jc_name; if(S.jc_dob)F.c_jc_dob=S.jc_dob; if(S.jc_rel)F.c_jc_rel=S.jc_rel;
     }
   }
 
@@ -743,7 +738,7 @@ function buildFields(S){
       const p=slots[gi][i];
       if(b.name)F['c_'+p+'_name']=b.name; if(b.rel)F['c_'+p+'_rel']=b.rel;
       if(b.share)F['c_'+p+'_share']=String(b.share);
-      if(b.dob)F['c_'+p+'_dob']=b.dob; if(b.ssn)F['c_'+p+'_ssn']=b.ssn;
+      if(b.dob)F['c_'+p+'_dob']=b.dob;
       if(b.phone)F['c_'+p+'_phone']=b.phone; if(b.email)F['c_'+p+'_email']=b.email;
       const addr=b.lives?homeAddr(S):b.addr;
       if(addr)F['c_'+p+'_addr']=addr;
@@ -812,7 +807,7 @@ function buildFields(S){
   /* children */
   if(S.kids===true){
     S.kRows.slice(0,3).forEach((r,i)=>{const n=i+1;
-      if(r.name)F['c_k'+n+'_name']=r.name; if(r.dob)F['c_k'+n+'_dob']=r.dob; if(r.ssn)F['c_k'+n+'_ssn']=r.ssn;});
+      if(r.name)F['c_k'+n+'_name']=r.name; if(r.dob)F['c_k'+n+'_dob']=r.dob;});
     yn(F,'kq1',S.kq1); yn(F,'kq2',S.kq2); yn(F,'kq3',S.kq3); yn(F,'kq4',S.kq4);
     if(S.juv){yn(F,'juv_guard',S.guard);
       S.jRows.slice(0,3).forEach((r,i)=>{const n=i+1;
@@ -835,7 +830,25 @@ const store={get(k){try{return localStorage.getItem(k)}catch(e){return this._m&&
              set(k,v){try{localStorage.setItem(k,v)}catch(e){(this._m=this._m||{})[k]=v}},
              del(k){try{localStorage.removeItem(k)}catch(e){if(this._m)delete this._m[k]}}};
 let S=newState();
-try{const saved=store.get('efa_intake'); if(saved)S=Object.assign(newState(),JSON.parse(saved));}catch(e){}
+/* SSNs and tax IDs are no longer collected here — Joshua takes them directly. A session
+   saved by an earlier build can still hold them, and Object.assign would merge them back
+   into the submitted payload, so strip them (and rewrite storage) before anything reads S. */
+function scrubIds(o){
+  if(!o||typeof o!=='object')return o;
+  ['ssn','own_ssn','jc_ssn'].forEach(k=>{delete o[k];});
+  Object.keys(o).forEach(k=>{const v=o[k];
+    if(Array.isArray(v))v.forEach(scrubIds); else if(v&&typeof v==='object')scrubIds(v);});
+  return o;
+}
+try{
+  const saved=store.get('efa_intake');
+  if(saved){
+    S=Object.assign(newState(),JSON.parse(saved));
+    const before=JSON.stringify(S);
+    scrubIds(S);
+    if(JSON.stringify(S)!==before)store.set('efa_intake',JSON.stringify(S));
+  }
+}catch(e){}
 
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 const save=()=>{store.set('efa_intake',JSON.stringify(S)); tick();};
@@ -944,9 +957,8 @@ function benRow(list,i,host){
    '<div class="f c3"><label>Full name</label><input type="text" data-bk="name" name="bene_name" autocomplete="section-'+sec+' name"></div>'+
    '<div class="f c2"><label>Relationship</label><select data-bk="rel" name="bene_relationship"><option value=""></option><option>Spouse</option><option>Child</option><option>Parent</option><option>Sibling</option><option>Partner</option><option>Trust</option><option>Charitable organization</option><option>Other</option></select></div>'+
    '<div class="f c1"><label>Share %</label><input type="text" data-bk="share" inputmode="numeric"></div>'+
-   '<div class="f c2"><label>Date of birth</label><input type="text" data-bk="dob" name="bene_birth_date" autocomplete="section-'+sec+' bday"></div>'+
-   '<div class="f c2"><label>SSN or tax ID</label><input type="text" data-bk="ssn" name="bene_ssn"></div>'+
-   '<div class="f c2"><label>Phone <span class="optional">optional</span></label><input type="tel" data-bk="phone" name="bene_phone" autocomplete="section-'+sec+' tel"></div>'+
+   '<div class="f c3"><label>Date of birth</label><input type="text" data-bk="dob" name="bene_birth_date" autocomplete="section-'+sec+' bday"></div>'+
+   '<div class="f c3"><label>Phone <span class="optional">optional</span></label><input type="tel" data-bk="phone" name="bene_phone" autocomplete="section-'+sec+' tel"></div>'+
    '</div>'+
    '<div class="toggleRow"><input type="checkbox" class="tgl" data-bk="lives"><span>Lives with me (uses my address)</span></div>'+
    '<div class="grid addrWrap" style="display:none"><div class="f c6"><label>Address</label><input type="text" data-bk="addr" name="bene_address" autocomplete="section-'+sec+' street-address"></div></div>';
@@ -968,9 +980,9 @@ function renderBenes(){
   const ph=$('#pList');ph.innerHTML='';S.pben.forEach((_,i)=>benRow(S.pben,i,ph));
   const ch=$('#cList');ch.innerHTML='';S.cben.forEach((_,i)=>benRow(S.cben,i,ch));
 }
-$('#addP').onclick=()=>{S.pben.push({name:'',rel:'',share:'',dob:'',ssn:'',phone:'',email:'',lives:true,addr:''});splitShares(S.pben);renderBenes();save();};
-$('#addC').onclick=()=>{S.cben.push({name:'',rel:'',share:'',dob:'',ssn:'',phone:'',email:'',lives:true,addr:''});splitShares(S.cben);renderBenes();save();};
-if(!S.pben.length)S.pben.push({name:'',rel:'',share:100,dob:'',ssn:'',phone:'',email:'',lives:true,addr:''});
+$('#addP').onclick=()=>{S.pben.push({name:'',rel:'',share:'',dob:'',phone:'',email:'',lives:true,addr:''});splitShares(S.pben);renderBenes();save();};
+$('#addC').onclick=()=>{S.cben.push({name:'',rel:'',share:'',dob:'',phone:'',email:'',lives:true,addr:''});splitShares(S.cben);renderBenes();save();};
+if(!S.pben.length)S.pben.push({name:'',rel:'',share:100,dob:'',phone:'',email:'',lives:true,addr:''});
 renderBenes();
 
 /* inforce + kids + juvenile rows */
@@ -982,8 +994,8 @@ function simpleRow(list,i,host,fields){
 }
 function renderIF(){const h=$('#ifList');h.innerHTML='';S.ifRows.forEach((_,i)=>simpleRow(S.ifRows,i,h,[{k:'co',l:'Company',c:'c2'},{k:'pol',l:'Policy #',c:'c2'},{k:'amt',l:'Amount',c:'c1'},{k:'year',l:'Year',c:'c1'}]));}
 $('#addIF').onclick=()=>{S.ifRows.push({co:'',pol:'',amt:'',year:''});renderIF();save();};
-function renderK(){const h=$('#kList');h.innerHTML='';S.kRows.forEach((_,i)=>simpleRow(S.kRows,i,h,[{k:'name',l:"Child's full name",c:'c3',ac:'section-kid'+i+' name',nm:'child_name'},{k:'dob',l:'Date of birth',c:'c2',ac:'section-kid'+i+' bday',nm:'child_birth_date'},{k:'ssn',l:'SSN',c:'c1',nm:'child_ssn'}]));}
-$('#addK').onclick=()=>{S.kRows.push({name:'',dob:'',ssn:''});renderK();save();};
+function renderK(){const h=$('#kList');h.innerHTML='';S.kRows.forEach((_,i)=>simpleRow(S.kRows,i,h,[{k:'name',l:"Child's full name",c:'c3',ac:'section-kid'+i+' name',nm:'child_name'},{k:'dob',l:'Date of birth',c:'c3',ac:'section-kid'+i+' bday',nm:'child_birth_date'}]));}
+$('#addK').onclick=()=>{S.kRows.push({name:'',dob:''});renderK();save();};
 function renderJ(){const h=$('#jList');h.innerHTML='';S.jRows.forEach((_,i)=>simpleRow(S.jRows,i,h,[{k:'person',l:'Family member + relationship',c:'c3'},{k:'co',l:'Company',c:'c2'},{k:'amt',l:'Amount in force',c:'c1'}]));}
 $('#addJ').onclick=()=>{S.jRows.push({person:'',co:'',amt:''});renderJ();save();};
 renderIF();renderK();renderJ();
