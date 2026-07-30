@@ -176,7 +176,7 @@ footer .who{font-family:'Cormorant Garamond',serif;font-size:17px;color:var(--na
         <div class="f c2"><label>First name</label><input type="text" data-m="first" name="first_name" autocomplete="given-name"></div>
         <div class="f c2"><label>Middle <span class="optional">optional</span></label><input type="text" data-m="middle" name="middle_name" autocomplete="additional-name"></div>
         <div class="f c2"><label>Last name</label><input type="text" data-m="last" name="last_name" autocomplete="family-name"></div>
-        <div class="f c2"><label>Date of birth</label><input type="text" data-m="dob" name="birth_date" autocomplete="bday" placeholder="mm/dd/yyyy" inputmode="numeric"></div>
+        <div class="f c2"><label>Date of birth</label><input type="text" data-m="dob" data-date name="birth_date" autocomplete="bday" placeholder="mm/dd/yyyy" inputmode="numeric"></div>
         <div class="f c2"><label>Birth state / country</label><input type="text" data-m="birth" name="birth_place" placeholder="e.g. California, USA"></div>
         <div class="f c2"><label>Gender <span class="optional">as listed on the application</span></label>
           <span class="yn" data-seg="gender" data-a="M" data-b="F"><button type="button">M</button><button type="button">F</button></span>
@@ -231,7 +231,7 @@ footer .who{font-family:'Cormorant Garamond',serif;font-size:17px;color:var(--na
         </div>
         <div class="grid">
           <div class="f c6"><label>Owner's full name <span class="optional">trust: trust name, trustees, grantors, date of agreement</span></label><input type="text" data-m="own_name" name="owner_name" autocomplete="section-owner name"></div>
-          <div class="f c3"><label>Date of birth</label><input type="text" data-m="own_dob" name="owner_birth_date" autocomplete="section-owner bday"></div>
+          <div class="f c3"><label>Date of birth</label><input type="text" data-m="own_dob" data-date name="owner_birth_date" autocomplete="section-owner bday" placeholder="mm/dd/yyyy" inputmode="numeric"></div>
           <div class="f c3"><label>Relationship to you</label><input type="text" data-m="own_rel" name="owner_relationship"></div>
           <div class="f c4"><label>Mailing address</label><input type="text" data-m="own_addr" name="owner_address" autocomplete="section-owner street-address"></div>
           <div class="f c2"><label>Phone</label><input type="tel" data-m="own_phone" name="owner_phone" autocomplete="section-owner tel"></div>
@@ -245,7 +245,7 @@ footer .who{font-family:'Cormorant Garamond',serif;font-size:17px;color:var(--na
           </div>
           <div class="grid">
             <div class="f c3"><label>Full name</label><input type="text" data-m="jc_name" name="joint_owner_name" autocomplete="section-jowner name"></div>
-            <div class="f c1"><label>DOB</label><input type="text" data-m="jc_dob"></div>
+            <div class="f c1"><label>DOB</label><input type="text" data-m="jc_dob" data-date placeholder="mm/dd/yyyy" inputmode="numeric"></div>
             <div class="f c2"><label>Relationship</label><input type="text" data-m="jc_rel"></div>
           </div>
         </div>
@@ -368,8 +368,13 @@ footer .who{font-family:'Cormorant Garamond',serif;font-size:17px;color:var(--na
         <div class="f c4"><label>Reason and outcome</label><input type="text" data-m="doc_reason"></div>
       </div>
       <div class="grid">
-        <div class="f c2"><label>Height</label><input type="text" data-m="height" placeholder="5' 10&quot;"></div>
-        <div class="f c2"><label>Weight</label><input type="text" data-m="weight" inputmode="numeric"></div>
+        <div class="f c2"><label>Height</label>
+          <div style="display:flex;gap:6px">
+            <select id="htFt" aria-label="Height, feet"></select>
+            <select id="htIn" aria-label="Height, inches"></select>
+          </div>
+        </div>
+        <div class="f c2"><label>Weight <span class="optional">lbs</span></label><input type="text" data-m="weight" inputmode="numeric"></div>
       </div>
       <div class="qrow"><p>Gained or lost weight in the past 12 months?</p><span class="yn" data-yn="wt"><button type="button">Yes</button><button type="button">No</button></span></div>
       <div class="grid" id="wtWrap" style="display:none"><div class="f c6"><label>Roughly how much, and why</label><input type="text" data-m="wt_details"></div></div>
@@ -512,10 +517,10 @@ footer .who{font-family:'Cormorant Garamond',serif;font-size:17px;color:var(--na
   </form>
 
   <footer>
-    <div class="who">Joshua Edwards, Consultant</div>
+    <div class="who">Edwards Financial &amp; Associates</div>
     <div>Life &amp; Annuities · Retirement Consulting · Estate Strategy</div>
-    <div>joshua@edwardsfinancialassociates.com · edwardsfinancialassociates.com</div>
-    <div style="margin-top:4px">CA Insurance Lic. #0G52544 · NPN #13411537 · Confidential</div>
+    <div>edwardsfinancialassociates.com</div>
+    <div style="margin-top:4px">Confidential</div>
     <div class="views" style="margin-top:8px"><a href="?">Client view</a> &nbsp;·&nbsp; <a href="?mode=agent">Agent view</a></div>
   </footer>
 </div>
@@ -862,6 +867,32 @@ FORM.addEventListener('submit',e=>e.preventDefault());
 /* browsers sometimes fire only 'change' on autofill; relay it so bindings run */
 FORM.addEventListener('change',e=>{const t=e.target;if(t&&t.matches&&t.matches('input,select,textarea'))t.dispatchEvent(new Event('input'));});
 function sweep(){document.querySelectorAll('[data-m]').forEach(el=>{S[el.dataset.m]=el.type==='checkbox'?el.checked:el.value;});}
+/* Dates: type digits only — the slashes appear as you go. Runs in the capture phase so the
+   field is already formatted before the binding below writes it to state. Deleting still works:
+   the slash is only re-added once there are more than two digits. */
+function fmtDate(v){
+  const s=String(v).trim();
+  /* a pasted ISO date would otherwise be read positionally as mm/dd/yyyy and silently
+     produce the wrong birth date, so reorder it before masking */
+  const iso=s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
+  if(iso)return iso[2].padStart(2,'0')+'/'+iso[3].padStart(2,'0')+'/'+iso[1];
+  let d=s.replace(/\D/g,'');
+  /* a leading digit above 1 can only be a single-digit month, so pad it — this is what
+     lets "3151960" and a pasted "3/15/1960" both land as 03/15/1960 */
+  if(d.length>=1&&+d[0]>1)d='0'+d;
+  if(d.length>=3&&+d[2]>3)d=d.slice(0,2)+'0'+d.slice(2);
+  d=d.slice(0,8);
+  if(d.length<=2)return d;
+  if(d.length<=4)return d.slice(0,2)+'/'+d.slice(2);
+  return d.slice(0,2)+'/'+d.slice(2,4)+'/'+d.slice(4);
+}
+FORM.addEventListener('input',e=>{
+  const t=e.target;
+  if(t&&t.matches&&t.matches('input[data-date]')){
+    const f=fmtDate(t.value);
+    if(f!==t.value)t.value=f;
+  }
+},true);
 
 /* leverage counter */
 function tick(){
@@ -966,7 +997,7 @@ function benRow(list,i,host){
    '<div class="f c3"><label>Full name</label><input type="text" data-bk="name" name="bene_name" autocomplete="section-'+sec+' name"></div>'+
    '<div class="f c2"><label>Relationship</label><select data-bk="rel" name="bene_relationship"><option value=""></option><option>Spouse</option><option>Child</option><option>Parent</option><option>Sibling</option><option>Partner</option><option>Trust</option><option>Charitable organization</option><option>Other</option></select></div>'+
    '<div class="f c1"><label>Share %</label><input type="text" data-bk="share" inputmode="numeric"></div>'+
-   '<div class="f c3"><label>Date of birth</label><input type="text" data-bk="dob" name="bene_birth_date" autocomplete="section-'+sec+' bday"></div>'+
+   '<div class="f c3"><label>Date of birth</label><input type="text" data-bk="dob" data-date name="bene_birth_date" autocomplete="section-'+sec+' bday" placeholder="mm/dd/yyyy" inputmode="numeric"></div>'+
    '<div class="f c3"><label>Phone <span class="optional">optional</span></label><input type="tel" data-bk="phone" name="bene_phone" autocomplete="section-'+sec+' tel"></div>'+
    '</div>'+
    '<div class="toggleRow"><input type="checkbox" class="tgl" data-bk="lives"><span>Lives with me (uses my address)</span></div>'+
@@ -997,17 +1028,30 @@ renderBenes();
 /* inforce + kids + juvenile rows */
 function simpleRow(list,i,host,fields){
   const r=list[i],d=document.createElement('div');d.className='grid';d.style.marginTop='6px';
-  d.innerHTML=fields.map(f=>'<div class="f '+f.c+'"><label>'+f.l+'</label><input type="text" data-rk="'+f.k+'"'+(f.ac?' autocomplete="'+f.ac+'"':'')+(f.nm?' name="'+f.nm+'"':'')+'></div>').join('');
+  d.innerHTML=fields.map(f=>'<div class="f '+f.c+'"><label>'+f.l+'</label><input type="text" data-rk="'+f.k+'"'+(f.ac?' autocomplete="'+f.ac+'"':'')+(f.nm?' name="'+f.nm+'"':'')+(f.date?' data-date placeholder="mm/dd/yyyy" inputmode="numeric"':'')+'></div>').join('');
   d.querySelectorAll('[data-rk]').forEach(el=>{el.value=r[el.dataset.rk]||'';el.oninput=()=>{r[el.dataset.rk]=el.value;save();};});
   host.appendChild(d);
 }
 function renderIF(){const h=$('#ifList');h.innerHTML='';S.ifRows.forEach((_,i)=>simpleRow(S.ifRows,i,h,[{k:'co',l:'Company',c:'c2'},{k:'pol',l:'Policy #',c:'c2'},{k:'amt',l:'Amount',c:'c1'},{k:'year',l:'Year',c:'c1'}]));}
 $('#addIF').onclick=()=>{S.ifRows.push({co:'',pol:'',amt:'',year:''});renderIF();save();};
-function renderK(){const h=$('#kList');h.innerHTML='';S.kRows.forEach((_,i)=>simpleRow(S.kRows,i,h,[{k:'name',l:"Child's full name",c:'c3',ac:'section-kid'+i+' name',nm:'child_name'},{k:'dob',l:'Date of birth',c:'c3',ac:'section-kid'+i+' bday',nm:'child_birth_date'}]));}
+function renderK(){const h=$('#kList');h.innerHTML='';S.kRows.forEach((_,i)=>simpleRow(S.kRows,i,h,[{k:'name',l:"Child's full name",c:'c3',ac:'section-kid'+i+' name',nm:'child_name'},{k:'dob',l:'Date of birth',c:'c3',ac:'section-kid'+i+' bday',nm:'child_birth_date',date:true}]));}
 $('#addK').onclick=()=>{S.kRows.push({name:'',dob:''});renderK();save();};
 function renderJ(){const h=$('#jList');h.innerHTML='';S.jRows.forEach((_,i)=>simpleRow(S.jRows,i,h,[{k:'person',l:'Family member + relationship',c:'c3'},{k:'co',l:'Company',c:'c2'},{k:'amt',l:'Amount in force',c:'c1'}]));}
 $('#addJ').onclick=()=>{S.jRows.push({person:'',co:'',amt:''});renderJ();save();};
 renderIF();renderK();renderJ();
+
+/* Height as two pickers — nothing to type and no punctuation to get wrong.
+   S.height keeps the same "5' 10"" shape the PDF mapping expects. */
+(function(){
+  const ft=$('#htFt'),inch=$('#htIn');
+  if(!ft||!inch)return;
+  ft.innerHTML='<option value="">ft</option>'+[1,2,3,4,5,6,7].map(n=>'<option value="'+n+'">'+n+' ft</option>').join('');
+  inch.innerHTML='<option value="">in</option>'+Array.from({length:12},(_,i)=>'<option value="'+i+'">'+i+' in</option>').join('');
+  const m=String(S.height||'').match(/(\d+)\D+(\d+)/);
+  if(m){ft.value=m[1];inch.value=m[2];}
+  const sync=()=>{S.height=(ft.value!==''&&inch.value!=='')?ft.value+"' "+inch.value+'"':'';save();};
+  ft.onchange=sync;inch.onchange=sync;
+})();
 
 /* conditional visibility */
 function syncVis(){
