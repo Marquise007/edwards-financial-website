@@ -18,10 +18,12 @@
 *{box-sizing:border-box}
 html,body{height:100%;margin:0;background:var(--cream);font-family:"Aptos","Segoe UI",system-ui,sans-serif;color:var(--ink);overflow:hidden}
 body{padding:12px}
-.module{height:calc(100svh - 24px);max-width:1460px;margin:0 auto;border:1px solid rgba(215,204,174,.95);border-radius:28px;overflow:hidden;background:linear-gradient(180deg,#fbfaf7 0%,#f5f2ea 100%);box-shadow:0 24px 70px rgba(13,30,58,.10);display:grid;grid-template-rows:minmax(132px,23%) 1fr}
-.hero{position:relative;padding:18px 30px 18px;background:linear-gradient(135deg,rgba(8,22,43,.74),rgba(13,30,58,.60)), url("img/tax-brackets-hero.jpg") center/cover no-repeat;color:#fff;display:flex;align-items:flex-end}
-.hero:after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(8,22,43,.22),rgba(8,22,43,.10));pointer-events:none}
-.hero-inner{position:relative;z-index:1;max-width:1080px}
+.module{height:calc(100svh - 24px);max-width:1460px;margin:0 auto;border:1px solid rgba(215,204,174,.95);border-radius:28px;overflow:hidden;background:linear-gradient(180deg,#fbfaf7 0%,#f5f2ea 100%);box-shadow:0 24px 70px rgba(13,30,58,.10);display:grid;grid-template-rows:minmax(150px,26%) 1fr}
+.hero{position:relative;overflow:hidden;isolation:isolate;padding:22px 34px 22px;background:var(--navy2);color:#fff;display:flex;align-items:flex-end;border-bottom:2px solid var(--gold)}
+.hero:before{content:"";position:absolute;inset:0;z-index:0;background:url("img/tax-brackets-hero.jpg") center 58%/cover no-repeat;transform:scale(1.075);animation:heroSettle 1700ms cubic-bezier(.19,.79,.24,1) forwards}
+@keyframes heroSettle{to{transform:scale(1)}}
+.hero:after{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;background:linear-gradient(96deg,rgba(6,17,34,.94) 0%,rgba(6,17,34,.88) 24%,rgba(7,19,38,.66) 44%,rgba(8,22,43,.34) 68%,rgba(8,22,43,.18) 100%),linear-gradient(180deg,rgba(6,17,34,.30) 0%,rgba(6,17,34,0) 34%,rgba(6,17,34,.26) 100%)}
+.hero-inner{position:relative;z-index:2;max-width:62ch;text-shadow:0 1px 14px rgba(4,12,26,.55)}
 .eyebrow{color:var(--gold2);text-transform:uppercase;letter-spacing:.32em;font-size:11px;font-weight:800;margin-bottom:8px}
 .hero h1{font-family:Georgia,"Times New Roman",serif;font-weight:500;margin:0;font-size:clamp(21px,2.55vw,38px);line-height:1.04;max-width:30ch;text-wrap:balance}.hero h1 span{color:var(--gold2);font-style:italic}
 .hero p{margin:7px 0 0;color:#e5eaf1;font-size:clamp(12px,.98vw,15.5px);line-height:1.4;max-width:78ch}
@@ -97,8 +99,9 @@ button.pill[aria-pressed="true"]{background:var(--navy);color:#fff;border-color:
 .imp-card strong{display:block;color:var(--navy);font-size:18px;margin-bottom:6px}.imp-card .date{display:block;color:#8b6b0e;font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px}
 .imp-card p{margin:0;color:#334155;line-height:1.45;font-size:14px}
 .modal-footer{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:14px}
+@media (prefers-reduced-motion:reduce){.hero:before{animation:none;transform:none}}
 @media (max-height:860px){.hero h1{font-size:clamp(20px,2.3vw,33px)}.hero p{font-size:12.5px}.chart-title h2{font-size:23px}.side h3{font-size:20px}.side .helper{font-size:12px}.context-card .era{font-size:23px}.context-card p,.summary p{font-size:13px}.kpi .kvalue{font-size:20px}.kpi .ksub{font-size:11px}.side{gap:9px;padding:13px}.main{gap:11px;padding:11px}.chart-header{padding:12px 14px 6px}.chart-footer{padding:4px 14px 12px}.input-wrap input{padding:9px 10px;font-size:14px}}
-@media (max-height:740px){.module{grid-template-rows:minmax(124px,22.5%) 1fr}.hero{padding:11px 24px 11px}.hero h1{font-size:clamp(19px,2.1vw,28px)}.hero p{font-size:11.5px;margin-top:5px}.eyebrow{font-size:10px;margin-bottom:5px}.chart-title h2{font-size:20px}.side h3{font-size:18px}.context-card{padding:12px}.kpi{padding:11px}.summary{padding:12px}.context-card .era{font-size:20px}.kpi .kvalue{font-size:18px}.context-card p,.summary p{font-size:12.5px;line-height:1.42}.pill{padding:7px 10px;font-size:11.5px}}
+@media (max-height:740px){.module{grid-template-rows:minmax(132px,24%) 1fr}.hero{padding:11px 24px 11px}.hero h1{font-size:clamp(19px,2.1vw,28px)}.hero p{font-size:11.5px;margin-top:5px}.eyebrow{font-size:10px;margin-bottom:5px}.chart-title h2{font-size:20px}.side h3{font-size:18px}.context-card{padding:12px}.kpi{padding:11px}.summary{padding:12px}.context-card .era{font-size:20px}.kpi .kvalue{font-size:18px}.context-card p,.summary p{font-size:12.5px;line-height:1.42}.pill{padding:7px 10px;font-size:11.5px}}
 @media (max-width:900px){body{overflow:auto;height:auto;padding:8px}html,body{overflow:auto}.module{height:auto;min-height:100svh;grid-template-rows:auto auto}.main{grid-template-columns:1fr}.hero{align-items:flex-end}}
 </style>
 </head>
