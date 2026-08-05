@@ -1,0 +1,348 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Top marginal tax brackets, 1913 to 2026 | Edwards Financial &amp; Associates</title>
+<meta name="description" content="The top federal marginal income tax rate in every year from 1913 to 2026, and what it means for how retirement vehicles evolved.">
+<script src="/resources/gate.js"></script>
+<style>
+:root{--navy:#0d1e3a;--navy2:#08162b;--gold:#b8972e;--gold2:#d7bc60;--cream:#f7f5f1;--ink:#0d1e3a;--muted:#61708a;--line:#d9cfb3;--white:#fff;}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;background:var(--cream);font-family:"Aptos","Segoe UI",system-ui,sans-serif;color:var(--ink);overflow:hidden}
+body{padding:12px}
+.module{height:calc(100svh - 24px);max-width:1460px;margin:0 auto;border:1px solid rgba(215,204,174,.95);border-radius:28px;overflow:hidden;background:linear-gradient(180deg,#fbfaf7 0%,#f5f2ea 100%);box-shadow:0 24px 70px rgba(13,30,58,.10);display:grid;grid-template-rows:minmax(132px,23%) 1fr}
+.hero{position:relative;padding:18px 30px 18px;background:linear-gradient(135deg,rgba(8,22,43,.74),rgba(13,30,58,.60)), url("img/tax-brackets-hero.jpg") center/cover no-repeat;color:#fff;display:flex;align-items:flex-end}
+.hero:after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(8,22,43,.22),rgba(8,22,43,.10));pointer-events:none}
+.hero-inner{position:relative;z-index:1;max-width:1080px}
+.eyebrow{color:var(--gold2);text-transform:uppercase;letter-spacing:.32em;font-size:11px;font-weight:800;margin-bottom:8px}
+.hero h1{font-family:Georgia,"Times New Roman",serif;font-weight:500;margin:0;font-size:clamp(21px,2.55vw,38px);line-height:1.04;max-width:30ch;text-wrap:balance}.hero h1 span{color:var(--gold2);font-style:italic}
+.hero p{margin:7px 0 0;color:#e5eaf1;font-size:clamp(12px,.98vw,15.5px);line-height:1.4;max-width:78ch}
+.main{display:grid;grid-template-columns:1.58fr .82fr;gap:14px;padding:14px;min-height:0}
+.panel{background:rgba(255,255,255,.84);border:1px solid rgba(215,204,174,.96);border-radius:22px;box-shadow:0 12px 30px rgba(13,30,58,.06);min-height:0}
+.chart-panel{display:grid;grid-template-rows:auto 1fr auto;overflow:hidden}
+.chart-header{display:flex;justify-content:space-between;align-items:center;gap:18px;padding:16px 18px 8px}
+.chart-title h2,.side h3,.modal h3{margin:0;font-family:Georgia,"Times New Roman",serif;font-weight:500;color:var(--navy)}
+.chart-title h2{font-size:28px;line-height:1.06}
+.chip-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
+.pill{display:inline-flex;align-items:center;gap:8px;border-radius:999px;padding:9px 12px;font-size:12px;font-weight:800;letter-spacing:.03em;text-decoration:none;border:1px solid transparent;white-space:nowrap}
+.pill.gold{background:rgba(215,188,96,.15);color:var(--navy);border-color:rgba(184,151,46,.38)}
+.pill.link{background:#fff;color:var(--navy);border-color:#d8dee8}
+button.pill{cursor:pointer}
+.chart-wrap{padding:0 10px 0 12px;min-height:0}
+svg{display:block;width:100%;height:100%}
+.grid-line{stroke:#e4e7ee;stroke-width:1}
+.axis text{fill:#6c7382;font-size:10px}
+.axis path,.axis line{stroke:#8b95a6;stroke-width:1}
+.bar{fill:url(#barGrad);rx:2.5;ry:2.5;transition:opacity .2s ease, filter .2s ease, fill .2s ease}
+.bar:hover{cursor:pointer}
+.bar.dim{opacity:.42}
+.bar.active{filter:drop-shadow(0 4px 8px rgba(184,151,46,.33))}
+.bar.locked{fill:url(#barGradStrong)}
+.focus-line{stroke:rgba(184,151,46,.76);stroke-width:2;stroke-dasharray:4 5;opacity:0;transition:opacity .18s ease}
+.focus-band{fill:rgba(184,151,46,.12);opacity:0;transition:opacity .18s ease}
+.point-label{font-size:12px;font-weight:800;fill:var(--navy);cursor:pointer;transition:fill .18s ease, opacity .18s ease}
+.point-label.active{fill:#8f6a06}
+.avg-layer{opacity:0;transition:opacity .22s ease;pointer-events:none}
+.avg-layer.on{opacity:1}
+.avg-line{stroke:var(--gold);stroke-width:1.6;stroke-dasharray:7 5}
+.avg-chip{fill:var(--cream);stroke:rgba(184,151,46,.55);stroke-width:1}
+.avg-text{font-size:11px;font-weight:800;fill:#8f6a06}
+button.pill[aria-pressed="true"]{background:var(--navy);color:#fff;border-color:var(--navy)}
+.point-dot{fill:var(--gold);stroke:var(--navy);stroke-width:1.8;cursor:pointer;transition:fill .18s ease, stroke .18s ease, r .18s ease}
+.chart-footer{padding:6px 18px 16px;display:grid;grid-template-columns:auto auto 1fr auto;gap:12px;align-items:center}
+.legend{display:flex;gap:16px;align-items:center;color:var(--muted);font-size:12px}
+.legend span{display:inline-flex;align-items:center;gap:7px}
+.swatch{width:14px;height:14px;border-radius:4px;background:var(--navy);border:1px solid rgba(13,30,58,.12)}
+.dot{width:12px;height:12px;border-radius:50%;background:var(--gold);border:2px solid var(--navy)}
+.input-wrap{display:flex;align-items:center;gap:10px;font-size:12px;color:var(--muted);justify-self:end}
+.input-wrap label{text-transform:uppercase;letter-spacing:.14em;font-weight:800}
+.input-wrap input{width:148px;padding:11px 12px;border-radius:12px;border:1px solid #d5dbe5;background:#fff;color:var(--ink);font-size:15px}
+.side{display:grid;grid-template-rows:auto auto auto 1fr auto;gap:12px;padding:16px;min-height:0}
+.side h3{font-size:23px;line-height:1.08}
+.side .helper{margin:2px 0 0;color:var(--muted);font-size:13px;line-height:1.4}
+.context-card{background:linear-gradient(180deg,#fff,#fbfaf7);border:1px solid #dde2ec;border-radius:20px;padding:16px 16px 14px;min-height:0}
+.context-card .label{font-size:11px;text-transform:uppercase;letter-spacing:.18em;color:var(--muted);font-weight:800;margin-bottom:8px}
+.context-card .era{font-size:27px;font-weight:900;color:var(--navy);margin-bottom:4px}
+.context-card .rate{font-size:15px;color:#8b6b0e;font-weight:900;margin-bottom:10px}
+.context-card p{margin:0;color:#334155;line-height:1.5;font-size:14px}
+.kpis{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.kpi{background:#fff;border:1px solid #dde2ec;border-radius:18px;padding:14px}
+.kpi .klabel{font-size:10px;text-transform:uppercase;letter-spacing:.15em;color:var(--muted);font-weight:800;margin-bottom:7px}
+.kpi .kvalue{font-size:24px;font-weight:900;color:var(--navy);line-height:1.05}
+.kpi .ksub{font-size:12px;color:var(--muted);margin-top:6px;line-height:1.35}
+.summary{background:linear-gradient(135deg, rgba(13,30,58,.05), rgba(184,151,46,.12));border:1px solid rgba(215,188,96,.5);border-radius:20px;padding:15px 16px}
+.summary .slabel{font-size:11px;text-transform:uppercase;letter-spacing:.16em;color:#8b6b0e;font-weight:800;margin-bottom:8px}
+.summary p{margin:0;color:#22324c;font-size:14px;line-height:1.5}
+.action-row{display:flex;justify-content:space-between;gap:10px;align-items:center}
+.small-link{color:var(--muted);font-size:11px;line-height:1.4;max-width:62%}
+.text-link{font-size:12px;color:var(--muted);text-decoration:none;font-weight:700}
+.modal-backdrop{position:fixed;inset:0;background:rgba(8,22,43,.56);display:none;align-items:center;justify-content:center;padding:18px;z-index:50}
+.modal-backdrop.open{display:flex}
+.modal{width:min(980px,96vw);background:#fbfaf7;border:1px solid rgba(215,204,174,.92);border-radius:24px;box-shadow:0 30px 70px rgba(8,22,43,.28);padding:22px 24px 20px;color:var(--ink)}
+.modal-top{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;margin-bottom:14px}
+.modal h3{font-size:30px;line-height:1.05}
+.modal .sub{margin:4px 0 0;color:var(--muted);font-size:14px}
+.close-btn{border:none;background:var(--navy);color:#fff;border-radius:12px;padding:10px 12px;font-weight:800;cursor:pointer}
+.modal-intro{background:linear-gradient(135deg, rgba(13,30,58,.05), rgba(184,151,46,.12));border:1px solid rgba(215,188,96,.52);border-radius:18px;padding:14px 16px;margin-bottom:14px;color:#22324c;line-height:1.5}
+.imp-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.imp-card{background:#fff;border:1px solid #dde2ec;border-radius:18px;padding:14px}
+.imp-card strong{display:block;color:var(--navy);font-size:18px;margin-bottom:6px}.imp-card .date{display:block;color:#8b6b0e;font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px}
+.imp-card p{margin:0;color:#334155;line-height:1.45;font-size:14px}
+.modal-footer{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:14px}
+@media (max-height:860px){.hero h1{font-size:clamp(20px,2.3vw,33px)}.hero p{font-size:12.5px}.chart-title h2{font-size:23px}.side h3{font-size:20px}.side .helper{font-size:12px}.context-card .era{font-size:23px}.context-card p,.summary p{font-size:13px}.kpi .kvalue{font-size:20px}.kpi .ksub{font-size:11px}.side{gap:9px;padding:13px}.main{gap:11px;padding:11px}.chart-header{padding:12px 14px 6px}.chart-footer{padding:4px 14px 12px}.input-wrap input{padding:9px 10px;font-size:14px}}
+@media (max-height:740px){.module{grid-template-rows:minmax(124px,22.5%) 1fr}.hero{padding:11px 24px 11px}.hero h1{font-size:clamp(19px,2.1vw,28px)}.hero p{font-size:11.5px;margin-top:5px}.eyebrow{font-size:10px;margin-bottom:5px}.chart-title h2{font-size:20px}.side h3{font-size:18px}.context-card{padding:12px}.kpi{padding:11px}.summary{padding:12px}.context-card .era{font-size:20px}.kpi .kvalue{font-size:18px}.context-card p,.summary p{font-size:12.5px;line-height:1.42}.pill{padding:7px 10px;font-size:11.5px}}
+@media (max-width:900px){body{overflow:auto;height:auto;padding:8px}html,body{overflow:auto}.module{height:auto;min-height:100svh;grid-template-rows:auto auto}.main{grid-template-columns:1fr}.hero{align-items:flex-end}}
+</style>
+</head>
+<body>
+<section class="module">
+  <header class="hero">
+    <div class="hero-inner">
+      <div class="eyebrow">EDWARDS FINANCIAL &amp; ASSOCIATES</div>
+      <h1>Top marginal tax brackets, <span>1913 to 2026</span></h1>
+      <p>Implications for strategy evolution and why retirement vehicles often evolve far beyond their original purpose</p>
+    </div>
+  </header>
+
+  <div class="main">
+    <section class="panel chart-panel">
+      <div class="chart-header">
+        <div class="chart-title">
+          <h2>Top federal marginal income-tax brackets</h2>
+        </div>
+        <div class="chip-row">
+          <button id="avgBtn" class="pill link" type="button" aria-pressed="false">Average</button>
+          <button id="implicationsBtn" class="pill gold" type="button">Implications</button>
+        </div>
+      </div>
+
+      <div class="chart-wrap">
+        <svg id="chart" viewBox="0 0 980 470" aria-labelledby="chartTitle" role="img">
+          <title id="chartTitle">Historical top U.S. federal income-tax bracket chart</title>
+          <defs>
+            <linearGradient id="barGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#0d1e3a"></stop><stop offset="100%" stop-color="#0d1e3a"></stop></linearGradient>
+            <linearGradient id="barGradStrong" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#2c4a7a"></stop><stop offset="100%" stop-color="#24406b"></stop></linearGradient>
+          </defs>
+        </svg>
+      </div>
+
+      <div class="chart-footer">
+        <div class="legend">
+          <span><i class="swatch"></i>Top bracket bar</span>
+          <span><i class="dot"></i>Key rate milestone</span>
+        </div>
+        <button id="resetSelection" class="pill link" type="button">Reset selection</button>
+        <div></div>
+        <div class="input-wrap">
+          <label for="balanceInput">Base amount</label>
+          <input id="balanceInput" type="number" value="1000000" min="0" step="1000">
+        </div>
+      </div>
+    </section>
+
+    <aside class="panel side">
+      <div>
+        <h3>Selected era</h3>
+        <p class="helper">Select a milestone to see what was driving tax policy in that period.</p>
+      </div>
+
+      <div class="context-card">
+        <div class="label">Historical context</div>
+        <div id="selectedYear" class="era">2003–2012</div>
+        <div id="selectedRate" class="rate">35.0% top bracket</div>
+        <p id="selectedContext">Early-2000s tax cuts reduced the top marginal rate to 35%, where it remained for several years.</p>
+      </div>
+
+      <div class="kpis">
+        <div class="kpi">
+          <div class="klabel">Estimated IRS share</div>
+          <div id="irsShare" class="kvalue">$350,000</div>
+          <div class="ksub">Illustration based on the selected top marginal rate.</div>
+        </div>
+        <div class="kpi">
+          <div class="klabel">Your share</div>
+          <div id="yourShareValue" class="kvalue">$650,000</div>
+          <div class="ksub">Simple after-top-bracket illustration, not a tax projection.</div>
+        </div>
+      </div>
+
+      <div class="summary">
+        <div class="slabel">Why it matters</div>
+        <p>High-rate eras tend to increase the value of deferral, tax diversification, and alternative planning structures. That helps explain why retirement vehicles often evolve beyond their original purpose.</p>
+      </div>
+
+      <div class="action-row">
+        <span class="small-link">Illustrative educational module.</span>
+        <div style="display:flex;gap:10px;align-items:center;">
+          <a class="text-link" href="https://www.usdebtclock.org/" target="_blank" rel="noopener">Debt clock ↗</a>
+          <button id="openImplicationsBottom" class="pill gold" type="button">Open implications</button>
+        </div>
+      </div>
+    </aside>
+  </div>
+</section>
+
+<div id="modalBackdrop" class="modal-backdrop" aria-hidden="true">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="impTitle">
+    <div class="modal-top">
+      <div>
+        <h3 id="impTitle">Implications for strategy evolution</h3>
+        <p class="sub">Why tax history matters to the broader retirement conversation.</p>
+      </div>
+      <button id="closeModal" class="close-btn" type="button">Close</button>
+    </div>
+
+    <div class="modal-intro"><strong>Top tax brackets help explain why retirement vehicles often evolve far beyond their original purpose.</strong> Deferral, tax diversification, and alternative planning structures become much more valuable in high-rate eras.</div>
+
+    <div class="imp-grid">
+      <div class="imp-card">
+        <strong>401(k)</strong>
+        <span class="date">1978 • 1981</span>
+        <p>Created in the Revenue Act of 1978 as a cash-or-deferred arrangement under the tax code, then expanded in practical use after IRS guidance in 1981. It evolved from a narrow provision into the mainstream employee savings plan.</p>
+      </div>
+      <div class="imp-card">
+        <strong>Traditional IRA</strong>
+        <span class="date">1974 • 1981</span>
+        <p>Established by ERISA in 1974 to give workers without employer pensions a tax-advantaged retirement option. Eligibility broadened in 1981, helping the IRA become a core personal savings and rollover vehicle.</p>
+      </div>
+      <div class="imp-card">
+        <strong>Roth IRA</strong>
+        <span class="date">1997 • 1998</span>
+        <p>Created by the Taxpayer Relief Act of 1997 and effective in 1998. It introduced after-tax contributions with tax-free qualified withdrawals, adding a powerful tax-diversification option to retirement planning.</p>
+      </div>
+      <div class="imp-card">
+        <strong>403(b)</strong>
+        <span class="date">1958 • 1961 • 1974</span>
+        <p>Began in 1958 as a tax-sheltered annuity arrangement for certain nonprofit employees, expanded to public-school employees in 1961, and later added mutual-fund custodial accounts in 1974. It evolved into a broader workplace plan for educators and nonprofits.</p>
+      </div>
+      <div class="imp-card">
+        <strong>457(b)</strong>
+        <span class="date">1978 • 1986 • 1996</span>
+        <p>Added in 1978 for deferred compensation in state and local government, extended to tax-exempt organizations in 1986, and strengthened for governmental plans in 1996 with trust and custodial requirements. It became a major public-sector supplemental retirement plan.</p>
+      </div>
+      <div class="imp-card">
+        <strong>Permanent life insurance</strong>
+        <span class="date">1759 • 1861 • 1880 • modern era</span>
+        <p>American life insurance began as family protection, then gained nonforfeiture protections in the 19th century and living cash value features such as cash-surrender rights. Modern planning later adapted those long-standing features for supplemental income, liquidity, tax diversification, and legacy support.</p>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <span class="small-link">Use this pop-up as the bridge between tax history and product evolution.</span>
+      <a class="text-link" href="https://www.usdebtclock.org/" target="_blank" rel="noopener">U.S. Debt Clock ↗</a>
+    </div>
+  </div>
+</div>
+<script>
+const periods = [
+  {start:1913,end:1915,rate:7,context:'After ratification of the 16th Amendment, the modern federal income-tax system began with relatively low rates.'},
+  {start:1916,end:1916,rate:15,context:'Rates moved higher as federal revenue needs increased and the tax base developed.'},
+  {start:1917,end:1917,rate:67,context:'The United States entered World War I, and tax rates rose sharply as Washington searched for wartime revenue.'},
+  {start:1918,end:1918,rate:77,context:'War financing pushed the top marginal rate to 77%.'},
+  {start:1919,end:1921,rate:73,context:'Rates stayed extremely high immediately after the war before the 1920s tax-cut era took hold.'},
+  {start:1922,end:1922,rate:58,context:'Postwar retrenchment and a more growth-oriented tax philosophy drove rates lower.'},
+  {start:1923,end:1923,rate:43.5,context:'The reductions of the Mellon era continued, pulling the top rate far below its postwar level.'},
+  {start:1924,end:1924,rate:46,context:'The top rate ticked up briefly before the deeper cuts of the mid-1920s.'},
+  {start:1925,end:1928,rate:25,context:'Major tax reductions during the 1920s brought the top bracket down dramatically relative to wartime levels.'},
+  {start:1929,end:1929,rate:24,context:'The top bracket reached its lowest point of the era in the year of the crash.'},
+  {start:1930,end:1931,rate:25,context:'The low-rate structure of the 1920s held into the first years of the Depression.'},
+  {start:1932,end:1935,rate:63,context:'During the Depression, the federal government raised top rates as it confronted collapsing revenue and major fiscal pressure.'},
+  {start:1936,end:1939,rate:79,context:'As New Deal policy expanded the federal role, very high top marginal rates persisted.'},
+  {start:1940,end:1940,rate:81.1,context:'Defense preparation ahead of full U.S. wartime mobilization pushed top brackets higher again.'},
+  {start:1941,end:1941,rate:81,context:'Rates held near their prewar peak as mobilization accelerated.'},
+  {start:1942,end:1943,rate:88,context:'Full war mobilization required extraordinary revenue, raising already high rates even further.'},
+  {start:1944,end:1945,rate:94,context:'The federal government used extremely high top marginal rates to help finance total war.'},
+  {start:1946,end:1947,rate:86.45,context:'Even after the war, the top bracket remained extremely elevated as the U.S. adjusted to postwar obligations.'},
+  {start:1948,end:1949,rate:82.13,context:'Postwar legislation trimmed the top rate, though it stayed far above prewar levels.'},
+  {start:1950,end:1950,rate:84.36,context:'Rates turned higher again as Korean War spending began.'},
+  {start:1951,end:1951,rate:91,context:'Korean War revenue needs pushed the top bracket back to 91%.'},
+  {start:1952,end:1953,rate:92,context:'The top marginal rate reached its postwar high of 92%.'},
+  {start:1954,end:1963,rate:91,context:'The postwar fiscal structure kept top rates at 91% through the 1950s and into the early 1960s.'},
+  {start:1964,end:1964,rate:77,context:'The Revenue Act of 1964 cut top marginal rates sharply from the long-running 91% level.'},
+  {start:1965,end:1967,rate:70,context:'The top bracket settled at 70%, shaping compensation planning and the appeal of deferral strategies.'},
+  {start:1968,end:1968,rate:75.25,context:'A temporary Vietnam-era surcharge lifted the top rate back above 70%.'},
+  {start:1969,end:1969,rate:77,context:'The wartime surcharge reached its peak before being phased out.'},
+  {start:1970,end:1970,rate:71.75,context:'The surcharge wound down and the top rate began returning to 70%.'},
+  {start:1971,end:1980,rate:70,context:'The 70% top bracket held through the 1970s, keeping deferral strategies compelling.'},
+  {start:1981,end:1981,rate:69.13,context:'The first of the Reagan-era cuts began stepping the top rate down.'},
+  {start:1982,end:1986,rate:50,context:'Early-1980s tax reform brought a major step down from the prior 70% regime.'},
+  {start:1987,end:1987,rate:38.5,context:'The system moved rapidly toward fewer brackets and lower top marginal rates.'},
+  {start:1988,end:1990,rate:28,context:'The Tax Reform Act of 1986 dramatically reduced the top federal marginal rate, a major turning point in tax history.'},
+  {start:1991,end:1992,rate:31,context:'Budget pressures and tax legislation nudged the top bracket back upward.'},
+  {start:1993,end:2000,rate:39.6,context:'Deficit-reduction policy in the early 1990s raised the top rate again during a period focused on budget pressure.'},
+  {start:2001,end:2001,rate:39.1,context:'Early-2000s tax changes began stepping the top bracket down from the 39.6% range.'},
+  {start:2002,end:2002,rate:38.6,context:'The phased reduction continued ahead of the larger 2003 cut.'},
+  {start:2003,end:2012,rate:35,context:'Early-2000s tax cuts reduced the top marginal rate to 35%, where it remained for several years.'},
+  {start:2013,end:2017,rate:39.6,context:'The 2001 and 2003 cuts were written to expire, and the top rate returned to 39.6% on the highest incomes.'},
+  {start:2018,end:2026,rate:37,context:'The 2017 tax law set seven brackets topping out at 37%, and later legislation made that structure permanent.'}
+];
+
+const milestones = [
+  {year:1918,label:'77%',era:'1918',context:'World War I financing pushed the top rate sharply higher.'},
+  {year:1920,label:'73%',era:'1919–1921',context:'Rates stayed elevated after the war before the 1920s tax-cut era took hold.'},
+  {year:1928,label:'25%',era:'1925–1928',context:'Major 1920s tax cuts brought the top bracket much lower.'},
+  {year:1933,label:'63%',era:'1932–1935',context:'The Great Depression era produced major fiscal pressure and higher top rates.'},
+  {year:1938,label:'79%',era:'1936–1939',context:'New Deal expansion helped keep top rates very high.'},
+  {year:1944,label:'94%',era:'1944–1945',context:'This iconic peak reflected World War II financing.'},
+  {year:1958,label:'91%',era:'1954–1963',context:'The postwar fiscal structure held top rates at 91% for a decade.'},
+  {year:1975,label:'70%',era:'1971–1980',context:'A long 70% era made deferral and tax-sensitive planning more compelling.'},
+  {year:1984,label:'50%',era:'1982–1986',context:'Early-Reagan-era reform marked a major step down from the 70% regime.'},
+  {year:1989,label:'28%',era:'1988–1990',context:'Tax Reform Act changes created one of the lowest modern top rates.'},
+  {year:1996,label:'39.6%',era:'1993–2000',context:'Early-1990s deficit-reduction policy pushed the top rate back near 40%.'},
+  {year:2008,label:'35%',era:'2003–2012',context:'The early-2000s tax cuts reduced the top rate to 35%.'},
+  {year:2015,label:'39.6%',era:'2013–2017',context:'The earlier cuts expired and the top rate returned to 39.6%.'},
+  {year:2022,label:'37%',era:'2018–2026',context:'The current 37% top bracket, now a permanent part of the rate structure.'}
+];
+
+const years=[]; for(let y=1913;y<=2026;y++){const p=periods.find(x=>y>=x.start && y<=x.end);years.push({year:y,rate:p.rate,context:p.context});}
+const chart=document.getElementById('chart'); const balanceInput=document.getElementById('balanceInput'); const resetBtn=document.getElementById('resetSelection');
+const yearEl=document.getElementById('selectedYear'); const rateEl=document.getElementById('selectedRate'); const contextEl=document.getElementById('selectedContext');
+const irsEl=document.getElementById('irsShare'); const yoursEl=document.getElementById('yourShareValue');
+const modalBackdrop=document.getElementById('modalBackdrop'); const implicationsBtn=document.getElementById('implicationsBtn'); const openImplicationsBottom=document.getElementById('openImplicationsBottom'); const closeModal=document.getElementById('closeModal');
+const pad={top:28,right:16,bottom:34,left:40},W=980,H=470,innerW=W-pad.left-pad.right,innerH=H-pad.top-pad.bottom,maxY=100,barW=innerW/years.length;
+let locked=null; let selected={era:'2003–2012',rate:35,context:'Early-2000s tax cuts reduced the top marginal rate to 35%, where it remained for several years.',index:years.findIndex(d=>d.year===2008)};
+let focusLine, focusBand, avgLayer; var avgOn=false;
+const avgRate = years.reduce((s,d)=>s+d.rate,0)/years.length;
+function money(n){return new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',maximumFractionDigits:0}).format(n);}
+function rateFmt(n){return `${Number(n).toFixed(Number.isInteger(n)?0:1)}%`;}
+function xForIndex(i){return pad.left+i*barW;} function yForRate(r){return pad.top+innerH-(r/maxY)*innerH;} function el(tag,attrs={}){const n=document.createElementNS('http://www.w3.org/2000/svg',tag);Object.entries(attrs).forEach(([k,v])=>n.setAttribute(k,v));return n;}
+function draw(){
+  chart.innerHTML=`<defs><linearGradient id="barGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#0d1e3a"></stop><stop offset="100%" stop-color="#0d1e3a"></stop></linearGradient><linearGradient id="barGradStrong" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#2c4a7a"></stop><stop offset="100%" stop-color="#24406b"></stop></linearGradient></defs>`;
+  const grid=el('g');
+  for(let t=0;t<=100;t+=10){const y=yForRate(t);grid.appendChild(el('line',{class:'grid-line',x1:pad.left,y1:y,x2:W-pad.right,y2:y})); const tx=el('text',{x:pad.left-8,y:y+4,'text-anchor':'end',class:'axis'}); tx.textContent=t; grid.appendChild(tx);}
+  chart.appendChild(grid);
+  focusBand=el('rect',{class:'focus-band',x:0,y:pad.top,width:0,height:innerH}); focusLine=el('line',{class:'focus-line',x1:0,y1:pad.top,x2:0,y2:pad.top+innerH}); chart.appendChild(focusBand); chart.appendChild(focusLine);
+  const barsG=el('g');
+  years.forEach((d,i)=>{const x=xForIndex(i)+0.35,y=yForRate(d.rate),h=pad.top+innerH-y; const rect=el('rect',{class:'bar',x,y:pad.top+innerH,width:Math.max(2,barW-0.7),height:0,'data-i':i}); rect.addEventListener('mouseenter',()=>activate({era:String(d.year),rate:d.rate,context:d.context,index:i},false)); rect.addEventListener('click',()=>activate({era:String(d.year),rate:d.rate,context:d.context,index:i},true)); rect.addEventListener('mouseleave',()=>{if(!locked) deactivate();}); barsG.appendChild(rect); requestAnimationFrame(()=>{rect.style.transition=`y .58s cubic-bezier(.22,.8,.22,1) ${i*5}ms, height .58s cubic-bezier(.22,.8,.22,1) ${i*5}ms, opacity .18s ease, filter .18s ease, fill .18s ease`; rect.setAttribute('y',y); rect.setAttribute('height',h);});});
+  chart.appendChild(barsG);
+  const axisG=el('g',{class:'axis'}); axisG.appendChild(el('line',{x1:pad.left,y1:pad.top+innerH,x2:W-pad.right,y2:pad.top+innerH}));
+  for(let y=1920;y<=2020;y+=10){const i=years.findIndex(d=>d.year===y);const x=xForIndex(i)+barW/2; axisG.appendChild(el('line',{x1:x,y1:pad.top+innerH,x2:x,y2:pad.top+innerH+5})); const tx=el('text',{x,y:pad.top+innerH+18,'text-anchor':'middle'}); tx.textContent=y; axisG.appendChild(tx);}
+  chart.appendChild(axisG);
+  avgLayer=el('g',{class:'avg-layer'});
+  const avgY=yForRate(avgRate), avgTxt=`Average since 1913: ${avgRate.toFixed(1)}%`;
+  avgLayer.appendChild(el('line',{class:'avg-line',x1:pad.left,y1:avgY,x2:W-pad.right,y2:avgY}));
+  const avgW=avgTxt.length*5.9+16, avgX=W-pad.right-avgW-4;
+  avgLayer.appendChild(el('rect',{class:'avg-chip',x:avgX,y:avgY-18,width:avgW,height:16,rx:8}));
+  const avgLbl=el('text',{class:'avg-text',x:avgX+avgW/2,y:avgY-6,'text-anchor':'middle'}); avgLbl.textContent=avgTxt; avgLayer.appendChild(avgLbl);
+  if(avgOn) avgLayer.classList.add('on');
+  chart.appendChild(avgLayer);
+  const labelsG=el('g');
+  milestones.forEach(m=>{const i=years.findIndex(d=>d.year===m.year); const x=xForIndex(i)+barW/2; const y=yForRate(years[i].rate); labelsG.appendChild(el('line',{x1:x,y1:y-6,x2:x,y2:y-24,stroke:'#d0c3a2','stroke-width':'1','stroke-dasharray':'3 4'})); const dot=el('circle',{class:'point-dot',cx:x,cy:y,r:4.6,'data-i':i}); const label=el('text',{class:'point-label',x,y:y-29,'text-anchor':'middle','data-i':i}); label.textContent=m.label; [dot,label].forEach(node=>{node.addEventListener('mouseenter',()=>activate({era:m.era,rate:years[i].rate,context:m.context,index:i},false)); node.addEventListener('click',()=>activate({era:m.era,rate:years[i].rate,context:m.context,index:i},true)); node.addEventListener('mouseleave',()=>{if(!locked) deactivate();});}); labelsG.appendChild(dot); labelsG.appendChild(label);});
+  chart.appendChild(labelsG);
+  updateUI(selected);
+}
+function activate(obj,lock){ if(lock) locked=obj; selected=obj; updateUI(obj); updateFocus(obj.index,!!lock); }
+function deactivate(){ selected={era:'2003–2012',rate:35,context:'Early-2000s tax cuts reduced the top marginal rate to 35%, where it remained for several years.',index:years.findIndex(d=>d.year===2008)}; updateUI(selected); clearFocus(); }
+function updateFocus(index,isLock){const x=xForIndex(index)+barW/2; focusLine.setAttribute('x1',x); focusLine.setAttribute('x2',x); focusBand.setAttribute('x',Math.max(pad.left,x-barW*1.9)); focusBand.setAttribute('width',barW*3.8); focusLine.style.opacity=1; focusBand.style.opacity=1; document.querySelectorAll('.bar').forEach((bar,i)=>{bar.classList.toggle('active',i===index); bar.classList.toggle('dim',Math.abs(i-index)>11); bar.classList.toggle('locked',!!locked && i===index);}); document.querySelectorAll('.point-label').forEach((n)=>{const active=Number(n.getAttribute('data-i'))===index; n.classList.toggle('active',active);}); document.querySelectorAll('.point-dot').forEach((n)=>{const active=Number(n.getAttribute('data-i'))===index; n.classList.toggle('active',active); n.setAttribute('r',active?6.2:4.6); n.setAttribute('fill',active?'#ead88d':'#b8972e'); n.setAttribute('stroke',active?'#8f6a06':'#0d1e3a');}); }
+function clearFocus(){if(!focusLine || !focusBand) return; focusLine.style.opacity=0; focusBand.style.opacity=0; document.querySelectorAll('.bar').forEach(bar=>bar.classList.remove('active','dim','locked')); document.querySelectorAll('.point-label').forEach(n=>n.classList.remove('active')); document.querySelectorAll('.point-dot').forEach((n)=>{n.setAttribute('r',4.6); n.setAttribute('fill','#b8972e'); n.setAttribute('stroke','#0d1e3a');});}
+function updateUI(obj){yearEl.textContent=obj.era; rateEl.textContent=`${rateFmt(obj.rate)} top bracket`; contextEl.textContent=obj.context; const base=Number(balanceInput.value||0); const irs=base*(obj.rate/100); const yours=base-irs; irsEl.textContent=money(irs); yoursEl.textContent=money(yours);}
+const avgBtn=document.getElementById('avgBtn');
+avgBtn.addEventListener('click',()=>{avgOn=!avgOn; avgBtn.setAttribute('aria-pressed',String(avgOn)); if(avgLayer) avgLayer.classList.toggle('on',avgOn);});
+balanceInput.addEventListener('input',()=>updateUI(selected)); resetBtn.addEventListener('click',()=>{locked=null; deactivate();});
+function openModal(){modalBackdrop.classList.add('open'); modalBackdrop.setAttribute('aria-hidden','false');} function closeModalFn(){modalBackdrop.classList.remove('open'); modalBackdrop.setAttribute('aria-hidden','true');}
+implicationsBtn.addEventListener('click',openModal); openImplicationsBottom.addEventListener('click',openModal); closeModal.addEventListener('click',closeModalFn); modalBackdrop.addEventListener('click',(e)=>{if(e.target===modalBackdrop) closeModalFn();}); document.addEventListener('keydown',(e)=>{if(e.key==='Escape') closeModalFn();});
+draw();
+</script>
+</body>
+</html>
