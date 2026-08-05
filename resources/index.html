@@ -96,7 +96,7 @@
   }
   .nav-portal:hover { background: var(--gold); color: var(--ink); }
 
-  /* Mobile menu toggle — hidden on desktop, shown only in the phone breakpoint */
+  /* Mobile menu toggle - hidden on desktop, shown only in the phone breakpoint */
   .nav-toggle {
     display: none; background: none; border: none; cursor: pointer;
     width: 28px; height: 20px; padding: 0;
@@ -142,6 +142,13 @@
     line-height: 1.8; color: var(--warm-gray);
     max-width: 640px;
   }
+  .resources-note {
+    font-size: 12.5px; font-weight: 300;
+    line-height: 1.7; color: var(--warm-gray);
+    opacity: 0.8;
+    max-width: 640px;
+    margin-top: 12px;
+  }
 
   .resources-body {
     max-width: 1180px;
@@ -149,7 +156,7 @@
     padding: 24px 60px 120px;
   }
 
-  /* Group heading — use one above each grid when adding sections (e.g. "Articles & Guides") */
+  /* Group heading - use one above each grid when adding sections (e.g. "Articles & Guides") */
   .group-title {
     font-family: 'Cormorant Garamond', serif;
     font-size: 30px; font-weight: 400;
@@ -159,7 +166,7 @@
   }
   .group-title:first-child { margin-top: 0; }
 
-  /* Auto-flowing card grid — drop in more .tool-card anchors and they reflow automatically */
+  /* Auto-flowing card grid - drop in more .tool-card anchors and they reflow automatically */
   .tools-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
@@ -229,7 +236,7 @@
     .footer-disc { text-align: center; }
   }
 
-  /* ===== PHONE BREAKPOINT — applies only at <=600px; desktop is unaffected ===== */
+  /* ===== PHONE BREAKPOINT - applies only at <=600px; desktop is unaffected ===== */
   @media (max-width: 600px) {
     html, body { overflow-x: hidden; }
 
@@ -284,13 +291,14 @@
 <section class="resources-intro reveal">
   <p class="resources-eyebrow">Tools &amp; Resources</p>
   <h1>Plan With <em>Clarity</em></h1>
-  <p class="resources-lead">Free, interactive planning tools built for California public employees: estimate your pension, model your retirement income, and see your numbers clearly before you make a move.</p>
+  <p class="resources-lead">Interactive tools built in-house for the decisions that rarely have an obvious answer. Pension timing, income durability, and what a century of tax history says about the account you are funding now. Every figure traces back to the plan documents and the tax code itself.</p>
+  <p class="resources-note">Access is shared with clients and the professionals we work alongside.</p>
 </section>
 
 <!-- RESOURCES -->
 <section class="resources-body">
 
-  <!-- TOOLS GRID — to add a tool, copy one .tool-card anchor below; the grid reflows automatically. -->
+  <!-- TOOLS GRID - to add a tool, copy one .tool-card anchor below; the grid reflows automatically. -->
   <div class="tools-grid">
 
     <a class="tool-card reveal" href="/resources/retirement-income-illustrator">
@@ -305,6 +313,13 @@
       <span class="tool-name">California Public Pension Calculator</span>
       <span class="tool-desc">Estimate your CalPERS, CalSTRS, LACERA, OCERS, or UCRP pension, project your retirement income gap, and see the capital needed to bridge it for life.</span>
       <span class="tool-link">Open the Calculator &rarr;</span>
+    </a>
+
+    <a class="tool-card reveal" href="/resources/top-marginal-tax-brackets">
+      <span class="tool-eyebrow">Module</span>
+      <span class="tool-name">Top marginal tax brackets, 1913 to 2026</span>
+      <span class="tool-desc">The top federal rate in every year since the income tax began, and what it means for how retirement vehicles evolved.</span>
+      <span class="tool-link">Open the Module &rarr;</span>
     </a>
 
   </div>
