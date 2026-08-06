@@ -66,7 +66,7 @@ button.pill[aria-pressed="true"]{background:var(--navy);color:#fff;border-color:
 .dot{width:12px;height:12px;border-radius:50%;background:var(--gold);border:2px solid var(--navy)}
 .input-wrap{display:flex;align-items:center;gap:10px;font-size:12px;color:var(--muted);justify-self:end}
 .input-wrap label{text-transform:uppercase;letter-spacing:.14em;font-weight:800}
-.input-wrap input{width:148px;padding:11px 12px;border-radius:12px;border:1px solid #d5dbe5;background:#fff;color:var(--ink);font-size:15px}
+.input-wrap input{width:158px;padding:11px 12px;border-radius:12px;border:1px solid #d5dbe5;background:#fff;color:var(--ink);font-size:15px;text-align:right;font-variant-numeric:lining-nums tabular-nums}
 .side{display:grid;grid-template-rows:auto auto auto 1fr auto;gap:12px;padding:16px;min-height:0}
 .side h3{font-size:23px;line-height:1.08}
 .side .helper{margin:2px 0 0;color:var(--muted);font-size:13px;line-height:1.4}
@@ -123,7 +123,6 @@ button.pill[aria-pressed="true"]{background:var(--navy);color:#fff;border-color:
         </div>
         <div class="chip-row">
           <button id="avgBtn" class="pill link" type="button" aria-pressed="false">Average</button>
-          <button id="implicationsBtn" class="pill gold" type="button">Implications</button>
         </div>
       </div>
 
@@ -146,7 +145,7 @@ button.pill[aria-pressed="true"]{background:var(--navy);color:#fff;border-color:
         <div></div>
         <div class="input-wrap">
           <label for="balanceInput">Base amount</label>
-          <input id="balanceInput" type="number" value="1000000" min="0" step="1000">
+          <input id="balanceInput" type="text" inputmode="numeric" value="$1,000,000" aria-label="Base amount in dollars">
         </div>
       </div>
     </section>
@@ -233,8 +232,8 @@ button.pill[aria-pressed="true"]{background:var(--navy);color:#fff;border-color:
       </div>
       <div class="imp-card">
         <strong>Permanent life insurance</strong>
-        <span class="date">1759 • 1861 • 1880 • modern era</span>
-        <p>American life insurance began as family protection, then gained nonforfeiture protections in the 19th century and living cash value features such as cash-surrender rights. Modern planning later adapted those long-standing features for supplemental income, liquidity, tax diversification, and legacy support.</p>
+        <span class="date">1913 • 1932 • 1979 • 1988 • 1997</span>
+        <p>The death benefit exclusion is as old as the income tax itself, arriving with the Revenue Act of 1913. By 1932, with the top rate at 63 percent and banks failing, policy loans had reached 18 percent of every dollar insurers held, and cash value was the liquidity households actually reached for. The vehicle then changed shape: universal life unbundled cost from savings in 1979, TAMRA drew the modified endowment line in 1988, and indexed universal life arrived in 1997. The product kept evolving because the tax code kept moving.</p>
       </div>
     </div>
 
@@ -309,12 +308,13 @@ const years=[]; for(let y=1913;y<=2026;y++){const p=periods.find(x=>y>=x.start &
 const chart=document.getElementById('chart'); const balanceInput=document.getElementById('balanceInput'); const resetBtn=document.getElementById('resetSelection');
 const yearEl=document.getElementById('selectedYear'); const rateEl=document.getElementById('selectedRate'); const contextEl=document.getElementById('selectedContext');
 const irsEl=document.getElementById('irsShare'); const yoursEl=document.getElementById('yourShareValue');
-const modalBackdrop=document.getElementById('modalBackdrop'); const implicationsBtn=document.getElementById('implicationsBtn'); const openImplicationsBottom=document.getElementById('openImplicationsBottom'); const closeModal=document.getElementById('closeModal');
+const modalBackdrop=document.getElementById('modalBackdrop'); const openImplicationsBottom=document.getElementById('openImplicationsBottom'); const closeModal=document.getElementById('closeModal');
 const pad={top:28,right:16,bottom:34,left:40},W=980,H=470,innerW=W-pad.left-pad.right,innerH=H-pad.top-pad.bottom,maxY=100,barW=innerW/years.length;
 let locked=null; let selected={era:'2003–2012',rate:35,context:'Early-2000s tax cuts reduced the top marginal rate to 35%, where it remained for several years.',index:years.findIndex(d=>d.year===2008)};
 let focusLine, focusBand, avgLayer; var avgOn=false;
 const avgRate = years.reduce((s,d)=>s+d.rate,0)/years.length;
 function money(n){return new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',maximumFractionDigits:0}).format(n);}
+function parseMoney(v){const n=parseFloat(String(v).replace(/[^0-9.]/g,''));return isFinite(n)&&n>0?n:0;}
 function rateFmt(n){return `${Number(n).toFixed(Number.isInteger(n)?0:1)}%`;}
 function xForIndex(i){return pad.left+i*barW;} function yForRate(r){return pad.top+innerH-(r/maxY)*innerH;} function el(tag,attrs={}){const n=document.createElementNS('http://www.w3.org/2000/svg',tag);Object.entries(attrs).forEach(([k,v])=>n.setAttribute(k,v));return n;}
 function draw(){
@@ -346,12 +346,15 @@ function activate(obj,lock){ if(lock) locked=obj; selected=obj; updateUI(obj); u
 function deactivate(){ selected={era:'2003–2012',rate:35,context:'Early-2000s tax cuts reduced the top marginal rate to 35%, where it remained for several years.',index:years.findIndex(d=>d.year===2008)}; updateUI(selected); clearFocus(); }
 function updateFocus(index,isLock){const x=xForIndex(index)+barW/2; focusLine.setAttribute('x1',x); focusLine.setAttribute('x2',x); focusBand.setAttribute('x',Math.max(pad.left,x-barW*1.9)); focusBand.setAttribute('width',barW*3.8); focusLine.style.opacity=1; focusBand.style.opacity=1; document.querySelectorAll('.bar').forEach((bar,i)=>{bar.classList.toggle('active',i===index); bar.classList.toggle('dim',Math.abs(i-index)>11); bar.classList.toggle('locked',!!locked && i===index);}); document.querySelectorAll('.point-label').forEach((n)=>{const active=Number(n.getAttribute('data-i'))===index; n.classList.toggle('active',active);}); document.querySelectorAll('.point-dot').forEach((n)=>{const active=Number(n.getAttribute('data-i'))===index; n.classList.toggle('active',active); n.setAttribute('r',active?6.2:4.6); n.setAttribute('fill',active?'#ead88d':'#b8972e'); n.setAttribute('stroke',active?'#8f6a06':'#0d1e3a');}); }
 function clearFocus(){if(!focusLine || !focusBand) return; focusLine.style.opacity=0; focusBand.style.opacity=0; document.querySelectorAll('.bar').forEach(bar=>bar.classList.remove('active','dim','locked')); document.querySelectorAll('.point-label').forEach(n=>n.classList.remove('active')); document.querySelectorAll('.point-dot').forEach((n)=>{n.setAttribute('r',4.6); n.setAttribute('fill','#b8972e'); n.setAttribute('stroke','#0d1e3a');});}
-function updateUI(obj){yearEl.textContent=obj.era; rateEl.textContent=`${rateFmt(obj.rate)} top bracket`; contextEl.textContent=obj.context; const base=Number(balanceInput.value||0); const irs=base*(obj.rate/100); const yours=base-irs; irsEl.textContent=money(irs); yoursEl.textContent=money(yours);}
+function updateUI(obj){yearEl.textContent=obj.era; rateEl.textContent=`${rateFmt(obj.rate)} top bracket`; contextEl.textContent=obj.context; const base=parseMoney(balanceInput.value); const irs=base*(obj.rate/100); const yours=base-irs; irsEl.textContent=money(irs); yoursEl.textContent=money(yours);}
 const avgBtn=document.getElementById('avgBtn');
 avgBtn.addEventListener('click',()=>{avgOn=!avgOn; avgBtn.setAttribute('aria-pressed',String(avgOn)); if(avgLayer) avgLayer.classList.toggle('on',avgOn);});
-balanceInput.addEventListener('input',()=>updateUI(selected)); resetBtn.addEventListener('click',()=>{locked=null; deactivate();});
+balanceInput.addEventListener('input',()=>{const atEnd=balanceInput.selectionStart===balanceInput.value.length;const n=parseMoney(balanceInput.value);balanceInput.value=n?money(n):'';if(atEnd){const L=balanceInput.value.length;balanceInput.setSelectionRange(L,L);}updateUI(selected);});
+balanceInput.addEventListener('focus',()=>balanceInput.select());
+balanceInput.addEventListener('blur',()=>{balanceInput.value=money(parseMoney(balanceInput.value));});
+resetBtn.addEventListener('click',()=>{locked=null; deactivate();});
 function openModal(){modalBackdrop.classList.add('open'); modalBackdrop.setAttribute('aria-hidden','false');} function closeModalFn(){modalBackdrop.classList.remove('open'); modalBackdrop.setAttribute('aria-hidden','true');}
-implicationsBtn.addEventListener('click',openModal); openImplicationsBottom.addEventListener('click',openModal); closeModal.addEventListener('click',closeModalFn); modalBackdrop.addEventListener('click',(e)=>{if(e.target===modalBackdrop) closeModalFn();}); document.addEventListener('keydown',(e)=>{if(e.key==='Escape') closeModalFn();});
+openImplicationsBottom.addEventListener('click',openModal); closeModal.addEventListener('click',closeModalFn); modalBackdrop.addEventListener('click',(e)=>{if(e.target===modalBackdrop) closeModalFn();}); document.addEventListener('keydown',(e)=>{if(e.key==='Escape') closeModalFn();});
 draw();
 </script>
 </body>
