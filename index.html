@@ -294,6 +294,7 @@
     transition: border-color 0.4s, background 0.4s;
   }
   .serve-card:hover .serve-card-arrow { border-color: var(--gold); background: var(--gold); }
+  a.serve-card { display: block; text-decoration: none; color: inherit; cursor: pointer; }
 
   /* LEVERAGE BANNER */
   .leverage-banner {
@@ -477,6 +478,7 @@
     color: var(--ink); margin-bottom: 16px; line-height: 1.2;
   }
   .service-desc { font-size: 11px; font-weight: 300; line-height: 1.9; color: var(--warm-gray); }
+  a.service-item { display: block; text-decoration: none; color: inherit; cursor: pointer; }
 
   /* PROCESS */
   .process { background: #f0ece4; padding: 120px 60px; }
@@ -878,6 +880,7 @@
   <ul class="nav-links">
     <li><a href="#serve">Who We Serve</a></li>
     <li><a href="#services">Practice Areas</a></li>
+    <li><a href="/business-owners">Business Owners</a></li>
     <li><a href="/premium-finance">Premium Finance</a></li>
     <li><a href="professional-partners.html">For Advisors</a></li>
     <li><a href="/resources">Resources</a></li>
@@ -945,7 +948,7 @@
     <p class="section-desc">Two distinct client profiles. One uncompromising standard of care. Whether you're building an empire or protecting one, this practice was built for you.</p>
   </div>
   <div class="serve-cards reveal">
-    <div class="serve-card">
+    <a class="serve-card" href="/business-owners">
       <span class="serve-card-tag">Private Wealth & Legacy</span>
       <h3 class="serve-card-title">High-Net-Worth<br>& Business Owners</h3>
       <p class="serve-card-desc">For those whose net worth demands more than conventional planning, clients who want their assets to work harder in death than they did in life.</p>
@@ -962,7 +965,7 @@
           <path d="M3 8h10M9 4l4 4-4 4" stroke="#b8972e" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
       </div>
-    </div>
+    </a>
     <div class="serve-card">
       <span class="serve-card-tag">Retirement & Income</span>
       <h3 class="serve-card-title">Families,<br>Retirees & Pensioners</h3>
@@ -1058,12 +1061,12 @@
       <h3 class="service-title">Tax-Advantaged Accumulation</h3>
       <p class="service-desc">Accumulation strategies that pursue growth with downside protection and tax advantages, and can supplement retirement income. Results depend on the structure and policy selected.</p>
     </div>
-    <div class="service-item">
+    <a class="service-item" href="/business-owners">
       <div class="service-num">06</div>
       <div class="service-icon"></div>
       <h3 class="service-title">Business Succession &amp; Key-Person Planning</h3>
       <p class="service-desc">For owners whose company is their largest asset. The plan funds buy-sell agreements, insures the people the business can’t replace, and structures an exit that honors a lifetime of building.</p>
-    </div>
+    </a>
   </div>
 </section>
 
