@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="robots" content="noindex, nofollow">
-<title>Partner Access — Edwards Financial & Associates</title>
+<title>Partner Access · Edwards Financial & Associates</title>
 <!-- Favicons -->
 <link rel="icon" href="/favicon.ico" sizes="any">
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
@@ -19,7 +19,7 @@
 <meta property="og:image" content="https://edwardsfinancialassociates.com/edwards-og-image.jpg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
@@ -35,7 +35,7 @@
   }
   html, body { height: 100%; }
   body {
-    font-family: 'Montserrat', sans-serif;
+    font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
     background: var(--parchment);
     color: var(--ink);
     display: flex;
@@ -185,7 +185,7 @@
     background: var(--parchment);
     border: 1px solid var(--rule);
     color: var(--ink);
-    font-family: 'Montserrat', sans-serif;
+    font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
     font-size: 13px; padding: 13px 16px;
     outline: none;
     transition: border-color 0.3s;
@@ -197,7 +197,7 @@
     width: 100%;
     background: var(--ink);
     color: var(--white);
-    font-family: 'Montserrat', sans-serif;
+    font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
     font-size: 10px; font-weight: 600;
     letter-spacing: 0.2em; text-transform: uppercase;
     padding: 15px;
@@ -246,7 +246,7 @@
 <body>
 
 <nav>
-  <a href="index.html" class="nav-logo">Edwards <span>&</span> Associates</a>
+  <a href="index.html" class="nav-logo">Edwards Financial <span>&</span> Associates</a>
   <a href="index.html" class="nav-back">← Back to Main Site</a>
 </nav>
 
@@ -258,10 +258,10 @@
         <h1 class="left-title">Professional<br><em>Partner</em><br>Portal</h1>
         <p class="left-desc">Restricted access for approved financial professionals and associates of Edwards Financial & Associates.</p>
         <ul class="feature-list">
-          <li>Full client profile management</li>
+          <li>Client video pages ready to send</li>
           <li>Pension & retirement calculators</li>
-          <li>Tax and estate planning tools</li>
-          <li>Action item tracking per client</li>
+          <li>Retirement readiness illustrations</li>
+          <li>Annuity and life intake forms</li>
           <li>Reference ledger & benchmarks</li>
         </ul>
       </div>
@@ -325,7 +325,7 @@
 
 <footer>
   <p>© 2025 Edwards Financial & Associates. All rights reserved.</p>
-  <p>Restricted Access — Authorized Personnel Only</p>
+  <p>Restricted Access · Authorized Personnel Only</p>
 </footer>
 
 <script>
@@ -365,7 +365,7 @@
       return;
     }
 
-    // Success — go to dashboard
+    // Success, go to dashboard
     window.location.href = 'portal-partner-dashboard.html';
   }
 
@@ -388,12 +388,22 @@
     btn.disabled = true;
     btn.textContent = 'Submitting...';
 
-    const { error } = await sb.from('access_requests').insert([{
-      name, email, company, license, status: 'pending', requested_at: new Date().toISOString()
-    }]);
+    let ok = false;
+    try {
+      const res = await fetch('/api/access-request', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, company, license })
+      });
+      const data = await res.json().catch(function () { return {}; });
+      ok = res.ok && data.ok;
+      if (!ok) console.error('access-request failed:', res.status, data);
+    } catch (e) {
+      console.error('access-request threw:', e);
+    }
 
-    if (error) {
-      showMsg('request-msg', 'error', 'Submission failed. Please try again.');
+    if (!ok) {
+      showMsg('request-msg', 'error', 'Could not submit. Please email joshua@edwardsfinancialassociates.com and we will set you up.');
       btn.disabled = false;
       btn.textContent = 'Submit Request';
       return;
