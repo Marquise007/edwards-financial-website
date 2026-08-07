@@ -47,88 +47,110 @@
     overflow-x: hidden;
   }
 
-  /* NAV */
-  nav {
-    position: fixed;
-    top: 0; left: 0; right: 0;
-    z-index: 100;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 48px;
-    padding: 28px 60px;
-    background: rgba(247, 244, 239, 0.92);
-    backdrop-filter: blur(12px);
-    border-bottom: 1px solid transparent;
-    transition: border-color 0.4s, padding 0.4s;
+  /* ===== STANDARD NAV — support layer =====
+     Aliases the shared header's variable names onto this page's palette and
+     supplies the .wrap / .btn helpers the header markup depends on. */
+  :root {
+    --navy: #0d1e3a;
+    --cream: #f7f5f1;
+    --muted: #667389;
+    --line: rgba(13,30,58,.13);
+    --gold-lt: #d5bd68;
+    /* Rendered height of the sticky header: 76px .nav-in + 1px border.
+       Measured, not declared. Every offset below it derives from this. */
+    --nav-h: 77px;
   }
-  nav.scrolled { border-color: var(--rule); padding: 18px 60px; }
-  .nav-logo {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 20px; font-weight: 500;
-    letter-spacing: 0.08em;
-    color: var(--ink); text-decoration: none;
+  .wrap { width: var(--wrap); margin: 0 auto; }
+  .btn {
+    display:inline-flex;align-items:center;gap:9px;min-height:48px;padding:0 24px;
+    text-decoration:none;font-size:10.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
+    transition:background .22s ease,color .22s ease,transform .22s ease,border-color .22s ease;
   }
-  .nav-logo span { color: var(--gold); }
-  .nav-links { display: flex; gap: 40px; list-style: none; }
-  .nav-links a {
-    font-size: 10px; font-weight: 500;
-    letter-spacing: 0.2em; text-transform: uppercase;
-    color: var(--warm-gray); text-decoration: none;
-    transition: color 0.3s;
-  }
-  .nav-links a:hover { color: var(--gold); }
-  .nav-right { display: flex; align-items: center; gap: 12px; }
-  .nav-partner {
-    font-size: 10px; font-weight: 500;
-    letter-spacing: 0.2em; text-transform: uppercase;
-    color: rgba(107,101,96,0.7); text-decoration: none;
-    font-family: 'Montserrat', sans-serif;
-    transition: color 0.3s;
-  }
-  .nav-partner:hover { color: var(--gold); }
-  .nav-portal {
-    font-size: 10px; font-weight: 500;
-    letter-spacing: 0.2em; text-transform: uppercase;
-    color: var(--gold); text-decoration: none;
-    border: 1px solid var(--gold);
-    padding: 10px 22px;
-    transition: background 0.3s, color 0.3s;
-  }
-  .nav-portal:hover { background: var(--gold); color: var(--ink); }
+  .btn-gold{background:var(--gold);color:var(--navy)}
+  .btn-gold:hover{background:var(--gold-lt);transform:translateY(-2px)}
+  .btn-ghost{border:1px solid var(--line);color:var(--navy);background:transparent}
+  .btn-ghost:hover{border-color:var(--gold);color:var(--gold)}
+  .btn:focus-visible{outline:3px solid var(--gold);outline-offset:3px}
+  .btn svg{width:15px;height:15px;fill:currentColor}
 
-  /* Mobile menu toggle — hidden on desktop, shown only in the phone breakpoint */
-  .nav-toggle {
-    display: none; background: none; border: none; cursor: pointer;
-    width: 28px; height: 20px; padding: 0;
-    flex-direction: column; justify-content: space-between;
+  /* ---------- nav ---------- */
+  .nav{
+    --wrap:min(1400px,calc(100% - 48px));
+    position:sticky;top:0;z-index:60;
+    background:rgba(247,245,241,.94);backdrop-filter:blur(12px);
+    border-bottom:1px solid var(--line);
   }
-  .nav-toggle span {
-    display: block; height: 2px; width: 100%; background: var(--ink);
-    transition: transform 0.3s, opacity 0.3s;
+  .logo{display:flex;align-items:center;gap:12px;text-decoration:none;flex:0 0 auto}
+  .logo-mark{
+    width:42px;height:42px;display:grid;place-items:center;color:#fff;background:var(--navy);
+    border:1px solid rgba(184,151,46,.7);font:600 19px/1 "Cormorant Garamond",Georgia,serif;
   }
-  nav.open .nav-toggle span:nth-child(1) { transform: translateY(9px) rotate(45deg); }
-  nav.open .nav-toggle span:nth-child(2) { opacity: 0; }
-  nav.open .nav-toggle span:nth-child(3) { transform: translateY(-9px) rotate(-45deg); }
-  .nav-cta {
-    font-size: 10px; font-weight: 500;
-    letter-spacing: 0.2em; text-transform: uppercase;
-    color: var(--white); background: var(--ink);
-    padding: 12px 28px; text-decoration: none;
-    transition: background 0.3s;
+  .logo-txt{display:grid;gap:2px}
+  .logo-name{color:var(--navy);font:600 19px/1 "Cormorant Garamond",Georgia,serif}
+  .logo-sub{color:var(--muted);font-size:8.5px;font-weight:700;letter-spacing:.16em;text-transform:uppercase}
+
+  .nav-in{display:flex;align-items:center;justify-content:space-between;gap:22px;min-height:76px}
+  .nav-links{display:flex;align-items:center;gap:18px}
+  .nav-links > a{
+    text-decoration:none;color:var(--navy);font-size:11px;font-weight:500;letter-spacing:.01em;
+    padding:4px 0;white-space:nowrap;border-bottom:1px solid transparent;transition:border-color .2s ease,color .2s ease;
   }
-  .nav-cta:hover { background: var(--gold-muted); }
+  .nav-links > a:hover{border-color:var(--gold);color:var(--gold)}
+  .nav-links > a[aria-current="page"]{border-color:var(--gold);color:var(--gold)}
+  .nav-links-cta{display:none}
+  .nav-cta{display:flex;align-items:center;gap:12px;flex:0 0 auto}
+  .nav-signin{display:flex;align-items:center;gap:12px;padding-right:12px;border-right:1px solid var(--line)}
+  .nav-signin a{
+    text-decoration:none;color:var(--muted);font-size:8.5px;font-weight:700;letter-spacing:.11em;
+    text-transform:uppercase;white-space:nowrap;transition:color .2s ease;
+  }
+  .nav-signin a:hover{color:var(--gold)}
+  .nav-signin a:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+  .nav-cta .btn,.nav-links-cta .btn{min-height:38px;padding:0 13px;font-size:8.5px;letter-spacing:.11em}
+  .nav-toggle{
+    display:none;align-items:center;gap:9px;border:1px solid var(--line);background:transparent;
+    padding:10px 13px;color:var(--navy);font-size:9.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;
+  }
+  .nav-toggle .bars{position:relative;width:15px;height:9px;display:inline-block}
+  .nav-toggle .bars::before,.nav-toggle .bars::after{content:"";position:absolute;left:0;right:0;height:1.5px;background:var(--navy)}
+  .nav-toggle .bars::before{top:0}
+  .nav-toggle .bars::after{bottom:0}
+  @media (max-width:1360px){
+    .nav-in{position:relative}
+    .nav-links{
+      display:none;position:absolute;left:0;right:0;top:100%;z-index:70;
+      flex-direction:column;align-items:stretch;gap:0;
+      padding:6px 26px 20px;background:var(--cream);border-bottom:1px solid var(--line);
+      box-shadow:0 22px 40px rgba(13,30,58,.12);
+    }
+    .nav-links.open{display:flex}
+    .nav-links > a{padding:13px 0;font-size:13px;border-bottom:1px solid var(--line)}
+    .nav-links-cta{display:grid;gap:8px;margin-top:16px}
+    .nav-links-cta .btn{width:100%;justify-content:center;min-height:44px;font-size:9.5px}
+    .nav-signin{display:none}
+    .nav-toggle{display:inline-flex}
+  }
+  @media (max-width:640px){.nav-cta > .btn-gold{display:none}}
+  @media (max-width:430px){.logo-sub{display:none}.logo-name{font-size:17px}}
+  @media (max-width:380px){
+    :root{--wrap:min(100% - 24px,720px)}
+    .logo-name{font-size:15px}
+    .logo-mark{width:34px;height:34px;font-size:16px}
+    .nav-in{gap:12px}
+    .nav-toggle{padding:9px 9px;font-size:8.5px;gap:6px}
+    .nav-toggle .bars{width:13px}
+  }
 
   /* HERO */
   .hero {
-    min-height: 100vh;
+    min-height: calc(100svh - var(--nav-h));
     display: grid; grid-template-columns: 1fr 1fr;
     position: relative; overflow: hidden;
   }
   .hero-left {
     background: var(--ink);
     display: flex; flex-direction: column; justify-content: flex-end;
-    padding: 140px 70px 80px;
+    padding: calc(140px - var(--nav-h)) 70px 80px;
     position: relative; overflow: hidden;
   }
   .hero-left::before {
@@ -188,7 +210,7 @@
   .hero-right {
     background: var(--parchment);
     display: flex; flex-direction: column; justify-content: center;
-    padding: 140px 70px 80px; position: relative;
+    padding: calc(140px - var(--nav-h)) 70px 80px; position: relative;
   }
   .hero-stat-grid {
     display: grid; grid-template-columns: 1fr 1fr;
@@ -781,9 +803,6 @@
 
   /* RESPONSIVE */
   @media (max-width: 1024px) {
-    nav { padding: 24px 32px; }
-    nav.scrolled { padding: 16px 32px; }
-    .nav-links { gap: 24px; }
     .hero { grid-template-columns: 1fr; }
     .hero-right { padding-top: 60px; }
     .serve-cards, .services-grid, .process-steps, .leverage-inner, .pension-inner, .pension-pillars { grid-template-columns: 1fr; }
@@ -804,27 +823,9 @@
     /* stop decorative offsets from causing sideways scroll */
     html, body { overflow-x: hidden; }
 
-    /* NAV → hamburger menu */
-    nav { padding: 16px 20px; flex-wrap: wrap; gap: 0; }
-    nav.scrolled { padding: 14px 20px; }
-    .nav-logo { font-size: 18px; }
-    .nav-toggle { display: flex; }
-    .nav-links, .nav-right { display: none; }
-    nav.open .nav-links {
-      display: flex; flex-direction: column; gap: 2px; width: 100%;
-      margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--rule);
-    }
-    nav.open .nav-links a { padding: 11px 0; }
-    nav.open .nav-right {
-      display: flex; flex-direction: column; align-items: stretch; gap: 10px;
-      width: 100%; margin-top: 10px;
-    }
-    nav.open .nav-partner, nav.open .nav-portal, nav.open .nav-cta {
-      text-align: center; padding: 13px;
-    }
 
     /* HERO — stack and ease the type/padding */
-    .hero-left { padding: 104px 24px 56px; }
+    .hero-left { padding: calc(104px - var(--nav-h)) 24px 56px; }
     .hero-right { padding: 48px 24px 64px; }
     .hero-heading { font-size: clamp(38px, 11vw, 50px); }
     .hero-sub { max-width: none; margin-bottom: 40px; }
@@ -873,25 +874,44 @@
 </head>
 <body>
 
-<!-- NAV -->
-<nav id="nav">
-  <a href="#" class="nav-logo">Edwards <span>&</span> Associates</a>
-  <button class="nav-toggle" id="navToggle" aria-label="Open menu" aria-expanded="false"><span></span><span></span><span></span></button>
-  <ul class="nav-links">
-    <li><a href="#serve">Who We Serve</a></li>
-    <li><a href="#services">Practice Areas</a></li>
-    <li><a href="/business-owners">Business Owners</a></li>
-    <li><a href="/premium-finance">Premium Finance</a></li>
-    <li><a href="professional-partners.html">For Advisors</a></li>
-    <li><a href="/resources">Resources</a></li>
-    <li><a href="#about">About</a></li>
-  </ul>
-  <div class="nav-right">
-    <a href="portal-partner-login.html" class="nav-partner">Partner Access</a>
-    <a href="#" class="nav-portal" id="openPortal">Client Portal</a>
-    <a href="https://calendly.com/jedwards-finance/30min" target="_blank" rel="noopener noreferrer" onclick="if(window.Calendly){Calendly.initPopupWidget({url:'https://calendly.com/jedwards-finance/30min'});return false;}" class="nav-cta">Begin the Conversation</a>
+<!-- NAV (standard site header — see nav-standard reference; keep identical across pages) -->
+<header class="nav">
+  <div class="wrap nav-in">
+    <a class="logo" href="/">
+      <span class="logo-mark" aria-hidden="true">EFA</span>
+      <span class="logo-txt">
+        <span class="logo-name">Edwards &amp; Associates</span>
+        <span class="logo-sub">Protect &#183; Grow &#183; Legacy</span>
+      </span>
+    </a>
+
+    <nav class="nav-links" id="navlinks" aria-label="Primary">
+      <a href="/#serve">Who We Serve</a>
+      <a href="/#services">Practice Areas</a>
+      <a href="/business-owners">Business Owners</a>
+      <a href="/premium-finance">Premium Finance</a>
+      <a href="/professional-partners.html">For Advisors</a>
+      <a href="/resources">Resources</a>
+      <a href="/#about">About</a>
+      <span class="nav-links-cta">
+        <a class="btn btn-ghost" href="/portal-partner-login.html">Partner Access</a>
+        <a class="btn btn-ghost" href="/?portal=1" data-portal>Client Portal</a>
+        <a class="btn btn-gold" href="https://calendly.com/jedwards-finance/30min">Begin the Conversation</a>
+      </span>
+    </nav>
+
+    <div class="nav-cta">
+      <span class="nav-signin">
+        <a href="/portal-partner-login.html">Partner Access</a>
+        <a href="/?portal=1" data-portal>Client Portal</a>
+      </span>
+      <a class="btn btn-gold" href="https://calendly.com/jedwards-finance/30min">Begin the Conversation</a>
+      <button class="nav-toggle" id="navtoggle" aria-expanded="false" aria-controls="navlinks">
+        <span class="bars" aria-hidden="true"></span>Menu
+      </button>
+    </div>
   </div>
-</nav>
+</header>
 
 <!-- HERO -->
 <section class="hero">
@@ -1362,23 +1382,6 @@
 </div>
 
 <script>
-  // Nav scroll
-  const nav = document.getElementById('nav');
-  window.addEventListener('scroll', () => nav.classList.toggle('scrolled', window.scrollY > 40));
-
-  // Mobile menu toggle
-  const navToggle = document.getElementById('navToggle');
-  navToggle.addEventListener('click', () => {
-    const open = nav.classList.toggle('open');
-    navToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
-  });
-  // Close the menu after tapping any nav link
-  nav.querySelectorAll('.nav-links a, .nav-right a').forEach(a => {
-    a.addEventListener('click', () => {
-      nav.classList.remove('open');
-      navToggle.setAttribute('aria-expanded', 'false');
-    });
-  });
 
   // Reveal
   const reveals = document.querySelectorAll('.reveal');
@@ -1410,7 +1413,14 @@
     document.body.style.overflow = '';
   }
 
-  document.getElementById('openPortal').addEventListener('click', e => { e.preventDefault(); openPortalModal(); });
+  // The standard nav's Client Portal links call this; see the [data-portal] handler.
+  window.openClientPortal = openPortalModal;
+
+  // Arriving from another page's Client Portal link (/?portal=1) opens the modal.
+  if (new URLSearchParams(location.search).get('portal') === '1') {
+    openPortalModal();
+  }
+
   document.getElementById('closePortal').addEventListener('click', closePortalModal);
   document.getElementById('closeDash').addEventListener('click', closePortalModal);
   overlay.addEventListener('click', e => { if (e.target === overlay) closePortalModal(); });
@@ -1514,6 +1524,29 @@
     document.getElementById('login-email').value = '';
     document.getElementById('login-password').value = '';
   }
+</script>
+<script>
+(function(){
+  var t=document.getElementById('navtoggle'),l=document.getElementById('navlinks');
+  if(t&&l){
+    t.addEventListener('click',function(){
+      var open=l.classList.toggle('open');
+      t.setAttribute('aria-expanded',open?'true':'false');
+    });
+    document.addEventListener('keydown',function(e){
+      if(e.key==='Escape'&&l.classList.contains('open')){
+        l.classList.remove('open');t.setAttribute('aria-expanded','false');t.focus();
+      }
+    });
+  }
+  /* Client Portal. On the home page the modal opens in place; everywhere else the
+     link carries ?portal=1 home and index.html opens it on load. */
+  document.querySelectorAll('[data-portal]').forEach(function(a){
+    a.addEventListener('click',function(e){
+      if(typeof window.openClientPortal==='function'){e.preventDefault();window.openClientPortal();}
+    });
+  });
+})();
 </script>
 </body>
 </html>
