@@ -166,6 +166,13 @@ button{font-family:inherit}
 .card__glyph svg{width:18px;height:18px;fill:currentColor}
 
 /* ---- actions ---- */
+.chip{
+  display:inline-flex;align-items:center;gap:6px;padding:4px 9px;margin-bottom:11px;
+  font-size:8.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
+}
+.chip--live{background:var(--navy);color:var(--cream)}
+.chip--hold{border:1px solid var(--gold);color:#8a6e22}
+.chip--hold::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--gold)}
 .card__acts{display:grid;grid-template-columns:1fr 1fr;gap:1px;margin-top:16px;background:var(--line)}
 .card__acts--one{grid-template-columns:1fr}
 .btn{
@@ -216,6 +223,10 @@ button{font-family:inherit}
       <a class="nav-item active" tabindex="0" role="button" onclick="showView('marketing')">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2zm6 3.5v9l7-4.5-7-4.5z"/></svg>
         Send to clients
+      </a>
+      <a class="nav-item" tabindex="0" role="button" onclick="showView('crediting')">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3h2v16h16v2H3V3zm5 11 4-5 3 3.5L20 6l1.5 1.3-6.4 7.5-3-3.5L9.4 15 8 14z"/></svg>
+        Crediting strategies
       </a>
     </div>
     <div class="nav-section">
@@ -331,6 +342,40 @@ button{font-family:inherit}
               <span>Copy link</span>
             </button>
             <a class="btn btn--go" href="private-reserve-strategy.html" target="_blank" rel="noopener">Preview
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 3v2h3.6l-9.3 9.3 1.4 1.4L19 6.4V10h2V3h-7zM5 5h5V3H3v18h18v-7h-2v5H5V5z"/></svg>
+            </a>
+          </div>
+        </article>
+
+      </div>
+    </div>
+
+
+    <!-- ============ CREDITING ============ -->
+    <div class="view" id="view-crediting">
+      <div class="shelf-head">
+        <p class="shelf-eyebrow">Client-facing</p>
+        <h2 class="shelf-h">Crediting strategies by carrier</h2>
+        <p class="shelf-note">How each carrier credits interest, what the contract guarantees regardless of the illustrated rate, and what the mechanics produced historically. A piece only gets a copy link once the carrier has issued its advertising approval number.</p>
+      </div>
+
+      <div class="grid">
+
+        <article class="card">
+          <div class="card__body">
+            <span class="card__glyph" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 3h2v16h16v2H3V3zm5 11 4-5 3 3.5L20 6l1.5 1.3-6.4 7.5-3-3.5L9.4 15 8 14z"/></svg></span>
+            <span class="chip chip--hold">Approval pending</span>
+            <p class="card__kind">National Life Group · LSW · Life</p>
+            <h3 class="card__name">FlexLife Indexed Universal Life</h3>
+            <p class="card__desc">What the illustrated rate represents under Actuarial Guideline 49-B, the contractual floors, caps, and participation minimums that hold regardless of it, and twenty-five calendar years of hypothetical crediting through the dotcom collapse, 2008, the pandemic, and 2022.</p>
+            <div class="card__meta">
+              <div class="card__row"><b>Covers</b><span>Cap Focus, Participation Focus, 1% Floor, Indexed Loan Account</span></div>
+              <div class="card__row"><b>Length</b><span>3 pages, portrait</span></div>
+              <div class="card__row"><b>Hold</b><span>Needs the National Life TC number and the illustration date before it goes to a client</span></div>
+            </div>
+          </div>
+          <div class="card__acts card__acts--one">
+            <a class="btn" href="/resources/collateral/lsw-flexlife-crediting.pdf" target="_blank" rel="noopener">Open PDF
               <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 3v2h3.6l-9.3 9.3 1.4 1.4L19 6.4V10h2V3h-7zM5 5h5V3H3v18h18v-7h-2v5H5V5z"/></svg>
             </a>
           </div>
@@ -487,6 +532,7 @@ button{font-family:inherit}
 
   const TITLES = {
     marketing: 'Send to clients',
+    crediting: 'Crediting strategies by carrier',
     calculators: 'Calculators and analysis',
     intakes: 'Intakes'
   };
