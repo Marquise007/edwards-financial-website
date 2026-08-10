@@ -230,28 +230,6 @@ table.matrix{width:100%;min-width:820px;border-collapse:collapse;font-size:12.5p
 .pill.hi{border-color:rgba(184,151,46,.6);color:var(--gold-lt)}
 .matrix-note{margin:22px 0 0;max-width:74ch;color:rgba(255,255,255,.6);font-size:12.5px;line-height:1.6}
 
-/* video */
-.video-row{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(280px,.65fr);gap:clamp(22px,3vw,42px);align-items:start}
-.video-card{background:var(--navy);box-shadow:var(--shadow);border-top:3px solid var(--gold);overflow:hidden}
-.video-bar{
-  min-height:58px;padding:12px 20px;display:flex;align-items:center;justify-content:space-between;gap:16px;color:#fff;
-  background:radial-gradient(circle at 12% 0%,rgba(184,151,46,.18),transparent 15rem),linear-gradient(135deg,var(--navy-2),var(--navy));
-}
-.video-bar span{display:block;color:rgba(255,255,255,.55);font-size:8.5px;font-weight:700;letter-spacing:.16em;text-transform:uppercase}
-.video-bar strong{display:block;margin-top:3px;font:600 21px/1.08 "Cormorant Garamond",Georgia,serif}
-.video-badge{flex:0 0 auto;padding:7px 10px;border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.7);font-size:8px;font-weight:700;letter-spacing:.12em;text-transform:uppercase}
-.video-frame{position:relative;width:100%;aspect-ratio:16/9;background:#06101f}
-.video-frame iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
-.watch{border:1px solid var(--line);background:var(--paper);padding:clamp(22px,2.4vw,30px)}
-.watch h3{color:var(--navy);font-size:26px;margin-bottom:6px}
-.watch>p{margin:0 0 18px;color:var(--muted);font-size:12.5px;line-height:1.5}
-.watch ol{list-style:none;margin:0;padding:0;display:grid;gap:14px}
-.watch li{display:grid;grid-template-columns:28px 1fr;gap:12px;align-items:start}
-.watch-n{width:28px;height:28px;display:grid;place-items:center;border:1px solid rgba(184,151,46,.55);color:var(--gold);font:600 15px/1 "DM Sans",sans-serif}
-.watch b{display:block;color:var(--navy);font-size:12.5px;line-height:1.3}
-.watch small{display:block;margin-top:3px;color:var(--muted);font-size:11.5px;line-height:1.42}
-.watch-more{margin:20px 0 0;padding-top:16px;border-top:1px solid var(--line);color:var(--muted);font-size:11.5px;line-height:1.5}
-
 /* work band */
 .work{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:1px;background:var(--line)}
 .work-step{background:var(--paper);padding:clamp(24px,2.4vw,30px)}
@@ -321,6 +299,11 @@ table.matrix{width:100%;min-width:820px;border-collapse:collapse;font-size:12.5p
 .fact span{display:block;color:var(--muted);font-size:8.5px;font-weight:700;letter-spacing:.16em;text-transform:uppercase}
 .fact strong{display:block;margin-top:5px;color:var(--navy);font-size:12.5px;font-weight:500;line-height:1.35}
 .arr .video-row{margin-top:clamp(24px,3vw,36px)}
+.note{margin-top:clamp(22px,2.6vw,32px);padding:clamp(22px,2.6vw,30px);border-left:3px solid var(--gold);background:rgba(184,151,46,.05)}
+.note-lbl{margin:0 0 8px;color:var(--gold);font-size:9px;font-weight:700;letter-spacing:.2em;text-transform:uppercase}
+.note h3{margin:0 0 10px;color:var(--navy);font-size:clamp(21px,2.1vw,26px);line-height:1.12}
+.note p{margin:0;color:rgba(27,43,69,.78);font-size:13.5px;line-height:1.65}
+.note .src{margin-top:12px;color:var(--muted);font-size:10px;line-height:1.45}
 @media (max-width:900px){.arr-head{grid-template-columns:1fr;gap:16px}.facts{grid-template-columns:1fr}}
 </style>
 </head>
@@ -403,35 +386,11 @@ table.matrix{width:100%;min-width:820px;border-collapse:collapse;font-size:12.5p
         <div class="fact"><span>Access to cash value</span><strong>Unrestricted</strong></div>
         <div class="fact"><span>Company recovers cost</span><strong>No</strong></div>
       </div>
-      <div class="video-row">
-        <div class="video-card">
-          <div class="video-bar">
-            <div>
-              <span>Featured video</span>
-              <strong>How Does an Executive Bonus Plan with Life Insurance Work?</strong>
-            </div>
-            <span class="video-badge">Presented by North American</span>
-          </div>
-          <div class="video-frame">
-            <iframe
-              src="https://fast.wistia.net/embed/iframe/fkixmm9j78?seo=false&amp;videoFoam=true"
-              title="How Does an Executive Bonus Plan with Life Insurance Work?, presented by North American"
-              allow="autoplay; fullscreen"
-              allowfullscreen
-              loading="lazy"></iframe>
-          </div>
-        </div>
-
-        <aside class="watch">
-          <h3>What to listen for</h3>
-          <p>Use the video to understand the basic employer and employee structure, then coordinate the details with the appropriate insurance, tax, and legal professionals.</p>
-          <ol>
-            <li><span class="watch-n" aria-hidden="true">1</span><span><b>Employer and employee roles</b><small>How the business provides the bonus while the employee applies for and owns the life insurance policy.</small></span></li>
-            <li><span class="watch-n" aria-hidden="true">2</span><span><b>Protection and policy value</b><small>How the arrangement can pair life insurance protection with cash value accumulation potential for the employee.</small></span></li>
-            <li><span class="watch-n" aria-hidden="true">3</span><span><b>Tax and design coordination</b><small>Why bonus treatment, policy funding, ownership, and the broader compensation strategy should be reviewed together.</small></span></li>
-          </ol>
-          <p class="watch-more">Bring your questions to the consultation. Nothing here replaces the conversation. It just means the conversation can start further along.</p>
-        </aside>
+      <div class="note">
+        <p class="note-lbl">Worth knowing</p>
+        <h3>One person is allowed to be the only person</h3>
+        <p>Because the arrangement is nonqualified, the benefit can be offered to a single key employee. That avoids the non-discrimination testing, administrative requirements, and contribution limits that come with other plan types. And because the premium is treated as taxable compensation to the employee, the business may be entitled to a compensation deduction for it.</p>
+        <p class="src">Source: Life Insurance Company of the Southwest, SummitLife IUL Executive Benefit Planning, Cat No 106306</p>
       </div>
     </article>
 
@@ -451,8 +410,12 @@ table.matrix{width:100%;min-width:820px;border-collapse:collapse;font-size:12.5p
         <div class="fact"><span>Access to cash value</span><strong>Restricted until vesting</strong></div>
         <div class="fact"><span>Company recovers cost</span><strong>Possible, under the agreement</strong></div>
       </div>
-      <!-- VIDEO SLOT. Paste the <div class="video-row"> block from the Executive Bonus
-           section above, swap the Wistia id, the title, and the three listening lines. -->
+      <div class="note">
+        <p class="note-lbl">Worth knowing</p>
+        <h3>The carrier is not the enforcer</h3>
+        <p>The terms of a restricted executive bonus arrangement are not part of the policy the insurance company issues, and the carrier states plainly that it cannot directly enforce restrictions belonging to the arrangement rather than to the contract. The restriction lives in the endorsement and the employment agreement, which is why counsel drafts both. The employer's bonus payments used to pay the premium are fully deductible.</p>
+        <p class="src">Source: North American Company for Life and Health Insurance, Business Planning: Restricted Executive Bonus Arrangement, 1804NM-1</p>
+      </div>
     </article>
 
     <article class="arr">
@@ -471,8 +434,12 @@ table.matrix{width:100%;min-width:820px;border-collapse:collapse;font-size:12.5p
         <div class="fact"><span>Access to cash value</span><strong>Company controlled</strong></div>
         <div class="fact"><span>Company recovers cost</span><strong>Yes, recovers its interest</strong></div>
       </div>
-      <!-- VIDEO SLOT. Paste the <div class="video-row"> block from the Executive Bonus
-           section above, swap the Wistia id, the title, and the three listening lines. -->
+      <div class="note">
+        <p class="note-lbl">Worth knowing</p>
+        <h3>The taxable piece is annual, and reporting it is the employer's job</h3>
+        <p>The value of the life insurance afforded to the employee each year is taxable to that employee, and the employer is expected to provide tax reporting on it under the requirements set out in the tax code. That is an ongoing administrative obligation, not a one-time filing at setup.</p>
+        <p class="src">Source: North American Company for Life and Health Insurance, Executive Retention+, 1896NM-6</p>
+      </div>
     </article>
 
     <article class="arr">
@@ -491,8 +458,12 @@ table.matrix{width:100%;min-width:820px;border-collapse:collapse;font-size:12.5p
         <div class="fact"><span>Access to cash value</span><strong>Subject to the loan</strong></div>
         <div class="fact"><span>Company recovers cost</span><strong>Yes, the loan is repaid</strong></div>
       </div>
-      <!-- VIDEO SLOT. Paste the <div class="video-row"> block from the Executive Bonus
-           section above, swap the Wistia id, the title, and the three listening lines. -->
+      <div class="note">
+        <p class="note-lbl">Worth knowing</p>
+        <h3>Ownership is what selects the tax regime</h3>
+        <p>The two split dollar designs are taxed under different sets of rules depending on who holds the policy, so the ownership decision made at application governs the tax treatment for the life of the arrangement. It gets settled with your CPA before the application is written, not renegotiated afterward.</p>
+        <p class="src">Source: North American Company for Life and Health Insurance, Business Planning: Restricted Executive Bonus Arrangement, 1804NM-1</p>
+      </div>
     </article>
 
     <article class="arr">
@@ -511,8 +482,12 @@ table.matrix{width:100%;min-width:820px;border-collapse:collapse;font-size:12.5p
         <div class="fact"><span>Access to cash value</span><strong>Company controlled</strong></div>
         <div class="fact"><span>Company recovers cost</span><strong>Yes, the policy stays with the company</strong></div>
       </div>
-      <!-- VIDEO SLOT. Paste the <div class="video-row"> block from the Executive Bonus
-           section above, swap the Wistia id, the title, and the three listening lines. -->
+      <div class="note">
+        <p class="note-lbl">Worth knowing</p>
+        <h3>Four jobs, stacked on one policy</h3>
+        <p>The design starts with key person protection as the foundation, then adds a share of the death benefit directed to the employee's beneficiary through an endorsement split dollar arrangement, then a retention bonus paid after a set period of service, then funding to help that employee buy the business one day. Each block is added when the business is ready for it, and both the split dollar and the bonus require their own legal agreement.</p>
+        <p class="src">Source: North American Company for Life and Health Insurance, Executive Retention+, 1896NM-6</p>
+      </div>
     </article>
 
     <article class="arr">
@@ -531,8 +506,12 @@ table.matrix{width:100%;min-width:820px;border-collapse:collapse;font-size:12.5p
         <div class="fact"><span>Access to cash value</span><strong>Company controlled</strong></div>
         <div class="fact"><span>Company recovers cost</span><strong>Yes, keeps the asset</strong></div>
       </div>
-      <!-- VIDEO SLOT. Paste the <div class="video-row"> block from the Executive Bonus
-           section above, swap the Wistia id, the title, and the three listening lines. -->
+      <div class="note">
+        <p class="note-lbl">Worth knowing</p>
+        <h3>It only works while it stays unfunded</h3>
+        <p>Deferred compensation arrangements must remain unfunded to preserve income tax deferral for the employee, which means the employer may not establish a specific reserve fund in which the participant holds a vested right. In exchange the arrangement is exempt from ERISA's regulatory requirements, needs no IRS approval, and may provide different benefits to different employees.</p>
+        <p class="src">Source: North American Company for Life and Health Insurance, Business Planning: Nonqualified Deferred Compensation, 1804NM-26</p>
+      </div>
     </article>
   </div>
 </section>
@@ -572,15 +551,15 @@ table.matrix{width:100%;min-width:820px;border-collapse:collapse;font-size:12.5p
   <div class="wrap cta-in">
     <div>
       <p class="eyebrow on-dark">Begin the Conversation</p>
-      <h2>Bring Your Attorney. <em>Bring Your CPA.</em></h2>
-      <p>Thirty minutes, no presentation, no obligation. Which arrangement fits depends on your books and your people, and that is a conversation, not a brochure.</p>
+      <h2>Start Where <em>You Are.</em></h2>
+      <p>Whether your agreements are drafted, outdated, or still an intention, this conversation is private, unhurried, and specific to your company.</p>
     </div>
     <div class="cta-actions">
       <a class="btn btn-gold" href="https://calendly.com/jedwards-finance/30min">
-        Schedule a Consultation
+        Request a Consultation
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13.2 5.2 19 11H4v2h15l-5.8 5.8 1.4 1.4L22.8 12l-8.2-8.2z"/></svg>
       </a>
-      <a class="btn btn-ghost on-dark" href="tel:+16199169773">Call the Office</a>
+      <a class="btn btn-ghost on-dark" href="tel:+16199169773">Call Our Office</a>
     </div>
   </div>
 </section>
@@ -594,8 +573,12 @@ table.matrix{width:100%;min-width:820px;border-collapse:collapse;font-size:12.5p
       professional. Tax treatment follows how the agreement is written and who owns the policy, not what the
       arrangement is called. Life insurance policies contain costs, charges, limitations, exclusions, and conditions;
       coverage depends on underwriting and on the terms of the policy issued. Guarantees are backed by the
-      claims-paying ability of the issuing insurance company. Program names referenced belong to the carriers that
-      offer them. Video content is produced by the issuing carrier and is presented with attribution.
+      claims-paying ability of the issuing insurance company. Policy loans and withdrawals reduce cash value and
+      death benefit, are subject to interest charges, and are generally not subject to income tax provided the
+      contract is not a Modified Endowment Contract as defined by Section 7702A of the Internal Revenue Code.
+      Distributions from a Modified Endowment Contract are taxable to the extent of gain and may carry an
+      additional tax before age 59 and a half. Program names referenced belong to the carriers that offer them,
+      and carrier material is cited to its published form number.
     </p>
   </div>
 </section>
