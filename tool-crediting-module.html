@@ -1,0 +1,1382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Crediting Module | Edwards Financial &amp; Associates</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,600;1,700&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#0d1e3a; --gold:#b8972e; --gold-lt:#d3b45f; --cream:#f7f5f1; --page:#eae5db;
+  --line:#e3ddd0; --line2:#f0ebe0; --ink:#22262e; --soft:#6d675c; --red:#a32b2b; --slate:#94a1b5;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden}
+body{background:var(--page);font-family:'DM Sans',system-ui,sans-serif;color:var(--ink);
+  font-variant-numeric:lining-nums tabular-nums;-webkit-font-smoothing:antialiased;
+  display:flex;flex-direction:column}
+.eyebrow{font-size:9px;letter-spacing:.19em;text-transform:uppercase;color:var(--gold);font-weight:700;line-height:1.5;margin-bottom:7px}
+
+/* ---------------- top bar ---------------- */
+.bar{flex:0 0 auto;background:var(--navy);color:#fff;display:flex;align-items:center;
+  gap:16px;padding:0 18px;height:56px}
+.mono{width:50px;height:34px;flex:0 0 auto;border:1.5px solid var(--gold);display:flex;
+  align-items:center;justify-content:center}
+.mono span{font-family:'Cormorant Garamond',serif;font-weight:700;font-size:17px;
+  letter-spacing:.03em;color:var(--gold-lt);line-height:1}
+.bname{font-family:'Cormorant Garamond',serif;font-weight:600;font-size:18px;line-height:1;white-space:nowrap}
+.btag{font-size:8.5px;letter-spacing:.17em;text-transform:uppercase;color:#8fa0ba;margin-top:4px}
+nav{display:flex;gap:3px;margin-left:14px}
+nav button{font-family:'DM Sans',sans-serif;font-size:11.5px;font-weight:500;color:#b9c3d2;
+  background:none;border:1px solid transparent;padding:8px 13px;cursor:pointer;border-radius:2px;
+  white-space:nowrap;display:flex;align-items:baseline;gap:7px}
+nav button i{font-style:normal;font-size:9.5px;font-weight:700;color:var(--gold);letter-spacing:.08em}
+nav button:hover{color:#fff;border-color:rgba(255,255,255,.18)}
+nav button.on{background:#fff;color:var(--navy);font-weight:700;border-color:#fff}
+nav button.on i{color:var(--gold)}
+nav button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.pick{margin-left:auto;display:flex;gap:9px;align-items:center;padding-left:20px}
+select{font-family:'DM Sans',sans-serif;font-size:11.5px;color:var(--navy);background:#fff;
+  border:1px solid rgba(255,255,255,.25);padding:7px 9px;border-radius:2px;cursor:pointer;max-width:262px}
+select:focus{outline:2px solid var(--gold);outline-offset:1px}
+.prtbtn{font-family:'DM Sans',sans-serif;font-size:9.5px;font-weight:700;letter-spacing:.11em;
+  text-transform:uppercase;background:var(--gold);border:none;color:#fff;padding:9px 13px;
+  border-radius:2px;cursor:pointer}
+
+/* ---------------- stage: a fixed canvas scaled to fit ---------------- */
+#stage{flex:1 1 auto;min-height:0;position:relative;overflow:hidden}
+.page{position:absolute;top:0;left:0;width:1440px;height:824px;background:#fff;
+  transform-origin:top left;display:none;flex-direction:column;padding:22px 30px 18px}
+.page.on{display:flex}
+
+.phead{flex:0 0 auto;display:flex;align-items:flex-end;gap:20px;
+  border-bottom:2px solid var(--navy);padding-bottom:11px;margin-bottom:14px}
+.phead h1{font-family:'Cormorant Garamond',serif;font-weight:700;font-size:31px;line-height:1.04;
+  color:var(--navy);letter-spacing:-.008em}
+.phead h1 em{font-style:italic;color:var(--gold)}
+.phead .psub{font-size:11.5px;color:var(--soft);line-height:1.45;max-width:60ch;padding-bottom:3px}
+.phead .psub b{color:var(--navy);font-weight:500}
+.subtabs{margin-left:auto;display:flex;gap:4px;flex:0 0 auto}
+.subtabs button{font-family:'DM Sans',sans-serif;font-size:11px;font-weight:500;padding:7px 13px;
+  border:1px solid var(--line);background:#fff;color:var(--soft);cursor:pointer;border-radius:2px;white-space:nowrap}
+.subtabs button.on{background:var(--navy);border-color:var(--navy);color:#fff;font-weight:700}
+.subtabs button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.body{flex:1 1 auto;min-height:0;display:flex;gap:26px}
+.col{min-width:0;display:flex;flex-direction:column}
+
+/* ---------------- shared pieces ---------------- */
+.stats{display:flex;border-top:2px solid var(--navy);border-bottom:1px solid var(--line);flex:0 0 auto}
+.stat{flex:1;padding:13px 6px 11px;text-align:center;border-left:1px solid var(--line2)}
+.stat:first-child{border-left:none}
+.snum{font-family:'Cormorant Garamond',serif;font-weight:700;font-size:29px;line-height:1;color:var(--navy)}
+.snum.sm{font-size:19px;padding:5px 0}
+.snum.na{font-size:16px;color:var(--soft);padding:6px 0}
+.slab{font-size:8px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);font-weight:700;margin-top:6px}
+.card{background:var(--cream);border-left:3px solid var(--gold);padding:12px 15px}
+.card h4{font-family:'Cormorant Garamond',serif;font-weight:700;font-size:16px;color:var(--navy);line-height:1.2}
+.card p{font-size:11px;line-height:1.5;color:var(--soft);margin-top:6px}
+.card p b{color:var(--navy);font-weight:500}
+.foot{flex:0 0 auto;margin-top:11px;padding-top:9px;border-top:1px solid var(--line);
+  font-size:8.5px;line-height:1.5;color:var(--soft)}
+.foot b{color:var(--navy);font-weight:500}
+table{width:100%;border-collapse:collapse}
+th{font-size:8px;letter-spacing:.11em;text-transform:uppercase;color:var(--soft);font-weight:700;
+  padding:0 6px 6px;text-align:right;border-bottom:1.5px solid var(--navy);vertical-align:bottom;line-height:1.3}
+th span{display:block;font-size:7.5px;letter-spacing:.04em;text-transform:none;color:#a09a8d;font-weight:500;margin-top:2px}
+th:first-child,td:first-child{text-align:left}
+td{font-size:11px;padding:0 6px;height:20px;border-bottom:1px solid var(--line2);white-space:nowrap}
+tr.dn td{background:#faf0ee}
+td.ix{font-weight:700}
+td.neg{color:var(--red);font-weight:700}
+td.hero{font-weight:700;color:var(--navy)}
+tfoot tr.pr td{font-weight:500;color:var(--soft);border-top:none;height:20px;font-size:10px}
+tfoot td{font-weight:700;border-top:1.5px solid var(--navy);border-bottom:none;height:26px;
+  font-size:11.5px;color:var(--navy)}
+
+/* ---------------- page 1 ---------------- */
+.ex{display:flex;align-items:center;gap:12px;padding:12px 2px;border-bottom:1px solid var(--line2);
+  cursor:pointer;transition:background .14s}
+.ex:hover{background:#faf8f4}
+.ex.on{background:var(--cream);box-shadow:inset 3px 0 0 var(--gold)}
+.ex.dead{cursor:default}.ex.dead:hover{background:none}
+.exn{font-family:'Cormorant Garamond',serif;font-weight:700;font-size:13px;color:var(--gold);width:17px;flex:0 0 auto}
+.exi{font-family:'Cormorant Garamond',serif;font-weight:700;font-size:18px;color:var(--navy);
+  line-height:1.1;flex:0 0 84px}
+.exi.dn{color:var(--red)}
+.excalc{flex:1;font-size:13px;line-height:1.35;color:var(--navy);font-weight:500;letter-spacing:-.002em}
+.exr{font-family:'Cormorant Garamond',serif;font-weight:700;font-size:26px;color:var(--navy);
+  text-align:right;white-space:nowrap;flex:0 0 auto;min-width:96px}
+.exr.neg{color:var(--red)}
+.exr.na{font-size:12px;color:var(--soft);font-family:'DM Sans',sans-serif;font-weight:500}
+.glance{border:1px solid var(--line);border-radius:3px;padding:12px 14px 13px;background:#fdfcfa}
+.gtitle{font-family:'Cormorant Garamond',serif;font-weight:700;font-size:19px;color:var(--navy);margin-bottom:10px}
+.gcards{display:flex;gap:10px}
+.gcard{flex:1;border:1px solid var(--line);border-radius:3px;padding:9px 6px;text-align:center;background:#fff}
+.gcard b{display:block;font-family:'Cormorant Garamond',serif;font-weight:700;font-size:23px;color:var(--navy);line-height:1}
+.gcard span{display:block;font-size:8px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);font-weight:700;margin-top:6px}
+.reciperow{flex:0 0 auto;margin-top:14px;border-top:2px solid var(--navy);padding-top:11px}
+.steps{display:flex;gap:9px;margin-top:9px}
+.rstep{flex:1;display:flex;gap:8px;align-items:flex-start;background:var(--cream);padding:9px 11px;border-radius:3px}
+.rstep i{font-style:normal;flex:0 0 auto;width:17px;height:17px;border-radius:50%;background:var(--gold);color:#fff;
+  font-size:9.5px;font-weight:700;display:flex;align-items:center;justify-content:center;margin-top:1px}
+.rstep b{display:block;font-size:12px;font-weight:700;color:var(--navy);line-height:1.2}
+.rstep span{display:block;font-size:10px;line-height:1.4;color:var(--soft);margin-top:3px}
+.vrow{flex:0 0 auto;display:flex;gap:12px;margin-top:11px}
+.vcard{flex:1;background:var(--cream);border-top:3px solid var(--gold);padding:10px 13px}
+.vcard.v1{border-top-color:var(--slate)}
+.vcard.v2{border-top-color:var(--navy)}
+.vcard b{display:block;font-family:'Cormorant Garamond',serif;font-weight:700;font-size:15.5px;color:var(--navy)}
+.vcard span{display:block;font-size:10.5px;line-height:1.45;color:var(--soft);margin-top:4px}
+.exwrap{flex:1 1 auto;min-height:0;display:flex;flex-direction:column}
+.exwrap .ex{flex:1 1 0;min-height:46px;max-height:70px}
+.cwrap{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;justify-content:center;
+  border-top:2px solid var(--navy);padding-top:13px}
+.keyline{flex:0 0 auto;margin-top:15px;background:var(--cream);border-left:5px solid var(--gold);padding:15px 22px}
+.keyline h4{font-family:'Cormorant Garamond',serif;font-weight:700;font-size:23px;line-height:1.22;color:var(--navy)}
+.keyline p{font-size:12px;line-height:1.55;color:var(--soft);margin-top:7px}
+.enh{margin-top:11px;padding:10px 13px;background:var(--cream);border-left:3px solid var(--gold);
+  font-size:10.5px;line-height:1.5;color:var(--soft)}
+.enh b{color:var(--navy);font-weight:500}
+.chead{font-family:'Cormorant Garamond',serif;font-weight:600;font-size:16px;line-height:1.3;
+  color:var(--navy);text-align:center;padding:0 8px 4px}
+.chead b{color:var(--gold);font-weight:700}
+.chint{font-size:9px;letter-spacing:.13em;text-transform:uppercase;color:var(--gold);font-weight:700;
+  text-align:center;margin-top:6px}
+svg{display:block;width:100%;height:auto}
+
+/* ---------------- page 3 ledgers ---------------- */
+.ledgers{display:flex;gap:16px;flex:1 1 auto;min-height:0}
+.ldg{flex:1;display:flex;flex-direction:column;border:1px solid var(--line);border-top:3px solid var(--slate);
+  background:#fff;padding:16px 17px}
+.ldg.g{border-top-color:var(--navy)}
+.ldg.a{border-top-color:var(--slate)}
+.ldg.c{border-top-color:var(--gold);background:var(--cream)}
+.ldg .lk{font-size:8.5px;letter-spacing:.16em;text-transform:uppercase;font-weight:700;color:var(--soft)}
+.ldg .lr{font-family:'Cormorant Garamond',serif;font-weight:700;font-size:52px;line-height:1;
+  color:var(--navy);margin:7px 0 2px}
+.ldg.c .lr{color:var(--gold)}
+.ldg .lc{font-size:10px;color:var(--soft);letter-spacing:.02em}
+.how{margin-top:13px;padding-top:11px;border-top:1px solid var(--line)}
+.howlab{font-size:8px;letter-spacing:.15em;text-transform:uppercase;font-weight:700;color:var(--gold);margin-bottom:8px}
+.step{display:flex;gap:9px;align-items:flex-start;font-size:10.5px;line-height:1.45;color:var(--soft);margin-bottom:7px}
+.step i{font-style:normal;flex:0 0 auto;width:14px;height:14px;border-radius:50%;background:var(--navy);
+  color:#fff;font-size:8px;font-weight:700;display:flex;align-items:center;justify-content:center;margin-top:2px}
+.step b{color:var(--navy);font-weight:500}
+.mins{display:flex;gap:7px;align-items:center;margin:9px 0 3px;flex-wrap:wrap}
+.chip{font-family:'Cormorant Garamond',serif;font-weight:700;font-size:19px;padding:5px 11px;
+  border:1px solid var(--line);color:var(--soft);background:#fff}
+.chip.win{border-color:var(--gold);background:var(--gold);color:#fff}
+.chip.lose{text-decoration:line-through;opacity:.55}
+.mins span{font-size:10px;color:var(--soft)}
+.notline{margin-top:auto;padding-top:11px;font-size:10.5px;line-height:1.45;color:var(--soft)}
+.notline b{color:var(--soft);font-weight:700;display:block;font-size:8px;letter-spacing:.15em;text-transform:uppercase;margin-bottom:5px}
+.answers{margin-top:0;padding-top:11px;border-top:1px solid var(--line);font-size:10.5px;
+  line-height:1.45;color:var(--navy)}
+.answers b{color:var(--gold);font-weight:700;display:block;font-size:8px;letter-spacing:.15em;
+  text-transform:uppercase;margin-bottom:5px}
+.readrow{flex:0 0 auto;display:flex;gap:16px;margin-top:14px}
+.rd{flex:1;display:flex;gap:10px;align-items:flex-start}
+.rd .n{font-family:'Cormorant Garamond',serif;font-weight:700;font-size:26px;color:var(--gold);line-height:.9;flex:0 0 auto}
+.rd h5{font-size:11.5px;font-weight:700;color:var(--navy);line-height:1.25}
+.rd p{font-size:10px;line-height:1.45;color:var(--soft);margin-top:3px}
+
+.stress{border:1px solid var(--line);border-top:none}
+.sbar{background:var(--navy);color:#fff;font-family:'Cormorant Garamond',serif;font-weight:600;
+  font-size:17.5px;text-align:center;padding:6px 10px;letter-spacing:.005em}
+.stbl{border-collapse:separate;border-spacing:0}
+.stbl th{padding:8px 9px;border-bottom:none;color:#fff;text-align:right;font-size:8.5px;line-height:1.3;vertical-align:bottom}
+.stbl th span{color:rgba(255,255,255,.72);font-size:7.5px}
+.stbl th.hyr,.stbl th.hix{background:var(--navy)}
+.stbl th.hyr{text-align:left}
+.stbl th.hon{background:#a8862a!important;box-shadow:inset 0 3px 0 #7d641c}
+.stbl.lb td{height:17px;font-size:10.5px;padding:0 7px}
+.stbl.lb th{padding:5px 7px;font-size:8px}
+.stbl.lb tfoot td{height:22px;font-size:11px;font-weight:700;border-top:1.5px solid var(--navy);background:#fff}
+.stbl.lb tfoot tr.pr td{height:19px;font-size:10px;font-weight:500;color:var(--soft);border-top:none}
+.stbl td{height:23px;font-size:11.5px;border-bottom:1px solid var(--line2);background:#fff}
+.stbl tbody tr:nth-child(even) td{background:#fbfaf8}
+.stbl td.yr{font-weight:700;color:var(--navy)}
+.stbl td.below{color:var(--red);font-weight:700}
+.stbl td.hicol{background:#f6efdc!important;font-weight:700;color:#0d1e3a;
+  box-shadow:inset 1px 0 0 var(--gold),inset -1px 0 0 var(--gold)}
+.stbl tbody tr:last-child td.hicol{box-shadow:inset 1px 0 0 var(--gold),inset -1px 0 0 var(--gold),inset 0 -2px 0 var(--gold)}
+.pull{font-size:11px;line-height:1.45;color:var(--soft);padding:7px 2px 0}
+.pull b{color:var(--navy);font-weight:700}
+.icards{display:flex;gap:16px}
+.ic{flex:1;border-top:1px solid var(--line);padding-top:11px}
+.ic svg{width:21px;height:21px;flex:0 0 auto}
+.ic h4{font-family:'Cormorant Garamond',serif;font-weight:700;font-size:15.5px;color:var(--navy);margin-top:4px;line-height:1.18}
+.ic p{font-size:10.5px;line-height:1.45;color:var(--soft);margin-top:4px}
+.ic p b{color:var(--navy);font-weight:500}
+.banner{background:var(--navy);color:#fff;padding:11px 22px;font-family:'Cormorant Garamond',serif;
+  font-weight:600;font-size:18px;line-height:1.3}
+.banner em{font-style:normal;color:var(--gold-lt)}
+.crow{display:flex;align-items:baseline;gap:12px;padding:7px 2px;border-bottom:1px solid var(--line2);font-size:11.5px}
+.crow span{color:var(--soft);flex:0 0 122px}
+.crow b{color:var(--navy);font-weight:500}
+table.beh{margin-top:7px}
+table.beh th{padding:0 7px 6px;font-size:8px}
+table.beh td{height:24px;font-size:11.5px;padding:0 7px}
+table.beh td.below{color:var(--red);font-weight:700}
+table.beh td.hero{background:#f6efdc;font-weight:700;color:var(--navy)}
+.msg{flex:1 1 auto;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;gap:13px;padding:30px}
+.msg h3{font-family:'Cormorant Garamond',serif;font-weight:700;font-size:26px;color:var(--navy);max-width:26ch;line-height:1.15}
+.msg p{font-size:12.5px;line-height:1.55;color:var(--soft);max-width:66ch}
+.jump{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin-top:4px}
+.jump button{font-family:'DM Sans',sans-serif;font-size:11px;padding:7px 12px;border:1px solid var(--line);
+  background:#fff;color:var(--navy);cursor:pointer;border-radius:2px}
+.jump button:hover{border-color:var(--gold)}
+
+@keyframes growbar{from{transform:scaleY(0)}}
+@keyframes rise{from{opacity:0;transform:translateY(7px)}}
+@keyframes fade{from{opacity:0}}
+.gbar{animation:growbar 600ms cubic-bezier(.3,.85,.35,1) backwards}
+.gval{animation:rise 380ms backwards}
+.fi{animation:fade 500ms backwards}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+@media print{@page{size:letter landscape;margin:.3in} body{overflow:visible}}
+</style>
+</head>
+<body>
+
+<header class="bar">
+  <div class="mono"><span>EFA</span></div>
+  <div>
+    <div class="bname">Edwards Financial &amp; Associates</div>
+    <div class="btag">Protect &nbsp;·&nbsp; Grow &nbsp;·&nbsp; Legacy</div>
+  </div>
+  <nav id="nav"></nav>
+  <div class="pick">
+    <select id="car" aria-label="Carrier"></select>
+    <select id="str" aria-label="Strategy"></select>
+    <button class="prtbtn" onclick="window.print()">Print</button>
+  </div>
+</header>
+
+<div id="stage">
+  <section class="page" id="p1"></section>
+  <section class="page" id="p2"></section>
+  <section class="page" id="p3"></section>
+</div>
+
+<script>
+/* ===========================================================================
+   ONE DATA MODEL FOR ALL THREE PAGES.
+
+   Four separate components, never summed into a single rate:
+     indexCredit   par, spread, floor, cap      the segment credit
+     mult          multiplies the CREDIT only   never the account value
+     enh           pct of ACCOUNT VALUE         outside the credit entirely
+     charge        deducted either way          can push the result negative
+
+   chartIndex names the series a strategy is plotted against, or null when no
+   annual history exists for its index. Series belong to the carrier that
+   printed them and are never shared silently.
+   ========================================================================= */
+
+const SERIES={
+ "na|S&P 500":       [-13.00,-23.40,26.40,9.00,4.70,13.50,3.50,-38.50,23.50,12.80,1.50,13.40,29.60,11.40,-0.70,
+                      10.50,20.40,-6.20,28.90,16.30,26.90,-19.80,23.50,23.80,17.30],
+ "na|S&P MidCap 400":[-1.60,-15.40,34.00,15.20,12.90,9.40,6.70,-37.30,35.00,24.90,-2.10,16.10,31.60,8.20,-3.70,
+                      19.40,15.50,-12.50,24.10,11.80,23.20,-14.90,14.10,12.10,7.00],
+ "na|Russell 2000":  [1.00,-21.60,45.40,17.00,5.00,17.00,-2.80,-34.80,25.20,25.30,-4.00,14.60,37.00,3.50,-5.70,
+                      20.20,14.20,-12.20,23.70,18.40,13.70,-22.00,14.30,9.90,12.10],
+ "lsw|S&P 500":      [-13.04,-23.37,26.38,8.99,3.00,13.62,3.53,-38.49,23.45,12.78,0.00,13.41,29.60,11.39,-0.73,
+                      9.54,19.42,-6.24,28.88,16.26,26.89,-19.44,24.23,23.31,16.39],
+
+ /* John Hancock, Protection IUL illustration prepared 22 July 2026, historical
+    index changes page. Sourced to S&P 500 data 12/31/2000 to 12/31/2025. This is
+    the same 12/31 series LSW prints, and it differs from North American's. */
+ "jh|S&P 500":       [-13.04,-23.37,26.38,8.99,3.00,13.62,3.53,-38.49,23.45,12.78,0.00,13.41,29.60,11.39,-0.73,
+                      9.54,19.42,-6.24,28.88,16.26,26.89,-19.44,24.23,23.31,16.39],
+ "jh|Nasdaq-100":    [-32.65,-37.58,49.12,10.44,1.49,6.79,18.67,-41.89,53.54,19.22,2.70,16.82,34.99,17.94,8.43,
+                      5.89,31.52,-1.04,37.96,47.58,26.63,-32.97,53.81,24.88,20.17],
+
+ /* Allianz, Life Accumulator illustration prepared 6 August 2026, 25-year
+    historical allocation performance page. The index launched August 2010, so
+    everything before that is back-tested rather than lived. */
+ /* Fidelity Multifactor Yield 5% ER, raw index returns. 2001 through 2019 from a
+    North American carrier illustration showing the index's own annual return, not
+    a credited rate; 2020 through 2023 from North American's periodic index chart.
+    2024 and 2025 are deliberately absent: the only tables carrying them report
+    credited rates after participation and bonus, not the raw index, so they are
+    left open rather than back-solved. The index launched 11 December 2019, so
+    everything before that is back-tested rather than lived. */
+ "na|Fidelity Multifactor Yield 5% ER":
+                     [-1.19,3.84,10.03,6.48,-0.92,3.28,4.16,-0.35,4.40,11.82,10.19,7.19,4.46,10.93,-2.47,
+                      6.33,7.83,-0.53,11.78,4.42,3.43,-11.65,2.83],
+
+ "allianz|S&P 500 Futures Index ER":
+                     [-17.74,-23.70,27.05,9.19,1.37,10.11,-0.08,-39.29,25.52,14.67,1.73,15.43,31.50,13.19,0.86,
+                      11.47,19.88,-6.96,23.41,22.27,27.99,-19.73,19.76,17.55,12.09]
+};
+/* Anything a reader has to be told about a particular series, said on the page. */
+const SERIES_NOTE={
+ "allianz|S&P 500 Futures Index ER":
+   "The index launched August 2010, so 2001 through 2010 is back-tested rather than lived.",
+ "na|Fidelity Multifactor Yield 5% ER":
+   "Nineteen of these twenty-three years are back-tested. The index launched 11 December 2019, and Fidelity states that pre-inception performance is built by applying the methodology retroactively, with the benefit of hindsight and knowledge of factors that may have positively affected performance. Only 2020 through 2023 is lived. The series also stops at 2023, because the 2024 and 2025 raw index returns are not on file and the only tables carrying those years report credited rates after participation and bonus rather than the index itself."
+};
+const Y0=2001;
+const EVENTS=[
+ {y:2001,t:"September 11"},
+ {y:2002,t:"Dot-com collapse"},
+ {y:2008,t:"Global financial crisis and housing crash"},
+ {y:2011,t:"US credit downgrade, European debt crisis"},
+ {y:2020,t:"COVID-19 pandemic"},
+ {y:2022,t:"Inflation shock, war in Ukraine"}
+];
+const SPANS=[{a:2001,b:2021,t:"WAR IN AFGHANISTAN"},{a:2003,b:2011,t:"WAR IN IRAQ"}];
+
+/* What each index sponsor actually publishes. The module does not carry these
+   series yet; saying "no published history" was wrong and is corrected here.
+   Sources named per row. Confirm each against the cited document before client use. */
+const HIST_PUBLISHED={
+ "S&P 500 Futures Index ER":{span:"twenty-five years, 2001 through 2025",who:"Allianz, in M-7267",
+   note:"S&P Dow Jones Indices publishes performance back to December 1999. The index launched August 2010, so earlier results are back-tested."},
+ "PIMCO Tactical Balanced ER":{span:"twenty-one years, 2005 through 2025",who:"Allianz, in M-7267",
+   note:"Allianz calls twenty-one years the longest common period available and prints the credit under each bonus tier."},
+ "Blended Futures Index":{span:"fifteen years, 2011 through 2025",who:"Allianz, in M-7267",
+   note:"Allianz calls fifteen years the longest common period available."},
+ "Bloomberg US Dynamic Balance III ER":{span:"fourteen years, 2012 through 2025",who:"Allianz, in M-7267 and CSI-592",
+   note:"Allianz prints the annual index return and the credit under Classic, Bonused and Select for every year."},
+ "Nasdaq-100":{span:"twenty-five years, 2001 through 2025",who:"the current John Hancock illustration"},
+ "Barclays Global Multi Asset":{span:"fifteen annual periods, December 2006 through December 2021",
+   who:"a John Hancock illustration filed with the NAIC",
+   note:"The current illustration withholds the display because the index is under ten years old. That is a display rule, not an absence of data."},
+ "Fidelity Multifactor Yield 5% ER":{span:"an index start date of 22 June 1998, with daily values calculated back to 29 December 1995",
+   who:"Fidelity", note:"The index launched December 2019, so earlier results are back-tested. North American publishes twenty-year statistics for it."},
+ "Balanced Trend Index":{span:"twenty-three complete years, 2003 through 2025",who:"UBS",
+   note:"UBS publishes the annual returns directly. Results before 20 November 2017 are simulated."},
+ "US Pacesetter Index":{span:"history from 8 March 2002",who:"Societe Generale",
+   note:"The index launched 10 December 2021, so everything earlier is reconstructed rather than lived."},
+ "BNP Paribas Multi Asset Diversified 5":{span:"an annual series",who:"BNP Paribas"}
+};
+/* Three rows Allianz prints itself, used to check this engine rather than to
+   illustrate anything. Every tier reproduces to within a rounding step. */
+const ALLIANZ_CHECK={index:"Bloomberg US Dynamic Balance III ER",
+  rows:[[2012,3.97,{Classic:8.54,Bonused:8.45,Select:8.73}],
+        [2022,-7.60,{Classic:1.00,Bonused:0.00,Select:-1.00}],
+        [2025,2.83,{Classic:6.37,Bonused:6.02,Select:5.93}]]};
+
+const AAVE={pct:0.25,from:"the second policy anniversary",where:"the Basic Strategy",step:{year:10,pct:0.50}};
+
+const CARRIERS=[
+{ id:"jh", brand:"John Hancock", company:"John Hancock Life Insurance Company (U.S.A.)",
+  product:"Accumulation IUL", segment:"life", ownSeries:false,
+  asOf:"from the Indexed Account Parameters screen",
+  ledger:{illustrated:6.35, declaredFixed:5.45, guaranteed:0.00, altRule:"fixed",
+    gWhat:"a 0.00% crediting rate, with every charge at its guaranteed maximum",
+    cMethod:"applying the indexed account parameters to a hypothetical rate of return that is itself capped by regulation, using the 25-year geometric average of the index",
+    note:"Rates are from the Protection IUL illustration prepared 22 July 2026. The accounts priced elsewhere in this module are Accumulation IUL, a different product."},
+  strategies:[
+   {name:"Base Capped", ord:1, index:"S&P 500", method:"Annual point-to-point", type:"ptp", par:100, cap:11.65, floor:0, minCap:3.00, chartIndex:"S&P 500"},
+   {name:"Base Capped Bonus", ord:7, index:"S&P 500", method:"Annual point-to-point", type:"ptp", par:100, cap:8.80, floor:0, minCap:0.50,
+     enh:{pct:0.85,from:"the first year, guaranteed",where:"the account value",pending:true}, chartIndex:"S&P 500"},
+   {name:"Select Capped", ord:5, index:"S&P 500", method:"Annual point-to-point", type:"ptp", par:100, cap:9.75, floor:0, mult:11, minCap:3.00, chartIndex:"S&P 500"},
+   {name:"Barclays Global MA Classic", index:"Barclays Global Multi Asset", indexShort:"Barclays Global MA",
+     method:"Annual point-to-point, no cap", type:"ptp", par:165, floor:0, minPar:20, examples:[-8,4,8], chartIndex:null,
+     absent:null,
+     note:"No contractual cap. A volatility control mechanism inside the index rules adjusts exposure to target a set level of volatility, which is why the participation rate can be this high."},
+   {name:"High Capped", ord:2, index:"S&P 500", method:"Annual point-to-point", type:"ptp", par:100, cap:12.25, floor:0, mult:30, charge:1.98, minCap:3.75, chartIndex:"S&P 500",
+     note:"The index performance charge is annualised but assessed monthly and is taken whether the index rises, falls or does nothing. A 10.25% cap with a 50% multiplier belongs to Protection IUL, a different John Hancock product, not to this one."},
+   {name:"Enhanced High Capped", ord:4, index:"S&P 500", method:"Annual point-to-point", type:"ptp", par:100, cap:12.65, floor:0, mult:80, charge:4.98, minCap:4.25, chartIndex:"S&P 500",
+     note:"The index performance charge is taken whether the index rises, falls or does nothing, so a year with no credit nets minus 4.98%."},
+   {name:"Nasdaq Capped", ord:3, index:"Nasdaq-100", method:"Annual point-to-point", type:"ptp", par:100, cap:14.00, floor:0, charge:0.96, minCap:3.00, chartIndex:"Nasdaq-100",
+     absent:null},
+   {name:"Loaned Indexed", ord:6, index:"S&P 500", method:"Annual point-to-point", type:"ptp", par:100, cap:9.35, floor:0, minCap:3.25,
+     enh:{pct:0.65,from:"the first year, guaranteed",where:"the account value",pending:true}, chartIndex:"S&P 500",
+     note:"This account applies to value held as collateral for a policy loan."}
+  ]},
+
+{ id:"allianz", brand:"Allianz Life Accumulator", company:"Allianz Life Insurance Company of North America",
+  product:"Life Accumulator", segment:"life", ownSeries:false,
+  asOf:"from the current Allianz rate sheet and CSI-546",
+  ledger:{illustrated:6.69, declaredFixed:5.30, guaranteed:0.10, altRule:"lesser",
+    gWhat:"the contract's guaranteed minimum interest rate, which the fixed allocation can never fall below",
+    cMethod:"averaging the annualised rate for each 25-year period in the last 65 calendar years, assuming the current cap on the benchmark index account applied in every one of them, then applying the historical performance of the allocation actually selected"},
+  strategies:[
+   {name:"Fixed Interest", index:"Not index linked", indexShort:"Fixed account", method:"Declared rate", type:"fixed", rate:5.30, minRate:0.10, chartIndex:"S&P 500"},
+   {name:"Trigger, Standard", index:"S&P 500", method:"Annual trigger", type:"trigger", trigger:8.00, floor:0, minTrigger:0.25, chartIndex:"S&P 500",
+     note:"A trigger pays one flat rate in any year the index is not down. It does not pay more in a strong year, and it does not care how strong that year was."},
+   {name:"Monthly Sum, Standard", index:"S&P 500", method:"Monthly sum, 3.80% monthly cap", type:"monthly", monthCap:3.80, minCap:0.50, chartIndex:null,
+     absent:null,
+     note:"Each month's index change is capped at 3.80% on the upside, the twelve months are added together, and the year is floored at 0%. A single annual figure cannot reproduce that."},
+   {name:"Annual Point-to-Point, Standard", index:"S&P 500", method:"Annual point-to-point", type:"ptp", par:100, cap:12.25, floor:0, minCap:0.25, chartIndex:"S&P 500"},
+   {name:"Classic, Bloomberg US Dynamic Balance III", index:"Bloomberg US Dynamic Balance III ER", indexShort:"Bloomberg US Dyn Bal III",
+     method:"Annual point-to-point, no cap", type:"ptp", par:190, floor:0, minPar:5, examples:[-8,4,8], chartIndex:null,
+     enh:{pct:1.00,from:"the first year",where:"the accumulation value",always:true},
+     absent:null,
+     note:"Classic pays a 1% flat bonus added to the accumulation value every year, including a year the index credits nothing. The bonus is not part of the crediting rate. Index Lock is available. Classic carries an allocation restriction: 100% of accumulation value may not be allocable if the fixed allocation falls below 1%."},
+   {name:"Classic, PIMCO Tactical Balanced", index:"PIMCO Tactical Balanced ER", indexShort:"PIMCO Tactical Balanced",
+     method:"Annual point-to-point, no cap", type:"ptp", par:185, floor:0, minPar:5, examples:[-8,4,8], chartIndex:null,
+     enh:{pct:1.00,from:"the first year",where:"the accumulation value",always:true},
+     absent:null,
+     note:"Classic pays a 1% flat bonus on accumulation value every year, including a year the index credits nothing. Index Lock is available."},
+   {name:"Classic, Blended Futures", index:"Blended Futures Index", indexShort:"Blended Futures",
+     method:"Annual point-to-point, no cap", type:"ptp", par:95, floor:0, minPar:5, examples:[-8,4,8], chartIndex:null,
+     enh:{pct:1.00,from:"the first year",where:"the accumulation value",always:true},
+     absent:null,
+     note:"Classic pays a 1% flat bonus on accumulation value every year, including a year the index credits nothing."},
+   {name:"Classic, S&P 500 Futures", index:"S&P 500 Futures Index ER", indexShort:"S&P 500 Futures ER",
+     method:"Annual point-to-point, no cap", type:"ptp", par:60, floor:0, minPar:5, examples:[-10,5,10], chartIndex:null,
+     enh:{pct:1.00,from:"the first year",where:"the accumulation value",always:true},
+     absent:null,
+     note:"Classic pays a 1% flat bonus on accumulation value every year, including a year the index credits nothing."},
+   {name:"Bonused, Bloomberg US Dynamic Balance III", index:"Bloomberg US Dynamic Balance III ER", indexShort:"Bloomberg US Dyn Bal III",
+     method:"Annual point-to-point, no cap", type:"ptp", par:185, floor:0, minPar:5, mult:15, examples:[-8,4,8], chartIndex:null,
+     absent:null,
+     note:"Bonused multiplies any annual indexed interest by 15%, at no additional charge. In a year the index credits nothing there is nothing to multiply. Index Lock is available."},
+   {name:"Bonused, PIMCO Tactical Balanced", index:"PIMCO Tactical Balanced ER", indexShort:"PIMCO Tactical Balanced",
+     method:"Annual point-to-point, no cap", type:"ptp", par:180, floor:0, minPar:5, mult:15, examples:[-8,4,8], chartIndex:null,
+     absent:null,
+     note:"Bonused multiplies any annual indexed interest by 15%, at no additional charge."},
+   {name:"Bonused, Blended Futures", index:"Blended Futures Index", indexShort:"Blended Futures",
+     method:"Annual point-to-point, no cap", type:"ptp", par:95, floor:0, minPar:5, mult:15, examples:[-8,4,8], chartIndex:null,
+     absent:null,
+     note:"Bonused multiplies any annual indexed interest by 15%, at no additional charge."},
+   {name:"Bonused, S&P 500 Futures", index:"S&P 500 Futures Index ER", indexShort:"S&P 500 Futures ER",
+     method:"Annual point-to-point, no cap", type:"ptp", par:60, floor:0, minPar:5, mult:15, examples:[-10,5,10], chartIndex:"S&P 500 Futures Index ER",
+     absent:null,
+     note:"Bonused multiplies any annual indexed interest by 15%, at no additional charge."},
+   {name:"Select, Bloomberg US Dynamic Balance III", index:"Bloomberg US Dynamic Balance III ER", indexShort:"Bloomberg US Dyn Bal III",
+     method:"Annual point-to-point, no cap", type:"ptp", par:175, floor:0, minPar:5, mult:40, charge:1.00, examples:[-8,4,8], chartIndex:null,
+     absent:null,
+     note:"Select multiplies any annual indexed interest by 40% in exchange for a 1% annual asset charge. The charge is taken whether or not interest is credited, so a year with no credit nets minus 1%. Index Lock is available."},
+   {name:"Select, PIMCO Tactical Balanced", index:"PIMCO Tactical Balanced ER", indexShort:"PIMCO Tactical Balanced",
+     method:"Annual point-to-point, no cap", type:"ptp", par:175, floor:0, minPar:5, mult:40, charge:1.00, examples:[-8,4,8], chartIndex:null,
+     absent:null,
+     note:"Select multiplies any annual indexed interest by 40% in exchange for a 1% annual asset charge, taken whether or not interest is credited."},
+   {name:"Select, Blended Futures", index:"Blended Futures Index", indexShort:"Blended Futures",
+     method:"Annual point-to-point, no cap", type:"ptp", par:90, floor:0, minPar:5, mult:40, charge:1.00, examples:[-8,4,8], chartIndex:null,
+     absent:null,
+     note:"Select multiplies any annual indexed interest by 40% in exchange for a 1% annual asset charge, taken whether or not interest is credited."},
+   {name:"Select, S&P 500 Futures", index:"S&P 500 Futures Index ER", indexShort:"S&P 500 Futures ER",
+     method:"Annual point-to-point, no cap", type:"ptp", par:55, floor:0, minPar:5, mult:40, charge:1.00, examples:[-10,5,10], chartIndex:"S&P 500 Futures Index ER",
+     absent:null,
+     note:"Select multiplies any annual indexed interest by 40% in exchange for a 1% annual asset charge, taken whether or not interest is credited."}
+  ]},
+
+{ id:"lsw", brand:"LSW FlexLife", company:"Life Insurance Company of the Southwest",
+  product:"FlexLife", segment:"life", ownSeries:true,
+  asOf:"from the illustration prepared 24 July 2026",
+  printed:{index:6.80,"Cap Focus":7.00,"Participation Focus":5.60,"1% Floor":5.90,"Indexed Loan Account":6.20},
+  ledger:{illustrated:6.84, declaredFixed:3.50, guaranteed:1.75, altRule:"lesser",
+    gWhat:"the policy's Guaranteed Interest Rate, the same rate the contract uses to calculate guaranteed account and cash surrender values",
+    cMethod:"applying today's caps and participation rates to every 25-year index return sequence across the past 65 years, then averaging"},
+  strategies:[
+   {name:"Cap Focus", index:"S&P 500", method:"Annual point-to-point", type:"ptp", par:100, cap:11.00, floor:0,
+     enh:AAVE, maxRate:6.84, minCap:3.10, minPar:100, chartIndex:"S&P 500", hero:true,
+     note:"The benchmark indexed account behind the 6.84% illustrated rate."},
+   {name:"Participation Focus", index:"S&P 500", method:"Annual point-to-point", type:"ptp", par:140, cap:8.25, floor:0,
+     enh:AAVE, maxRate:5.67, minCap:3.00, minPar:110, chartIndex:"S&P 500"},
+   {name:"1% Floor", index:"S&P 500", method:"Annual point-to-point", type:"ptp", par:100, cap:8.50, floor:1,
+     enh:AAVE, maxRate:5.85, minCap:2.10, minPar:100, chartIndex:"S&P 500"},
+   {name:"Indexed Loan Account", index:"S&P 500", method:"Annual point-to-point", type:"ptp", par:100, cap:9.50, floor:0,
+     enh:AAVE, minCap:3.10, minPar:100, chartIndex:"S&P 500",
+     note:"Applies to value held as collateral for a Participating Fixed Loan."},
+   {name:"Balanced Trend", index:"Balanced Trend Index", indexShort:"Balanced Trend",
+     method:"Annual point-to-point, no cap", type:"ptp", par:245, floor:0, minPar:50, enh:AAVE, maxRate:6.84, examples:[-8,4,8], chartIndex:null,
+     absent:null,
+     note:"The index is volatility controlled, built to move less than the S&P 500, which is why it carries no cap and why the participation rate can be this high. Not available in New York, and California availability is unresolved."},
+   {name:"US Pacesetter", index:"US Pacesetter Index", indexShort:"US Pacesetter",
+     method:"Annual point-to-point, no cap", type:"ptp", par:265, floor:0, minPar:50, enh:AAVE, maxRate:6.84, examples:[-8,4,8], chartIndex:null,
+     absent:null,
+     note:"The index is volatility controlled. Not available in New York, and California availability is unresolved."},
+   {name:"Fixed Term", index:"Not index linked", indexShort:"Fixed account", method:"Declared rate", type:"fixed",
+     rate:3.50, maxRate:3.50, minRate:1.75, enh:{pct:0.25,from:"the second policy anniversary",where:"the Basic Strategy"}, chartIndex:"S&P 500",
+     note:"Not linked to an index, so the market result does not change what it credits."}
+  ]},
+
+{ id:"na", brand:"North American", company:"North American Company for Life and Health Insurance",
+  product:"Builder Plus IUL 4", segment:"life", ownSeries:true,
+  asOf:"from the illustration run 6 August 2026",
+  ledger:{illustrated:6.62, declaredFixed:4.50, guaranteed:2.00, altRule:"lesser",
+    gWhat:"the contract's guaranteed minimum account value rate",
+    cMethod:"the indexed weighted average of the allocation on the illustration, 50% S&P 500 annual point-to-point and 50% High Par Fidelity MFY 5% ER, each computed under the same regulation"},
+  strategies:[
+   {name:"S&P 500 Annual Point-to-Point", ord:3, index:"S&P 500", method:"Annual point-to-point", type:"ptp",
+     par:100, cap:10.50, floor:0.25, minCap:2.00, maxRate:6.65, chartIndex:"S&P 500", hero:true,
+     note:"The contract floor is 0%. The carrier currently declares 0.25%, so a down year still credits something. This is the highest ceiling of the nine selections, on the plainest set of terms."},
+   {name:"High Par S&P 500", ord:1, index:"S&P 500", method:"Annual point-to-point", type:"ptp", par:140, cap:9.65, floor:0, minCap:1.00, maxRate:6.50, chartIndex:"S&P 500"},
+   {name:"Uncapped S&P 500", index:"S&P 500", method:"Annual point-to-point, no cap", type:"ptp", par:62, floor:0, minPar:10, maxRate:6.20, chartIndex:"S&P 500",
+     note:"No cap, in exchange for participating in 62% of the move."},
+   {name:"S&P 500 with Spread", index:"S&P 500", method:"Annual point-to-point with spread", type:"ptp",
+     par:100, spread:5.50, floor:0, maxRate:6.22, chartIndex:"S&P 500",
+     note:"A spread is taken off the top of the index move rather than a cap being placed on it. The index has to clear 5.50% before anything is credited, and above that there is no ceiling."},
+   {name:"S&P MidCap 400", ord:2, index:"S&P MidCap 400", method:"Annual point-to-point", type:"ptp", par:100, cap:11.15, floor:0, maxRate:6.29, chartIndex:"S&P MidCap 400",
+     note:"Mid-cap companies have run more volatile than the S&P 500 across this period, which is why the cap sits higher."},
+   {name:"Russell 2000", ord:4, index:"Russell 2000", method:"Annual point-to-point", type:"ptp", par:100, cap:11.35, floor:0, maxRate:6.28, chartIndex:"Russell 2000",
+     note:"Small-cap companies. The highest cap of the capped accounts, and the ceiling still lands within a hundredth of the mid-cap option."},
+   {name:"High Par Fidelity MFY 5% ER", index:"Fidelity Multifactor Yield 5% ER", indexShort:"Fidelity MFY 5% ER",
+     method:"Annual point-to-point, no cap", type:"ptp", par:235, floor:0, minPar:35, maxRate:6.59, examples:[-8,4,8], chartIndex:"Fidelity Multifactor Yield 5% ER",
+     absent:null,
+     note:"The index is volatility controlled, built to move less than the S&P 500. Note the ceiling: 235% participation is illustrated at 6.59% against 6.65% for the plain S&P 500 account at 100%."},
+   {name:"Fidelity MFY 5% ER, Standard", index:"Fidelity Multifactor Yield 5% ER", indexShort:"Fidelity MFY 5% ER",
+     method:"Annual point-to-point, no cap", type:"ptp", par:195, floor:0, minPar:35, maxRate:5.59, examples:[-8,4,8], chartIndex:"Fidelity Multifactor Yield 5% ER",
+     absent:null,
+     note:"The same volatility controlled index at the standard participation rate. Forty points of participation separate this from the High Par account and the ceilings differ by a full point."}
+  ]},
+
+{ id:"athene", brand:"Athene", company:"Athene Annuity and Life Company",
+  product:"Performance Elite", segment:"annuity", ownSeries:false,
+  asOf:"the contract guaranteed minimums in form 25851 (06/25)",
+  basis:"contract guaranteed minimum rates",
+  seriesNote:"Athene does not print an index history on the documents on file. This strategy runs on the North American calendar-year series, which is a standardised backcast rather than a reproduction of this carrier's own disclosure.",
+  ledger:null,
+  strategies:[
+   {name:"S&P 500 One Year Point-to-Point", index:"S&P 500 (SPX)", indexShort:"S&P 500", method:"1 year point-to-point",
+     type:"ptp", par:100, cap:0.50, floor:0, chartIndex:"S&P 500",
+     note:"Shown at the contract minimum. The rate declared each term will be higher and is set at the company's discretion."},
+   {name:"BNP Paribas Multi Asset Diversified 5", index:"BNP Paribas Multi Asset Diversified 5", indexShort:"BNPIMAD5",
+     method:"1 year point-to-point, no cap", type:"ptp", par:10, floor:0, examples:[-8,4,8], chartIndex:null,
+     absent:null,
+     note:"Shown at the contract minimum participation rate of 10%. The declared rate each term will be higher."}
+  ]}
+];
+
+/* ------------------------------ the engine ------------------------------ */
+const rnd=n=>Math.round(n*100+(n>=0?1e-9:-1e-9))/100;
+const pc=n=>{const r=rnd(n);return (Math.abs(r)<0.005?0:r).toFixed(2)+"%";};
+const sg=n=>(n>0?"Up ":n<0?"Down ":"")+(n===0?"Flat":Math.abs(n)+"%");
+const cap1=t=>t.replace(/^./,c=>c.toUpperCase());
+const esc=t=>String(t).replace(/&/g,"&amp;").replace(/</g,"&lt;");
+
+function indexCredit(s,idx){
+  if(s.type==="monthly") return null;
+  if(s.type==="fixed")   return {v:s.rate, steps:["declared rate of "+pc(s.rate)+", not linked to the index"]};
+  if(s.type==="trigger"){ const fl=s.floor||0;
+    return idx>=0 ? {v:s.trigger, steps:["index was not down, so the "+pc(s.trigger)+" trigger rate is credited in full"]}
+                  : {v:fl, steps:["index was down, so "+pc(fl)+" is credited"]}; }
+  const par=s.par==null?100:s.par, floor=s.floor==null?0:s.floor;
+  let st=[], v=idx*par/100;
+  if(par!==100) st.push(pc(idx)+" x "+(par/100).toFixed(2)+" = "+pc(v));
+  if(s.spread!=null){ const b=v; v-=s.spread; st.push((st.length?"":pc(b)+" ")+"minus "+pc(s.spread)+" spread = "+pc(v)); }
+  if(v<=floor){ v=floor; st=[pc(floor)+" index credit"]; }
+  else if(s.cap!=null&&v>s.cap){ v=s.cap; st.push("capped at "+pc(s.cap)); }
+  if(!st.length&&!s.mult) st.push("full "+pc(idx)+" credited");
+  return {v,steps:st};
+}
+const indexedMultiplier=(c,s)=>(s.mult&&c>0)?c*(s.mult/100):0;
+const strategyCharge=s=>s.charge==null?0:s.charge;
+function accountEnhancement(s,year){
+  if(!s.enh) return 0;
+  const start=s.enh.always?1:((s.enh.from||"").indexOf("second")>=0?2:1);
+  if(year<start) return 0;
+  return (s.enh.step&&year>=s.enh.step.year)?s.enh.step.pct:s.enh.pct;
+}
+function run(s,idx){
+  const c=indexCredit(s,idx);
+  if(c===null) return {v:null,enh:0,steps:"This method measures each month separately, so it cannot be shown from a single annual figure"};
+  let v=c.v, st=c.steps.slice();
+  const m=indexedMultiplier(v,s);
+  if(m){ const b=v; v+=m; st.push((st.length?"":pc(b)+" ")+"x "+(1+s.mult/100).toFixed(2)+" = "+pc(v)); }
+  const ch=strategyCharge(s);
+  if(ch){ v-=ch; st.push("minus "+pc(ch)+" charge"); }
+  return {v, enh:accountEnhancement(s,10), steps:cap1(st.join("; "))};
+}
+const credited=(s,g)=>run(s,g).v;
+
+const compound=a=>(a.reduce((v,r)=>v*(1+r/100),1)**(1/a.length)-1)*100;
+const arith=a=>a.reduce((x,y)=>x+y,0)/a.length;
+const carrierOf=id=>CARRIERS.find(c=>c.id===id);
+const seriesKeyFor=(c,ix)=>SERIES[c.id+"|"+ix]?c.id+"|"+ix:"na|"+ix;
+const seriesFor=(c,ix)=>SERIES[seriesKeyFor(c,ix)];
+const seriesOwnerName=k=>k.split("|")[0]==="lsw"
+  ? "Life Insurance Company of the Southwest" : "North American Company for Life and Health Insurance";
+const avgOf=(c,a)=>c.ownSeries&&c.id==="lsw"?compound(a):arith(a);
+const basisWord=c=>(c.ownSeries&&c.id==="lsw")?"compound annual rates":"simple averages, the basis this carrier publishes";
+/* strategies of this carrier that share one index and can be plotted */
+const cohort=(c,ix)=>c.strategies.filter(s=>s.chartIndex===ix&&s.type==="ptp");
+
+/* ------------------------------- state ---------------------------------- */
+let S={page:1, car:"allianz", str:0, ex:1, sub:"chart"};
+const $=id=>document.getElementById(id);
+const CUR=()=>{const c=carrierOf(S.car); return {c, s:c.strategies[Math.max(0,Math.min(S.str,c.strategies.length-1))]};};
+
+/* ================================ PAGE 1 ================================= */
+function headline(s,i){
+  const r=run(s,i); if(r.v==null) return "";
+  if(s.type==="fixed") return `This account credits <b>${pc(r.v)}</b> whatever the index does.`;
+  const x=sg(i).toLowerCase();
+  return r.v<0 ? `When the index is ${x}, the ${pc(s.charge)} charge leaves you at <b>${pc(r.v)}</b>.`
+               : `When the index is ${x}, this strategy credits <b>${pc(r.v)}</b>.`;
+}
+function bars(s,sel){
+  if(s.type==="monthly") return "";
+  const ex=s.examples||[-20,5,20];
+  const i=(sel!=null&&ex[sel]!=null)?ex[sel]:ex[0];
+  const r=run(s,i); if(r.v==null) return "";
+  const fixed=(s.type==="fixed");
+  const W=470,H=330,T=52,B=98,L=40,R=16, ih=H-T-B;
+  const vals=fixed?[r.v]:[i,r.v];
+  const hiV=Math.max(0,...vals), loV=Math.min(0,...vals), span=(hiV-loV)||1;
+  const zy=T+(hiV/span)*ih;
+  const bw=fixed?132:120;
+  const cx=fixed?[(L+W-R)/2]:[L+(W-L-R)*0.28, L+(W-L-R)*0.74];
+  const col=fixed?["#b8972e"]:["#94a1b5", r.v<0?"#a32b2b":"#b8972e"];
+  const lab=fixed?[["YOU WERE CREDITED","what this account pays"]]
+                 :[["THE INDEX DID","the market result"],["YOU WERE CREDITED","what you actually get"]];
+  let out="";
+  vals.forEach((v,k)=>{
+    const h=Math.max(Math.abs(v)/span*ih,3), up=v>=0, y=up?zy-h:zy, x=cx[k]-bw/2;
+    out+=`<rect class="gbar" style="transform-origin:${cx[k].toFixed(1)}px ${zy.toFixed(1)}px;animation-delay:${130*k}ms"
+      x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${bw}" height="${h.toFixed(1)}" fill="${col[k]}" rx="1.5"/>`;
+    out+=`<text class="gval" style="animation-delay:${130*k+300}ms" x="${cx[k].toFixed(1)}" y="${(up?y-12:zy+25).toFixed(1)}"
+      text-anchor="middle" font-family="Cormorant Garamond, serif" font-weight="700" font-size="26"
+      fill="${up?"#0d1e3a":(h>=29?"#ffffff":"#a32b2b")}">${(v<0?"-":"")+pc(Math.abs(v))}</text>`;
+    out+=`<text x="${cx[k].toFixed(1)}" y="${H-B+40}" text-anchor="middle" font-size="10" font-weight="700"
+      letter-spacing=".1em" fill="#0d1e3a">${lab[k][0]}</text>`;
+    out+=`<text x="${cx[k].toFixed(1)}" y="${H-B+55}" text-anchor="middle" font-size="10" fill="#6d675c">${lab[k][1]}</text>`;
+  });
+  return `<svg viewBox="0 0 ${W} ${H}">${out}
+    <line x1="${L}" y1="${zy.toFixed(1)}" x2="${W-R}" y2="${zy.toFixed(1)}" stroke="#0d1e3a" stroke-width="1.6"/>
+    <text x="${L-8}" y="${(zy+4).toFixed(1)}" text-anchor="end" font-size="10" fill="#6d675c">0%</text>
+    <text x="${((L+W-R)/2).toFixed(1)}" y="${H-6}" text-anchor="middle" font-size="9" font-weight="700"
+      letter-spacing=".13em" fill="#b8972e">${fixed?"NOT LINKED TO ANY INDEX":"THE SAME SCALE, SIDE BY SIDE"}</text></svg>`;
+}
+function statCells(s){
+  const P=[];
+  if(s.type==="fixed"){ P.push([pc(s.rate),"Declared rate"]); if(s.minRate!=null) P.push([pc(s.minRate),"Guaranteed floor"]); return P; }
+  if(s.type==="monthly") return [[pc(s.monthCap),"Monthly cap"],["0.00%","Annual floor"]];
+  if(s.type==="trigger") return [[pc(s.trigger),"Trigger rate"],[pc(s.floor||0),"Down year"]];
+  P.push([s.cap!=null?pc(s.cap):"None","Cap"]);
+  P.push([(s.par==null?100:s.par)+"%","Participation"]);
+  if(s.spread!=null) P.push([pc(s.spread),"Spread"]);
+  if(s.mult) P.push([s.mult+"%","Multiplier"]);
+  if(s.charge!=null) P.push([pc(s.charge),"Annual charge"]);
+  P.push([pc(s.floor==null?0:s.floor),"Floor"]);
+  return P.slice(0,5);
+}
+function takeaway(s){
+  if(s.type==="monthly") return "Each month is measured on its own and the twelve are added together, so a single annual number cannot describe it.";
+  if(s.type==="fixed") return "Not linked to an index. It credits a rate the company declares, currently "+pc(s.rate)+".";
+  if(s.type==="trigger") return "A flat "+pc(s.trigger)+" is credited in any year the index is not down, however strong that year was. In a down year the credit is "+pc(s.floor||0)+".";
+  const par=s.par==null?100:s.par, floor=s.floor==null?0:s.floor;
+  let a="Down years credit "+pc(floor)+(s.charge!=null?", but the "+pc(s.charge)+" charge still applies, so the result is negative":"")+". ";
+  let b="Up years credit "+s.index;
+  if(par!==100) b+=" at "+par+"% participation";
+  if(s.spread!=null) b+=" less a "+pc(s.spread)+" spread";
+  b+=s.cap!=null?", to a "+pc(s.cap)+" cap":", with no cap";
+  if(s.mult) b+=", then the credit is multiplied by "+(1+s.mult/100).toFixed(2);
+  if(s.charge!=null) b+=", then less the charge";
+  return a+b+".";
+}
+function enhStrip(s){
+  if(!s.enh) return "";
+  const e=s.enh;
+  let t=`<b>${pc(e.pct)} bonus, paid on value.</b> Credited to ${e.where} from ${e.from}`;
+  if(e.step) t+=`, rising to ${pc(e.step.pct)} from policy year ${e.step.year}`;
+  t+=". "+(e.always
+    ? "It is paid every year, including a year the index credits nothing."
+    : "It is a bonus on the value held in the account, not an addition to the crediting rate, so the figures on the left do not include it.");
+  if(e.pending) t+=" Held as an account enhancement pending written carrier confirmation of how it is applied.";
+  return `<div class="enh">${t}</div>`;
+}
+/* The rules, in the order they actually apply. This is the thing a client has
+   to understand, so it gets its own band rather than a line of small type. */
+function recipe(s){
+  const r=[];
+  if(s.type==="fixed")   return [["Declared rate","The company sets it. The index has nothing to do with it."]];
+  if(s.type==="monthly") return [["Each month on its own","Twelve monthly changes, each capped at "+pc(s.monthCap)],
+                                 ["Add them up","The twelve are summed to make the year"],
+                                 ["Floor the year","The year cannot finish below 0.00%"]];
+  if(s.type==="trigger") return [["Was the index down?","That is the only question this account asks"],
+                                 ["No","Credit the full "+pc(s.trigger)+", however strong the year was"],
+                                 ["Yes","Credit "+pc(s.floor||0)]];
+  const par=s.par==null?100:s.par;
+  r.push(["Start with the index",esc(s.index)+" from one anniversary to the next, price change only"]);
+  if(par!==100) r.push(["Multiply by "+par+"%","The participation rate, applied before anything else"]);
+  if(s.spread!=null) r.push(["Take off "+pc(s.spread),"The spread comes off the top. Below it, nothing is credited"]);
+  r.push([s.cap!=null?"Stop at "+pc(s.cap):"No ceiling",
+          s.cap!=null?"The cap. Anything above it is given up":"There is no cap on this account"]);
+  r.push(["Never below "+pc(s.floor==null?0:s.floor),"The floor. A falling index cannot take credited interest away"]);
+  if(s.mult) r.push(["Multiply the credit by "+(1+s.mult/100).toFixed(2),"The multiplier acts on the credit, never on the account value"]);
+  if(s.charge!=null) r.push(["Subtract "+pc(s.charge),"The annual charge, taken whether or not interest is credited"]);
+  return r;
+}
+function verdicts(s){
+  const out=[];
+  const floor=s.floor==null?0:s.floor;
+  if(floor>0) out.push(["Strength","A positive floor means a down year still credits "+pc(floor)+"."]);
+  else if(s.cap==null&&s.type==="ptp") out.push(["Strength","No ceiling. A strong index year is not truncated."]);
+  else if(s.mult) out.push(["Strength","The multiplier adds "+s.mult+"% to whatever is credited."]);
+  else out.push(["Strength","The floor holds at 0.00%. A falling index cannot take credited interest away."]);
+
+  if(s.charge!=null) out.push(["Tradeoff","The "+pc(s.charge)+" charge is taken every year, so a year with no credit finishes below zero."]);
+  else if(s.spread!=null) out.push(["Tradeoff","The index has to clear "+pc(s.spread)+" before anything is credited."]);
+  else if(s.cap!=null) out.push(["Tradeoff","Strong index years are limited by the "+pc(s.cap)+" cap."]);
+  else if((s.par==null?100:s.par)<100) out.push(["Tradeoff","You participate in "+s.par+"% of the move, not all of it."]);
+  else if(s.type==="trigger") out.push(["Tradeoff","A 30% year and a 1% year pay exactly the same."]);
+  else out.push(["Tradeoff","The participation rate is what pays for having no cap."]);
+
+  out.push(["Watch","Caps, participation rates and other declared terms can change, down to the contractual minimums shown."]);
+  return out;
+}
+
+function page1(){
+  const {c,s}=CUR();
+  const ex=s.examples||[-20,5,20];
+  if(S.ex>=ex.length) S.ex=0;
+  const live=s.type!=="monthly";
+  const rows=ex.map((i,k)=>{const r=run(s,i);
+    const val=r.v==null?`<div class="exr na">not priced</div>`
+      :`<div class="exr${r.v<0?" neg":""}">${(r.v<0?"-":"")+pc(Math.abs(r.v))}</div>`;
+    return `<div class="ex${live?"":" dead"}${live&&k===S.ex?" on":""}"${live?` onclick="pickEx(${k})"`:""}>
+      <div class="exn">${String(k+1).padStart(2,"0")}</div>
+      <div class="exi${i<0?" dn":""}">${sg(i)}</div>
+      <div class="excalc">${r.steps}</div>${val}</div>`;}).join("");
+  const gtees=[];
+  if(s.minCap!=null)     gtees.push([pc(s.minCap),"Cap never below"]);
+  if(s.minPar!=null)     gtees.push([s.minPar+"%","Participation never below"]);
+  if(s.minTrigger!=null) gtees.push([pc(s.minTrigger),"Trigger never below"]);
+  if(s.minRate!=null)    gtees.push([pc(s.minRate),"Rate never below"]);
+  if(s.floor!=null||s.type==="ptp") gtees.push([pc(s.floor==null?0:s.floor),"Floor, every year"]);
+  if(s.maxRate!=null)    gtees.push([pc(s.maxRate),"Most it may be illustrated at"]);
+  const ch=bars(s,S.ex);
+
+  $("p1").innerHTML=`
+  <div class="phead">
+    <div>
+      <div class="eyebrow">${esc(c.brand)} &nbsp;·&nbsp; ${esc(c.product)}</div>
+      <h1>How <em>${esc(s.name)}</em> turns an index result into interest</h1>
+    </div>
+  </div>
+  <div class="body">
+    <div class="col" style="flex:1 1 53%">
+      <div class="eyebrow">What matters most</div>
+      <div class="glance">
+        <div class="gtitle">The strategy at a glance</div>
+        <div class="gcards">${statCells(s).map(([n,l])=>
+          `<div class="gcard"><b>${n}</b><span>${l}</span></div>`).join("")}</div>
+      </div>
+      <div class="eyebrow" style="margin-top:15px">What it credits</div>
+      <div class="exwrap">${rows}</div>
+      ${enhStrip(s)}
+    </div>
+    <div class="col" style="flex:1 1 47%">
+      <div class="eyebrow">The comparison</div>
+      <div class="cwrap">
+        ${ch?`<div class="chead">${headline(s,ex[S.ex])}</div>${ch}<div class="chint">Tap a scenario on the left</div>`
+            :`<div class="card"><h4>${takeaway(s)}</h4></div>`}
+      </div>
+    </div>
+  </div>
+  <div class="reciperow">
+    <div class="eyebrow">The recipe &nbsp;·&nbsp; follow the rules in this order</div>
+    <div class="steps">${recipe(s).map((r,i)=>
+      `<div class="rstep"><i>${i+1}</i><div><b>${r[0]}</b><span>${r[1]}</span></div></div>`).join("")}</div>
+  </div>
+  <div class="vrow">${verdicts(s).map(([k,v],i)=>
+    `<div class="vcard v${i}"><b>${k}</b><span>${v}</span></div>`).join("")}</div>
+  <div class="foot"><b>Illustrative examples only.</b> Values are simplified strategy examples, not guarantees, and do not reflect
+    policy charges, which reduce values. ${gtees.length?"Contractual minimums: "+gtees.map(g=>g[1].toLowerCase()+" "+g[0]).join(", ")+". ":""}
+    Rates shown are ${esc(c.asOf)}, are set by the carrier and may change. Internal and partner use.</div>`;
+}
+window.pickEx=k=>{S.ex=k;page1();fit();};
+
+/* ================================ PAGE 2 ================================= */
+/* Zoom buttons are built from whatever series is loaded, so a 23-year index
+   does not inherit a 25-year window and run off the end of the array. */
+function zoomsFor(n){
+  const z=[["All "+n+" years",0,n]], q=Math.ceil(n/4);
+  for(let a=0;a<n;a+=q){ const b=Math.min(a+q,n);
+    z.push([(Y0+a)+" to "+(Y0+b-1),a,b]); }
+  return z;
+}
+let ZA=0,ZB=null;
+const pathOf=arr=>{const p=[100000]; arr.forEach(r=>p.push(p[p.length-1]*(1+r/100))); return p;};
+const usd=n=>"$"+Math.round(n).toLocaleString();
+const usdk=n=>"$"+Math.round(n/1000)+"k";
+
+/* Two endpoint labels, pushed apart when the lines finish close together.
+   Each block is 40px tall, so they need 44px of clearance to read cleanly. */
+function endLabels(vA,vB,yA,yB,x,top,bot){
+  let a=yA,b=yB;
+  if(Math.abs(a-b)<44){ const mid=(a+b)/2; if(a<=b){a=mid-22;b=mid+22;} else {b=mid-22;a=mid+22;} }
+  a=Math.max(top+16,Math.min(bot-24,a)); b=Math.max(top+16,Math.min(bot-24,b));
+  return `<text x="${x}" y="${(a-4).toFixed(1)}" font-size="9.5" font-weight="700" fill="#94a1b5" letter-spacing=".1em">THE INDEX</text>
+    <text x="${x}" y="${(a+15).toFixed(1)}" font-size="17" font-weight="700" fill="#94a1b5">${usd(vA)}</text>
+    <text x="${x}" y="${(b-4).toFixed(1)}" font-size="9.5" font-weight="700" fill="#b8972e" letter-spacing=".1em">YOU WERE CREDITED</text>
+    <text x="${x}" y="${(b+15).toFixed(1)}" font-size="17" font-weight="700" fill="#0d1e3a">${usd(vB)}</text>`;
+}
+function growthChart(s,IDX){
+  const cred=IDX.map(g=>credited(s,g));
+  const A=pathOf(IDX), B=pathOf(cred);
+  const W=1176,H=392,L=78,R=176,T=30,Bm=52;
+  const span=ZB-ZA, vis=[]; for(let k=ZA;k<=ZB;k++) vis.push(k);
+  const top=Math.max(...vis.map(k=>Math.max(A[k],B[k])))*1.07;
+  const bot=Math.min(...vis.map(k=>Math.min(A[k],B[k])))*0.93;
+  const px=k=>L+(k-ZA)/span*(W-L-R), py=v=>H-Bm-(v-bot)/(top-bot)*(H-T-Bm);
+  const line=P=>vis.map((k,i)=>(i?"L":"M")+px(k).toFixed(1)+" "+py(P[k]).toFixed(1)).join(" ");
+  let bands="";
+  [[2001,2002,"dot-com collapse"],[2008,2008,"financial crisis"],[2022,2022,"inflation shock"]].forEach(([a2,b2,lb])=>{
+    const k1=Math.max(a2-Y0,ZA), k2=Math.min(b2-Y0+1,ZB); if(k2<=k1) return;
+    bands+=`<rect x="${px(k1).toFixed(1)}" y="${T}" width="${(px(k2)-px(k1)).toFixed(1)}" height="${H-Bm-T}" fill="#a32b2b" opacity=".055"/>
+      <text x="${((px(k1)+px(k2))/2).toFixed(1)}" y="${T+13}" text-anchor="middle" font-size="9" font-weight="700"
+      fill="#b98a8a" letter-spacing=".06em">${lb}</text>`;
+  });
+  let gy=""; const rng=top-bot, mag=Math.pow(10,Math.floor(Math.log10(rng))), step=(rng/mag<2?mag/4:rng/mag<5?mag/2:mag);
+  for(let v=Math.ceil(bot/step)*step; v<=top; v+=step)
+    gy+=`<line x1="${L}" y1="${py(v).toFixed(1)}" x2="${W-R}" y2="${py(v).toFixed(1)}" stroke="#e3ddd0" stroke-width="1"/>
+      <text x="${L-9}" y="${(py(v)+4).toFixed(1)}" text-anchor="end" font-size="9.5" fill="#6d675c">${usdk(v)}</text>`;
+  let gx=""; const every=span<=8?1:span<=14?2:5;
+  for(let k=ZA;k<=ZB;k++){ if(k===0) continue; const y=Y0+k-1;
+    if((y-Y0)%every===0||k===ZB) gx+=`<text x="${px(k).toFixed(1)}" y="${H-Bm+19}" text-anchor="middle" font-size="9.5" fill="#6d675c">${y}</text>`; }
+  let dots=""; vis.forEach(k=>{ if(k===0) return;
+    dots+=`<circle cx="${px(k).toFixed(1)}" cy="${py(A[k]).toFixed(1)}" r="2.4" fill="#94a1b5"/>
+           <circle cx="${px(k).toFixed(1)}" cy="${py(B[k]).toFixed(1)}" r="2.8" fill="#b8972e"/>`; });
+  let hov=""; const slot=(W-L-R)/span;
+  vis.forEach(k=>{ if(k===0) return; const yr=Y0+k-1, X=px(k), bw2=236,bh2=50;
+    let bx=Math.max(L+2,Math.min(W-R-bw2-2,X-bw2/2));
+    hov+=`<g class="yr"><rect x="${(X-slot/2).toFixed(1)}" y="${T}" width="${slot.toFixed(1)}" height="${H-Bm-T}" fill="#0d1e3a" fill-opacity="0"/>
+      <g class="yf" opacity="0">
+       <line x1="${X.toFixed(1)}" y1="${T}" x2="${X.toFixed(1)}" y2="${H-Bm}" stroke="#0d1e3a" stroke-width="1.2" opacity=".28"/>
+       <circle cx="${X.toFixed(1)}" cy="${py(A[k]).toFixed(1)}" r="4.5" fill="#94a1b5" stroke="#fff" stroke-width="2"/>
+       <circle cx="${X.toFixed(1)}" cy="${py(B[k]).toFixed(1)}" r="5" fill="#b8972e" stroke="#fff" stroke-width="2"/>
+       <rect x="${bx.toFixed(1)}" y="${T+6}" width="${bw2}" height="${bh2}" rx="3" fill="#0d1e3a"/>
+       <text x="${(bx+bw2/2).toFixed(1)}" y="${T+22}" text-anchor="middle" font-size="12" font-weight="700" fill="#fff">${yr}</text>
+       <text x="${bx+11}" y="${T+38}" font-size="10.5" fill="#b9c3d2">index ${pc(IDX[k-1])}</text>
+       <text x="${bx+bw2-11}" y="${T+38}" text-anchor="end" font-size="10.5" font-weight="700" fill="#fff">${usd(A[k])}</text>
+       <text x="${bx+11}" y="${T+50}" font-size="10.5" fill="#d3b45f">credited ${pc(cred[k-1])}</text>
+       <text x="${bx+bw2-11}" y="${T+50}" text-anchor="end" font-size="10.5" font-weight="700" fill="#d3b45f">${usd(B[k])}</text>
+      </g></g>`; });
+  /* meet plus a height ceiling means the drawing can never spill onto the
+     stats row underneath, whatever the viewport does. */
+  return `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet"
+    style="max-height:100%"><style>.yr .yf{transition:opacity .12s}.yr:hover .yf{opacity:1}</style>
+    ${bands}${gy}${gx}
+    <path d="${line(A)}" fill="none" stroke="#94a1b5" stroke-width="2.2" stroke-linejoin="round"/>
+    <path d="${line(B)}" fill="none" stroke="#b8972e" stroke-width="3.8" stroke-linejoin="round" stroke-linecap="round"/>
+    ${dots}
+    ${endLabels(A[ZB],B[ZB],py(A[ZB]),py(B[ZB]),W-R+12,T,H-Bm)}
+    <text x="${L}" y="${T-12}" font-size="9" font-weight="700" fill="#b8972e" letter-spacing=".12em">HOVER ANY YEAR</text>
+    ${hov}</svg>`;
+}
+
+function lookbackTable(c,ix,IDX,cols,sel){
+  let head=`<tr><th class="hyr">Year</th><th class="hix">${esc(ix)}<span>index growth rate</span></th>`;
+  cols.forEach((x,i)=>{const on=sel&&x.name===sel.name;
+    head+=`<th class="hs${on?" hon":""}" style="background:${on?"#a8862a":COLHUE[i%COLHUE.length]}">${esc(x.name)}<span>${x.cap!=null?"cap "+pc(x.cap):"no cap"} · par ${x.par==null?100:x.par}%</span></th>`;});
+  head+="</tr>";
+  let body="";
+  IDX.forEach((g,i)=>{
+    body+=`<tr class="${g<=0?"dn":""}"><td class="yr">${Y0+i}</td><td class="${g<0?"neg":"ix"}">${pc(g)}</td>`;
+    cols.forEach(x=>{const v=credited(x,g), on=sel&&x.name===sel.name;
+      body+=`<td class="${on?"hicol":""}${v<0?" below":""}">${pc(v)}</td>`;});
+    body+="</tr>";
+  });
+  let foot=`<tfoot><tr><td class="yr">${IDX.length} year average</td><td>${pc(avgOf(c,IDX))}</td>`;
+  cols.forEach(x=>{const on=sel&&x.name===sel.name;
+    foot+=`<td class="${on?"hicol":""}">${pc(avgOf(c,IDX.map(g=>credited(x,g))))}</td>`;});
+  foot+="</tr>";
+  if(c.printed){
+    foot+=`<tr class="pr"><td class="yr">As printed by the carrier</td><td>${c.printed.index!=null?pc(c.printed.index):"not printed"}</td>`;
+    cols.forEach(x=>{foot+=`<td>${c.printed[x.name]!=null?pc(c.printed[x.name]):"not printed"}</td>`;});
+    foot+="</tr>";
+  }
+  foot+="</tfoot>";
+  return `<div class="stress"><div class="sbar">Hypothetical returns by strategy &nbsp;·&nbsp; ${Y0} through ${Y0+IDX.length-1} &nbsp;·&nbsp; ${esc(ix)}</div>
+    <table class="stbl lb"><thead>${head}</thead><tbody>${body}</tbody>${foot}</table></div>`;
+}
+
+const COLHUE=["#24456e","#3d628f","#5b7bb0","#7e97c0","#95a9c9"];
+function stressTable(c,ix,IDX,cols,sel){
+  let head=`<tr><th class="hyr">Year</th><th class="hix">${esc(ix)}<span>index growth rate</span></th>`;
+  cols.forEach((x,i)=>{const on=x.name===sel.name;
+    head+=`<th class="hs${on?" hon":""}" style="background:${on?"#a8862a":COLHUE[i%COLHUE.length]}">${esc(x.name)}<span>${x.cap!=null?"cap "+pc(x.cap):"no cap"} · par ${x.par==null?100:x.par}%</span></th>`;});
+  head+="</tr>";
+  let body="";
+  IDX.forEach((g,i)=>{
+    if(g>0) return;
+    body+=`<tr><td class="yr">${Y0+i}</td><td class="${g<0?"neg":"ix"}">${pc(g)}</td>`;
+    cols.forEach(x=>{const on=x.name===sel.name, v=credited(x,g);
+      body+=`<td class="${on?"hicol":""}${v<0?" below":""}">${pc(v)}</td>`;});
+    body+="</tr>";
+  });
+  return `<div class="stress"><div class="sbar">How the strategies responded in stress years</div>
+    <table class="stbl"><thead>${head}</thead><tbody>${body}</tbody></table></div>`;
+}
+const ICONS={
+ shield:`<svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="#b8972e" stroke-width="1.7" stroke-linejoin="round"><path d="M12 2.5 20.5 6v6.2c0 4.9-3.9 7.9-8.5 9.3-4.6-1.4-8.5-4.4-8.5-9.3V6z"/><path d="M8.6 12.2l2.4 2.4 4.4-4.6"/></svg>`,
+ trend:`<svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="#b8972e" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17.5l5.5-5.6 3.6 3.6L21 6.5"/><path d="M15.4 6.5H21v5.6"/></svg>`,
+ bank:`<svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="#b8972e" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.6 12 4l9 5.6"/><path d="M5.4 9.6v9M9.8 9.6v9M14.2 9.6v9M18.6 9.6v9"/><path d="M3 20.4h18"/></svg>`
+};
+
+/* A strategy with no series loaded is not a blank page. Everything below is
+   derived from the strategy's own declared mechanics, which are verified, so
+   nothing here needs an index history to be true. */
+const family=(c,st)=>c.strategies.filter(x=>x.index===st.index&&x.type!=="monthly");
+const landed=(st,g)=>{const r=run(st,g); return r.v==null?null:r.v+r.enh;};
+
+function crossovers(fam,LO,HI){
+  if(fam.length<2) return [];
+  const out=[]; let prev=null;
+  for(let g=LO;g<=HI;g+=0.05){
+    const v=fam.map(x=>landed(x,g));
+    let lead=0; for(let i=1;i<v.length;i++) if(v[i]>v[lead]+1e-9) lead=i;
+    if(prev!==null&&lead!==prev) out.push({at:g,from:prev,to:lead});
+    prev=lead;
+  }
+  return out;
+}
+const shortTier=x=>x.name.indexOf(",")>0?x.name.split(",")[0]:x.name;
+
+function responseCurve(fam,sel,LO,HI){
+  const W=900,H=452,L=60,R=96,T=26,B=58, iw=W-L-R, ih=H-T-B;
+  const N=241, gs=[]; for(let i=0;i<N;i++) gs.push(LO+(HI-LO)*i/(N-1));
+  const lines=fam.map(x=>gs.map(g=>landed(x,g)));
+  const all=[].concat.apply(gs.slice(),lines);
+  let ylo=Math.min.apply(null,all), yhi=Math.max.apply(null,all);
+  const padv=(yhi-ylo)*0.08; ylo-=padv; yhi+=padv;
+  const px=g=>L+(g-LO)/(HI-LO)*iw, py=v=>T+ih-(v-ylo)/(yhi-ylo)*ih;
+  const step=(yhi-ylo)>90?20:(yhi-ylo)>45?10:5;
+  let grid="";
+  for(let v=Math.ceil(ylo/step)*step; v<=yhi; v+=step){
+    grid+=`<line x1="${L}" y1="${py(v).toFixed(1)}" x2="${W-R}" y2="${py(v).toFixed(1)}" stroke="${Math.abs(v)<1e-9?"#0d1e3a":"#e3ddd0"}" stroke-width="${Math.abs(v)<1e-9?1.4:1}"/>
+      <text x="${L-9}" y="${(py(v)+4).toFixed(1)}" text-anchor="end" font-size="9.5" fill="#6d675c">${v>0?"+":""}${v}%</text>`;
+  }
+  for(let g=LO;g<=HI;g+=10){
+    grid+=`<line x1="${px(g).toFixed(1)}" y1="${T}" x2="${px(g).toFixed(1)}" y2="${T+ih}" stroke="${g===0?"#0d1e3a":"#f0ebe0"}" stroke-width="${g===0?1.4:1}"/>
+      <text x="${px(g).toFixed(1)}" y="${T+ih+19}" text-anchor="middle" font-size="9.5" fill="#6d675c">${g>0?"+":""}${g}%</text>`;
+  }
+  const ref=gs.map((g,i)=>(i?"L":"M")+px(g).toFixed(1)+" "+py(g).toFixed(1)).join(" ");
+  const pal=["#0d1e3a","#5b7bb0","#94a1b5","#7e97c0"];
+  let paths="", labs="";
+  fam.forEach((x,k)=>{
+    const on=x.name===sel.name;
+    const d=lines[k].map((v,i)=>(i?"L":"M")+px(gs[i]).toFixed(1)+" "+py(v).toFixed(1)).join(" ");
+    paths+=`<path d="${d}" fill="none" stroke="${on?"#b8972e":pal[k%pal.length]}" stroke-width="${on?3.6:2}"
+      stroke-linejoin="round" opacity="${on?1:.75}"/>`;
+    const ey=py(lines[k][N-1]);
+    labs+=`<text x="${W-R+4}" y="${(ey+3.5).toFixed(1)}" font-size="9.5" font-weight="${on?700:500}"
+      fill="${on?"#b8972e":pal[k%pal.length]}">${esc(shortTier(x))}</text>`;
+  });
+  let xo="";
+  crossovers(fam,LO,HI).forEach(c=>{
+    xo+=`<line x1="${px(c.at).toFixed(1)}" y1="${T}" x2="${px(c.at).toFixed(1)}" y2="${T+ih}"
+      stroke="#b8972e" stroke-width="1" stroke-dasharray="3 3" opacity=".7"/>
+      <text x="${px(c.at).toFixed(1)}" y="${T-8}" text-anchor="middle" font-size="9" font-weight="700"
+      fill="#b8972e">${c.at>0?"+":""}${c.at.toFixed(1)}%</text>`;
+  });
+  return `<svg viewBox="0 0 ${W} ${H}">${grid}
+    <path d="${ref}" fill="none" stroke="#c3bdb0" stroke-width="1.6" stroke-dasharray="5 4"/>
+    ${xo}${paths}${labs}
+    <text x="${px(HI*0.62).toFixed(1)}" y="${(py(HI*0.62)-7).toFixed(1)}" font-size="9" font-weight="700"
+      fill="#a09a8d" letter-spacing=".08em">THE INDEX ITSELF</text>
+    <text x="${(L+iw/2).toFixed(1)}" y="${H-8}" text-anchor="middle" font-size="9" font-weight="700"
+      letter-spacing=".13em" fill="#b8972e">WHAT THE INDEX DOES IN A YEAR</text>
+    <text x="14" y="${(T+ih/2).toFixed(1)}" font-size="9" font-weight="700" letter-spacing=".13em" fill="#b8972e"
+      transform="rotate(-90 14 ${(T+ih/2).toFixed(1)})" text-anchor="middle">WHAT LANDS IN THE POLICY</text></svg>`;
+}
+
+function page2(){
+  const {c,s}=CUR();
+  const chartable=!!s.chartIndex;
+  if(!chartable) S.sub="concept"; else if(S.sub==="concept") S.sub="chart";
+  const preIX=chartable?seriesFor(c,s.chartIndex):null;
+  const tabs=chartable
+    ? [["chart","The comparison"],["table",preIX.length+" years, "+Y0+" to "+(Y0+preIX.length-1)],["zero","The power of zero"]]
+    : [["concept","How it behaves"]];
+  const head=`<div class="phead">
+    <div>
+      <div class="eyebrow">${esc(c.brand)} &nbsp;·&nbsp; ${esc(s.name)}</div>
+      <h1>${S.sub==="chart"?"The same market. <em>Two very different rides.</em>"
+           :S.sub==="table"?"What the floor <em>actually did</em>"
+           :S.sub==="zero"?"The power of the <em>0% floor</em>"
+           :"What this strategy <em>does with a year</em>"}</h1>
+    </div>
+    <div class="subtabs">${tabs.map(([k,t])=>
+      `<button class="${S.sub===k?"on":""}" onclick="setSub('${k}')">${t}</button>`).join("")}</div>
+  </div>`;
+
+  /* ---- no series loaded: show the mechanics, which need no history ---- */
+  if(!chartable){
+    const fam=family(c,s), LO=-25, HI=25;
+    const xo=crossovers(fam,LO,HI);
+    const h=HIST_PUBLISHED[s.index];
+    const moves=[-20,-10,0,5,10,20];
+    const loaded=c.strategies.filter(x=>x.chartIndex);
+    const comp=[];
+    comp.push(["Participation",(s.par==null?100:s.par)+"% of the index move"]);
+    if(s.spread!=null) comp.push(["Spread",pc(s.spread)+" comes off the top first"]);
+    comp.push(["Cap",s.cap!=null?pc(s.cap)+" ceiling":"None. There is no ceiling."]);
+    comp.push(["Floor",pc(s.floor==null?0:s.floor)+" in a down year"]);
+    if(s.mult) comp.push(["Multiplier",s.mult+"% added to whatever is credited"]);
+    if(s.enh) comp.push(["Bonus on value",pc(s.enh.pct)+(s.enh.always?", paid even in a zero year":", paid on the account value")]);
+    if(s.charge!=null) comp.push(["Annual charge",pc(s.charge)+", taken whether or not interest is credited"]);
+
+    const lead=g=>{const v=fam.map(x=>landed(x,g)); let k=0; for(let i=1;i<v.length;i++) if(v[i]>v[k]+1e-9) k=i; return fam[k];};
+    let story;
+    if(fam.length<2){
+      story=`Down years credit ${pc(s.floor==null?0:s.floor)} on the index${s.charge!=null?`, and the ${pc(s.charge)} charge still comes out, so the year finishes below zero`:""}${s.enh?`, and the bonus on value still lands, which is why the table shows ${pc(accountEnhancement(s,10))} rather than nothing`:""}.
+        ${s.cap!=null?`Up years follow the index to a ${pc(s.cap)} ceiling.`:`Up years have no ceiling at all, which is what the participation rate is buying.`}`;
+    } else {
+      const dn=fam.map(x=>landed(x,-5));
+      const tie=dn.every(v=>Math.abs(v-dn[0])<0.005);
+      const down=tie
+        ? `In a flat or down year every one of these credits ${pc(dn[0])}, so the only thing separating them is what happens on the way up.`
+        : `In a flat or down year ${esc(shortTier(lead(-5)))} pays the most${fam.some(x=>x.charge)?` and the tier carrying the charge pays the least`:""}.`;
+      const parts=xo.map(cx=>`${esc(shortTier(fam[cx.from]))} leads until the index reaches about ${cx.at>0?"+":""}${cx.at.toFixed(0)}%`);
+      const up=parts.length
+        ? parts.join(", then ")+`, after which ${esc(shortTier(lead(HI)))} pulls ahead and stays ahead.`
+        : `${esc(shortTier(lead(HI)))} is ahead at every level of index return, and the gap widens the stronger the year.`;
+      story=down+" "+up;
+    }
+
+    $("p2").innerHTML=head+`
+    <p style="flex:0 0 auto;font-size:12px;color:var(--soft);line-height:1.5;margin-bottom:8px;max-width:130ch">
+      This index does not have a series loaded into this comparison yet, so nothing here is a backtest. Every line below comes
+      from the strategy's own declared terms, which means it holds in any year. Read it as the shape of the deal rather than a
+      record of one.</p>
+    <div class="body">
+      <div class="col" style="flex:1 1 60%;justify-content:center">${responseCurve(fam,s,LO,HI)}</div>
+      <div class="col" style="flex:1 1 40%;gap:11px">
+        <div>
+          <div class="eyebrow">What decides your credit</div>
+          <div class="stats" style="display:block;border-bottom:none">
+            ${comp.map(([k2,v])=>`<div class="crow"><span>${k2}</span><b>${esc(v)}</b></div>`).join("")}
+          </div>
+        </div>
+        <div>
+          <div class="eyebrow">What lands, on a year like this</div>
+          <table class="beh"><thead><tr><th>If the index does</th>
+            ${fam.map(x=>`<th>${esc(shortTier(x))}</th>`).join("")}</tr></thead>
+            <tbody>${moves.map(g=>`<tr><td class="${g<0?"neg":""}">${g>0?"+":""}${g}%</td>
+              ${fam.map(x=>{const v=landed(x,g);const on=x.name===s.name;
+                return `<td class="${on?"hero":""} ${v<0?"below":""}">${(v<0?"-":"")+pc(Math.abs(v))}</td>`;}).join("")}</tr>`).join("")}</tbody></table>
+        </div>
+        ${loaded.length?`<div style="margin-top:auto">
+          <div class="eyebrow">Strategies on this carrier with a series loaded</div>
+          <div class="jump" style="justify-content:flex-start">${loaded.slice(0,6).map(x=>
+            `<button onclick="jumpStr('${esc(x.name).replace(/'/g,"")}')">${esc(x.name)}</button>`).join("")}</div></div>`:""}
+      </div>
+    </div>
+    <div class="keyline"><h4>${story}</h4>
+      <p>${h?`<b>${esc(h.who)}</b> publishes ${esc(h.span)}. ${h.note?esc(h.note)+" ":""}That series is not yet loaded into this comparison, which is a gap in this tool rather than a gap in the record.`
+          :"The annual series for this index is not on file."}</p></div>
+    <div class="foot"><b>Not a backtest and not a projection.</b> The curve applies today's declared participation rate, cap, floor,
+      multiplier, bonus and charge to every possible one-year index result. Those terms are declared by the carrier, are reviewed and
+      will change. Where an index sponsor publishes history that predates the index launch, those years are back-tested rather than
+      lived, and applying today's terms to any past index result does not mean that credit was available then.
+      Figures exclude cost of insurance, policy fees, expense charges and premium loads, all of which reduce policy values.
+      Rates shown are ${esc(c.asOf)}. Internal and partner use.</div>`;
+    return;
+  }
+
+  const ix=s.chartIndex, key=seriesKeyFor(c,ix), IDX=seriesFor(c,ix);
+  const owner=seriesOwnerName(key), borrowed=!c.ownSeries;
+  const cols=cohort(c,ix);
+  /* The two history views describe indexed mechanics. If the selected account
+     is a declared rate or a trigger it is not in this cohort, so the narrative
+     speaks for the first indexed account on the same index instead. */
+  const nar=cols.indexOf(s)>=0?s:(cols[0]||s);
+  if(ZB===null||ZB>IDX.length||ZA>=ZB){ ZA=0; ZB=IDX.length; }
+  const cred=IDX.map(g=>credited(nar,g));
+  const worst=Math.min(...IDX), worstYr=Y0+IDX.indexOf(worst);
+  const flatOrDown=IDX.filter(g=>g<=0).length, losing=IDX.filter(g=>g<0).length;
+  const sAvg=avgOf(c,cred), iAvg=avgOf(c,IDX);
+  const givenUp=IDX.reduce((t,g)=>{const v=credited(nar,g); return t+(g>v?g-v:0);},0);
+  const yearsCapped=IDX.filter(g=>g>credited(nar,g)).length;
+  const avoided=IDX.reduce((t,g)=>t+(g<0?-g:0),0);
+  const sNote=SERIES_NOTE[key]||"";
+  const srcNote=`<b>Source:</b> the ${Y0} to ${Y0+IDX.length-1} index growth series as printed by ${esc(owner)}.
+    ${sNote?`<b>${esc(sNote)}</b> `:""}
+    ${borrowed?`<b>${esc(c.brand)} does not print an index history on the documents on file,</b> so this is a standardised backcast on the North American series, not a reproduction of this carrier's own disclosure. Carriers print different series: North American shows 2011 at +1.50% where Life Insurance Company of the Southwest shows 0.00%. `:""}
+    Historical rates apply today's declared caps, participation rates and floors to each calendar year and are hypothetical. Rates then in effect would have differed.
+    Returns exclude all policy charges, including cost of insurance, policy fees and expense charges, all of which reduce policy values. Any bonus paid on account value is reported separately and is not in these figures.
+    The index growth rate excludes reinvested dividends. Past index behaviour does not predict future results. Internal and partner use.`;
+
+  /* ---- 2a. the comparison ---- */
+  if(S.sub==="chart"){
+    const A=pathOf(IDX), B=pathOf(cred);
+    const nth=(a,k)=>[...a].sort((x,y)=>x-y)[k];
+    const gap=(B[B.length-1]/A[A.length-1]-1)*100;
+    const rows=[["Losing years out of "+IDX.length,losing,cred.filter(v=>v<0).length,"the index, then this strategy"],
+      ["Worst single year",pc(worst),pc(Math.min(...cred)),"the index, then this strategy"],
+      ["Second worst single year",pc(nth(IDX,1)),pc(nth(cred,1)),"the index, then this strategy"],
+      ["Where $100,000 ended",usd(A[A.length-1]),usd(B[B.length-1]),"after "+IDX.length+" years"]];
+    $("p2").innerHTML=head+`
+    <div style="flex:0 0 auto;display:flex;gap:8px;align-items:center;margin-bottom:8px">
+      <span class="eyebrow">Zoom</span>
+      ${zoomsFor(IDX.length).map(([t,a,b])=>`<button class="jbtn" style="font-family:'DM Sans';font-size:10.5px;padding:6px 11px;border:1px solid ${ZA===a&&ZB===b?"#0d1e3a":"#e3ddd0"};background:${ZA===a&&ZB===b?"#0d1e3a":"#fff"};color:${ZA===a&&ZB===b?"#fff":"#22262e"};cursor:pointer;border-radius:2px" onclick="zoomTo(${a},${b})">${t}</button>`).join("")}
+      <span style="margin-left:auto;font-size:10.5px;color:var(--soft)">A comparison of crediting mechanics, not of policy performance against an investment.</span>
+    </div>
+    <div class="body" style="flex-direction:column;gap:10px">
+      <div style="flex:1 1 auto;min-height:0;display:flex;align-items:stretch">${growthChart(s,IDX)}</div>
+      <div class="stats" style="flex:0 0 auto">${rows.map(([l,a,b,k])=>
+        `<div class="stat"><div class="slab" style="margin:0 0 7px">${l}</div>
+          <div class="snum sm"><span style="color:var(--slate)">${a}</span> &nbsp; <span>${b}</span></div>
+          <div style="font-size:9px;color:var(--soft);margin-top:5px">${k}</div></div>`).join("")}</div>
+      <div class="card" style="flex:0 0 auto"><h4>Across the same ${IDX.length} years this strategy finished
+        ${Math.abs(Math.round(gap))}% ${gap>=0?"ahead of":"behind"} the index it follows.
+        The index's two worst years were ${pc(worst)} and ${pc(nth(IDX,1))}. This strategy's were ${pc(Math.min(...cred))} and ${pc(nth(cred,1))}.
+        ${(nar.maxRate&&compound(cred)>nar.maxRate)?`<span style="display:block;font-size:12px;font-weight:500;color:var(--soft);margin-top:7px;line-height:1.45">
+          This stretch compounded to ${pc(compound(cred))} a year, above the ${pc(nar.maxRate)} ceiling ${esc(nar.name)} may be
+          illustrated at. The ceiling is computed from every twenty-five year window in the last sixty-five calendar years, not from
+          this one, and it is the number to plan on.</span>`:""}</h4></div>
+    </div>
+    <div class="foot">${srcNote}</div>`;
+    return;
+  }
+
+  /* ---- 2b. twenty-five years ---- */
+  if(S.sub==="table"){
+    $("p2").innerHTML=head+`
+    <div class="body">
+      <div class="col" style="flex:1 1 62%">
+        <div>${lookbackTable(c,ix,IDX,cols,nar)}</div>
+      </div>
+      <div class="col" style="flex:1 1 38%;gap:12px;justify-content:flex-start">
+        <div class="stats" style="border-top:2px solid var(--navy)">
+          <div class="stat"><div class="snum">${flatOrDown} of ${IDX.length}</div><div class="slab">Flat or lower</div></div>
+          <div class="stat"><div class="snum" style="color:var(--red)">${pc(worst)}</div><div class="slab">Worst year, ${worstYr}</div></div>
+          <div class="stat"><div class="snum">${pc(compound(cred))}</div><div class="slab">Compounded, vs index ${pc(compound(IDX))}</div></div>
+        </div>
+        <p style="font-size:10.5px;color:var(--soft);line-height:1.5">Averaged year by year the strategy shows
+          <b style="color:var(--navy)">${pc(sAvg)}</b> against the index at <b style="color:var(--navy)">${pc(iAvg)}</b>, which reads
+          like a shortfall. Compounded, which is what actually happens to money, the order reverses. $100,000 following the index
+          becomes <b style="color:var(--navy)">${usd(pathOf(IDX)[IDX.length])}</b>; credited by ${esc(nar.name)} it becomes
+          <b style="color:var(--navy)">${usd(pathOf(cred)[cred.length])}</b>.</p>
+        ${nar.cap!=null?`<div class="card"><h4>The cap gave up more than the floor saved</h4>
+          <p>Across ${yearsCapped} years the index rose above what ${esc(nar.name)} could credit, and the strategy gave up
+          <b>${givenUp.toFixed(2)} points</b> of raw upside. Across ${losing} losing years the floor avoided
+          <b>${avoided.toFixed(2)} points</b>. In a straight line the cap cost about ${Math.abs(givenUp-avoided).toFixed(0)} points
+          ${givenUp>avoided?"more than the floor saved":"less than the floor saved"}. Compounded, the order
+          ${sAvg>iAvg?"reverses":"holds"}: the index compounded to ${pc(compound(IDX))} a year and the strategy to ${pc(compound(cred))}.</p></div>`:""}
+        ${nar.maxRate?`<div class="card"><h4>The ceiling sits below the lookback, on purpose</h4>
+          <p>This stretch compounded to <b>${pc(compound(cred))}</b> a year. The most ${esc(nar.name)} may be illustrated at is
+          <b>${pc(nar.maxRate)}</b>, and that ceiling is computed from every twenty-five year window in the last sixty-five
+          calendar years rather than from this one. Where a lookback runs above the ceiling, the ceiling is the number to plan on.</p></div>`:""}
+        <div class="card" style="margin-top:auto"><h4>Why an average is not a straight line</h4>
+          <p>A loss does more damage than an equal gain repairs. Climbing back from ${pc(worst)} in ${worstYr} took a gain of more than
+          ${((1/(1+worst/100)-1)*100).toFixed(0)}%. Nothing was lost, so nothing had to be recovered. Crediting also runs one calendar year end to end:
+          the index fell hard in early 2020 and recovered before December, so the pandemic never became a negative crediting year.</p></div>
+      </div>
+    </div>
+    <div class="foot">${srcNote} No returns are shown for strategies with less than ten years of history. This lookback is a different and shorter calculation than the maximum illustrated rate on page three.</div>`;
+    return;
+  }
+
+  /* ---- 2c. the power of zero ---- */
+  const downYears=IDX.map((g,i)=>[Y0+i,g]).filter(([,g])=>g<=0);
+  const W=1360,H=140,AX=70;
+  const x=y=>52+((y-Y0)/(IDX.length-1))*(W-104);
+  let tl=`<line x1="52" y1="${AX}" x2="${W-52}" y2="${AX}" stroke="#e3ddd0" stroke-width="2"/>`;
+  EVENTS.filter(e=>e.y>=Y0&&e.y<=Y0+IDX.length-1).forEach((e,i)=>{
+    const yy=13+(i%2)*18, X=x(e.y);
+    const anch=X<170?"start":X>W-170?"end":"middle";
+    const tx=anch==="start"?52:anch==="end"?W-52:X;
+    tl+=`<line x1="${X.toFixed(1)}" y1="${yy+6}" x2="${X.toFixed(1)}" y2="${AX-28}" stroke="#e3ddd0" stroke-width="1"/>
+      <text x="${tx.toFixed(1)}" y="${yy}" text-anchor="${anch}" font-size="8.5" font-weight="700"
+      letter-spacing=".05em" fill="#a09a8d">${esc(e.t.toUpperCase())}</text>`;
+  });
+  downYears.forEach(([y,g])=>{ const X=x(y);
+    tl+=`<circle cx="${X.toFixed(1)}" cy="${AX}" r="6.5" fill="#a32b2b"/>
+      <text x="${X.toFixed(1)}" y="${AX-14}" text-anchor="middle" font-size="10.5" font-weight="700" fill="#a32b2b">${pc(g)}</text>
+      <text x="${X.toFixed(1)}" y="${AX+19}" text-anchor="middle" font-size="9.5" fill="#6d675c">${y}</text>`;
+  });
+  SPANS.forEach((sp,i)=>{
+    const a=Math.max(sp.a,Y0), b=Math.min(sp.b,Y0+IDX.length-1); if(b<=a) return;
+    const yy=AX+42+i*19;
+    tl+=`<line x1="${x(a).toFixed(1)}" y1="${yy}" x2="${x(b).toFixed(1)}" y2="${yy}" stroke="#b8972e" stroke-width="3" opacity=".38"/>
+      <circle cx="${x(a).toFixed(1)}" cy="${yy}" r="3" fill="#b8972e" opacity=".55"/>
+      <circle cx="${x(b).toFixed(1)}" cy="${yy}" r="3" fill="#b8972e" opacity=".55"/>
+      <text x="${(x(a)+6).toFixed(1)}" y="${yy-7}" font-size="8" font-weight="700" letter-spacing=".11em" fill="#a89468">${sp.t} &nbsp;${sp.a} TO ${sp.b}</text>`;
+  });
+
+  const runs=[]; for(let i=0;i<IDX.length-1;i++) if(IDX[i]<=0&&IDX[i+1]<=0) runs.push(Y0+i);
+  const rebound=runs.length?IDX[runs[0]-Y0+2]:null;
+  const heroAvg=(c.printed&&c.printed[nar.name]!=null)?c.printed[nar.name]:sAvg;
+
+  $("p2").innerHTML=head+`
+  <p style="flex:0 0 auto;font-size:12px;color:var(--soft);line-height:1.5;margin-bottom:6px;max-width:132ch">
+    Not a laboratory. Lived history: September 11 and the two long wars that followed, the dot-com collapse, the financial
+    crisis and housing crash, a pandemic, an inflation shock. In every year the index finished lower, the floor held the
+    index credit at zero.${cols.some(x=>x.charge)?` Where an account carries an annual charge, that charge still came out, which is why
+    ${cols.filter(x=>x.charge).map(x=>esc(x.name)).join(" and ")} finish those years below zero. That is the charge, not the index.`:""}</p>
+  <div style="flex:0 0 auto"><svg viewBox="0 0 ${W} ${H}">${tl}</svg></div>
+  <div style="flex:0 0 auto;margin-top:4px">${stressTable(c,ix,IDX,cols,nar)}</div>
+  ${runs.length&&rebound!=null?`<p class="pull"><b>${runs[0]} and ${runs[0]+1} were consecutive losing years.</b>
+    Each credited ${pc(credited(s,IDX[runs[0]-Y0]))}, so there was no compounding hole to climb out of when ${runs[0]+2} gained ${pc(rebound)}.</p>`:""}
+  <div class="icards" style="flex:0 0 auto;margin-top:10px;align-items:flex-start">
+    <div class="ic">${ICONS.shield}<h4>Avoiding the deep holes</h4>
+      <p>A steep decline does lasting damage. When the index fell ${pc(worst)} in ${worstYr}, ${esc(nar.name)} was credited
+      <b>${pc(credited(nar,worst))}</b>. There was no hole to climb out of the following year.</p></div>
+    <div class="ic">${ICONS.trend}<h4>Staying in the plan</h4>
+      <p>People rarely abandon a plan because a good year was modest. They abandon it because a bad year frightened them.
+      A floor makes a long plan easier to keep.</p></div>
+    <div class="ic">${ICONS.bank}<h4>Under-promising on purpose</h4>
+      <p>${nar.maxRate?`The illustration is run at <b>${pc(nar.maxRate)}</b>. The lookback above, under today's rates, produced <b>${pc(heroAvg)}</b>.`
+        :`The lookback above, under today's rates, produced <b>${pc(heroAvg)}</b> against the index at ${pc(iAvg)}.`}
+      Neither number is a prediction. Building the plan on the lower one is the whole discipline.</p></div>
+  </div>
+  <div class="banner" style="flex:0 0 auto;margin-top:auto">Two wars. Two market collapses. A pandemic and an inflation shock.
+    <em>${flatOrDown} years when the floor did the work.</em> The ${esc(nar.name)} average across all of it: ${pc(heroAvg)} a year.</div>
+  <div class="foot">${srcNote} Historical events are noted for context only.</div>`;
+}
+window.setSub=k=>{S.sub=k;page2();fit();};
+window.zoomTo=(a,b)=>{ZA=a;ZB=b;page2();fit();};
+window.jumpStr=nm=>{const c=carrierOf(S.car);
+  const i=c.strategies.findIndex(x=>x.name.replace(/'/g,"")===nm); if(i>=0){S.str=i;S.ex=1;render();}};
+
+/* ================================ PAGE 3 ================================= */
+function page3(){
+  const c=carrierOf(S.car);
+  const L=c.ledger;
+  const head=`<div class="phead">
+    <div>
+      <div class="eyebrow">${esc(c.brand)} &nbsp;·&nbsp; ${esc(c.product)}</div>
+      <h1>How to read <em>your illustration</em></h1>
+    </div>
+    <div class="psub">The same policy, shown three times. That is a rule, not a sales trick. Each column assumes something
+      different about the future, and <b>only the first one is a promise</b>. Read them in order and the document stops
+      being confusing.</div>
+  </div>`;
+
+  if(!L){
+    const have=CARRIERS.filter(x=>x.ledger);
+    $("p3").innerHTML=head+`<div class="msg">
+      <h3>No ledger rates on file for ${esc(c.brand)}</h3>
+      <p>This page shows the three columns of an illustration and the arithmetic behind each rate. That needs the
+         carrier's own illustration. The guaranteed rate, the declared fixed-account rate and the illustrated rate for
+         ${esc(c.brand)} are not on file, so nothing is shown rather than estimated.</p>
+      <div class="jump">${have.map(x=>`<button onclick="jumpCar('${x.id}')">${esc(x.brand)}</button>`).join("")}</div>
+    </div>`;
+    return;
+  }
+  const less1=rnd(L.illustrated-1.00);
+  const winner=Math.min(less1,L.declaredFixed);
+  const fixedWins=L.declaredFixed<=less1;
+
+  $("p3").innerHTML=head+`
+  <div class="ledgers">
+    <div class="ldg g">
+      <div class="lk">Guaranteed</div>
+      <div class="lr">${pc(L.guaranteed)}</div>
+      <div class="lc">Maximum charges, minimum crediting</div>
+      <div class="how"><div class="howlab">How the rate is arrived at</div>
+        <div class="step"><i>1</i><div>Assume the company charges you <b>the most it is ever allowed to charge</b>. Every year, for the whole life of the policy.</div></div>
+        <div class="step"><i>2</i><div>And assume it pays you <b>the least it is ever allowed to pay</b>, which is ${esc(L.gWhat)}.</div></div>
+        <div class="step"><i>3</i><div>Nothing here comes from the market. This number is <b>written into the contract</b>, so the company is not allowed to go below it.</div></div>
+      </div>
+      <div class="notline"><b>What it is not</b>Not a guess at a bad market, and not what anyone expects to happen. It is the worst the company is legally allowed to treat you, all at once, every single year.</div>
+      <div class="answers"><b>The plain version</b>Worst case, by contract. If the plan still works here, everything better than this is a bonus rather than a hope.</div>
+    </div>
+
+    <div class="ldg a">
+      <div class="lk">Alternative current illustrated values</div>
+      <div class="lr">${pc(winner)}</div>
+      <div class="lc">Current charges, index credits stripped out</div>
+      <div class="how"><div class="howlab">How the rate is arrived at</div>
+        <div class="step"><i>1</i><div>The regulator makes every company show this third column, and it has to be <b>just as easy to see</b> as the others. Nobody can bury it.</div></div>
+        <div class="step"><i>2</i><div>Nobody picks this rate. It is a formula. Work out two numbers, then <b>use whichever is lower</b>.</div></div>
+        <div class="mins">
+          <span class="chip ${fixedWins?"lose":"win"}">${pc(less1)}</span>
+          <span>the illustrated rate, ${pc(L.illustrated)}, minus one percent</span>
+        </div>
+        <div class="mins">
+          <span class="chip ${fixedWins?"win":"lose"}">${pc(L.declaredFixed)}</span>
+          <span>the plain fixed account rate today</span>
+        </div>
+        <div class="step" style="margin-top:9px"><i>3</i><div><b>${pc(winner)}</b> is the lower of the two, so ${pc(winner)} is the rate this column has to use.</div></div>
+      </div>
+      <div class="notline"><b>What it is not</b>Not a promise, and not a second opinion about the market. It is a required stress test that no one at the company chose.</div>
+      <div class="answers"><b>The plain version</b>What if the index never does anything for me? Today's costs stay in, the market help comes out, and this is what is left.</div>
+    </div>
+
+    <div class="ldg c">
+      <div class="lk">Current illustrated values</div>
+      <div class="lr">${pc(L.illustrated)}</div>
+      <div class="lc">Current charges, index credits at the illustrated rate</div>
+      <div class="how"><div class="howlab">How the rate is arrived at</div>
+        <div class="step"><i>1</i><div>There is a <b>legal speed limit</b> on how good an illustration is allowed to look. Any bonus interest has to be baked into this number already, so a bonus cannot be added on top.</div></div>
+        <div class="step"><i>2</i><div>The company works the limit out by ${esc(L.cMethod)}.</div></div>
+        <div class="step"><i>3</i><div>So this is a <b>ceiling, not a prediction</b>. The company did not choose it and is not allowed to show anything higher.</div></div>
+      </div>
+      <div class="notline"><b>What it is not</b>Not a number you can use to compare two companies, because each one is worked out from that company's own caps. Not permanent either. Caps, participation rates and charges get reviewed and will change.</div>
+      <div class="answers"><b>The plain version</b>The best the page is allowed to show. This is the column the plan is built on, and the one most likely to be wrong in any single year.</div>
+    </div>
+  </div>
+
+  <div class="readrow">
+    <div class="rd"><div class="n">1</div><div><h5>Start on the left, at the promise.</h5>
+      <p>If the plan does not survive the guaranteed column, it is funded too tightly. No assumption about the market fixes that, and hoping harder is not a plan.</p></div></div>
+    <div class="rd"><div class="n">2</div><div><h5>Read the middle one as a bad decade.</h5>
+      <p>On a policy pushed for the most income the software will produce, the first two columns will often show the money running out. That is telling you the income is set too high, not that the company is weak. It happens at essentially every carrier.</p></div></div>
+    <div class="rd"><div class="n">3</div><div><h5>Treat the right one as the plan, not the promise.</h5>
+      <p>Then check the date on the page. Every rate on the document is a snapshot of one day, and all of them get reviewed and change.</p></div></div>
+  </div>
+
+  <div class="foot"><b>Read the guaranteed column first. If you can live with that, everything above it is upside rather than hope.</b>
+    This page describes how an illustration is structured and is general in nature. It is not a substitute for the illustration itself,
+    which contains the complete narrative summary, numeric summary, tabular detail and definitions for the policy being considered.
+    Guaranteed values reflect the policy's contractual guarantees, assuming maximum charges and minimum crediting. Non-guaranteed values
+    assume current charges and crediting rates, which the company may change. Neither non-guaranteed column is a prediction, and actual
+    results will differ. Guarantees depend on the claims-paying ability of the issuing company. Rates shown are ${esc(c.asOf)}.
+    Internal and partner use.</div>`;
+}
+window.jumpCar=id=>{S.car=id;S.str=-1;S.ex=1;render();};
+
+/* ------------------------------- shell ---------------------------------- */
+const PAGES=[[1,"01","Strategy sheets"],[2,"02","Market vs credited"],[3,"03","Reading an illustration"]];
+let BOOTED=false;
+function render(){
+  if(!BOOTED){ BOOTED=true;
+    const c0=carrierOf(S.car);
+    const i0=c0.strategies.findIndex(x=>x.name==="Annual Point-to-Point, Standard");
+    if(i0>=0) S.str=i0;
+  }
+  $("nav").innerHTML=PAGES.map(([n,num,t])=>
+    `<button class="${S.page===n?"on":""}" onclick="go(${n})"><i>${num}</i>${t}</button>`).join("");
+  $("car").innerHTML=CARRIERS.map(c=>`<option value="${c.id}"${c.id===S.car?" selected":""}>${esc(c.brand)}</option>`).join("");
+  const c=carrierOf(S.car);
+  if(S.str>=c.strategies.length) S.str=-1;
+  const G={"Capped":[],"Uncapped":[],"Fixed and other":[]};
+  c.strategies.forEach((s,i)=>{
+    if(s.type==="fixed"||s.type==="trigger"||s.type==="monthly") G["Fixed and other"].push([i,s]);
+    else if(s.cap!=null) G["Capped"].push([i,s]);
+    else G["Uncapped"].push([i,s]);
+  });
+  /* Inside each group, strongest first on a 20% index year, counting the
+     multiplier, the charge and any bonus paid on value. Nothing on the page
+     says so; the order is the signal. */
+  const rank=x=>{const r=run(x,20); return r.v==null?-1e9:r.v+r.enh;};
+  /* An explicit `ord` pins a strategy's place. Anything without one falls in
+     behind it, still strongest first on a 20% index year. */
+  Object.keys(G).forEach(k=>G[k].sort((a,b)=>{
+    const oa=a[1].ord, ob=b[1].ord;
+    if(oa!=null&&ob!=null) return oa-ob;
+    if(oa!=null) return -1;
+    if(ob!=null) return 1;
+    return rank(b[1])-rank(a[1]);
+  }));
+  const shown=[].concat.apply([],Object.keys(G).filter(k=>G[k].length).map(k=>G[k]));
+  if(S.str<0||!shown.some(([i])=>i===S.str)) S.str=shown.length?shown[0][0]:0;
+  $("str").innerHTML=Object.keys(G).filter(k=>G[k].length).map(k=>
+    `<optgroup label="${k}">`+G[k].map(([i,s])=>
+      `<option value="${i}"${i===S.str?" selected":""}>${esc(s.name)}${s.chartIndex?"":" ·"}</option>`).join("")+`</optgroup>`).join("");
+  document.querySelectorAll(".page").forEach(p=>p.classList.remove("on"));
+  $("p"+S.page).classList.add("on");
+  if(S.page===1) page1(); else if(S.page===2) page2(); else page3();
+  fit();
+}
+window.go=n=>{S.page=n;render();};
+$("car").onchange=e=>{S.car=e.target.value;S.str=-1;S.ex=1;S.sub="chart";render();};
+$("str").onchange=e=>{S.str=+e.target.value;S.ex=1;S.sub="chart";render();};
+
+function fit(){
+  const st=$("stage"), pg=document.querySelector(".page.on"); if(!pg) return;
+  const k=Math.min(st.clientWidth/1440, st.clientHeight/824);
+  pg.style.transform="scale("+k+")";
+  pg.style.left=Math.max(0,(st.clientWidth-1440*k)/2)+"px";
+}
+window.addEventListener("resize",fit);
+render();
+</script>
+</body>
+</html>
