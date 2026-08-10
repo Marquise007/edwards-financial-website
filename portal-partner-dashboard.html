@@ -153,6 +153,19 @@ button{font-family:inherit}
   background:radial-gradient(120% 90% at 22% 12%,rgba(184,151,46,.22),transparent 58%),linear-gradient(155deg,var(--navy-2),var(--navy-deep));
 }
 .card__thumb--deck svg{width:44px;height:44px;fill:rgba(184,151,46,.85)}
+.card__thumb--poster{
+  display:flex;flex-direction:column;justify-content:space-between;
+  padding:15px 16px 12px;
+  background:radial-gradient(120% 90% at 22% 10%,rgba(184,151,46,.20),transparent 58%),linear-gradient(155deg,var(--navy-2),var(--navy-deep));
+}
+.poster__eyebrow{color:var(--gold);font-size:8px;font-weight:700;letter-spacing:.16em;text-transform:uppercase}
+.poster__headline{
+  display:block;color:var(--cream);
+  font-family:"Cormorant Garamond",Georgia,serif;font-size:24px;font-weight:600;line-height:1.07;letter-spacing:-.01em;
+}
+.poster__headline em{color:var(--gold-lift);font-style:italic}
+.poster__rule{display:block;width:34px;height:2px;background:var(--gold);margin:9px 0 0}
+.poster__foot{color:rgba(247,245,241,.6);font-size:8px;font-weight:700;letter-spacing:.15em;text-transform:uppercase}
 .card__run{
   position:absolute;right:9px;bottom:9px;padding:3px 7px;
   background:rgba(9,23,51,.84);color:#fff;font-size:10.5px;font-weight:500;letter-spacing:.05em;
@@ -328,8 +341,13 @@ button{font-family:inherit}
         </article>
 
         <article class="card">
-          <a class="card__thumb" href="/watch/buy-sell" target="_blank" rel="noopener" aria-label="Preview: Buy-Sell Agreement with Life Insurance">
-            <img src="https://embed-ssl.wistia.com/deliveries/273b84b53e9be8d4fdaa7d5daa5dbfeb.jpg?image_crop_resized=1280x720" alt="North American title card for the buy-sell explainer, over a woman outside a glass office building." loading="lazy" width="1280" height="720">
+          <a class="card__thumb card__thumb--poster" href="/watch/buy-sell" target="_blank" rel="noopener" aria-label="Preview: Buy-Sell Agreement with Life Insurance">
+            <span class="poster__eyebrow">Business transition</span>
+            <span>
+              <span class="poster__headline">Buy-Sell, <em>Funded.</em></span>
+              <span class="poster__rule"></span>
+            </span>
+            <span class="poster__foot">North American</span>
             <span class="card__run">1:24</span>
           </a>
           <div class="card__body">
@@ -349,8 +367,13 @@ button{font-family:inherit}
         </article>
 
         <article class="card">
-          <a class="card__thumb" href="/watch/key-person" target="_blank" rel="noopener" aria-label="Preview: What Is Key Person Life Insurance?">
-            <img src="https://embed-ssl.wistia.com/deliveries/bad946d568a133459bdece43f70a7d02.jpg?image_crop_resized=1280x720" alt="North American title card for the key person explainer, over a man at a desk checking his phone." loading="lazy" width="1280" height="720">
+          <a class="card__thumb card__thumb--poster" href="/watch/key-person" target="_blank" rel="noopener" aria-label="Preview: What Is Key Person Life Insurance?">
+            <span class="poster__eyebrow">Business protection</span>
+            <span>
+              <span class="poster__headline">The Person You <em>Cannot Replace.</em></span>
+              <span class="poster__rule"></span>
+            </span>
+            <span class="poster__foot">North American</span>
             <span class="card__run">1:42</span>
           </a>
           <div class="card__body">
@@ -370,8 +393,13 @@ button{font-family:inherit}
         </article>
 
         <article class="card">
-          <a class="card__thumb" href="/watch/executive-bonus" target="_blank" rel="noopener" aria-label="Preview: How Does an Executive Bonus Plan Work?">
-            <img src="https://embed-ssl.wistia.com/deliveries/0aefb5ffbdcaa9e79d89190c52c951dd.jpg?image_crop_resized=1280x720" alt="North American title card for the executive bonus explainer, over a manager talking with a worker on a warehouse floor." loading="lazy" width="1280" height="720">
+          <a class="card__thumb card__thumb--poster" href="/watch/executive-bonus" target="_blank" rel="noopener" aria-label="Preview: How Does an Executive Bonus Plan Work?">
+            <span class="poster__eyebrow">Executive benefits</span>
+            <span>
+              <span class="poster__headline">Reward Them. <em>Keep Them.</em></span>
+              <span class="poster__rule"></span>
+            </span>
+            <span class="poster__foot">North American</span>
             <span class="card__run">1:59</span>
           </a>
           <div class="card__body">
