@@ -253,6 +253,13 @@ button{font-family:inherit}
         Intakes
       </a>
     </div>
+    <div class="nav-section">
+      <div class="nav-section-label">Beta</div>
+      <a class="nav-item" tabindex="0" role="button" onclick="showView('beta')">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 2h6v2h-1v4.6l5.2 9.6A2 2 0 0 1 17.4 21H6.6a2 2 0 0 1-1.8-2.8L10 8.6V4H9V2zm3 2v5.1L7.4 17h9.2L12 9.1V4z"/></svg>
+        In development
+      </a>
+    </div>
   </nav>
 
   <div class="sidebar-user">
@@ -686,6 +693,39 @@ button{font-family:inherit}
       </div>
     </div>
 
+    <!-- ============ BETA ============ -->
+    <div class="view" id="view-beta">
+      <div class="shelf-head">
+        <p class="shelf-eyebrow">Beta</p>
+        <h2 class="shelf-h">In development</h2>
+        <p class="shelf-note">Modules that are built and running but not finished. Each one states on its own page what is verified, what is reproduced from a source document, and what it deliberately will not calculate. Nothing on this shelf has been reviewed for client use.</p>
+      </div>
+
+      <div class="grid">
+
+        <article class="card">
+          <div class="card__body">
+            <span class="card__glyph" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 3h2v16h16v2H3V3zm4 10h3v4H7v-4zm5-5h3v9h-3V8zm5-4h3v13h-3V4z"/></svg></span>
+            <span class="chip chip--hold">Beta</span>
+            <p class="card__kind">Premium finance · Loan ledger</p>
+            <h3 class="card__name">Commercial Premium Finance Ledger</h3>
+            <p class="card__desc">Models the bank loan side of a financed life insurance case. Vary the rate path, client contribution, collateral advance, and exit year, then read peak collateral, total cost of money, and net death benefit by year.</p>
+            <div class="card__meta">
+              <div class="card__row"><b>Verified</b><span>Loan engine reproduces a carrier case study to the dollar, proved on every load</span></div>
+              <div class="card__row"><b>You supply</b><span>Account and surrender values from a carrier illustration</span></div>
+              <div class="card__row"><b>Open</b><span>Live technique comparison needs current AFR and 7520 rates</span></div>
+            </div>
+          </div>
+          <div class="card__acts card__acts--one">
+            <a class="btn btn--go" href="tool-premium-finance-ledger.html" target="_blank" rel="noopener">Open module
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8.6 5.4 15.2 12l-6.6 6.6 1.8 1.8L18.8 12 10.4 3.6z"/></svg>
+            </a>
+          </div>
+        </article>
+
+      </div>
+    </div>
+
   </div>
 </div>
 
@@ -700,7 +740,8 @@ button{font-family:inherit}
     marketing: 'Client Educational Videos',
     crediting: 'Crediting strategies by carrier',
     calculators: 'Modules',
-    intakes: 'Intakes'
+    intakes: 'Intakes',
+    beta: 'In development'
   };
 
   async function init() {

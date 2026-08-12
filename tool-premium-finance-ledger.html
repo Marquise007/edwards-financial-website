@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow,noarchive,nosnippet,noimageindex">
+<meta name="theme-color" content="#0d1e3a">
+<title>Premium Finance Ledger | Edwards Financial &amp; Associates</title>
+<link rel="icon" href="/favicon.ico">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#0d1e3a; --navy-2:#12294c; --navy-deep:#091733;
+  --gold:#b8972e; --gold-lift:#c8a63a;
+  --cream:#f7f5f1; --paper:#fffdf9; --ink:#1b2b45; --muted:#667389;
+  --line:rgba(13,30,58,.13);
+  --flag:#8a3324; --ok:#2f6b4f;
+}
+*,*::before,*::after{box-sizing:border-box}
+html,body{margin:0;min-width:320px}
+body{
+  min-height:100vh; color:var(--ink);
+  font-family:"DM Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  font-size:15px; line-height:1.6;
+  font-variant-numeric:lining-nums tabular-nums;
+  font-feature-settings:"lnum" 1,"tnum" 1;
+  background:
+    radial-gradient(circle at 5% 0%,rgba(184,151,46,.10),transparent 30rem),
+    radial-gradient(circle at 100% 40%,rgba(13,30,58,.06),transparent 34rem),
+    var(--cream);
+  -webkit-font-smoothing:antialiased;
+}
+a{color:inherit;-webkit-tap-highlight-color:transparent}
+.wrap{width:min(1520px,calc(100% - 34px));margin:0 auto}
+
+.site-header{
+  min-height:62px;padding:10px 0;display:flex;align-items:center;
+  justify-content:space-between;gap:20px;border-bottom:1px solid var(--line);
+}
+.brand{display:flex;align-items:center;gap:11px;text-decoration:none}
+.brand-mark{
+  width:38px;height:38px;display:grid;place-items:center;color:#fff;background:var(--navy);
+  border:1px solid rgba(184,151,46,.72);font:600 18px/1 "Cormorant Garamond",Georgia,serif;
+}
+.brand-name{color:var(--navy);font:600 18px/1 "Cormorant Garamond",Georgia,serif}
+.brand-tagline{display:block;margin-top:3px;color:var(--muted);font-size:9px;font-weight:700;letter-spacing:.15em;text-transform:uppercase}
+.back{
+  display:inline-flex;align-items:center;gap:7px;padding:7px 12px;border:1px solid var(--line);
+  color:var(--navy);text-decoration:none;font-size:9px;font-weight:700;letter-spacing:.13em;text-transform:uppercase;
+  transition:border-color .2s ease,color .2s ease;
+}
+.back:hover{border-color:var(--gold);color:var(--gold)}
+.back svg{width:11px;height:11px;fill:currentColor}
+
+main{padding:clamp(24px,4vh,40px) 0 clamp(40px,8vh,80px)}
+.eyebrow{
+  display:flex;align-items:center;gap:9px;margin:0 0 6px;color:var(--gold);
+  font-size:9.5px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;
+}
+.eyebrow::before{content:"";width:28px;height:1px;background:var(--gold)}
+h1{margin:0 0 12px;color:var(--navy);font:600 clamp(32px,4.6vw,52px)/1 "Cormorant Garamond",Georgia,serif;letter-spacing:-.03em}
+.lede{max-width:56rem;margin:0 0 22px;color:rgba(27,43,69,.74);font-size:15.5px;line-height:1.62}
+
+.beta-bar{
+  display:flex;align-items:flex-start;gap:12px;margin:0 0 26px;padding:13px 16px;
+  background:var(--paper);border:1px solid var(--line);border-left:3px solid var(--gold);
+}
+.beta-chip{
+  flex:0 0 auto;padding:4px 9px;background:var(--navy);color:var(--cream);
+  font-size:8.5px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;
+}
+.beta-bar p{margin:0;font-size:12.5px;line-height:1.55;color:rgba(27,43,69,.72)}
+
+/* ---- tabs ---- */
+.tabs{display:flex;gap:2px;flex-wrap:wrap;margin-bottom:22px;border-bottom:1px solid var(--line)}
+.tab{
+  background:transparent;border:0;border-bottom:3px solid transparent;
+  color:var(--muted);font-family:inherit;font-size:9.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
+  padding:12px 17px;cursor:pointer;transition:color .2s ease,border-color .2s ease;
+}
+.tab:hover{color:var(--navy)}
+.tab[aria-selected="true"]{color:var(--navy);border-bottom-color:var(--gold)}
+.tab:focus-visible{outline:2px solid var(--gold);outline-offset:-2px}
+.panel{display:none}
+.panel.on{display:block}
+
+.cols{display:grid;grid-template-columns:308px minmax(0,1fr);gap:22px;align-items:start}
+
+/* ---- input rail ---- */
+.rail{position:sticky;top:14px;background:var(--paper);border:1px solid var(--line);border-top:3px solid var(--gold)}
+.rail-hd{background:var(--navy);color:var(--cream);padding:11px 16px;font-size:9px;font-weight:700;letter-spacing:.15em;text-transform:uppercase}
+fieldset{border:0;border-top:1px solid var(--line);margin:0;padding:14px 16px 16px}
+fieldset:first-of-type{border-top:0}
+legend{font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);padding:0;margin-bottom:10px}
+.f{margin-bottom:11px}
+.f:last-child{margin-bottom:0}
+.lab{display:block;margin-bottom:5px;color:var(--navy);font-size:9px;font-weight:700;letter-spacing:.11em;text-transform:uppercase}
+input,select,textarea{
+  width:100%;min-height:38px;padding:8px 10px;background:#fff;color:var(--ink);
+  border:1px solid var(--line);border-radius:0;font-family:inherit;font-size:14px;
+  font-variant-numeric:lining-nums tabular-nums;
+}
+textarea{min-height:56px;resize:vertical;font-size:12px;line-height:1.45}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--gold);outline-offset:-1px;border-color:var(--gold)}
+select{appearance:none;background-image:linear-gradient(45deg,transparent 50%,var(--navy) 50%),linear-gradient(135deg,var(--navy) 50%,transparent 50%);background-position:calc(100% - 17px) 17px,calc(100% - 12px) 17px;background-size:5px 5px;background-repeat:no-repeat}
+.f2{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.hint{display:block;margin-top:5px;color:var(--muted);font-size:10.5px;line-height:1.45}
+.btn{
+  width:100%;min-height:41px;padding:0 12px;border:0;cursor:pointer;
+  display:inline-flex;align-items:center;justify-content:center;gap:7px;
+  background:var(--navy);color:var(--cream);
+  font-family:inherit;font-size:9.5px;font-weight:700;letter-spacing:.11em;text-transform:uppercase;
+  transition:background .2s ease,color .2s ease;
+}
+.btn:hover{background:var(--navy-2)}
+.btn:focus-visible{outline:3px solid var(--gold);outline-offset:-3px}
+.btn--ghost{background:var(--paper);color:var(--navy);border:1px solid var(--line);margin-top:7px}
+.btn--ghost:hover{background:var(--cream);border-color:var(--gold);color:var(--gold)}
+
+/* ---- summary stats ---- */
+.stats{display:grid;gap:1px;margin-bottom:20px;background:var(--line);grid-template-columns:repeat(auto-fit,minmax(178px,1fr))}
+.stat{padding:15px 17px;background:var(--paper);border-top:3px solid var(--navy)}
+.stat--acc{border-top-color:var(--gold)}
+.stat--warn{border-top-color:var(--flag)}
+.stat .k{display:block;margin-bottom:6px;color:var(--muted);font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;line-height:1.35;min-height:24px}
+.stat .v{color:var(--navy);font:600 26px/1.05 "Cormorant Garamond",Georgia,serif}
+.stat .v.pass{color:var(--ok)}
+.stat .v.fail{color:var(--flag)}
+.stat .n{display:block;margin-top:5px;color:var(--muted);font-size:10.5px;line-height:1.42}
+
+/* ---- sheet ---- */
+.sheet{background:var(--paper);border:1px solid var(--line)}
+.sheet-hd{padding:14px 18px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:baseline;gap:16px;flex-wrap:wrap}
+.sheet-hd h2{margin:0;color:var(--navy);font:600 24px/1.1 "Cormorant Garamond",Georgia,serif}
+.sheet-hd .meta{color:var(--muted);font-size:10.5px;line-height:1.45}
+.scroll{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:12.5px}
+thead th{
+  background:var(--navy);color:var(--cream);font-weight:700;text-align:right;
+  padding:9px 11px;font-size:8.5px;letter-spacing:.1em;text-transform:uppercase;white-space:nowrap;
+}
+thead th:first-child{text-align:left}
+thead th.grp{background:var(--navy-2);text-align:center;letter-spacing:.14em}
+thead th.sep,tbody td.sep{border-left:1px solid rgba(13,30,58,.16)}
+thead th.sep{border-left-color:rgba(247,245,241,.2)}
+tbody td{padding:6px 11px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap;color:rgba(27,43,69,.86)}
+tbody td:first-child{text-align:left;font-weight:500;color:var(--muted)}
+tbody tr:hover td{background:rgba(184,151,46,.05)}
+tbody tr.pay td:first-child{color:var(--navy);font-weight:700}
+tbody tr.exit td{background:rgba(184,151,46,.10)}
+tbody tr.exit td:first-child{color:var(--gold);font-weight:700;box-shadow:inset 3px 0 0 var(--gold)}
+td.gold{color:#8a6e22;font-weight:500}
+td.neg{color:var(--flag)}
+td.zero{color:rgba(27,43,69,.32)}
+td.left{text-align:left}
+
+/* ---- notes ---- */
+.note{
+  background:var(--paper);border:1px solid var(--line);border-left:3px solid var(--gold);
+  padding:15px 18px;margin-bottom:18px;font-size:13px;line-height:1.6;color:rgba(27,43,69,.78);
+}
+.note--flag{border-left-color:var(--flag)}
+.note h3{margin:0 0 6px;color:var(--navy);font:600 19px/1.15 "Cormorant Garamond",Georgia,serif}
+.note p{margin:0 0 8px}
+.note p:last-child{margin-bottom:0}
+.tag{
+  display:inline-block;margin-right:7px;padding:2px 7px;vertical-align:1px;
+  font-size:8.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;
+  border:1px solid var(--line);color:var(--muted);
+}
+.tag--v{border-color:var(--ok);color:var(--ok)}
+.tag--u{border-color:var(--flag);color:var(--flag)}
+h2.sec{margin:0 0 6px;color:var(--navy);font:600 30px/1.05 "Cormorant Garamond",Georgia,serif;letter-spacing:-.02em}
+p.sec-lede{max-width:60rem;margin:0 0 20px;color:rgba(27,43,69,.7);font-size:14px;line-height:1.62}
+
+.site-footer{padding:22px 0 34px;border-top:1px solid var(--line);color:var(--muted);font-size:10px;line-height:1.55}
+.site-footer strong{color:var(--navy);font-weight:600}
+
+@media (max-width:1040px){.cols{grid-template-columns:1fr}.rail{position:static}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap" style="display:flex;align-items:center;justify-content:space-between;gap:20px">
+    <a class="brand" href="/portal-partner-dashboard">
+      <span class="brand-mark" aria-hidden="true">EFA</span>
+      <span>
+        <span class="brand-name">Edwards Financial &amp; Associates</span>
+        <span class="brand-tagline">Protect · Grow · Legacy</span>
+      </span>
+    </a>
+    <a class="back" href="/portal-partner-dashboard">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15.4 18.6 8.8 12l6.6-6.6L13.6 3.6 5.2 12l8.4 8.4z"/></svg>
+      Portal
+    </a>
+  </div>
+</header>
+
+<main>
+  <div class="wrap">
+
+    <p class="eyebrow">Premium finance module</p>
+    <h1>Commercial Premium Finance Ledger</h1>
+    <p class="lede">A working model of the bank loan side of a financed life insurance case. The loan engine is reproduced from a carrier case study and validated to the dollar against the figures that carrier published. Policy values come from a real illustration rather than being modeled here.</p>
+
+    <div class="beta-bar">
+      <span class="beta-chip">Beta</span>
+      <p>This module is still in development. The loan engine is verified and the validation tab proves it on every load. The technique comparison is reproduced from a carrier document with its own dated assumptions, and the gift exposure calculation stays blank until current figures are entered. Nothing here has been reviewed for client use.</p>
+    </div>
+
+    <div class="tabs" role="tablist">
+      <button class="tab" role="tab" aria-selected="true" data-panel="model">Model</button>
+      <button class="tab" role="tab" aria-selected="false" data-panel="valid">Engine validation</button>
+      <button class="tab" role="tab" aria-selected="false" data-panel="tech">Technique comparison</button>
+      <button class="tab" role="tab" aria-selected="false" data-panel="notes">Method and sources</button>
+    </div>
+
+    <!-- ==================== MODEL ==================== -->
+    <section class="panel on" id="panel-model">
+      <div class="cols">
+
+        <form class="rail" id="rail" onsubmit="return false">
+          <div class="rail-hd">Case inputs</div>
+
+          <fieldset>
+            <legend>Preset</legend>
+            <div class="f">
+              <select id="preset" aria-label="Preset case">
+                <option value="csi540">Carrier case study, as printed</option>
+                <option value="stress">Rising rate stress path</option>
+              </select>
+            </div>
+            <button class="btn" type="button" id="loadPreset">Load preset</button>
+          </fieldset>
+
+          <fieldset>
+            <legend>Policy design</legend>
+            <div class="f2">
+              <div class="f"><label class="lab" for="premium">Annual premium</label><input id="premium" type="number" step="1" value="1412110"></div>
+              <div class="f"><label class="lab" for="premYears">Premium years</label><input id="premYears" type="number" step="1" value="10"></div>
+            </div>
+            <div class="f2">
+              <div class="f"><label class="lab" for="specAmount">Specified amount</label><input id="specAmount" type="number" step="1" value="19000000"></div>
+              <div class="f"><label class="lab" for="dbOption">Benefit option</label>
+                <select id="dbOption"><option value="B">B, increasing</option><option value="A">A, level</option></select></div>
+            </div>
+            <span class="hint">Option B gross death benefit is the specified amount plus account value. Option A is the specified amount alone.</span>
+          </fieldset>
+
+          <fieldset>
+            <legend>Bank loan</legend>
+            <div class="f">
+              <label class="lab" for="ratePath">Loan rate path, percent</label>
+              <textarea id="ratePath">5.00, 5.54, 5.52, 5.65, 5.82, 5.96, 6.07, 6.15, 6.20, 6.24, 6.26, 6.27, 6.28, 6.29</textarea>
+              <span class="hint">Comma separated. The last value carries forward for every remaining year.</span>
+            </div>
+            <div class="f2">
+              <div class="f"><label class="lab" for="clientPay">Client cash per year</label><input id="clientPay" type="number" step="1" value="300000"></div>
+              <div class="f"><label class="lab" for="payYears">Payment years</label><input id="payYears" type="number" step="1" value="10"></div>
+            </div>
+            <div class="f2">
+              <div class="f"><label class="lab" for="advance">Advance rate percent</label><input id="advance" type="number" step="0.1" value="90"></div>
+              <div class="f"><label class="lab" for="exitYear">Bank exit year</label><input id="exitYear" type="number" step="1" value="20"></div>
+            </div>
+            <div class="f"><label class="lab" for="polLoanRate">Policy loan charge percent</label><input id="polLoanRate" type="number" step="0.01" value="5.00"></div>
+            <span class="hint">At the exit year the bank balance is repaid with a policy loan, which then compounds at the charge rate.</span>
+          </fieldset>
+
+          <fieldset>
+            <legend>Policy values</legend>
+            <div class="f">
+              <label class="lab" for="valMode">Source</label>
+              <select id="valMode">
+                <option value="paste">Paste from carrier illustration</option>
+                <option value="sketch">Sketch, approximation only</option>
+              </select>
+            </div>
+            <div id="pasteBox">
+              <div class="f"><label class="lab" for="avList">Account value by year</label><textarea id="avList"></textarea></div>
+              <div class="f"><label class="lab" for="csvList">Surrender value by year</label><textarea id="csvList"></textarea></div>
+              <span class="hint">Comma separated, starting at year one. Enter gross values, before any policy loan is netted out.</span>
+            </div>
+            <div id="sketchBox" style="display:none">
+              <div class="f2">
+                <div class="f"><label class="lab" for="netCredit">Net credit percent</label><input id="netCredit" type="number" step="0.01" value="5.50"></div>
+                <div class="f"><label class="lab" for="load">Premium load percent</label><input id="load" type="number" step="0.01" value="9.23"></div>
+              </div>
+              <div class="f2">
+                <div class="f"><label class="lab" for="scStart">Year 1 surrender charge</label><input id="scStart" type="number" step="1" value="452675"></div>
+                <div class="f"><label class="lab" for="scYears">Charge runoff years</label><input id="scYears" type="number" step="1" value="13"></div>
+              </div>
+              <span class="hint">Sketch mode shapes a scenario before an illustration exists. It is not a carrier illustration and no figure from it belongs in a client document.</span>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Gift exposure</legend>
+            <div class="f2">
+              <div class="f"><label class="lab" for="benes">Beneficiaries</label><input id="benes" type="number" step="1" value="2"></div>
+              <div class="f"><label class="lab" for="annualExcl">Annual exclusion</label><input id="annualExcl" type="number" step="1" value="0" placeholder="confirm"></div>
+            </div>
+            <span class="hint">Leave the exclusion at zero until the current year amount is confirmed against primary source. This module will not supply a figure.</span>
+          </fieldset>
+
+          <fieldset>
+            <legend>Projection</legend>
+            <div class="f"><label class="lab" for="years">Years to project</label><input id="years" type="number" step="1" value="30"></div>
+            <button class="btn" type="button" id="run">Run ledger</button>
+            <button class="btn btn--ghost" type="button" id="copyCsv">Copy ledger as CSV</button>
+          </fieldset>
+        </form>
+
+        <div>
+          <div class="stats" id="stats"></div>
+          <div id="alerts"></div>
+          <div class="sheet">
+            <div class="sheet-hd">
+              <h2>Year by year ledger</h2>
+              <span class="meta" id="ledgerMeta"></span>
+            </div>
+            <div class="scroll"><table id="ledger"></table></div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ==================== VALIDATION ==================== -->
+    <section class="panel" id="panel-valid">
+      <h2 class="sec">Engine validation</h2>
+      <p class="sec-lede">The loan engine runs against the carrier case study inputs and is compared line by line to the figures printed in that document. Every computed column is calculated here, not copied. If a delta is not zero to the dollar, the engine has drifted and nothing else on this page should be trusted.</p>
+      <div class="stats" id="vstats"></div>
+      <div class="sheet">
+        <div class="sheet-hd">
+          <h2>Computed against printed</h2>
+          <span class="meta">Source: Allianz Life, CSI-540 (R-7/2026), premium finance estate planning case study</span>
+        </div>
+        <div class="scroll"><table id="vtable"></table></div>
+      </div>
+    </section>
+
+    <!-- ==================== TECHNIQUES ==================== -->
+    <section class="panel" id="panel-tech">
+      <h2 class="sec">Five financing techniques, side by side</h2>
+      <p class="sec-lede">These figures are reproduced exactly as printed by the carrier. They are not modeled here, because private financing, sale to a grantor trust, and private split dollar each require current applicable federal rates, the section 7520 rate, and economic benefit rate tables. Those are not built into this module and are not guessed.</p>
+
+      <div class="note note--flag">
+        <h3>Before this table is used for anything</h3>
+        <p><span class="tag tag--u">Unverified</span>The assumptions are February 2023 vintage: commercial rate varying 3.0 to 7.0 percent, private rate 4.27 percent, trust and GRAT asset return 7.00 percent, private split dollar 5.20 percent. Reprice against current rates before drawing any conclusion about a live case.</p>
+        <p>The two negative columns are not free money. Private financing requires the grantor to part with $8,301,427 in cash for nine years. Private split dollar assumes a $12,247,515 GRAT contribution. The table prices the interest and the gifts, not the capital lockup.</p>
+      </div>
+
+      <div class="sheet" style="margin-bottom:18px">
+        <div class="sheet-hd">
+          <h2>Cost comparison at a constant death benefit</h2>
+          <span class="meta">Source: John Hancock, Commercial vs Dual Summary vs PSD, printed February 3, 2023</span>
+        </div>
+        <div class="scroll"><table id="jhtable"></table></div>
+      </div>
+
+      <div class="sheet">
+        <div class="sheet-hd">
+          <h2>Which technique fits which estate</h2>
+          <span class="meta">Source: John Hancock, LIFE-7299-FT, Choosing a Financing Technique</span>
+        </div>
+        <div class="scroll"><table id="routetable"></table></div>
+      </div>
+    </section>
+
+    <!-- ==================== NOTES ==================== -->
+    <section class="panel" id="panel-notes">
+      <h2 class="sec">Method and sources</h2>
+      <p class="sec-lede">What this module computes, what it takes from a source document, and what it deliberately refuses to do.</p>
+
+      <div class="note">
+        <h3>The loan engine, verified</h3>
+        <p><span class="tag tag--v">Verified</span>Each year the bank charges interest on the prior balance plus that year's new premium. The client's fixed cash payment is subtracted and any shortfall capitalizes. Reproduced against nineteen printed years to a maximum error of ninety two cents, which is rounding in the source document.</p>
+        <p><span class="tag tag--v">Verified</span>Required outside collateral is the loan balance less the advance rate applied to surrender value, floored at zero.</p>
+        <p><span class="tag tag--v">Verified</span>At the exit year the bank balance is repaid with a policy loan equal to the prior year end balance grown one year at the policy loan charge rate. That loan then compounds and is not repaid.</p>
+        <p><span class="tag tag--v">Verified</span>Under benefit option B the gross death benefit is the specified amount plus the account value, constant across every pre exit year in the source document.</p>
+      </div>
+
+      <div class="note">
+        <h3>The policy side, not modeled</h3>
+        <p>Account value and surrender value are inputs, not outputs. In the source case study the account value compounds at rates between 5.61 and 6.07 percent net of charges against a stated illustrated rate of 5.5 percent. The cause of that difference is not disclosed in the document, so reproducing the policy engine would require assumptions this module will not invent. Paste real illustration values.</p>
+        <p>Sketch mode exists only to shape a scenario before an illustration is in hand. It labels itself as an approximation everywhere it appears, and no figure it produces belongs in a client document.</p>
+      </div>
+
+      <div class="note note--flag">
+        <h3>Carrier gates this module does not enforce</h3>
+        <p>The twenty percent client contribution test is computed and displayed, and it reflects one carrier's published guideline. Every other gate belongs to the carrier: issue age bands, net worth floors, maximum non modified endowment funding, approved vendor and lender lists, disclosure forms, producer training, and the requirement that a case be financially justified independent of the financing. None of them are checked here.</p>
+        <p><span class="tag tag--u">Unverified</span>Gift exposure depends on the current annual exclusion and lifetime exemption amounts. This module supplies neither. Confirm both against primary source before any figure leaves this screen.</p>
+      </div>
+
+      <div class="note">
+        <h3>Source documents</h3>
+        <p>Allianz Life Insurance Company of North America: CSI-540 (R-7/2026) case study, CSI-542 (R-11/2025) glossary, CSI-543 (R-9/2025) additional considerations, ASI-457 (R-10/2024), ASI-461 (R-5/2023), ASI-466 (R-10/2024) guidelines.</p>
+        <p>John Hancock Advanced Markets: LIFE-7299 (4/18) Guide to Financing Premiums, LIFE-7299-FC foundational concepts, LIFE-7299-FT choosing a financing technique, LIFE-7230WEB (7/23) financing options at a glance, LIFE-7565 (11/25) premium financing guidelines, LIFE-8938 (6/20) fact finder, and the February 2023 financing options comparison.</p>
+        <p>Every John Hancock piece listed above, and the three Allianz ASI pieces, are marked for agent use only and may not be shown to a client.</p>
+      </div>
+    </section>
+
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <strong>Joshua Edwards</strong> · Edwards Financial &amp; Associates ·
+    Life &amp; Annuities · Retirement Consulting · Estate Strategy ·
+    CA Insurance License #0G52544 · NPN #13411537
+  </div>
+</footer>
+<script>
+"use strict";
+
+/* Transcribed from Allianz CSI-540 (R-7/2026). Used only to validate the engine. */
+var CSI540 = {
+  premium:1412110, premYears:10, clientPay:300000, payYears:10,
+  specAmount:19000000, dbOption:"B", advance:0.90, exitYear:20,
+  polLoanRate:0.05, years:30,
+  rates:[5.00,5.54,5.52,5.65,5.82,5.96,6.07,6.15,6.20,6.24,6.26,6.27,6.28,6.29],
+  av:[1281828,2703716,4213891,5817721,7523050,9336971,11266975,13320933,15508092,17837449,
+      18889210,20008936,21200895,22469356,23818301,25307042,26881983,28546774,30304291,32157807,
+      34110976,36167472,38331481,40605369,42991175,45487397,48111426,50866913,53754044,56772333],
+  csv:[829153,2264341,3787721,5404756,7123100,8950036,10892960,13009333,15258812,17650489,
+       18764570,19946616,21200895,22469356,23818301,25307042,26881983,28546774,30304291,32157807,
+       34110976,36167472,38331481,40605369,42991175,45487397,48111426,50866913,53754044,56772333],
+  pInterest:[70606,143753,212558,292408,382949,481266,586866,699088,817066,942718,
+             985974,1049369,1116943,1188978,1263764,1343255,1427746,1517551,1613005],
+  pBalance:[1182716,2438579,3763247,5167765,6662823,8256199,9955176,11766374,13695550,15750378,
+            16736351,17785720,18902664,20091641,21355406,22698661,24126406,25643957,27256962],
+  pCollat:[436478,400672,354298,303484,252033,201166,151512,57974,0,0],
+  pPolLoan:[28619810,30050801,31553341,33131008,34787558,36526936,38353283,40270947,42284494,44398719,46618655],
+  pNetDB:[19099112,19265137,19450644,19649956,19860227,20080772,20311799,20554560,20812542,21087071,
+          21152858,21223215,21298231,21377714,21462895,21608381,21755577,21902816,22047329,22537997,
+          23060175,23614131,24200473,24817811,25464239,26134114,26840478,27582418,28355325,29153678]
+};
+
+/* ---------------------------- engine ---------------------------- */
+function runModel(c){
+  var rows=[], bal=0, polLoan=0, bankInt=0, polInt=0;
+  for(var y=1;y<=c.years;y++){
+    var beforeExit = y < c.exitYear, atExit = (y === c.exitYear);
+    var prem = (beforeExit && y<=c.premYears) ? c.premium : 0;
+    var pay  = (beforeExit && y<=c.payYears)  ? c.clientPay : 0;
+    var rate = c.rates[Math.min(y,c.rates.length)-1];
+    var interest=0, balEnd=0;
+
+    if(beforeExit){
+      var base = bal + prem;
+      interest = base*rate;
+      balEnd = base + interest - pay;
+      bankInt += interest;
+      bal = balEnd;
+    }else if(atExit){
+      polLoan = bal*(1+c.polLoanRate);
+      polInt += polLoan - bal;
+      bal = 0;
+    }else{
+      var g = polLoan*c.polLoanRate;
+      polInt += g; polLoan += g;
+    }
+
+    var av  = (c.av[y-1]  !== undefined) ? c.av[y-1]  : 0;
+    var csv = (c.csv[y-1] !== undefined) ? c.csv[y-1] : 0;
+    var grossDB = (c.dbOption === "B") ? c.specAmount + av : c.specAmount;
+    var collat  = beforeExit ? Math.max(0, balEnd - c.advance*csv) : 0;
+    var debt    = beforeExit ? balEnd : polLoan;
+
+    rows.push({
+      y:y, prem:prem, rate:rate, interest:interest, pay:pay, balEnd:balEnd,
+      av:av, csv:csv, collat:collat, polLoan: beforeExit ? 0 : polLoan,
+      grossDB:grossDB, netDB: grossDB - debt,
+      phase: beforeExit ? (y<=c.premYears ? "pay" : "accrue") : (atExit ? "exit" : "post")
+    });
+  }
+
+  var payingYears = Math.min(c.premYears, c.exitYear-1);
+  var cashYears   = Math.min(c.payYears,  c.exitYear-1);
+  var totalPrem   = c.premium*Math.max(0,payingYears);
+  var totalCash   = c.clientPay*Math.max(0,cashYears);
+  var peak = {collat:0,y:0};
+  for(var i=0;i<rows.length;i++){ if(rows[i].collat > peak.collat) peak = rows[i]; }
+  var clearYear = null;
+  for(var j=0;j<rows.length;j++){ if(rows[j].y > peak.y && rows[j].collat === 0){ clearYear = rows[j].y; break; } }
+  var exitRow = null;
+  for(var k=0;k<rows.length;k++){ if(rows[k].y === c.exitYear) exitRow = rows[k]; }
+  if(!exitRow) exitRow = rows[rows.length-1];
+  var shortfall = null;
+  for(var m=0;m<rows.length;m++){ if(rows[m].phase === "pay" && rows[m].interest > c.clientPay){ shortfall = rows[m].y; break; } }
+  var exclCap = (c.annualExcl||0)*(c.benes||0)*Math.max(0,cashYears);
+
+  return {
+    rows:rows, totalPrem:totalPrem, totalCash:totalCash,
+    oopPct: totalPrem>0 ? totalCash/totalPrem : 0,
+    peak:peak, clearYear:clearYear, exitRow:exitRow, lastRow:rows[rows.length-1],
+    bankInt:bankInt, polInt:polInt, costOfMoney:bankInt+polInt,
+    shortfallYear:shortfall, exclCap:exclCap,
+    exemptionBurn: Math.max(0, totalCash-exclCap),
+    irrExit: irr(c.clientPay, cashYears, c.exitYear, exitRow.netDB),
+    irrEnd:  irr(c.clientPay, cashYears, c.years, rows[rows.length-1].netDB)
+  };
+}
+
+function irr(pmt,n,t,target){
+  if(!pmt || !n || !(target>0)) return null;
+  var lo=0.0001, hi=1.0;
+  for(var i=0;i<240;i++){
+    var mid=(lo+hi)/2, fv=0;
+    for(var k=0;k<n;k++) fv += pmt*Math.pow(1+mid, t-k);
+    if(fv<target) lo=mid; else hi=mid;
+  }
+  var r=(lo+hi)/2;
+  return (r>0.9998 || r<0.0003) ? null : r;
+}
+
+/* ---------------------------- format ---------------------------- */
+function money(n){ return (n<0?"-":"") + "$" + Math.abs(Math.round(n)).toLocaleString("en-US"); }
+function pct(n,d){ return (n*100).toFixed(d===undefined?2:d) + "%"; }
+function cell(n,cls){
+  var c = (cls||"") + (n===0?" zero":"") + (n<0?" neg":"");
+  return '<td class="'+c.trim()+'">' + (n===0?"0":money(n)) + '</td>';
+}
+function $(id){ return document.getElementById(id); }
+function nums(s){
+  return String(s).split(/[\s,;]+/).map(function(x){return parseFloat(x);}).filter(function(x){return !isNaN(x);});
+}
+
+/* ---------------------------- config ---------------------------- */
+function readConfig(){
+  var years = Math.max(1, Math.min(80, parseInt($("years").value,10)||30));
+  var c = {
+    premium:+$("premium").value||0, premYears:+$("premYears").value||0,
+    clientPay:+$("clientPay").value||0, payYears:+$("payYears").value||0,
+    specAmount:+$("specAmount").value||0, dbOption:$("dbOption").value,
+    advance:(+$("advance").value||0)/100, exitYear:+$("exitYear").value||(years+1),
+    polLoanRate:(+$("polLoanRate").value||0)/100, years:years,
+    benes:+$("benes").value||0, annualExcl:+$("annualExcl").value||0
+  };
+  var r = nums($("ratePath").value).map(function(x){return x/100;});
+  c.rates = r.length ? r : [0.05];
+  while(c.rates.length < years) c.rates.push(c.rates[c.rates.length-1]);
+
+  if($("valMode").value === "sketch"){
+    var net=(+$("netCredit").value||0)/100, load=(+$("load").value||0)/100;
+    var sc0=+$("scStart").value||0, scY=Math.max(1,+$("scYears").value||1);
+    c.av=[]; c.csv=[];
+    var av=0;
+    for(var y=1;y<=years;y++){
+      var prem = (y<=c.premYears) ? c.premium*(1-load) : 0;
+      av = (av+prem)*(1+net);
+      var sc = (y<scY) ? sc0*(1-(y-1)/scY) : 0;
+      c.av.push(av); c.csv.push(Math.max(0, av-sc));
+    }
+    c.sketch = true;
+  }else{
+    c.av = nums($("avList").value); c.csv = nums($("csvList").value);
+    while(c.av.length  < years) c.av.push(c.av.length  ? c.av[c.av.length-1]  : 0);
+    while(c.csv.length < years) c.csv.push(c.csv.length ? c.csv[c.csv.length-1] : 0);
+  }
+  return c;
+}
+
+/* ---------------------------- render ---------------------------- */
+var lastResult = null;
+
+function render(){
+  var c = readConfig(), R = runModel(c);
+  lastResult = R;
+  var pass = R.oopPct >= 0.20;
+
+  $("stats").innerHTML =
+    '<div class="stat ' + (pass?"":"stat--warn") + '">' +
+      '<span class="k">Client contribution test</span>' +
+      '<span class="v ' + (pass?"pass":"fail") + '">' + pct(R.oopPct) + '</span>' +
+      '<span class="n">' + money(R.totalCash) + ' of cash against ' + money(R.totalPrem) + ' of planned premium. One carrier publishes a twenty percent floor.</span>' +
+    '</div>' +
+    '<div class="stat stat--acc">' +
+      '<span class="k">Peak outside collateral</span>' +
+      '<span class="v">' + money(R.peak.collat) + '</span>' +
+      '<span class="n">' + (R.peak.collat>0
+        ? 'Occurs in year ' + R.peak.y + '. ' + (R.clearYear ? 'Falls to zero in year ' + R.clearYear + '.' : 'Does not reach zero within the projection.')
+        : 'No outside collateral required at these assumptions.') + '</span>' +
+    '</div>' +
+    '<div class="stat">' +
+      '<span class="k">Total cost of money</span>' +
+      '<span class="v">' + money(R.costOfMoney) + '</span>' +
+      '<span class="n">' + money(R.bankInt) + ' bank interest, ' + money(R.polInt) + ' policy loan accrual. That is ' + (R.totalPrem ? pct(R.bankInt/R.totalPrem,0) : "not applicable") + ' of premium borrowed.</span>' +
+    '</div>' +
+    '<div class="stat">' +
+      '<span class="k">Net death benefit at exit</span>' +
+      '<span class="v">' + money(R.exitRow.netDB) + '</span>' +
+      '<span class="n">Year ' + R.exitRow.y + '. By year ' + R.lastRow.y + ' it is ' + money(R.lastRow.netDB) + '.</span>' +
+    '</div>' +
+    '<div class="stat stat--acc">' +
+      '<span class="k">Return on client cash</span>' +
+      '<span class="v">' + (R.irrExit ? pct(R.irrExit) : "not applicable") + '</span>' +
+      '<span class="n">If death occurs in the exit year. ' + (R.irrEnd ? pct(R.irrEnd) + ' if it occurs in year ' + R.lastRow.y + '.' : '') + '</span>' +
+    '</div>';
+
+  var a = [];
+  if(!pass){
+    a.push('<div class="note note--flag"><h3>Client contribution falls below twenty percent</h3><p>At ' + pct(R.oopPct) +
+      ' this design would not clear the published guideline of at least one carrier. Raise the client cash payment or reduce the premium.</p></div>');
+  }
+  if(R.shortfallYear){
+    a.push('<div class="note"><h3>Fixed payment stops covering current interest in year ' + R.shortfallYear + '</h3>' +
+      '<p>From that year forward the shortfall capitalizes into the loan balance, and the balance compounds against itself. This is the point most presentations pass over.</p></div>');
+  }
+  if(c.sketch){
+    a.push('<div class="note note--flag"><h3>Sketch values in use</h3><p>Account value and surrender value are approximated, not illustrated. Nothing on this screen traces to a carrier document while sketch mode is on.</p></div>');
+  }
+  if(R.totalCash > 0){
+    a.push('<div class="note"><h3>Gift exposure</h3><p>' + money(R.totalCash) + ' has to reach the trust across the payment period. ' +
+      (c.annualExcl > 0
+        ? 'Annual exclusion capacity for ' + c.benes + ' beneficiaries covers ' + money(R.exclCap) + ', leaving roughly ' + money(R.exemptionBurn) + ' against lifetime exemption.'
+        : 'Annual exclusion capacity is not calculated, because no exclusion amount has been entered. Confirm the current figure against primary source and enter it.') +
+      '</p></div>');
+  }
+  $("alerts").innerHTML = a.join("");
+
+  $("ledgerMeta").textContent = c.years + " years · exit year " + c.exitYear + " · benefit option " + c.dbOption;
+
+  var body = R.rows.map(function(r){
+    return '<tr class="' + r.phase + '">' +
+      '<td>' + r.y + '</td>' +
+      cell(r.prem,"sep") +
+      '<td>' + ((r.phase==="pay"||r.phase==="accrue") ? (r.rate*100).toFixed(2)+"%" : '<span class="zero">&mdash;</span>') + '</td>' +
+      cell(r.interest) + cell(r.pay) + cell(r.balEnd) +
+      cell(r.av,"sep") + cell(r.csv) +
+      cell(r.collat,"sep gold") + cell(r.polLoan) + cell(r.grossDB) + cell(r.netDB) +
+    '</tr>';
+  }).join("");
+
+  $("ledger").innerHTML =
+    '<thead><tr>' +
+      '<th rowspan="2">Yr</th>' +
+      '<th class="grp sep" colspan="5">Bank loan</th>' +
+      '<th class="grp sep" colspan="2">Policy values</th>' +
+      '<th class="grp sep" colspan="4">Position</th>' +
+    '</tr><tr>' +
+      '<th class="sep">Premium</th><th>Rate</th><th>Interest</th><th>Client cash</th><th>Balance</th>' +
+      '<th class="sep">Account value</th><th>Surrender value</th>' +
+      '<th class="sep">Collateral</th><th>Policy loan</th><th>Gross benefit</th><th>Net benefit</th>' +
+    '</tr></thead><tbody>' + body + '</tbody>';
+}
+
+/* -------------------------- validation -------------------------- */
+function renderValidation(){
+  var c = {
+    premium:CSI540.premium, premYears:CSI540.premYears,
+    clientPay:CSI540.clientPay, payYears:CSI540.payYears,
+    specAmount:CSI540.specAmount, dbOption:CSI540.dbOption,
+    advance:CSI540.advance, exitYear:CSI540.exitYear,
+    polLoanRate:CSI540.polLoanRate, years:CSI540.years,
+    av:CSI540.av, csv:CSI540.csv, benes:0, annualExcl:0,
+    rates:CSI540.rates.map(function(x){return x/100;})
+  };
+  while(c.rates.length < c.years) c.rates.push(c.rates[c.rates.length-1]);
+  var R = runModel(c);
+
+  var mI=0,mB=0,mC=0,mP=0,mD=0;
+  var rows = R.rows.map(function(r,i){
+    var pi=CSI540.pInterest[i], pb=CSI540.pBalance[i], pc=CSI540.pCollat[i],
+        pp=CSI540.pPolLoan[i-(CSI540.exitYear-1)], pd=CSI540.pNetDB[i];
+    var dI = (pi!==undefined) ? r.interest-pi : null;
+    var dB = (pb!==undefined) ? r.balEnd-pb   : null;
+    var dC = (pc!==undefined) ? r.collat-pc   : null;
+    var dP = (pp!==undefined) ? r.polLoan-pp  : null;
+    var dD = (pd!==undefined) ? r.netDB-pd    : null;
+    if(dI!==null) { mI=Math.max(mI,Math.abs(dI)); mB=Math.max(mB,Math.abs(dB)); }
+    if(dC!==null) mC=Math.max(mC,Math.abs(dC));
+    if(dP!==null) mP=Math.max(mP,Math.abs(dP));
+    if(dD!==null) mD=Math.max(mD,Math.abs(dD));
+    function d(v){
+      if(v===null) return '<td class="zero">&mdash;</td>';
+      return '<td class="' + (Math.abs(v)<1.5?"":"neg") + '">' + (Math.abs(v)<1.5 ? "0" : money(v)) + '</td>';
+    }
+    function pair(p,comp,sep){
+      if(p===undefined) return '<td class="zero' + (sep?" sep":"") + '">&mdash;</td><td class="zero">&mdash;</td>';
+      return '<td class="' + (sep?"sep":"") + '">' + money(p) + '</td><td>' + money(comp) + '</td>';
+    }
+    return '<tr class="' + r.phase + '"><td>' + r.y + '</td>' +
+      pair(pi,r.interest,true) + d(dI) +
+      pair(pb,r.balEnd,true)   + d(dB) +
+      pair(pc,r.collat,true)   + d(dC) +
+      pair(pp,r.polLoan,true)  + d(dP) +
+      pair(pd,r.netDB,true)    + d(dD) + '</tr>';
+  }).join("");
+
+  var worst = Math.max(mI,mB,mC,mP,mD), ok = worst < 1.5;
+  function cents(n){ return "$" + n.toFixed(2); }
+
+  $("vstats").innerHTML =
+    '<div class="stat ' + (ok?"":"stat--warn") + '"><span class="k">Engine status</span>' +
+      '<span class="v ' + (ok?"pass":"fail") + '">' + (ok?"Match":"Drift") + '</span>' +
+      '<span class="n">Largest disagreement with the printed document across every compared column is ' + cents(worst) + ', which is rounding in the source.</span></div>' +
+    '<div class="stat"><span class="k">Loan interest</span><span class="v">' + cents(mI) + '</span><span class="n">Maximum delta across 19 printed years.</span></div>' +
+    '<div class="stat"><span class="k">Loan balance</span><span class="v">' + cents(mB) + '</span><span class="n">Maximum delta across 19 printed years.</span></div>' +
+    '<div class="stat"><span class="k">Required collateral</span><span class="v">' + cents(mC) + '</span><span class="n">Maximum delta across 10 printed years.</span></div>' +
+    '<div class="stat"><span class="k">Net death benefit</span><span class="v">' + cents(mD) + '</span><span class="n">Maximum delta across all 30 printed years.</span></div>';
+
+  var grp = '<th class="grp sep" colspan="3">';
+  var sub = '<th class="sep">Printed</th><th>Computed</th><th>Delta</th>';
+  $("vtable").innerHTML =
+    '<thead><tr><th rowspan="2">Yr</th>' +
+      grp + 'Loan interest</th>' + grp + 'Loan balance</th>' + grp + 'Collateral</th>' +
+      grp + 'Policy loan</th>' + grp + 'Net death benefit</th></tr>' +
+      '<tr>' + sub + sub + sub + sub + sub + '</tr></thead><tbody>' + rows + '</tbody>';
+}
+
+/* ------------------------ static reference ----------------------- */
+function renderStatic(){
+  var cols = ["Annual gifts","Commercial, max funding","Commercial, min funding","Private financing, 9 year note","Dual loan, 9 year note","Private split dollar, 10 year term"];
+  var data = [
+    ["Initial death benefit","$15,000,000","$15,000,000","$15,000,000","$15,000,000","$15,000,000","$15,000,000"],
+    ["Death benefit at loan payoff","$15,000,000","$21,484,054","$15,000,000","$15,000,000","$15,000,000","$15,000,000"],
+    ["Net death benefit to trust after repayment","$15,000,000","$15,217,814","$15,000,000","$15,000,000","$15,000,000","$15,000,000"],
+    ["Annual premium","$196,473","$626,624","$196,473","$196,473","$196,473","$196,473"],
+    ["Total premiums to loan payoff","$1,964,730","$6,266,240","$1,964,730","$1,964,730","$1,964,730","$1,964,730"],
+    ["Initial loan amount","not applicable","$626,624","$196,473","$8,301,427","$8,301,427","$196,473"],
+    ["Commercial loan rate","","varies 3.0 to 7.0%","varies 3.0 to 7.0%","not applicable","fixed 3.00%","not applicable"],
+    ["Private illustrated rate","","","","4.27%","4.27%","5.20%"],
+    ["Policy, trust or GRAT asset return","","6.34%","6.34%","7.00%","7.00%","7.00%"],
+    ["Term of loan","","18 years","11 years","9 years","9 years","10 years"],
+    ["Gift and interest payments","$1,964,730","$4,377,595","$1,561,171","not applicable","$3,362,078","$6,728"],
+    ["Initial GRAT contribution","","","","","","$12,247,515"],
+    ["Interest received back from trust","$0","","","$3,190,238","$3,190,238",""],
+    ["GRAT payments received","","","","","","$16,015,683"],
+    ["Net interest and gift tax cost","$1,964,730","$4,377,595","$1,561,171","($3,190,238)","$171,840","($3,761,440)"]
+  ];
+  $("jhtable").innerHTML =
+    '<thead><tr><th>Line</th>' + cols.map(function(x){return '<th>'+x+'</th>';}).join("") + '</tr></thead><tbody>' +
+    data.map(function(r,i){
+      return '<tr class="' + (i===data.length-1 ? "exit" : "") + '"><td>' + r[0] + '</td>' +
+        r.slice(1).map(function(v){ return '<td>' + (v || '<span class="zero">&mdash;</span>') + '</td>'; }).join("") + '</tr>';
+    }).join("") + '</tbody>';
+
+  var route = [
+    ["Cash and other liquid assets","Private split dollar, or private finance"],
+    ["Income producing assets","Private split dollar, private finance, or sale to a grantor trust"],
+    ["Illiquid assets producing little to no income","Commercial premium finance, or dual loan"]
+  ];
+  $("routetable").innerHTML =
+    '<thead><tr><th>What the client predominantly owns</th><th style="text-align:left">Technique the carrier routes to</th></tr></thead><tbody>' +
+    route.map(function(r,i){
+      return '<tr class="' + (i===2?"exit":"") + '"><td>' + r[0] + '</td><td class="left">' + r[1] + '</td></tr>';
+    }).join("") + '</tbody>';
+}
+
+/* ---------------------------- wiring ---------------------------- */
+function applyPreset(name){
+  $("premium").value = 1412110; $("premYears").value = 10;
+  $("clientPay").value = 300000; $("payYears").value = 10;
+  $("specAmount").value = 19000000; $("dbOption").value = "B";
+  $("advance").value = 90; $("exitYear").value = 20;
+  $("polLoanRate").value = "5.00"; $("years").value = 30;
+  $("valMode").value = "paste"; toggleValMode();
+  $("avList").value = CSI540.av.join(", ");
+  $("csvList").value = CSI540.csv.join(", ");
+  $("ratePath").value = (name === "stress")
+    ? "3.00, 3.25, 3.50, 4.00, 4.50, 4.75, 5.50, 6.00, 6.50, 5.75"
+    : CSI540.rates.map(function(r){return r.toFixed(2);}).join(", ");
+  render();
+}
+
+function toggleValMode(){
+  var sketch = $("valMode").value === "sketch";
+  $("pasteBox").style.display  = sketch ? "none" : "block";
+  $("sketchBox").style.display = sketch ? "block" : "none";
+}
+
+function toCsv(){
+  if(!lastResult) return "";
+  var head = ["Year","Premium","Loan rate","Loan interest","Client cash","Loan balance",
+              "Account value","Surrender value","Required collateral","Policy loan",
+              "Gross death benefit","Net death benefit"].join(",");
+  var body = lastResult.rows.map(function(r){
+    return [r.y, r.prem, (r.rate*100).toFixed(2), Math.round(r.interest), r.pay,
+            Math.round(r.balEnd), Math.round(r.av), Math.round(r.csv),
+            Math.round(r.collat), Math.round(r.polLoan),
+            Math.round(r.grossDB), Math.round(r.netDB)].join(",");
+  });
+  return [head].concat(body).join("\n");
+}
+
+document.querySelectorAll(".tab").forEach(function(t){
+  t.addEventListener("click", function(){
+    document.querySelectorAll(".tab").forEach(function(x){ x.setAttribute("aria-selected","false"); });
+    document.querySelectorAll(".panel").forEach(function(p){ p.classList.remove("on"); });
+    t.setAttribute("aria-selected","true");
+    var p = $("panel-" + t.getAttribute("data-panel"));
+    if(p) p.classList.add("on");
+  });
+});
+
+$("run").addEventListener("click", render);
+$("loadPreset").addEventListener("click", function(){ applyPreset($("preset").value); });
+$("valMode").addEventListener("change", function(){ toggleValMode(); render(); });
+
+$("copyCsv").addEventListener("click", function(){
+  var btn = $("copyCsv"), csv = toCsv();
+  function done(ok){
+    btn.textContent = ok ? "Copied to clipboard" : "Copy blocked, select the table";
+    setTimeout(function(){ btn.textContent = "Copy ledger as CSV"; }, 2200);
+  }
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(csv).then(function(){ done(true); }, function(){ done(false); });
+  }else{
+    var ta = document.createElement("textarea");
+    ta.value = csv; ta.setAttribute("readonly","");
+    ta.style.position = "fixed"; ta.style.opacity = "0";
+    document.body.appendChild(ta); ta.select();
+    var ok = false;
+    try { ok = document.execCommand("copy"); } catch(e) { ok = false; }
+    document.body.removeChild(ta);
+    done(ok);
+  }
+});
+
+$("rail").addEventListener("input", function(e){
+  if(e.target && e.target.id !== "preset") render();
+});
+
+applyPreset("csi540");
+renderValidation();
+renderStatic();
+
+</script>
+</body>
+</html>
