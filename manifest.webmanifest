@@ -1,0 +1,31 @@
+{
+  "name": "Edwards Financial Daily Desk",
+  "short_name": "Daily Desk",
+  "description": "Today's prospecting queue for approved partners of Edwards Financial & Associates.",
+  "start_url": "/portal-partner-daily-desk",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f1ebdd",
+  "theme_color": "#0d1e3a",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
