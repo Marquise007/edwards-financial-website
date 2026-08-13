@@ -553,18 +553,23 @@ async function undoSend(key){
     /* crm_log_send also stamped the contact as touched. Deleting only the send
        row would leave the contact looking worked when it was not, which is the
        same pollution in a different table. */
+    let touchReverted=true;
     try{
       const c=await rest('crm_contacts','select=touch_count&id=eq.'+st.contact);
       const n=Math.max(0,(((c&&c[0]&&c[0].touch_count)||0)-1));
       const patch={touch_count:n};
       if(n===0) patch.last_touch_at=null;
-      await api('/rest/v1/crm_contacts?id=eq.'+st.contact,
-        {method:'PATCH',headers:{'Prefer':'return=minimal'},body:patch});
-    }catch(e){ /* the send is already gone; do not fail the undo over the count */ }
+      await patchRows('/rest/v1/crm_contacts?id=eq.'+st.contact,patch);
+    }catch(e){ touchReverted=false; }
+
     delete SENDS[st.contact+'|'+st.step];
     st.sendId=null; st.loggedBody=null; st.rating=0;
     renderScore(key);
-    toast('Send removed. It no longer counts.');
+    /* The send is gone either way, so this is a partial success, not a failure.
+       Say which half worked rather than reporting a clean undo. */
+    toast(touchReverted
+      ? 'Send removed. It no longer counts.'
+      : 'Send removed, but the touch count on the contact could not be rolled back.');
   }catch(e){ toast('Could not undo: '+e.message); }
 }
 
@@ -573,11 +578,10 @@ async function saveOwnNote(key,id){
   const text=cardText(key);
   if(!text){ toast('Nothing to save.'); return; }
   try{
-    await api('/rest/v1/crm_contacts?id=eq.'+id,
-      {method:'PATCH',headers:{'Prefer':'return=minimal'},body:{custom_connect_note:text}});
+    await patchRows('/rest/v1/crm_contacts?id=eq.'+id,{custom_connect_note:text});
     toast('Saved as this person’s note.');
     await loadProspects();
-  }catch(e){ toast('Could not save: '+e.message); }
+  }catch(e){ toast('Not saved: '+e.message); }
 }
 
 function scoreBlock(key){
@@ -645,6 +649,24 @@ async function api(path,opts){
 }
 const rest=(t,q)=>api('/rest/v1/'+t+(q?'?'+q:''));
 const rpc=(f,args)=>api('/rest/v1/rpc/'+f,{method:'POST',body:args||{}});
+
+/* PostgREST answers an UPDATE that matched nothing with 204 and no body, which
+   is indistinguishable from success. Under row level security that is the
+   normal shape of "this row exists but is not yours to change", so a write that
+   silently changed nothing would report Saved. Ask for the rows back and treat
+   an empty array as the failure it is.
+
+   Safe on these tables specifically: the SELECT policy on crm_contacts and
+   crm_tasks is at least as permissive as the UPDATE policy, so asking for the
+   row back cannot turn a working write into a 401. That is NOT true everywhere,
+   which is why the two public form endpoints must keep return=minimal. */
+async function patchRows(path,body){
+  const rows=await api(path,{method:'PATCH',headers:{'Prefer':'return=representation'},body:body});
+  if(!rows||!rows.length){
+    throw new Error('nothing was changed, so it is probably not yours to edit');
+  }
+  return rows;
+}
 
 /* ---------------- AUTH GATE ----------------
    Primary gate: the same stored Supabase session every other Partner Portal
@@ -766,10 +788,11 @@ function stepFromTitle(t){
 }
 function fmtDay(d){const x=new Date(d);return x.toLocaleDateString(undefined,{month:'short',day:'numeric'});}
 async function doneTask(id){
-  try{ await api('/rest/v1/crm_tasks?id=eq.'+id,{method:'PATCH',
-        headers:{'Prefer':'return=minimal'},
-        body:{status:'done',completed_at:new Date().toISOString()}});
-    toast('Done.'); await loadToday(); }catch(e){ toast('Could not update: '+e.message); }
+  try{
+    await patchRows('/rest/v1/crm_tasks?id=eq.'+id,
+      {status:'done',completed_at:new Date().toISOString()});
+    toast('Done.'); await loadToday();
+  }catch(e){ toast('Not marked done: '+e.message); }
 }
 async function stopCadence(cid){
   try{ await rpc('crm_linkedin_stop',{p_contact:cid,p_reason:'replied'});
@@ -1363,11 +1386,12 @@ async function saveBriefField(el){
   }
   try{
     const body={}; body[col]=value;
-    await api('/rest/v1/crm_contacts?id=eq.'+id,
-      {method:'PATCH',headers:{'Prefer':'return=minimal'},body:body});
+    await patchRows('/rest/v1/crm_contacts?id=eq.'+id,body);
     el.setAttribute('data-original',text);
     flash(el,'Saved');
   }catch(e){
+    /* Leave the text on screen exactly as typed. data-original is untouched, so
+       the next blur retries rather than treating the failed edit as the truth. */
     flash(el,'Not saved: '+e.message,true);
   }
 }
