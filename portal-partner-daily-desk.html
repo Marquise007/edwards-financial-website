@@ -69,6 +69,11 @@ svg{display:block}
 .navitem.active:after{content:"";position:absolute;left:0;right:0;bottom:0;height:2px;background:var(--gold)}
 .navitem .cnt{background:var(--gold);color:var(--navy);border-radius:9px;padding:0 6px;font-size:10px}
 .userarea{justify-self:end;display:flex;align-items:center;gap:10px;color:var(--navy);white-space:nowrap}
+/* Phone only. A horizontal strip put Numbers and Performance off the right
+   edge, where they stop being opened at all. */
+.navsel{display:none;width:100%;height:34px;border:1px solid var(--line);border-radius:5px;
+  background:#fff;color:var(--navy);font-size:12px;font-weight:700;padding:0 8px;
+  text-transform:uppercase;letter-spacing:.06em}
 .avatar-mini{width:30px;height:30px;border-radius:50%;background:var(--navy);color:#fff;
   display:grid;place-items:center;font-size:11px}
 .user-name{font-size:12px;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -115,7 +120,7 @@ svg{display:block}
 /* ===== INFO GRID ===== */
 .info-grid{margin-top:10px;display:grid;grid-template-columns:1.28fr 1.13fr 1.49fr .75fr;gap:9px}
 .pnl{background:#fff;border:1px solid var(--line);border-radius:5px;overflow:hidden;display:flex;flex-direction:column}
-.pnl>h4{height:38px;flex:0 0 auto;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:9px;
+.pnl>h4{height:34px;flex:0 0 auto;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:9px;
   padding:0 14px;text-transform:uppercase;letter-spacing:.07em;font-weight:800;font-size:11px;color:#112545}
 .pnl>h4 .ico{font-size:15px;color:var(--navy);opacity:.75}
 .pnl .body{padding:7px 13px;flex:1;min-height:0}
@@ -158,6 +163,9 @@ svg{display:block}
 .bval:empty::before{content:attr(data-empty);color:var(--light);font-style:italic}
 .bval.json{font-family:ui-monospace,Menlo,monospace;font-size:11px;white-space:pre-wrap;
   background:#fcfbf7;border:1px solid var(--line);padding:7px 9px;-webkit-line-clamp:unset;overflow:visible}
+/* do_not_misstate never clamps, at any width. It is the field that stops an
+   embarrassing message going out, and half a warning is worse than none. */
+.bval.noclamp{display:block;-webkit-line-clamp:unset;overflow:visible}
 .badge{display:inline-block;margin-left:6px;font-size:8.5px;letter-spacing:.06em;text-transform:uppercase;
   font-weight:800;padding:1px 6px;border-radius:3px;background:#eef1f4;color:var(--muted)}
 .flash{margin-left:7px;font-size:9px;letter-spacing:.06em;text-transform:uppercase;font-weight:800;color:var(--green)}
@@ -166,11 +174,11 @@ svg{display:block}
 /* ===== MESSAGE + WORKFLOW ===== */
 .bottom-grid{margin-top:9px;display:grid;grid-template-columns:1.16fr .90fr;gap:9px}
 .message-card,.workflow-card{background:#fff;border:1px solid var(--line);border-radius:5px;overflow:hidden}
-.card-title{height:38px;border-bottom:1px solid var(--line);display:flex;align-items:center;padding:0 14px;
+.card-title{height:34px;border-bottom:1px solid var(--line);display:flex;align-items:center;padding:0 14px;
   text-transform:uppercase;letter-spacing:.07em;font-weight:800;font-size:11px;color:#112545}
 .card-title .counter{margin-left:auto;color:var(--green);font-size:11px;font-weight:800}
 .card-title .counter.over{color:var(--red)}
-.message-text{padding:9px 12px;font-size:12.5px;line-height:1.6;color:#17243b;min-height:60px;outline:none}
+.message-text{padding:9px 12px;font-size:12.5px;line-height:1.6;color:#17243b;min-height:52px;outline:none}
 .message-text:focus{background:#fffdf7}
 .plabel{padding:8px 12px 0;font-size:9px;letter-spacing:.12em;text-transform:uppercase;font-weight:800;color:var(--muted)}
 .plabel.own{color:var(--gold)}
@@ -351,8 +359,8 @@ td.rate{font-weight:800}
   details.acc[open] .accbody{max-height:44vh}
   /* Measured compression to hold one screen at 390x844. Every number below
      came from measuring the block, not from taste. */
-  .mainnav{flex-wrap:nowrap;height:36px;gap:14px}
-  .navitem{font-size:11px}
+  .mainnav{display:none}
+  .navsel{display:block;grid-column:1/-1}
   .utility{flex-wrap:nowrap;min-height:34px}
   .utility .kick{display:none}
   .pager-btn{padding:0 10px;height:30px}
@@ -366,7 +374,7 @@ td.rate{font-weight:800}
   .status{padding:5px 9px;font-size:9.5px}
   .action-btn{height:30px;padding:0 10px;font-size:10px}
   .small-btn{height:30px;padding:0 10px;font-size:9.5px}
-  .message-text{min-height:52px}
+
   details.acc>summary{padding:8px 11px}
   .acc-sub{margin-top:2px}
   .topbar-inner{padding:5px 0;gap:4px}
@@ -401,6 +409,8 @@ td.rate{font-weight:800}
         <div class="brand-sub">Financial &amp; Associates</div>
       </div>
     </div>
+
+    <select class="navsel" id="navsel" aria-label="Section"></select>
 
     <nav class="mainnav">
       <button class="navitem active" data-tab="today">Today <span class="cnt" id="cnt_today">0</span></button>
@@ -683,13 +693,19 @@ function scoreBlock(key){
     '<div class="scorehead">Logged as sent. How did it land?'+
       '<button class="btn ghost undo" data-act="undo-send" data-key="'+key+'" '+
       'title="Remove this send">&times; Didn’t send</button></div>'+
-    '<select id="so_'+key+'"><option value="">Outcome, once you know</option>'+
-      OUTCOMES.map(o=>'<option value="'+o[0]+'"'+(cur===o[0]?' selected':'')+'>'+esc(o[1])+'</option>').join('')+'</select>'+
-    '<div class="stars">'+[1,2,3,4,5].map(n=>
-      '<button class="btn ghost star" data-act="rate" data-key="'+key+'" data-n="'+n+'">'+n+'</button>'
-    ).join('')+'</div>'+
-    '<input id="sn_'+key+'" maxlength="280" placeholder="What happened, in a line">'+
-    '<button class="btn" data-act="save-score" data-key="'+key+'">Save outcome</button>'+
+    /* .scorerow is what makes these wrap into one line instead of four stacked
+       full-width rows. It was styled but never emitted. */
+    '<div class="scorerow">'+
+      '<select id="so_'+key+'"><option value="">Outcome, once you know</option>'+
+        OUTCOMES.map(o=>'<option value="'+o[0]+'"'+(cur===o[0]?' selected':'')+'>'+esc(o[1])+'</option>').join('')+'</select>'+
+      '<div class="stars">'+[1,2,3,4,5].map(n=>
+        '<button class="star" data-act="rate" data-key="'+key+'" data-n="'+n+'">'+n+'</button>'
+      ).join('')+'</div>'+
+    '</div>'+
+    '<div class="scorerow" style="margin-top:7px">'+
+      '<input id="sn_'+key+'" maxlength="280" placeholder="What happened, in a line">'+
+      '<button class="small-btn primary" data-act="save-score" data-key="'+key+'">Save outcome</button>'+
+    '</div>'+
     '</div>';
 }
 function renderScore(key){
@@ -779,6 +795,11 @@ async function start(session){
   $('loginbox').classList.add('hide'); $('app').classList.remove('hide');
   $('whoami').textContent=USER.email;
   $('userInitials').textContent=initials((USER.user_metadata&&USER.user_metadata.full_name)||USER.email);
+  /* Populate the phone nav before any network call. It used to fill only as a
+     side effect of a loader succeeding, so an offline or 401 load left a phone
+     with an empty dropdown, no visible strip to fall back on, and no way off
+     the Today panel. */
+  syncNav('today');
   /* Reads existing state only. Never prompts. */
   refreshPushButton();
   await refreshAll();
@@ -805,7 +826,7 @@ let QUEUE=[], TODAY_AT=0, TODAY_META={}, TODAY_MSG={};
 async function loadToday(){
   const rows=await rest('crm_linkedin_today','select=*&order=due_at.asc');
   QUEUE=rows||[];
-  $('cnt_today').textContent=QUEUE.length;
+  $('cnt_today').textContent=QUEUE.length; syncNav();
   $('todayTotal').textContent=QUEUE.length;
   if(TODAY_AT>=QUEUE.length) TODAY_AT=0;
 
@@ -955,7 +976,7 @@ function doctrineFor(step){
 function editable(id,col,value,opts){
   const o=opts||{};
   const v=(value==null?'':String(value));
-  return '<div class="bval'+(o.json?' json':'')+'" contenteditable="true" '+
+  return '<div class="bval'+(o.json?' json':'')+(o.noclamp?' noclamp':'')+'" contenteditable="true" '+
     'spellcheck="'+(o.json?'false':'true')+'" '+
     'data-save-col="'+col+'" data-save-id="'+id+'"'+(o.json?' data-json="1"':'')+
     ' data-empty="'+esc(o.empty||'Not recorded')+'"'+
@@ -968,9 +989,11 @@ function snapshotPanel(r){
     return '<div class="snapshot-row"><div class="si">'+icon+'</div>'+
       '<div class="lab">'+esc(k)+'</div><div class="val">'+(v?esc(v):'&mdash;')+'</div></div>';
   };
+  /* alert also means never clamp: a truncated warning is worse than none. */
   const ed=function(icon,k,col,v,empty,alert){
     return '<div class="snapshot-row'+(alert?' alert':'')+'"><div class="si">'+icon+'</div>'+
-      '<div class="lab">'+esc(k)+'</div><div class="val">'+editable(id,col,v,{empty:empty})+'</div></div>';
+      '<div class="lab">'+esc(k)+'</div><div class="val">'+
+      editable(id,col,v,{empty:empty,noclamp:!!alert})+'</div></div>';
   };
   return '<section class="pnl"><h4><span class="ico">&#9814;</span>Prospect Snapshot</h4><div class="body">'+
     ro('&#9817;','Role',r.title)+
@@ -1184,7 +1207,7 @@ let PROS=[], PROS_AT=0;
 async function loadProspects(){
   const rows=await rest('crm_prospect_brief','select=*&order=created_at.desc&limit=200');
   PROS=rows||[];
-  $('cnt_pros').textContent=PROS.length;
+  $('cnt_pros').textContent=PROS.length; syncNav();
   $('prosTotal').textContent=PROS.length;
   if(PROS_AT>=PROS.length) PROS_AT=0;
   await loadSends(PROS.map(r=>r.contact_id));
@@ -1424,13 +1447,32 @@ async function enableReminders(){
   }
 }
 
+/* The phone dropdown and the desktop strip are two faces of one nav, so the
+   labels, the counts and the selection all come from a single list. */
+const NAV=[['today','Today'],['add','Add Prospect'],['list','Your List'],
+           ['seg','Segments'],['fun','Numbers'],['perf','Performance']];
+function syncNav(active){
+  const sel=$('navsel'); if(!sel) return;
+  const counts={today:($('cnt_today')||{}).textContent||'',
+                list:($('cnt_pros')||{}).textContent||''};
+  const cur=active||sel.value||'today';
+  sel.innerHTML=NAV.map(function(n){
+    const c=counts[n[0]];
+    return '<option value="'+n[0]+'"'+(n[0]===cur?' selected':'')+'>'+
+           esc(n[1])+((c&&c!=='0')?(' ('+esc(c)+')'):'')+'</option>';
+  }).join('');
+}
 function show(id){
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('on'));
   document.querySelectorAll('.navitem').forEach(t=>t.classList.remove('active'));
   const p=$('p_'+id); if(p) p.classList.add('on');
   const nav=document.querySelector('.navitem[data-tab="'+id+'"]');
   if(nav) nav.classList.add('active');
+  syncNav(id);
 }
+document.addEventListener('change',function(e){
+  if(e.target&&e.target.id==='navsel') show(e.target.value);
+});
 async function loadPerformance(){
   const box=$('perfbox');
   let rows=[];
@@ -1538,9 +1580,19 @@ document.addEventListener('blur',function(e){
 /* Editable fields live in two shapes: a .bfield with a .blabel, and a snapshot
    .srow with a .k. Find whichever label this one has, or the confirmation
    silently never appears. */
+/* Editable fields sit in four different wrappers, each with its own label
+   element. This used to hunt for .bfield/.srow/.blabel, which the theme rewrite
+   renamed out of existence, so every confirmation AND every failure went
+   nowhere. A failure now also raises a toast, so that this can never again fail
+   silently just because the markup moved. */
 function flash(el,msg,bad){
-  const holder=el.closest?(el.closest('.bfield')||el.closest('.srow')):null;
-  const lab=holder?(holder.querySelector('.blabel')||holder.querySelector('.k')):null;
+  if(bad) toast(msg);
+  const holder=el.closest
+    ? el.closest('.snapshot-row,.brief-row,.accrow,.why,.message-card,.pnl')
+    : null;
+  const lab=holder
+    ? holder.querySelector('.lab,.blab,.section-kicker,.blabel,b')
+    : null;
   if(!lab) return;
   let f=lab.querySelector('.flash');
   if(!f){ f=document.createElement('span'); f.className='flash'; lab.appendChild(f); }
