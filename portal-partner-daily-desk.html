@@ -440,6 +440,17 @@ async function undoSend(key){
     const gone=await api('/rest/v1/crm_message_sends?id=eq.'+st.sendId,
       {method:'DELETE',headers:{'Prefer':'return=representation'}});
     if(!gone||!gone.length){ toast('Nothing was removed. That send may not be yours.'); return; }
+    /* crm_log_send also stamped the contact as touched. Deleting only the send
+       row would leave the contact looking worked when it was not, which is the
+       same pollution in a different table. */
+    try{
+      const c=await rest('crm_contacts','select=touch_count&id=eq.'+st.contact);
+      const n=Math.max(0,(((c&&c[0]&&c[0].touch_count)||0)-1));
+      const patch={touch_count:n};
+      if(n===0) patch.last_touch_at=null;
+      await api('/rest/v1/crm_contacts?id=eq.'+st.contact,
+        {method:'PATCH',headers:{'Prefer':'return=minimal'},body:patch});
+    }catch(e){ /* the send is already gone; do not fail the undo over the count */ }
     delete SENDS[st.contact+'|'+st.step];
     st.sendId=null; st.loggedBody=null; st.rating=0;
     renderScore(key);
