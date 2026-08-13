@@ -216,6 +216,42 @@ svg{display:block}
   font-size:11px;font-weight:800;color:var(--navy)}
 .stars .star.on{background:var(--gold);border-color:var(--gold);color:var(--navy)}
 
+/* ===== COPY INBOX ===== */
+.pastewrap{padding:10px 12px 12px}
+#pastebox{width:100%;height:104px;resize:none;font-family:ui-monospace,Menlo,monospace;font-size:11.5px;
+  line-height:1.5;border:1px solid var(--line);border-radius:5px;padding:9px 10px;background:#fcfbf7}
+#pastebox:focus{outline:none;border-color:var(--gold);background:#fff}
+.pastefoot{display:flex;align-items:center;gap:8px;margin-top:9px;flex-wrap:wrap}
+.proposeout{margin-top:9px;border-radius:5px;padding:9px 11px;font-size:12px;line-height:1.5}
+.proposeout.ok{background:#eef6f1;border:1px solid rgba(20,125,84,.3);color:#0e5c3d}
+.proposeout.bad{background:#fdecec;border:1px solid rgba(224,37,37,.35);color:#8a1c1c}
+.proposeout b{display:block;font-size:9px;letter-spacing:.12em;text-transform:uppercase;margin-bottom:3px}
+.proposeout ul{margin:5px 0 0 16px;padding:0}
+.proposeout li{margin-top:2px}
+.tally{display:flex;gap:8px;margin-bottom:4px}
+.tally span{font-size:10px;letter-spacing:.07em;text-transform:uppercase;font-weight:800;
+  padding:2px 8px;border-radius:3px;background:#fff;border:1px solid var(--line)}
+.tally .acc{color:var(--green);border-color:rgba(20,125,84,.4)}
+.tally .rej{color:var(--red);border-color:rgba(224,37,37,.4)}
+
+.compare{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:10px 14px}
+.compare.solo{grid-template-columns:1fr}
+.side{border:1px solid var(--line);border-radius:5px;overflow:hidden;background:#fff}
+.side>h5{margin:0;padding:7px 11px;border-bottom:1px solid var(--line);background:var(--cream);
+  font-size:9px;letter-spacing:.11em;text-transform:uppercase;font-weight:800;color:#112545;
+  display:flex;align-items:center;gap:7px}
+.side>h5 .cc{margin-left:auto}
+.side.live>h5{background:#f2f0ec;color:var(--muted)}
+.side .txt{padding:9px 11px;font-size:12.5px;line-height:1.55;white-space:pre-wrap}
+.side.live .txt{color:var(--muted)}
+.why-rationale{padding:0 14px 10px;font-size:12px;line-height:1.5}
+.why-rationale b{display:block;font-size:9px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--gold);margin-bottom:2px}
+.propfoot{display:flex;gap:8px;padding:0 14px 12px;flex-wrap:wrap;align-items:center}
+.propfoot input{flex:1;min-width:150px;height:34px}
+.small-btn.approve{background:var(--green);border-color:var(--green);color:#fff}
+.small-btn.reject{border-color:var(--red);color:var(--red)}
+
 /* ===== ACCORDIONS ===== */
 .accordions{margin-top:9px;display:grid;grid-template-columns:repeat(4,1fr);
   border:1px solid var(--line);border-radius:5px;background:#fff;overflow:hidden}
@@ -416,6 +452,7 @@ td.rate{font-weight:800}
       <button class="navitem active" data-tab="today">Today <span class="cnt" id="cnt_today">0</span></button>
       <button class="navitem" data-tab="add">Add Prospect</button>
       <button class="navitem" data-tab="list">Your List <span class="cnt" id="cnt_pros">0</span></button>
+      <button class="navitem" data-tab="copy">Copy Inbox <span class="cnt" id="cnt_prop">0</span></button>
       <button class="navitem" data-tab="seg">Segments</button>
       <button class="navitem" data-tab="fun">Numbers</button>
       <button class="navitem" data-tab="perf">Performance</button>
@@ -486,6 +523,35 @@ td.rate{font-weight:800}
       <button class="export" onclick="exportCsv()">&#8681;&nbsp; Export CSV</button>
     </div>
     <div id="prosbox"></div>
+  </div>
+
+  <div class="panel" id="p_copy">
+    <div class="utility">
+      <span class="kick">Copy inbox</span>
+      <div class="utility-spacer"></div>
+      <div class="pager">
+        <button class="pager-btn" data-act="prop-prev">&lsaquo;&nbsp; Previous</button>
+        <div class="pager-count"><span id="propIdx">0</span> of <span id="propTotal">0</span></div>
+        <button class="pager-btn" data-act="prop-next">Next &nbsp;&rsaquo;</button>
+      </div>
+      <button class="export" onclick="loadProposals()">Refresh</button>
+    </div>
+
+    <section class="message-card">
+      <div class="card-title"><span>&#9635; &nbsp; Paste copy from ChatGPT</span>
+        <span class="counter" id="pasteState"></span></div>
+      <div class="pastewrap">
+        <textarea id="pastebox" spellcheck="false" placeholder='[ { "segment_id": "cpa", "step": "connect", "body": "...", "rationale": "why this works" } ]'></textarea>
+        <div class="pastefoot">
+          <button class="small-btn primary" data-act="propose">Submit</button>
+          <button class="small-btn" data-act="paste-clear">Clear</button>
+          <span class="inh">A JSON array. Each item needs segment_id, step and body.</span>
+        </div>
+        <div class="proposeout hide" id="proposeout"></div>
+      </div>
+    </section>
+
+    <div id="propbox"></div>
   </div>
 
   <div class="panel" id="p_seg">
@@ -1449,12 +1515,13 @@ async function enableReminders(){
 
 /* The phone dropdown and the desktop strip are two faces of one nav, so the
    labels, the counts and the selection all come from a single list. */
-const NAV=[['today','Today'],['add','Add Prospect'],['list','Your List'],
+const NAV=[['today','Today'],['add','Add Prospect'],['list','Your List'],['copy','Copy Inbox'],
            ['seg','Segments'],['fun','Numbers'],['perf','Performance']];
 function syncNav(active){
   const sel=$('navsel'); if(!sel) return;
   const counts={today:($('cnt_today')||{}).textContent||'',
-                list:($('cnt_pros')||{}).textContent||''};
+                list:($('cnt_pros')||{}).textContent||'',
+                copy:($('cnt_prop')||{}).textContent||''};
   const cur=active||sel.value||'today';
   sel.innerHTML=NAV.map(function(n){
     const c=counts[n[0]];
@@ -1473,6 +1540,157 @@ function show(id){
 document.addEventListener('change',function(e){
   if(e.target&&e.target.id==='navsel') show(e.target.value);
 });
+/* ---------------- COPY INBOX ----------------
+   Paste a JSON array from ChatGPT, propose it, then approve or reject each
+   proposal one at a time. Promotion into crm_segment_messages and superseding
+   rival proposals both happen inside crm_approve_proposal; this only calls it. */
+
+let PROPS=[], PROP_AT=0;
+
+function proposeOut(kind,html){
+  const el=$('proposeout');
+  el.className='proposeout '+kind;
+  el.innerHTML=html;
+  el.classList.remove('hide');
+}
+
+async function proposeCopy(){
+  const raw=($('pastebox').value||'').trim();
+  if(!raw){ proposeOut('bad','<b>Nothing pasted</b>Paste the JSON array first.'); return; }
+
+  /* Parse here, not in Postgres. A parse error should name the problem, not
+     arrive as a database exception about malformed input. */
+  let parsed;
+  try{
+    parsed=JSON.parse(raw);
+  }catch(e){
+    proposeOut('bad','<b>That is not valid JSON</b>'+esc(e.message)+
+      '<br>Nothing was sent to the database.');
+    return;
+  }
+  if(!Array.isArray(parsed)){
+    proposeOut('bad','<b>Not a JSON array</b>The top level is '+
+      esc(parsed===null?'null':typeof parsed)+
+      '. It has to be an array of objects, even for a single message. '+
+      'Nothing was sent to the database.');
+    return;
+  }
+  if(!parsed.length){
+    proposeOut('bad','<b>Empty array</b>There is nothing to propose.');
+    return;
+  }
+
+  $('pasteState').textContent='sending';
+  try{
+    const rows=await rpc('crm_propose_copy',{p_json:parsed});
+    const r=Array.isArray(rows)?rows[0]:rows;
+    const acc=(r&&r.accepted)||0, rej=(r&&r.rejected)||0;
+    const probs=(r&&r.problems)||[];
+    const tally='<div class="tally"><span class="acc">'+acc+' accepted</span>'+
+                '<span class="rej">'+rej+' rejected</span></div>';
+    if(probs.length){
+      proposeOut(acc?'ok':'bad', tally+'<b>Problems</b><ul>'+
+        probs.map(p=>'<li>'+esc(p)+'</li>').join('')+'</ul>');
+    }else{
+      proposeOut('ok', tally+'<b>All accepted</b>They are waiting below for review.');
+    }
+    if(acc) $('pastebox').value='';
+    await loadProposals();
+  }catch(e){
+    proposeOut('bad','<b>Not submitted</b>'+esc(e.message));
+  }finally{
+    $('pasteState').textContent='';
+  }
+}
+
+/* The view returns every status, so pending has to be asked for explicitly. */
+async function loadProposals(){
+  let rows=[];
+  try{
+    rows=await rest('crm_proposal_review','select=*&status=eq.pending&order=created_at.asc');
+  }catch(e){
+    $('propbox').innerHTML='<div class="empty"><p>'+esc(e.message)+'</p></div>';
+    return;
+  }
+  PROPS=rows||[];
+  $('cnt_prop').textContent=PROPS.length;
+  $('propTotal').textContent=PROPS.length;
+  if(PROP_AT>=PROPS.length) PROP_AT=0;
+  syncNav();
+  renderProposal();
+}
+
+function renderProposal(){
+  const box=$('propbox');
+  if(!PROPS.length){
+    $('propIdx').textContent='0';
+    box.innerHTML='<div class="empty"><div class="big">Nothing waiting.</div>'+
+      '<p>Paste a JSON array above and anything valid lands here for review.</p></div>';
+    return;
+  }
+  const p=PROPS[PROP_AT];
+  $('propIdx').textContent=(PROP_AT+1);
+
+  const chars='<span class="cc'+(p.over_limit?' over':'')+'">'+(p.char_count||0)+
+              (p.step==='connect'?' / 200':' chars')+'</span>';
+
+  let h='<section class="message-card" style="margin-top:10px">';
+  h+='<div class="card-title"><span>&#9673; &nbsp;'+esc(p.segment_label||p.segment_id||'Unknown segment')+
+     ' &middot; '+esc(p.step||'')+(p.variant&&p.variant!=='default'?(' &middot; '+esc(p.variant)):'')+'</span>'+
+     '<span class="counter'+(p.over_limit?' over':'')+'">'+(p.over_limit?'Over limit &middot; ':'')+
+     (p.char_count||0)+(p.step==='connect'?' / 200':'')+'</span></div>';
+
+  /* Side by side only when it would actually replace something. */
+  h+='<div class="compare'+(p.replaces_existing?'':' solo')+'">'+
+     '<div class="side"><h5>Proposed'+chars+'</h5><div class="txt">'+esc(p.body||'')+'</div></div>'+
+     (p.replaces_existing
+       ? '<div class="side live"><h5>Live now, would be replaced</h5><div class="txt">'+
+         esc(p.current_live_body||'')+'</div></div>'
+       : '')+
+     '</div>';
+
+  if(p.rationale) h+='<div class="why-rationale"><b>Rationale</b>'+esc(p.rationale)+'</div>';
+  if(!p.replaces_existing) h+='<div class="why-rationale"><b>New</b>Nothing live for this segment and step yet.</div>';
+
+  h+='<div class="propfoot">'+
+     '<input id="pnote_'+p.id+'" maxlength="280" placeholder="Note, optional">'+
+     '<button class="small-btn approve" data-act="prop-approve" data-id="'+p.id+'">Approve</button>'+
+     '<button class="small-btn reject" data-act="prop-reject" data-id="'+p.id+'">Reject</button>'+
+     '</div>';
+  box.innerHTML=h+'</section>';
+}
+
+function stepProposal(d){
+  if(!PROPS.length) return;
+  PROP_AT=(PROP_AT+d+PROPS.length)%PROPS.length;
+  renderProposal();
+}
+
+/* Both functions need crm_is_admin(). A partner's call updates zero rows and
+   returns without error, so success is confirmed by re-reading the row rather
+   than assumed from the absence of an exception. */
+async function decideProposal(id,approve){
+  const note=(($('pnote_'+id)||{}).value||'').trim()||null;
+  const fn=approve?'crm_approve_proposal':'crm_reject_proposal';
+  try{
+    await rpc(fn,{p_id:id,p_note:note});
+  }catch(e){
+    toast((approve?'Not approved. ':'Not rejected. ')+e.message);
+    return;
+  }
+  let after=[];
+  try{ after=await rest('crm_proposal_review','select=id,status&id=eq.'+id); }catch(e){}
+  const still=after&&after[0]&&after[0].status==='pending';
+  if(still){
+    toast('Nothing changed. Approving and rejecting need an admin account.');
+    return;
+  }
+  toast(approve?'Approved and promoted into the segment.':'Rejected.');
+  await loadProposals();
+  /* Approving rewrites segment copy, so the briefs that inherit it are stale. */
+  if(approve){ try{ await loadBriefs(); }catch(e){} }
+}
+
 async function loadPerformance(){
   const box=$('perfbox');
   let rows=[];
@@ -1520,6 +1738,7 @@ async function refreshAll(){
   try{ await loadProspects(); }catch(e){}
   try{ await loadFunnel(); }catch(e){}
   try{ await loadPerformance(); }catch(e){}
+  try{ await loadProposals(); }catch(e){}
 }
 /* Delegated, so nothing has to build JavaScript out of a database value. A
    LinkedIn URL containing an apostrophe used to break straight out of the
@@ -1554,6 +1773,12 @@ document.addEventListener('click',function(e){
   else if(act==='today-next') stepToday(1);
   else if(act==='pros-prev') stepProspect(-1);
   else if(act==='pros-next') stepProspect(1);
+  else if(act==='prop-prev') stepProposal(-1);
+  else if(act==='prop-next') stepProposal(1);
+  else if(act==='propose') proposeCopy();
+  else if(act==='paste-clear'){ $('pastebox').value=''; $('proposeout').classList.add('hide'); }
+  else if(act==='prop-approve') decideProposal(id,true);
+  else if(act==='prop-reject') decideProposal(id,false);
   /* Phone only: the four info panels and the workflow are off the face of the
      card by default, so the six things that matter are what you land on. */
   else if(act==='toggle-brief'){
