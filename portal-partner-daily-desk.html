@@ -110,6 +110,9 @@ opacity:0;pointer-events:none;transition:opacity .18s;z-index:99;border-left:4px
 .login p{font-size:13.5px;color:var(--ink-soft);margin-bottom:18px;}
 .err{color:var(--red);font-size:13px;margin-top:11px;}
 .hide{display:none !important;}
+.pushnote{background:#fdf7e8;border-left:4px solid var(--gold);padding:10px 13px;font-size:13px;
+line-height:1.5;margin-bottom:14px;}
+.pushnote.bad{background:#fbeceb;border-left-color:var(--red);color:var(--red);}
 @media(max-width:640px){h1{font-size:31px;}.grid{grid-template-columns:1fr;}.chead .right{margin-left:0;text-align:left;}}
 </style></head><body>
 
@@ -144,6 +147,7 @@ opacity:0;pointer-events:none;transition:opacity .18s;z-index:99;border-left:4px
     <div class="bar"><span class="lbl">Due now and overdue</span><span class="grow"></span>
       <button class="btn ghost" id="btn_push" onclick="enableReminders()">Enable reminders</button>
       <button class="btn ghost" onclick="loadToday()">Refresh</button></div>
+    <div class="pushnote hide" id="push_note"></div>
     <div id="queue"></div>
   </div>
 
@@ -197,7 +201,24 @@ let USER=null;
 const $=id=>document.getElementById(id);
 function toast(m){const t=$('toast');t.textContent=m;t.classList.add('show');
   clearTimeout(t._x);t._x=setTimeout(()=>t.classList.remove('show'),1900);}
-function esc(s){return (s==null?'':String(s)).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));}
+/* Quotes too, because several of these values land in HTML attributes. */
+function esc(s){return (s==null?'':String(s)).replace(/[&<>"']/g,
+  c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+
+function writeClip(text,msg){
+  const done=()=>toast(msg||'Copied. Paste it into LinkedIn.');
+  if(navigator.clipboard&&window.isSecureContext){
+    navigator.clipboard.writeText(text).then(done,()=>clipFallback(text,done));
+  }else clipFallback(text,done);
+}
+function clipFallback(text,done){
+  const ta=document.createElement('textarea');
+  ta.value=text; ta.setAttribute('readonly','');
+  ta.style.position='fixed'; ta.style.opacity='0';
+  document.body.appendChild(ta); ta.select();
+  try{ document.execCommand('copy'); }catch(e){}
+  ta.remove(); done();
+}
 
 /* Always send the current portal session. supabase-js refreshes it when stale. */
 async function authToken(){
@@ -293,7 +314,7 @@ async function loadToday(){
       h+='<div class="cfoot">';
       if(lim) h+='<span class="cc'+(m.char_count>lim?' over':'')+'">'+m.char_count+' / '+lim+'</span>';
       h+='<button class="btn" onclick="copyMsg(\''+t.task_id+'\')">Copy</button>';
-      if(t.linkedin_url) h+='<button class="btn ghost" onclick="window.open(\''+esc(t.linkedin_url)+'\',\'_blank\')">Open profile</button>';
+      if(t.linkedin_url) h+='<button class="btn ghost" data-act="open" data-url="'+esc(t.linkedin_url)+'">Open profile</button>';
       h+='<button class="btn ghost" onclick="doneTask(\''+t.task_id+'\')">Mark done</button>';
       h+='<button class="btn ghost" onclick="stopCadence(\''+t.contact_id+'\')">They replied</button>';
       h+='<span class="inh">'+(m.inherited?'Copy inherited from '+esc(m.defined_at):'Copy written for this segment')+'</span>';
@@ -318,9 +339,7 @@ function stepFromTitle(t){
 function fmtDay(d){const x=new Date(d);return x.toLocaleDateString(undefined,{month:'short',day:'numeric'});}
 function copyMsg(id){
   const el=$('msg_'+id); if(!el) return;
-  navigator.clipboard.writeText(el.textContent).then(()=>toast('Copied. Paste it into LinkedIn.'))
-   .catch(()=>{const ta=document.createElement('textarea');ta.value=el.textContent;
-     document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove();toast('Copied.');});
+  writeClip(el.textContent);
 }
 async function doneTask(id){
   try{ await api('/rest/v1/crm_tasks?id=eq.'+id,{method:'PATCH',
@@ -335,20 +354,94 @@ async function stopCadence(cid){
 }
 
 /* ---------------- PROSPECTS ---------------- */
+/* The connect note is only needed before the invite goes out. Restricting the
+   per-contact lookup to those rows is both the right workflow and what keeps
+   this to a handful of calls rather than one per contact. */
+const PRE_INVITE=['not_started','warming'];
+const CONNECT_LIMIT=200;
+
+/* A few at a time. Firing 200 RPCs at once from a phone is not kind to it. */
+async function mapLimit(items,limit,fn){
+  const out=new Array(items.length); let i=0;
+  async function worker(){ while(i<items.length){ const k=i++; out[k]=await fn(items[k]); } }
+  await Promise.all(Array.from({length:Math.min(limit,items.length)},worker));
+  return out;
+}
+
+/* Count and copy must agree exactly, or the counter lies about what you paste. */
+function connectText(el){
+  return el.innerText.replace(/ /g,' ').replace(/\s+$/,'');
+}
+function countConnect(id){
+  const el=$('pm_'+id), c=$('pcnt_'+id);
+  if(!el||!c) return;
+  const n=connectText(el).length;
+  c.textContent=n+' / '+CONNECT_LIMIT;
+  c.classList.toggle('over',n>CONNECT_LIMIT);
+}
+function copyConnect(id){
+  const el=$('pm_'+id); if(!el) return;
+  writeClip(connectText(el),'Connection note copied.');
+}
+
+function prospectCard(r,m){
+  const seg=esc(r.segment_id||'');
+  let h='<div class="card">';
+  h+='<div class="chead"><div><div class="who">'+esc(r.full_name)+'</div>'+
+     '<div class="meta">'+esc(r.segment_id||'No segment')+
+     (r.employer?' &middot; '+esc(r.employer):'')+
+     (r.city?' &middot; '+esc(r.city):'')+'</div></div>'+
+     '<div class="right"><span class="pill">'+esc(r.linkedin_status||'')+'</span></div></div>';
+
+  /* The per-person note. It was written precisely because the segment copy was
+     not specific enough, so it belongs above the message it is meant to change. */
+  if(r.notes) h+='<div class="obj"><b>Your note on this person</b>'+esc(r.notes)+'</div>';
+
+  const buttons=
+    (r.linkedin_url?'<button class="btn ghost" data-act="open" data-url="'+esc(r.linkedin_url)+'">Open profile</button>':'')+
+    '<button class="btn ghost" data-act="enrol" data-id="'+r.id+'" data-seg="'+seg+'">Sent note</button>'+
+    '<button class="btn ghost" data-act="accepted" data-id="'+r.id+'">Accepted</button>';
+
+  if(m){
+    /* Editable so an over-length note can be trimmed here and the count follows,
+       rather than being discovered after LinkedIn truncates it. */
+    h+='<div class="cbody" contenteditable="true" spellcheck="true" id="pm_'+r.id+'" '+
+       'data-count="'+r.id+'">'+esc(m.message)+'</div>';
+    h+='<div class="cfoot">'+
+       '<span class="cc" id="pcnt_'+r.id+'"></span>'+
+       '<button class="btn" data-act="copy-connect" data-id="'+r.id+'">Copy</button>'+
+       buttons+
+       '<span class="inh">'+(m.inherited?'Copy inherited from '+esc(m.defined_at):'Copy written for this segment')+'</span>'+
+       '</div>';
+  }else if(PRE_INVITE.indexOf(r.linkedin_status)!==-1){
+    h+='<div class="cbody" style="color:#8c2f26">No connect copy found for this segment. '+
+       'Write it in the Segments tab, or at a parent segment so everything below inherits it.</div>'+
+       '<div class="cfoot">'+buttons+'</div>';
+  }else{
+    h+='<div class="cfoot" style="padding-top:14px">'+buttons+'</div>';
+  }
+  return h+'</div>';
+}
+
 async function loadProspects(){
   const rows=await rest('crm_contacts',
-    'select=id,full_name,employer,city,segment_id,linkedin_status,linkedin_url&order=created_at.desc&limit=200');
+    'select=id,full_name,employer,city,notes,segment_id,linkedin_status,linkedin_url&order=created_at.desc&limit=200');
   $('cnt_pros').textContent=(rows||[]).length;
-  if(!rows||!rows.length){ $('prosbox').innerHTML='<div class="empty"><div class="big">No prospects yet.</div>'+
+  const box=$('prosbox');
+  if(!rows||!rows.length){ box.innerHTML='<div class="empty"><div class="big">No prospects yet.</div>'+
     '<p>Add one below, or send Claude a screenshot of a LinkedIn profile.</p></div>'; return; }
-  let h='<table><tr><th>Name</th><th>Employer</th><th>Segment</th><th>Status</th><th></th></tr>';
-  rows.forEach(r=>{
-    h+='<tr><td><b>'+esc(r.full_name)+'</b></td><td>'+esc(r.employer||'')+'</td>'+
-       '<td class="mono">'+esc(r.segment_id||'unset')+'</td><td>'+esc(r.linkedin_status)+'</td>'+
-       '<td><button class="btn ghost" onclick="enrol(\''+r.id+'\',\''+esc(r.segment_id||'')+'\')">Sent note</button> '+
-       '<button class="btn ghost" onclick="accepted(\''+r.id+'\')">Accepted</button></td></tr>';
+
+  const pending=rows.filter(r=>PRE_INVITE.indexOf(r.linkedin_status)!==-1);
+  const pairs=await mapLimit(pending,6,async r=>{
+    try{
+      const msgs=await rpc('crm_prospect_card',{p_contact:r.id});
+      return [r.id,(msgs||[]).find(x=>x.step==='connect')||null];
+    }catch(e){ return [r.id,null]; }
   });
-  $('prosbox').innerHTML=h+'</table>';
+  const connect=new Map(pairs);
+
+  box.innerHTML=rows.map(r=>prospectCard(r,connect.get(r.id)||null)).join('');
+  rows.forEach(r=>countConnect(r.id));
 }
 async function enrol(id,seg){
   if(!seg){ toast('Give this contact a segment first.'); return; }
@@ -441,6 +534,16 @@ function pushSupported(){
   return 'serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window;
 }
 
+/* A toast lasts under two seconds, which is no use on a phone when the thing
+   you need is the reason it failed. This line stays until it is replaced. */
+function pushNote(msg,bad){
+  const el=$('push_note'); if(!el) return;
+  if(!msg){ el.classList.add('hide'); return; }
+  el.textContent=msg;
+  el.classList.toggle('bad',!!bad);
+  el.classList.remove('hide');
+}
+
 async function refreshPushButton(){
   const b=$('btn_push'); if(!b) return;
   if(!pushSupported()){ b.textContent='Reminders unavailable'; b.disabled=true; return; }
@@ -462,14 +565,30 @@ async function enableReminders(){
   }
   b.disabled=true; b.textContent='Setting up...';
   try{
+    /* Ask for permission FIRST, before any other await.
+       requestPermission() needs the transient user activation from the tap, and
+       that activation is spent by intervening async work. Registering the
+       service worker first is slow enough on a phone that Android Chrome then
+       refuses to show the prompt at all: it resolves 'default' with no dialog,
+       and the whole flow dies here having made no network request. */
+    const perm=await Notification.requestPermission();
+    if(perm!=='granted'){
+      pushNote('Android did not grant notification permission. Tap again and choose Allow.');
+      await refreshPushButton(); b.disabled=false; return;
+    }
+
     /* Scope '/' because the worker sits at the site root. */
     const reg=await navigator.serviceWorker.register('/sw.js',{scope:'/'});
     await navigator.serviceWorker.ready;
 
-    const perm=await Notification.requestPermission();
-    if(perm!=='granted'){ toast('Reminders need notification permission.'); await refreshPushButton(); b.disabled=false; return; }
-
     let sub=await reg.pushManager.getSubscription();
+    /* A subscription made with a different application server key cannot be
+       reused. Drop it and make a fresh one rather than failing forever. */
+    if(sub){
+      const existing=sub.options&&sub.options.applicationServerKey
+        ? bytesToB64Url(sub.options.applicationServerKey) : null;
+      if(existing&&existing!==VAPID_PUBLIC){ await sub.unsubscribe(); sub=null; }
+    }
     if(!sub){
       sub=await reg.pushManager.subscribe({
         userVisibleOnly:true,
@@ -493,10 +612,13 @@ async function enableReminders(){
         fail_count:0
       }
     });
-    toast('Reminders on. This device will be notified when work is due.');
+    pushNote('Reminders on for this device. It will be notified when work is due.');
+    toast('Reminders on.');
     b.classList.add('done'); b.textContent='Reminders on';
   }catch(e){
-    toast('Could not enable reminders: '+e.message);
+    /* Name and message both: on Android the name is usually the useful half
+       (NotAllowedError, AbortError, InvalidStateError). */
+    pushNote('Could not enable reminders. '+(e.name?e.name+': ':'')+(e.message||String(e)), true);
     b.textContent='Enable reminders';
   }finally{
     b.disabled=false;
@@ -514,6 +636,24 @@ async function refreshAll(){
   try{ await loadProspects(); }catch(e){}
   try{ await loadFunnel(); }catch(e){}
 }
+/* Delegated, so nothing has to build JavaScript out of a database value. A
+   LinkedIn URL containing an apostrophe used to break straight out of the
+   inline onclick this replaces, and HTML-escaping cannot prevent that because
+   the attribute is decoded before the JavaScript in it is parsed. */
+document.addEventListener('click',function(e){
+  const t=e.target.closest?e.target.closest('[data-act]'):null;
+  if(!t) return;
+  const act=t.getAttribute('data-act'), id=t.getAttribute('data-id');
+  if(act==='open') window.open(t.getAttribute('data-url'),'_blank','noopener');
+  else if(act==='copy-connect') copyConnect(id);
+  else if(act==='enrol') enrol(id,t.getAttribute('data-seg')||'');
+  else if(act==='accepted') accepted(id);
+});
+document.addEventListener('input',function(e){
+  const id=e.target&&e.target.getAttribute?e.target.getAttribute('data-count'):null;
+  if(id) countConnect(id);
+});
+
 document.addEventListener('DOMContentLoaded',()=>{
   $('pw').addEventListener('keydown',e=>{ if(e.key==='Enter') login(); });
   gate();
