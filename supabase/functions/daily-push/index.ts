@@ -131,11 +131,19 @@ Deno.serve(async (req: Request) => {
     const userId = (isService || isCron) ? body.user_id : claims.sub;
     if (!userId) return json({ error: 'No user to send to.' }, 400);
 
-    const { data: profile } = await admin
+    /* Distinguish "the check could not run" from "you are not a partner".
+       Collapsing the two hides a missing grant behind a plausible 403, which is
+       exactly how this failed the first time: service_role had no SELECT on
+       partner_profiles, so the lookup errored and every caller looked unapproved. */
+    const { data: profile, error: profileErr } = await admin
       .from('partner_profiles')
       .select('id, approved')
       .eq('id', userId)
       .maybeSingle();
+    if (profileErr) {
+      console.error('partner_profiles lookup failed:', profileErr);
+      return json({ error: 'Could not verify the partner.', detail: profileErr.message }, 500);
+    }
     if (!profile || !profile.approved) return json({ error: 'Not an approved partner.' }, 403);
 
     const { data, error } = await admin
