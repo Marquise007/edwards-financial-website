@@ -72,7 +72,7 @@ button{font-family:inherit}
 }
 .nav-item{
   display:flex;align-items:center;gap:11px;
-  padding:10px 22px;cursor:pointer;
+  padding:10px 22px;cursor:pointer;text-decoration:none;
   color:rgba(247,245,241,.78);font-size:14px;
   border-left:2px solid transparent;
   transition:background .2s ease,color .2s ease,border-color .2s ease;
@@ -231,6 +231,13 @@ button{font-family:inherit}
   </div>
 
   <nav class="sidebar-nav">
+    <div class="nav-section">
+      <div class="nav-section-label">Prospecting</div>
+      <a class="nav-item" href="portal-partner-daily-desk.html">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5h2v2H3V5zm4 0h14v2H7V5zM3 11h2v2H3v-2zm4 0h14v2H7v-2zM3 17h2v2H3v-2zm4 0h14v2H7v-2z"/></svg>
+        Daily Desk
+      </a>
+    </div>
     <div class="nav-section">
       <div class="nav-section-label">Client-facing</div>
       <a class="nav-item active" tabindex="0" role="button" onclick="showView('marketing')">

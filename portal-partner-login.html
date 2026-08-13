@@ -334,6 +334,17 @@
   const { createClient } = supabase;
   const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
 
+  // Where to land after a successful sign in. Only a same-origin relative path
+  // is honoured, so ?next= cannot be used to bounce anyone off the site.
+  function nextTarget() {
+    var raw = new URLSearchParams(location.search).get('next') || '';
+    try { raw = decodeURIComponent(raw); } catch (e) { raw = ''; }
+    if (!raw || raw.charAt(0) === '/' || raw.indexOf('//') !== -1 || raw.indexOf(':') !== -1) {
+      return 'portal-partner-dashboard.html';
+    }
+    return raw;
+  }
+
   function switchTab(tab) {
     document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
     document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
@@ -365,8 +376,8 @@
       return;
     }
 
-    // Success, go to dashboard
-    window.location.href = 'portal-partner-dashboard.html';
+    // Success, go to the dashboard or back to the page that sent us here
+    window.location.href = nextTarget();
   }
 
   async function handleReset() {
@@ -415,7 +426,7 @@
 
   // If already logged in, go straight to dashboard
   sb.auth.getSession().then(({ data: { session } }) => {
-    if (session) window.location.href = 'portal-partner-dashboard.html';
+    if (session) window.location.href = nextTarget();
   });
 </script>
 </body>
