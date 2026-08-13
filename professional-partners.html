@@ -1130,10 +1130,10 @@
 
     <div id="pp-form-fields">
       <div class="pp-form-grid">
-        <div class="pp-field"><label>Firm / Practice Name</label><input type="text" id="pp-firm" placeholder="Your firm"></div>
-        <div class="pp-field"><label>Your Name</label><input type="text" id="pp-name" placeholder="First and last name"></div>
-        <div class="pp-field"><label>Email Address</label><input type="email" id="pp-email" placeholder="you@firm.com"></div>
-        <div class="pp-field"><label>Phone</label><input type="tel" id="pp-phone" placeholder="(555) 123-4567"></div>
+        <div class="pp-field"><label>Firm / Practice Name</label><input type="text" id="pp-firm" maxlength="200" placeholder="Your firm"></div>
+        <div class="pp-field"><label>Your Name</label><input type="text" id="pp-name" maxlength="200" placeholder="First and last name"></div>
+        <div class="pp-field"><label>Email Address</label><input type="email" id="pp-email" maxlength="320" placeholder="you@firm.com"></div>
+        <div class="pp-field"><label>Phone</label><input type="tel" id="pp-phone" maxlength="60" placeholder="(555) 123-4567"></div>
         <div class="pp-field">
           <label>Profession</label>
           <select id="pp-profession">
@@ -1159,8 +1159,8 @@
             <option>500+</option>
           </select>
         </div>
-        <div class="pp-field full"><label>Areas of Focus</label><input type="text" id="pp-focus" placeholder="e.g. high-net-worth families, business owners, public-sector retirees"></div>
-        <div class="pp-field full"><label>Anything You&rsquo;d Like Us to Know</label><textarea id="pp-message" placeholder="The kinds of cases you run into, or what a good partnership would look like."></textarea></div>
+        <div class="pp-field full"><label>Areas of Focus</label><input type="text" id="pp-focus" maxlength="500" placeholder="e.g. high-net-worth families, business owners, public-sector retirees"></div>
+        <div class="pp-field full"><label>Anything You&rsquo;d Like Us to Know</label><textarea id="pp-message" maxlength="5000" placeholder="The kinds of cases you run into, or what a good partnership would look like."></textarea></div>
       </div>
       <div class="pp-submit-row">
         <button class="btn-primary" id="pp-submit" onclick="submitInquiry()">Submit Inquiry</button>

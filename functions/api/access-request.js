@@ -27,12 +27,23 @@ function json(data, status = 200) {
   });
 }
 
+// Escapes quotes as well as angle brackets. The submitter's email is
+// interpolated into an href attribute below, and the email regex further down
+// permits a literal " in the local part, so without this a crafted address can
+// break out of the attribute in the email Joshua opens.
 function esc(s) {
   return String(s == null ? '' : s)
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;');
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
 }
+
+// These mirror the WITH CHECK caps on the access_requests row-level security
+// policy. Checking them here means an over-long value is rejected with a clear
+// message instead of being silently dropped by the database.
+const LIMITS = { name: 200, company: 200, license: 200, email: 320 };
 
 export async function onRequestPost(context) {
   const { request, env } = context;
@@ -55,9 +66,20 @@ export async function onRequestPost(context) {
   if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
     return json({ error: 'That email address does not look right.' }, 400);
   }
+  const fields = { name, email, company, license };
+  for (const key of Object.keys(LIMITS)) {
+    if ((fields[key] || '').length > LIMITS[key]) {
+      return json({ error: `That ${key === 'license' ? 'license or role' : key} is too long.` }, 400);
+    }
+  }
 
   // 1) Store the request in Supabase. Best-effort: if the table is missing or
   //    RLS blocks the insert, the email below is still the record of the request.
+  //
+  //    DO NOT switch this to `return=representation` to find out what was
+  //    inserted. anon deliberately has no SELECT on this table, and PostgREST
+  //    compiles that preference into INSERT ... RETURNING, which needs SELECT.
+  //    Asking for the row back turns a working insert into a hard 401.
   let stored = false;
   let storeDetail = '';
   try {
@@ -83,6 +105,12 @@ export async function onRequestPost(context) {
   } catch (e) {
     stored = false;
     storeDetail = String(e);
+  }
+  // Leave a trace in the Function log. Without this a failed insert is
+  // completely invisible: the submitter still sees success, because the email
+  // is what actually reaches Joshua.
+  if (!stored) {
+    console.error('access_requests insert failed:', storeDetail);
   }
 
   // 2) Email the request to Joshua via Resend. This is the primary record.
@@ -145,5 +173,7 @@ export async function onRequestPost(context) {
     return json({ error: 'Could not send the request.' }, 502);
   }
 
-  return json({ ok: true, stored, storeDetail });
+  // storeDetail stays server-side. It is a raw database error and does not
+  // belong in a response any visitor can read.
+  return json({ ok: true, stored });
 }

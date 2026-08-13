@@ -285,7 +285,7 @@
       <button class="btn-primary" onclick="handleLogin(this)">Sign In to My Portal</button>
 
       <div class="form-footer">
-        <p>Forgot password? <a href="#" onclick="handleReset()">Reset via email</a></p>
+        <p>Forgot password? <a href="#" onclick="handleReset(); return false;">Reset via email</a></p>
       </div>
     </div>
   </div>
@@ -338,9 +338,13 @@
   async function handleReset() {
     const email = document.getElementById('email').value.trim();
     if (!email) return showMsg('error', 'Enter your email address above first.');
-    const { error } = await sb.auth.resetPasswordForEmail(email);
+    // Without redirectTo the emailed link lands on the project Site URL, where
+    // nothing knows what to do with a recovery token. Send it to the page that does.
+    const { error } = await sb.auth.resetPasswordForEmail(email, {
+      redirectTo: location.origin + '/portal-reset-password?aud=client'
+    });
     if (error) return showMsg('error', error.message);
-    showMsg('success', 'Password reset email sent. Check your inbox.');
+    showMsg('success', 'Password reset email sent. Open the link on this device and you can set a new password.');
   }
 
   sb.auth.getSession().then(({ data: { session } }) => {

@@ -33,11 +33,33 @@ function json(data, status = 200) {
   });
 }
 
+// Escapes quotes as well as angle brackets. The submitter's email is
+// interpolated into an href attribute below, so a bare " would otherwise let a
+// crafted address break out of the attribute in the email Joshua opens.
 function esc(s) {
   return String(s == null ? '' : s)
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;');
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+const EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
+
+// Caps checked here rather than left to the database. A value that is too long
+// is rejected by the row-level security check with no useful diagnostic, which
+// looks exactly like the silent failure this endpoint used to have.
+const LIMITS = {
+  firm_name: 200, contact_name: 200, email: 320, phone: 60,
+  profession: 120, clients_served: 60, focus_areas: 500, message: 5000,
+};
+
+function tooLong(record) {
+  for (const key of Object.keys(LIMITS)) {
+    if ((record[key] || '').length > LIMITS[key]) return key;
+  }
+  return null;
 }
 
 export async function onRequestPost(context) {
@@ -56,6 +78,9 @@ export async function onRequestPost(context) {
   if (!firm || !name || !email) {
     return json({ error: 'Firm, name, and email are required.' }, 400);
   }
+  if (!EMAIL_RE.test(email)) {
+    return json({ error: 'That email address does not look right.' }, 400);
+  }
 
   const record = {
     firm_name: firm,
@@ -68,9 +93,20 @@ export async function onRequestPost(context) {
     message: (body.message || '').trim(),
   };
 
+  const over = tooLong(record);
+  if (over) {
+    return json({ error: `That ${over.replace(/_/g, ' ')} is too long.` }, 400);
+  }
+
   // 1) Store the inquiry in Supabase (RLS allows anonymous insert).
   //    Best-effort: if it fails, the email below is still the primary copy.
+  //
+  //    DO NOT switch this to `return=representation` to find out what was
+  //    inserted. anon deliberately has no SELECT on this table, and PostgREST
+  //    compiles that preference into INSERT ... RETURNING, which needs SELECT.
+  //    Asking for the row back turns a working insert into a hard 401.
   let stored = false;
+  let storeDetail = '';
   try {
     const r = await fetch(`${SUPABASE_URL}/rest/v1/partner_inquiries`, {
       method: 'POST',
@@ -83,8 +119,16 @@ export async function onRequestPost(context) {
       body: JSON.stringify(record),
     });
     stored = r.ok;
+    if (!r.ok) storeDetail = await r.text();
   } catch (e) {
     stored = false;
+    storeDetail = String(e);
+  }
+  // Leave a trace in the Function log. Without this a failed insert is
+  // completely invisible: the submitter still sees success, because the email
+  // is what actually reaches Joshua.
+  if (!stored) {
+    console.error('partner_inquiries insert failed:', storeDetail);
   }
 
   // 2) Email the inquiry to Joshua via Resend.

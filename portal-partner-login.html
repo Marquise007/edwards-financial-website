@@ -289,7 +289,7 @@
         </div>
         <button class="btn-primary" id="signin-btn" onclick="handleSignIn()">Access Partner Portal</button>
         <div class="form-footer">
-          <p>Forgot password? <a href="#" onclick="handleReset()">Reset via email</a></p>
+          <p>Forgot password? <a href="#" onclick="handleReset(); return false;">Reset via email</a></p>
         </div>
       </div>
 
@@ -300,19 +300,19 @@
         <div class="message" id="request-msg"></div>
         <div class="form-group">
           <label>Full Name</label>
-          <input type="text" id="req-name" placeholder="Your full name">
+          <input type="text" id="req-name" maxlength="200" placeholder="Your full name">
         </div>
         <div class="form-group">
           <label>Email Address</label>
-          <input type="email" id="req-email" placeholder="your@email.com">
+          <input type="email" id="req-email" maxlength="320" placeholder="your@email.com">
         </div>
         <div class="form-group">
           <label>Company / Organization</label>
-          <input type="text" id="req-company" placeholder="Your firm or company">
+          <input type="text" id="req-company" maxlength="200" placeholder="Your firm or company">
         </div>
         <div class="form-group">
           <label>License / Role</label>
-          <input type="text" id="req-license" placeholder="e.g. Life & Health, Series 65, CPA">
+          <input type="text" id="req-license" maxlength="200" placeholder="e.g. Life & Health, Series 65, CPA">
         </div>
         <button class="btn-primary" id="request-btn" onclick="handleRequest()">Submit Request</button>
         <div class="pending-notice">
@@ -383,9 +383,13 @@
   async function handleReset() {
     const email = document.getElementById('signin-email').value.trim();
     if (!email) return showMsg('signin-msg', 'info', 'Enter your email address above first.');
-    const { error } = await sb.auth.resetPasswordForEmail(email);
+    // Without redirectTo the emailed link lands on the project Site URL, where
+    // nothing knows what to do with a recovery token. Send it to the page that does.
+    const { error } = await sb.auth.resetPasswordForEmail(email, {
+      redirectTo: location.origin + '/portal-reset-password?aud=partner'
+    });
     if (error) return showMsg('signin-msg', 'error', error.message);
-    showMsg('signin-msg', 'success', 'Password reset email sent. Check your inbox.');
+    showMsg('signin-msg', 'success', 'Password reset email sent. Open the link on this device and you can set a new password.');
   }
 
   async function handleRequest() {
