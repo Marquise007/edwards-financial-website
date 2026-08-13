@@ -128,6 +128,13 @@ details.why[open]>summary{border-bottom:1px solid var(--rule);}
 color:var(--gold);margin-bottom:2px;}
 .whyrow.warn b{color:var(--red);}
 
+/* Which message is the one to send */
+.plabel{font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;font-weight:700;
+color:var(--ink-soft);padding:13px 17px 0 17px;}
+.plabel.own{color:var(--gold);}
+.score .undo{float:right;margin-top:-4px;padding:4px 9px;font-size:10px;letter-spacing:.06em;
+text-transform:none;font-weight:600;}
+
 /* Outcome scoring */
 .score{margin:0 16px 15px 16px;background:#f4f7f5;border-left:4px solid var(--green);padding:11px 13px;}
 .score.saved{border-left-color:var(--slate);}
@@ -275,6 +282,7 @@ function clipFallback(text,done){
    counted against the limit the database sets rather than a number hard-coded
    here, copied verbatim, and logged as what actually went out. */
 let BRIEFS={};
+let SENDS={};                /* contact|step -> the most recent logged send */
 const CARDS={};              /* key -> {contact, step, limit, sendId, loggedBody, rating} */
 const DEFAULT_LIMIT=200;
 const OUTCOMES=[['accepted','Accepted'],['replied','Replied'],['meeting_booked','Meeting booked'],
@@ -306,6 +314,40 @@ function countCard(key){
   c.textContent=n+' / '+st.limit;
   c.classList.toggle('over',n>st.limit);
 }
+/* The override now lives in crm_contacts.custom_connect_note. This only cleans
+   up the research prose for display: notes written before that column existed
+   still carry the note inline behind a "TAILORED ... :" marker, and showing it
+   twice on one card is exactly the confusion being fixed. Nothing is rewritten
+   in the database here. */
+const TAILORED_RE=/^.*TAILORED[^:\n]*:[ \t]*/is;
+function splitNotes(c){
+  const raw=((c&&c.notes)||'').trim();
+  const explicit=c&&c.custom&&c.custom.tailored_note;
+  if(explicit) return {research:raw,tailored:String(explicit).trim()};
+  const m=raw.match(TAILORED_RE);
+  if(!m) return {research:raw,tailored:''};
+  const research=raw.slice(0,raw.toUpperCase().indexOf('TAILORED')).trim();
+  let after=raw.slice(m[0].length);
+  /* A trailing bracketed aside is provenance, not part of the message. */
+  const tail=after.match(/\[[^\]]*\]\s*$/);
+  let aside='';
+  if(tail){ aside=tail[0].trim(); after=after.slice(0,tail.index); }
+  return {research:(research+(aside?'\n'+aside:'')).trim(), tailored:after.trim()};
+}
+
+/* Exactly one message on a card may look like the one to send. When a person has
+   their own note, the segment copy is demoted to a collapsed reference with no
+   Copy button, because a Copy button is the thing that says "send me". */
+function defaultPanel(m,limit){
+  if(!m) return '';
+  const n=(m.message||'').length;
+  return '<details class="why"><summary>Segment default, not used &middot; '+
+    n+' / '+limit+(n>limit?', over':'')+'</summary><div class="whybody">'+
+    '<div class="whyrow"><b>'+(m.inherited?'Inherited from '+esc(m.defined_at):'Written for this segment')+
+    '</b>'+esc(m.message)+'</div>'+
+    '<div class="whyrow"><b>Why you are seeing it</b>Reference only. The note above is what gets sent.</div>'+
+    '</div></details>';
+}
 
 /* Editable, so an over-length message is trimmed here with the count following,
    rather than discovered after LinkedIn truncates it. */
@@ -322,7 +364,8 @@ function copyControls(key){
    specific enough, so it belongs above the message it is meant to change, on
    every card that shows a message. */
 function notesBlock(c){
-  return (c&&c.notes)?'<div class="obj"><b>Your note on this person</b>'+esc(c.notes)+'</div>':'';
+  const research=splitNotes(c).research;
+  return research?'<div class="obj"><b>Research notes</b>'+esc(research)+'</div>':'';
 }
 
 /* Where a value came from. A guessed employer and a verified one look identical
@@ -359,37 +402,73 @@ function whyPanel(b){
          '<div class="whybody">'+inner+'</div></details>';
 }
 
-async function copyCard(key){
-  const st=CARDS[key]; if(!st) return;
+/* Copying is not sending. This reaches the clipboard and does nothing else. */
+function copyCard(key){
   const text=cardText(key);
+  if(!text) return;
   writeClip(text,'Copied. Paste it into LinkedIn.');
-  await logSend(key,text);
 }
 
-/* crm_log_send stamps last_touch_at and bumps touch_count, so a send is not a
-   free action. Copying the same text twice must not log twice; copying after an
-   edit must, because a genuinely different message went out. */
-async function logSend(key,text){
-  const st=CARDS[key];
-  if(!st||st.loggedBody===text) return;
+/* The send is logged when you say you sent it, never before, and it logs
+   whatever is on screen at that moment. crm_log_send also stamps last_touch_at
+   and bumps touch_count, which is a second reason it must not fire on a copy. */
+async function markSent(key){
+  const st=CARDS[key]; if(!st) return false;
+  const text=cardText(key);
+  if(!text){ toast('Nothing to log.'); return false; }
+  if(st.sendId&&st.loggedBody===text) return true;   /* already logged, unchanged */
   try{
     const id=await rpc('crm_log_send',{p_contact:st.contact,p_step:st.step,p_body:text});
     st.sendId=(typeof id==='string')?id:(id&&id.crm_log_send)||id;
     st.loggedBody=text;
+    SENDS[st.contact+'|'+st.step]={id:st.sendId,rating:0,outcome:null};
     renderScore(key);
+    return true;
   }catch(e){
-    /* The copy already reached the clipboard, so say what did not happen. */
-    toast('Copied, but not logged. '+e.message);
+    toast('Not logged. '+e.message);
+    return false;
   }
+}
+
+/* One wrong tap must not pollute the performance numbers permanently.
+   return=representation so a delete that matched nothing can be reported as
+   such, rather than looking like success. */
+async function undoSend(key){
+  const st=CARDS[key];
+  if(!st||!st.sendId) return;
+  try{
+    const gone=await api('/rest/v1/crm_message_sends?id=eq.'+st.sendId,
+      {method:'DELETE',headers:{'Prefer':'return=representation'}});
+    if(!gone||!gone.length){ toast('Nothing was removed. That send may not be yours.'); return; }
+    delete SENDS[st.contact+'|'+st.step];
+    st.sendId=null; st.loggedBody=null; st.rating=0;
+    renderScore(key);
+    toast('Send removed. It no longer counts.');
+  }catch(e){ toast('Could not undo: '+e.message); }
+}
+
+/* An edit made while looking at the card should outlive the refresh. */
+async function saveOwnNote(key,id){
+  const text=cardText(key);
+  if(!text){ toast('Nothing to save.'); return; }
+  try{
+    await api('/rest/v1/crm_contacts?id=eq.'+id,
+      {method:'PATCH',headers:{'Prefer':'return=minimal'},body:{custom_connect_note:text}});
+    toast('Saved as this person’s note.');
+    await loadProspects();
+  }catch(e){ toast('Could not save: '+e.message); }
 }
 
 function scoreBlock(key){
   const st=CARDS[key];
   if(!st||!st.sendId) return '';
+  const cur=st.outcome||'';
   return '<div class="score" id="sc_'+key+'">'+
-    '<div class="scorehead">Logged. How did it land?</div>'+
+    '<div class="scorehead">Logged as sent. How did it land?'+
+      '<button class="btn ghost undo" data-act="undo-send" data-key="'+key+'" '+
+      'title="Remove this send">&times; Didn’t send</button></div>'+
     '<select id="so_'+key+'"><option value="">Outcome, once you know</option>'+
-      OUTCOMES.map(o=>'<option value="'+o[0]+'">'+esc(o[1])+'</option>').join('')+'</select>'+
+      OUTCOMES.map(o=>'<option value="'+o[0]+'"'+(cur===o[0]?' selected':'')+'>'+esc(o[1])+'</option>').join('')+'</select>'+
     '<div class="stars">'+[1,2,3,4,5].map(n=>
       '<button class="btn ghost star" data-act="rate" data-key="'+key+'" data-n="'+n+'">'+n+'</button>'
     ).join('')+'</div>'+
@@ -507,6 +586,7 @@ async function loadToday(){
         'select=id,notes,custom,lead_source,email_status&id=in.('+ids.join(',')+')');
       (cs||[]).forEach(c=>{ META[c.id]=c; });
     }catch(e){}
+    await loadSends(ids);
   }
 
   const cards=await Promise.all(QUEUE.map(async t=>{
@@ -529,18 +609,21 @@ async function loadToday(){
       const brief=briefFor(m.defined_at,step,'default');
       CARDS[key]={contact:t.contact_id,step:step,
                   limit:(brief&&brief.char_limit)||DEFAULT_LIMIT,
-                  sendId:null,loggedBody:null,rating:0};
+                  sendId:null,loggedBody:null,rating:0,outcome:null};
+      const prior=SENDS[t.contact_id+'|'+step];
+      if(prior){ CARDS[key].sendId=prior.id; CARDS[key].rating=prior.rating||0;
+                 CARDS[key].outcome=prior.outcome||null; CARDS[key].loggedBody=prior.body_used||null; }
       if(m.hidden_objection){
         h+='<div class="obj"><b>The objection this answers</b>'+esc(m.hidden_objection)+'</div>';
       }
       h+=messageBody(key,m.message);
       h+='<div class="cfoot">'+copyControls(key);
       if(t.linkedin_url) h+='<button class="btn ghost" data-act="open" data-url="'+esc(t.linkedin_url)+'">Open profile</button>';
-      h+='<button class="btn ghost" data-act="done" data-id="'+t.task_id+'">Mark done</button>';
+      h+='<button class="btn ghost" data-act="done" data-key="'+key+'" data-id="'+t.task_id+'">Mark done</button>';
       h+='<button class="btn ghost" data-act="stop" data-id="'+t.contact_id+'">They replied</button>';
       h+='<span class="inh">'+(m.inherited?'Copy inherited from '+esc(m.defined_at):'Copy written for this segment')+'</span>';
       h+='</div>';
-      h+='<div id="hold_'+key+'"></div>';
+      h+='<div id="hold_'+key+'">'+scoreBlock(key)+'</div>';
       h+=whyPanel(brief);
     }else{
       h+='<div class="cbody" style="color:#8c2f26">No copy found for this step in this segment. '+
@@ -550,7 +633,7 @@ async function loadToday(){
     return h+'</div>';
   }));
   box.innerHTML=cards.join('');
-  QUEUE.forEach(t=>countCard('t'+t.task_id));
+  QUEUE.forEach(t=>{ countCard('t'+t.task_id); paintStars('t'+t.task_id); });
 }
 function stepFromTitle(t){
   t=(t||'').toLowerCase();
@@ -602,19 +685,35 @@ function prospectCard(r,m){
 
   const buttons=
     (r.linkedin_url?'<button class="btn ghost" data-act="open" data-url="'+esc(r.linkedin_url)+'">Open profile</button>':'')+
-    '<button class="btn ghost" data-act="enrol" data-id="'+r.id+'" data-seg="'+seg+'">Sent note</button>'+
+    '<button class="btn ghost" data-act="sent" data-key="'+key+'" data-id="'+r.id+'" data-seg="'+seg+'">Sent note</button>'+
     '<button class="btn ghost" data-act="accepted" data-id="'+r.id+'">Accepted</button>';
 
-  if(m){
-    const brief=briefFor(m.defined_at,'connect','default');
+  const own=(r.custom_connect_note||'').trim();
+  const primary=own||((m&&m.message)||'');
+
+  if(primary){
+    const brief=m?briefFor(m.defined_at,'connect','default'):null;
     CARDS[key]={contact:r.id,step:'connect',
                 limit:(brief&&brief.char_limit)||DEFAULT_LIMIT,
-                sendId:null,loggedBody:null,rating:0};
-    h+=messageBody(key,m.message);
-    h+='<div class="cfoot">'+copyControls(key)+buttons+
-       '<span class="inh">'+(m.inherited?'Copy inherited from '+esc(m.defined_at):'Copy written for this segment')+'</span>'+
+                sendId:null,loggedBody:null,rating:0,outcome:null};
+    const prior=SENDS[r.id+'|connect'];
+    if(prior){ CARDS[key].sendId=prior.id; CARDS[key].rating=prior.rating||0;
+               CARDS[key].outcome=prior.outcome||null; CARDS[key].loggedBody=prior.body_used||null; }
+
+    h+='<div class="plabel'+(own?' own':'')+'">'+
+       (own?'Written for this person':'Segment copy')+'</div>';
+    h+=messageBody(key,primary);
+    h+='<div class="cfoot">'+copyControls(key)+
+       '<button class="btn ghost" data-act="save-note" data-key="'+key+'" data-id="'+r.id+'">Save as this person’s note</button>'+
+       buttons+
+       '<span class="inh">'+(own
+          ? 'Overrides the segment copy'
+          : (m&&m.inherited?'Copy inherited from '+esc(m.defined_at):'Copy written for this segment'))+'</span>'+
        '</div>';
-    h+='<div id="hold_'+key+'"></div>';
+    /* Only ever shown when it is NOT the thing to send, and never with a Copy
+       button, because a Copy button is what makes a message look sendable. */
+    if(own&&m) h+=defaultPanel(m,CARDS[key].limit);
+    h+='<div id="hold_'+key+'">'+scoreBlock(key)+'</div>';
     h+=whyPanel(brief);
   }else if(PRE_INVITE.indexOf(r.linkedin_status)!==-1){
     h+='<div class="cbody" style="color:#8c2f26">No connect copy found for this segment. '+
@@ -628,8 +727,8 @@ function prospectCard(r,m){
 
 async function loadProspects(){
   const rows=await rest('crm_contacts',
-    'select=id,full_name,employer,city,notes,custom,lead_source,email_status,segment_id,linkedin_status,linkedin_url'+
-    '&order=created_at.desc&limit=200');
+    'select=id,full_name,employer,city,notes,custom,custom_connect_note,lead_source,email_status,'+
+    'segment_id,linkedin_status,linkedin_url&order=created_at.desc&limit=200');
   $('cnt_pros').textContent=(rows||[]).length;
   const box=$('prosbox');
   if(!rows||!rows.length){ box.innerHTML='<div class="empty"><div class="big">No prospects yet.</div>'+
@@ -643,10 +742,45 @@ async function loadProspects(){
     }catch(e){ return [r.id,null]; }
   });
   const connect=new Map(pairs);
+  await loadSends(rows.map(r=>r.id));
 
   box.innerHTML=rows.map(r=>prospectCard(r,connect.get(r.id)||null)).join('');
-  rows.forEach(r=>countCard('p'+r.id));
+  rows.forEach(r=>{ countCard('p'+r.id); paintStars('p'+r.id); });
 }
+
+/* Sends already logged, so the outcome panel survives a refresh and a reload
+   rather than living only in memory until the next render. */
+async function loadSends(contactIds){
+  const ids=(contactIds||[]).filter(Boolean);
+  if(!ids.length) return;
+  try{
+    const rows=await rest('crm_message_sends',
+      'select=id,contact_id,step,outcome,rating,body_used,sent_at'+
+      '&contact_id=in.('+ids.join(',')+')&order=sent_at.desc');
+    /* Merge rather than replace: Today and Prospects each load their own
+       contacts, and the second must not wipe the first. */
+    const seen={};
+    (rows||[]).forEach(r=>{
+      const k=r.contact_id+'|'+r.step;
+      if(!seen[k]){ seen[k]=1; SENDS[k]=r; }
+    });
+  }catch(e){}
+}
+/* Sent note is the moment the message actually went out, so this is where the
+   send is recorded. Log first: the on-screen text is the one thing that cannot
+   be recovered if the enrol call then fails. */
+async function sentNote(key,id,seg){
+  const ok=await markSent(key);
+  if(!seg){ if(ok) toast('Logged. Give this contact a segment to book the cadence.'); return; }
+  await enrol(id,seg);
+}
+
+/* Today's equivalent of Sent note: finishing the task is the moment it went out. */
+async function doneFromCard(key,id){
+  if(key&&CARDS[key]) await markSent(key);
+  await doneTask(id);
+}
+
 async function enrol(id,seg){
   if(!seg){ toast('Give this contact a segment first.'); return; }
   try{ await rpc('crm_linkedin_enroll',{p_contact:id,p_segment:seg});
@@ -874,6 +1008,7 @@ async function loadPerformance(){
 
 async function refreshAll(){
   /* Briefs first: the cards read char_limit and the doctrine out of them. */
+  SENDS={};
   try{ await loadBriefs(); }catch(e){}
   try{ await loadSegments(); }catch(e){}
   try{ await loadToday(); }catch(e){ $('queue').innerHTML='<div class="empty"><p>'+esc(e.message)+'</p></div>'; }
@@ -891,9 +1026,12 @@ document.addEventListener('click',function(e){
   const act=t.getAttribute('data-act'), id=t.getAttribute('data-id'), key=t.getAttribute('data-key');
   if(act==='open') window.open(t.getAttribute('data-url'),'_blank','noopener');
   else if(act==='copy') copyCard(key);
+  else if(act==='sent') sentNote(key,id,t.getAttribute('data-seg')||'');
+  else if(act==='undo-send') undoSend(key);
+  else if(act==='save-note') saveOwnNote(key,id);
   else if(act==='enrol') enrol(id,t.getAttribute('data-seg')||'');
   else if(act==='accepted') accepted(id);
-  else if(act==='done') doneTask(id);
+  else if(act==='done') doneFromCard(key,id);
   else if(act==='stop') stopCadence(id);
   else if(act==='rate'){ const st=CARDS[key]; if(st){ st.rating=Number(t.getAttribute('data-n')); paintStars(key); } }
   else if(act==='save-score') saveScore(key);
