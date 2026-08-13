@@ -128,6 +128,78 @@ details.why[open]>summary{border-bottom:1px solid var(--rule);}
 color:var(--gold);margin-bottom:2px;}
 .whyrow.warn b{color:var(--red);}
 
+/* ---- Prospect brief: panel grid ----
+   Four across on a desktop, stacked on a phone. The desk is used mostly on a
+   phone, so the stack is the base case and the grid is the enhancement. */
+.bgrid{display:grid;grid-template-columns:1fr;gap:12px;padding:0 16px 14px;}
+.bgrid2{display:grid;grid-template-columns:1fr;gap:12px;padding:0 16px 14px;}
+.accgrid{display:grid;grid-template-columns:1fr;gap:12px;padding:0 16px 16px;}
+@media(min-width:900px){
+  .bgrid{grid-template-columns:repeat(4,1fr);}
+  .bgrid2{grid-template-columns:1fr 1fr;}
+  .accgrid{grid-template-columns:repeat(4,1fr);}
+}
+/* The desk is built on an 820px measure, which is right for reading a message
+   and far too narrow for a four-column brief. Widen the page for this screen
+   only, and hold the other tabs at a comfortable line length. */
+@media(min-width:1100px){
+  .wrap{max-width:1340px;}
+  #p_today .card,#p_seg>*,#p_fun>*{max-width:860px;}
+  #p_pros .formbox,#p_pros>.bar{max-width:860px;}
+}
+.pnl{border:1px solid var(--rule);background:#fff;}
+.pnl>h4{display:flex;align-items:center;gap:7px;margin:0;padding:11px 13px;
+background:var(--cream);border-bottom:1px solid var(--rule);
+font-size:10px;letter-spacing:.13em;text-transform:uppercase;font-weight:700;color:var(--navy);}
+.pnl>h4 .ic{color:var(--gold);font-size:12px;line-height:1;}
+.pnl .body{padding:11px 13px;}
+.pnl .bfield{padding:0 0 12px;}
+.pnl .bfield:last-child{padding-bottom:0;}
+
+/* Snapshot rows */
+.srow{display:flex;gap:10px;padding:6px 0;border-bottom:1px solid #f0ece3;}
+.srow:last-child{border-bottom:0;}
+.srow .k{flex:0 0 40%;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;
+font-weight:700;color:var(--ink-soft);padding-top:2px;}
+.srow .v{flex:1;font-size:13px;line-height:1.5;}
+.srow.warn .k,.srow.warn .v{color:var(--red);}
+.srow.warn .k{font-weight:700;}
+
+/* Why she is on the list */
+.whyband{margin:0 16px 14px;background:var(--gold-bg);border:1px solid var(--gold-tint);
+border-left:4px solid var(--gold);padding:12px 14px;}
+.whyband .blabel{color:var(--gold);}
+
+/* Outreach workflow stepper */
+.steps{display:flex;align-items:flex-start;gap:0;padding:4px 0 10px;overflow-x:auto;}
+.step{flex:1;min-width:62px;text-align:center;position:relative;}
+.step .dot{width:15px;height:15px;border-radius:50%;border:2px solid var(--rule);
+background:#fff;margin:0 auto 6px;}
+.step.done .dot{border-color:var(--gold);background:var(--gold);}
+.step.now .dot{border-color:var(--gold);box-shadow:0 0 0 3px var(--gold-bg);}
+.step .lb{font-size:8.5px;letter-spacing:.09em;text-transform:uppercase;font-weight:700;
+color:var(--ink-soft);}
+.step.done .lb,.step.now .lb{color:var(--navy);}
+.step::before{content:'';position:absolute;top:8px;left:-50%;width:100%;height:2px;
+background:var(--rule);z-index:0;}
+.step:first-child::before{display:none;}
+.step.done::before{background:var(--gold);}
+.step .dot{position:relative;z-index:1;}
+.stepnote{font-size:12px;color:var(--ink-soft);line-height:1.5;}
+
+/* Connection note panel */
+.notehead{display:flex;align-items:center;justify-content:space-between;gap:10px;}
+.notebox{border:1px solid var(--rule);background:#fcfbf7;padding:12px 13px;margin-top:9px;
+font-size:14.5px;line-height:1.62;outline:none;}
+.notebox:focus{border-color:var(--gold);background:#fff;}
+.usedfact{margin-top:10px;font-size:11.5px;color:var(--ink-soft);line-height:1.5;}
+.usedfact b{display:block;font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;
+color:var(--green);margin-bottom:2px;}
+.notebtns{display:flex;flex-wrap:wrap;gap:8px;margin-top:11px;}
+.accgrid details.why{margin:0;}
+.accsub{font-size:11px;color:var(--ink-soft);font-weight:400;letter-spacing:0;
+text-transform:none;display:block;margin-top:2px;}
+
 /* ---- Prospect brief card ---- */
 .bhead{display:flex;gap:13px;align-items:flex-start;padding:15px 16px;background:var(--cream);
 border-bottom:1px solid var(--rule);}
@@ -424,7 +496,7 @@ function provenance(c){
   return bits.length?'<div class="provrow">'+bits.join('')+'</div>':'';
 }
 
-function whyPanel(b){
+function whyPanel(b,sub){
   if(!b) return '';
   const row=(label,val,warn)=> val
     ? '<div class="whyrow'+(warn?' warn':'')+'"><b>'+label+'</b>'+esc(val)+'</div>' : '';
@@ -435,7 +507,8 @@ function whyPanel(b){
               row('Success signal',b.success_signal)+
               row('Hard limits',b.hard_limits,true);
   if(!inner) return '';
-  return '<details class="why"><summary>Why this message</summary>'+
+  return '<details class="why"><summary>Why this message'+
+         (sub?'<span class="accsub">'+esc(sub)+'</span>':'')+'</summary>'+
          '<div class="whybody">'+inner+'</div></details>';
 }
 
@@ -769,6 +842,101 @@ function defaultPanel(text,chars,limit){
     '</div></details>';
 }
 
+/* The cadence, left to right. Derived from linkedin_status, which is the only
+   thing that actually knows where a person is: the later steps are booked by
+   crm_linkedin_accepted once they accept, so they are shown pending until then. */
+const FLOW=[['ready','Ready'],['sent','Sent'],['accepted','Accepted'],
+            ['welcome','Welcome'],['day2','Day 2'],['day6','Day 6'],['day12','Day 12']];
+function flowIndex(status){
+  switch(status){
+    case 'invited':   return 1;
+    case 'connected': return 2;
+    case 'in_cadence':
+    case 'replied':
+    case 'closed':    return 3;
+    default:          return 0;   /* not_started, warming, declined */
+  }
+}
+function workflowPanel(r){
+  const at=flowIndex(r.linkedin_status);
+  return '<div class="pnl"><h4><span class="ic">&#9679;</span>Outreach workflow</h4><div class="body">'+
+    '<div class="steps">'+FLOW.map(function(s,i){
+      const cls=(i<at?'done':(i===at?'done now':''));
+      return '<div class="step '+cls+'"><div class="dot"></div><div class="lb">'+esc(s[1])+'</div></div>';
+    }).join('')+'</div>'+
+    '<div class="stepnote">Cadence books automatically when the connection is accepted.</div>'+
+    '</div></div>';
+}
+
+function snapshotPanel(r){
+  const sig=r.linkedin_signals||{};
+  const row=function(k,v,warn){
+    return '<div class="srow'+(warn?' warn':'')+'"><div class="k">'+esc(k)+'</div>'+
+           '<div class="v">'+(v?esc(v):'&mdash;')+'</div></div>';
+  };
+  let h='<div class="pnl"><h4><span class="ic">&#9679;</span>Prospect snapshot</h4><div class="body">';
+  h+=row('Role',r.title);
+  h+=row('Firm',r.employer);
+  h+=row('Location',r.city);
+  h+=row('Segment',r.segment_label);
+  h+=row('Verified',sig.checked_at?('Checked '+sig.checked_at):null);
+  if(r.do_not_misstate) h+=row('Do not misstate',r.do_not_misstate,true);
+  return h+'</div></div>';
+}
+
+function timelinePanel(r){
+  return '<div class="pnl"><h4><span class="ic">&#9679;</span>Career and research timeline</h4>'+
+    '<div class="body">'+timelineRows(r.career_timeline)+'</div></div>';
+}
+
+function outreachPanel(id,r){
+  let h='<div class="pnl"><h4><span class="ic">&#9679;</span>Outreach brief</h4><div class="body">';
+  h+=briefField(id,'best_angle','Best angle',r.best_angle);
+  h+=briefField(id,'personalization_fact','Personalization fact',r.personalization_fact);
+  h+=briefField(id,'hidden_objection','Hidden objection',r.hidden_objection,
+      {badge:'<span class="badge">'+(r.objection_is_from_segment?'from segment':'personal')+'</span>',
+       empty:'None for this person, and none inherited from the segment.'});
+  h+=briefField(id,'warming_decision','Warming decision',r.warming_decision);
+  h+=briefField(id,'do_not_use','Do not use',r.do_not_use);
+  return h+'</div></div>';
+}
+
+function signalsPanel(r){
+  const s=r.linkedin_signals;
+  let h='<div class="pnl"><h4><span class="ic">&#9679;</span>LinkedIn signals</h4><div class="body">';
+  if(!s||typeof s!=='object'){ h+='<div class="srow"><div class="v">Nothing recorded.</div></div>'; }
+  else{
+    const row=function(k,v){ return '<div class="srow"><div class="k">'+esc(k)+'</div>'+
+      '<div class="v">'+(v==null||v===''?'&mdash;':esc(v))+'</div></div>'; };
+    h+=row('Connections',s.connections);
+    h+=row('Followers',s.followers);
+    h+=row('Posts',s.posts);
+    h+=row('Degree',s.degree);
+    h+=row('Source',s.source);
+    h+=row('Checked',s.checked_at);
+  }
+  return h+'</div></div>';
+}
+
+function notePanel(key,id,r,own,primary,limit){
+  let h='<div class="pnl"><h4><span class="ic">&#9679;</span>Connection note'+
+        '<span style="margin-left:auto;font-weight:700"><span class="cc" id="cnt_'+key+'"></span></span>'+
+        '</h4><div class="body">';
+  h+='<div class="plabel'+(own?' own':'')+'" style="padding:0 0 4px">'+
+     (own?'Written for this person':'Segment copy, nothing written for this person yet')+'</div>';
+  h+='<div class="notebox" contenteditable="true" spellcheck="true" id="msg_'+key+'" '+
+     'data-count="'+key+'">'+esc(primary)+'</div>';
+  if(r.personalization_fact){
+    h+='<div class="usedfact"><b>Personalization used</b>'+esc(r.personalization_fact)+'</div>';
+  }
+  h+='<div class="notebtns">'+
+     '<button class="btn" data-act="copy" data-key="'+key+'">Copy note</button>'+
+     '<button class="btn ghost" data-act="focus-note" data-key="'+key+'">Edit</button>'+
+     '<button class="btn ghost" data-act="save-note" data-key="'+key+'" data-id="'+id+'">Save for this person</button>'+
+     '</div>';
+  return h+'</div></div>';
+}
+
 function prospectCard(r){
   const id=r.contact_id, key='p'+id;
   const seg=esc(r.segment_id||'');
@@ -786,84 +954,66 @@ function prospectCard(r){
 
   let h='<div class="card">';
 
-  /* No photograph is stored anywhere, and a stock or generated face on a real
-     person's record is worse than no image, so this is always initials. */
+  /* Initials, never a face. No photograph is stored, and a stock or generated
+     one on a real person's record is worse than no image at all. */
   h+='<div class="bhead"><div class="avatar">'+esc(initials(r.full_name))+'</div>'+
      '<div class="grow"><div class="who">'+esc(r.full_name)+'</div>'+
      '<div class="meta">'+[r.title,r.employer,r.city].filter(Boolean).map(esc).join(' &middot; ')+'</div>'+
      (r.segment_label?'<div class="seg">'+esc(r.segment_label)+'</div>':'')+
-     '</div><div class="right"><span class="pill">'+esc(r.linkedin_status||'')+'</span></div></div>';
+     '</div><div class="right"><span class="pill">'+esc(r.linkedin_status||'')+'</span>'+
+     (r.linkedin_url?' <button class="btn ghost" data-act="open" data-url="'+esc(r.linkedin_url)+'">Open LinkedIn</button>':'')+
+     '</div></div>';
 
-  /* Flag a thin record rather than rendering a column of empty panels. */
   if(!r.brief_complete){
     h+='<div class="thin">Thin record. This needs why they are on the list and one '+
        'personalization fact before it is worth working.</div>';
   }
 
-  /* Visible without expanding anything. This is the mistake the panel exists to
-     prevent, and it is no use folded away inside an accordion. */
-  if(r.do_not_misstate){
-    h+='<div class="danger"><div class="bfield" style="padding:0">'+
-       '<div class="blabel" style="color:inherit">Do not misstate</div>'+
-       '<div class="bval" contenteditable="true" spellcheck="true" '+
-       'data-save-col="do_not_misstate" data-save-id="'+id+'" '+
-       'data-empty="Nothing recorded." data-original="'+esc(r.do_not_misstate)+'">'+
-       esc(r.do_not_misstate)+'</div></div></div>';
-  }
+  /* Full width, directly under the header, exactly as in the design. */
+  h+='<div class="whyband">'+briefField(id,'why_on_list','Why they are on the list',r.why_on_list)+'</div>';
 
-  h+=briefField(id,'why_on_list','Why they are on the list',r.why_on_list);
-  h+=briefField(id,'best_angle','Best angle',r.best_angle);
-  h+=briefField(id,'personalization_fact','Personalization fact',r.personalization_fact);
-  h+=briefField(id,'do_not_use','Do not use',r.do_not_use);
-  h+=briefField(id,'warming_decision','Warming decision',r.warming_decision);
-  h+=briefField(id,'hidden_objection','Hidden objection',r.hidden_objection,
-       {badge:'<span class="badge">'+(r.objection_is_from_segment?'from segment':'personal')+'</span>',
-        empty:'None for this person, and none inherited from the segment.'});
-  h+=signalStrip(r.linkedin_signals);
-
-  const buttons=
-    (r.linkedin_url?'<button class="btn ghost" data-act="open" data-url="'+esc(r.linkedin_url)+'">Open profile</button>':'')+
-    '<button class="btn ghost" data-act="sent" data-key="'+key+'" data-id="'+id+'" data-seg="'+seg+'">Sent note</button>'+
-    '<button class="btn ghost" data-act="accepted" data-id="'+id+'">Accepted</button>';
+  h+='<div class="bgrid">'+snapshotPanel(r)+timelinePanel(r)+outreachPanel(id,r)+signalsPanel(r)+'</div>';
 
   if(primary){
-    h+='<div class="plabel'+(own?' own':'')+'">'+(own?'Written for this person':'Segment copy')+'</div>';
-    h+=messageBody(key,primary);
-    h+='<div class="cfoot">'+copyControls(key)+
-       '<button class="btn ghost" data-act="save-note" data-key="'+key+'" data-id="'+id+'">Save as this person’s note</button>'+
-       buttons+
+    h+='<div class="bgrid2">'+notePanel(key,id,r,own,primary,limit)+workflowPanel(r)+'</div>';
+    h+='<div class="cfoot" style="padding:0 16px 15px">'+
+       '<button class="btn ghost" data-act="sent" data-key="'+key+'" data-id="'+id+'" data-seg="'+seg+'">Sent note</button>'+
+       '<button class="btn ghost" data-act="accepted" data-id="'+id+'">Accepted</button>'+
        '<span class="inh">'+(own?'Overrides the segment copy':'No note written for this person yet')+'</span>'+
        '</div>';
     h+='<div id="hold_'+key+'">'+scoreBlock(key)+'</div>';
   }else{
+    h+='<div class="bgrid2">'+workflowPanel(r)+'</div>';
     h+='<div class="cbody" style="color:#8c2f26">No connect copy for this segment, and nothing '+
-       'written for this person. Write it in the Segments tab so everything beneath inherits it.</div>'+
-       '<div class="cfoot">'+buttons+'</div>';
+       'written for this person. Write it in the Segments tab so everything beneath inherits it.</div>';
   }
 
   /* Fixed order: why this message, full research, segment default, technical. */
-  h+=whyPanel(brief);
-
-  h+='<details class="why"><summary>Full research and sources</summary><div class="whybody">'+
+  h+='<div class="accgrid">';
+  h+=whyPanel(brief,'The thinking behind this approach');
+  h+='<details class="why"><summary>Full research and sources<span class="accsub">All facts, notes and links</span></summary>'+
+     '<div class="whybody">'+
        briefField(id,'notes','Research',r.full_research,{empty:'No research recorded yet.'})+
        '<div class="whyrow"><b>Career timeline</b></div>'+timelineRows(r.career_timeline)+
        briefField(id,'career_timeline','Timeline as JSON',
-         r.career_timeline?JSON.stringify(r.career_timeline,null,2):'',
-         {json:true,empty:'[]'})+
+         r.career_timeline?JSON.stringify(r.career_timeline,null,2):'',{json:true,empty:'[]'})+
      '</div></details>';
-
-  if(own&&dflt) h+=defaultPanel(dflt,r.segment_default_chars,limit);
-
-  h+='<details class="why"><summary>Technical details</summary><div class="whybody">'+
+  h+=(own&&dflt)
+      ? defaultPanel(dflt,r.segment_default_chars,limit)
+      : '<details class="why"><summary>Segment default<span class="accsub">Template copy from segment</span></summary>'+
+        '<div class="whybody"><div class="whyrow">'+(dflt?esc(dflt):'None defined for this segment.')+'</div></div></details>';
+  h+='<details class="why"><summary>Technical details<span class="accsub">Ids, history and system info</span></summary>'+
+     '<div class="whybody">'+
        '<div class="whyrow"><b>Segment id</b>'+esc(r.segment_id||'unset')+'</div>'+
        '<div class="whyrow"><b>Segment path</b>'+esc(r.segment_path||'')+'</div>'+
        '<div class="whyrow"><b>Contact id</b>'+esc(id)+'</div>'+
        '<div class="whyrow"><b>Lifecycle stage</b>'+esc(r.lifecycle_stage||'')+'</div>'+
+       '<div class="whyrow"><b>LinkedIn status</b>'+esc(r.linkedin_status||'')+'</div>'+
        '<div class="whyrow"><b>Brief updated</b>'+esc(r.brief_updated_at||'never')+'</div>'+
        briefField(id,'linkedin_signals','LinkedIn signals as JSON',
-         r.linkedin_signals?JSON.stringify(r.linkedin_signals,null,2):'',
-         {json:true,empty:'{}'})+
+         r.linkedin_signals?JSON.stringify(r.linkedin_signals,null,2):'',{json:true,empty:'{}'})+
      '</div></details>';
+  h+='</div>';
 
   return h+'</div>';
 }
@@ -1162,6 +1312,9 @@ document.addEventListener('click',function(e){
   else if(act==='sent') sentNote(key,id,t.getAttribute('data-seg')||'');
   else if(act==='undo-send') undoSend(key);
   else if(act==='save-note') saveOwnNote(key,id);
+  else if(act==='focus-note'){ const el=$('msg_'+key); if(el){ el.focus();
+    const rg=document.createRange(); rg.selectNodeContents(el); rg.collapse(false);
+    const sel=window.getSelection(); sel.removeAllRanges(); sel.addRange(rg); } }
   else if(act==='enrol') enrol(id,t.getAttribute('data-seg')||'');
   else if(act==='accepted') accepted(id);
   else if(act==='done') doneFromCard(key,id);
