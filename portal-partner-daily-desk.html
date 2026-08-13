@@ -128,6 +128,50 @@ details.why[open]>summary{border-bottom:1px solid var(--rule);}
 color:var(--gold);margin-bottom:2px;}
 .whyrow.warn b{color:var(--red);}
 
+/* ---- Prospect brief card ---- */
+.bhead{display:flex;gap:13px;align-items:flex-start;padding:15px 16px;background:var(--cream);
+border-bottom:1px solid var(--rule);}
+.avatar{width:46px;height:46px;flex:0 0 auto;border-radius:50%;background:var(--navy);color:var(--gold);
+display:flex;align-items:center;justify-content:center;font-family:'CormorantG',serif;
+font-size:19px;font-weight:700;letter-spacing:.02em;}
+.bhead .grow{flex:1;min-width:0;}
+.seg{display:inline-block;margin-top:5px;font-size:10px;letter-spacing:.1em;text-transform:uppercase;
+font-weight:700;color:var(--gold);background:var(--gold-bg);border:1px solid var(--gold-tint);
+padding:3px 8px;border-radius:3px;}
+
+.thin{margin:0 16px 14px;background:#fdf7e8;border-left:4px solid var(--gold);padding:10px 13px;
+font-size:13px;line-height:1.5;}
+.danger{margin:14px 16px;background:#fbeceb;border:1px solid rgba(140,47,38,.35);
+border-left:5px solid var(--red);padding:11px 13px;font-size:14px;line-height:1.55;color:#6d241d;}
+.danger b{display:block;font-size:9.5px;letter-spacing:.13em;text-transform:uppercase;
+color:var(--red);margin-bottom:3px;}
+
+.bfield{padding:0 16px 13px;}
+.blabel{font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;font-weight:700;
+color:var(--gold);margin-bottom:3px;}
+.bval{font-size:14px;line-height:1.6;color:var(--ink);outline:none;
+border-bottom:1px dashed transparent;padding-bottom:1px;}
+.bval:hover{border-bottom-color:var(--rule);}
+.bval:focus{border-bottom-color:var(--gold);background:#fffdf7;}
+.bval:empty::before{content:attr(data-empty);color:#a79f93;font-style:italic;}
+.bval.json{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;white-space:pre-wrap;
+background:#fcfbf7;border:1px solid var(--rule);padding:8px 10px;}
+.badge{display:inline-block;margin-left:7px;font-size:9px;letter-spacing:.08em;text-transform:uppercase;
+font-weight:700;padding:2px 7px;border-radius:3px;background:#eef1f4;color:var(--slate);}
+.badge.seg{background:#eef1f4;color:var(--slate);border:0;margin-top:0;}
+.flash{margin-left:8px;font-size:10px;letter-spacing:.08em;text-transform:uppercase;
+font-weight:700;color:var(--green);}
+.flash.bad{color:var(--red);}
+
+.signals{display:flex;flex-wrap:wrap;gap:6px;padding:0 16px 14px;}
+.signals span{font-size:10px;letter-spacing:.06em;text-transform:uppercase;font-weight:700;
+background:#eef1f4;color:var(--slate);padding:3px 8px;border-radius:3px;}
+
+.tlrow{margin-top:9px;font-size:13px;line-height:1.5;}
+.tlrow b{display:block;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;
+color:var(--gold);margin-bottom:1px;}
+.tlrow i{display:block;font-size:11px;color:var(--ink-soft);font-style:italic;margin-top:2px;}
+
 /* Which message is the one to send */
 .plabel{font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;font-weight:700;
 color:var(--ink-soft);padding:13px 17px 0 17px;}
@@ -161,7 +205,13 @@ td.edited{font-weight:700;}
 td.edited.hot{color:var(--red);}
 td.rate{font-weight:700;}
 .perfnote{font-size:12.5px;color:var(--ink-soft);margin-top:9px;line-height:1.5;}
-@media(max-width:640px){h1{font-size:31px;}.grid{grid-template-columns:1fr;}.chead .right{margin-left:0;text-align:left;}}
+@media(max-width:640px){h1{font-size:31px;}.grid{grid-template-columns:1fr;}.chead .right{margin-left:0;text-align:left;}
+/* The status pill was squeezing the name into four lines. Let it drop to its
+   own row instead of stealing width from the person's name. */
+.bhead{flex-wrap:wrap;}
+.bhead .grow{flex:1 1 0;min-width:0;}
+.bhead .right{flex:0 0 100%;margin-top:8px;text-align:left;}
+}
 </style></head><body>
 
 <div id="loginbox" class="login hide">
@@ -335,19 +385,6 @@ function splitNotes(c){
   return {research:(research+(aside?'\n'+aside:'')).trim(), tailored:after.trim()};
 }
 
-/* Exactly one message on a card may look like the one to send. When a person has
-   their own note, the segment copy is demoted to a collapsed reference with no
-   Copy button, because a Copy button is the thing that says "send me". */
-function defaultPanel(m,limit){
-  if(!m) return '';
-  const n=(m.message||'').length;
-  return '<details class="why"><summary>Segment default, not used &middot; '+
-    n+' / '+limit+(n>limit?', over':'')+'</summary><div class="whybody">'+
-    '<div class="whyrow"><b>'+(m.inherited?'Inherited from '+esc(m.defined_at):'Written for this segment')+
-    '</b>'+esc(m.message)+'</div>'+
-    '<div class="whyrow"><b>Why you are seeing it</b>Reference only. The note above is what gets sent.</div>'+
-    '</div></details>';
-}
 
 /* Editable, so an over-length message is trimmed here with the count following,
    rather than discovered after LinkedIn truncates it. */
@@ -668,95 +705,180 @@ async function stopCadence(cid){
 }
 
 /* ---------------- PROSPECTS ---------------- */
-/* The connect note is only needed before the invite goes out. Restricting the
-   per-contact lookup to those rows is both the right workflow and what keeps
-   this to a handful of calls rather than one per contact. */
-const PRE_INVITE=['not_started','warming'];
+/* ---------------- THE PROSPECT BRIEF CARD ----------------
+   Everything on this screen comes from crm_prospect_brief, which assembles the
+   whole card in one query per contact, including the segment default note and
+   its character count. crm_contacts is not queried here. */
 
-/* A few at a time. Firing 200 RPCs at once from a phone is not kind to it. */
-async function mapLimit(items,limit,fn){
-  const out=new Array(items.length); let i=0;
-  async function worker(){ while(i<items.length){ const k=i++; out[k]=await fn(items[k]); } }
-  await Promise.all(Array.from({length:Math.min(limit,items.length)},worker));
-  return out;
+function initials(name){
+  const parts=String(name||'').trim().split(/\s+/).filter(Boolean);
+  if(!parts.length) return '?';
+  return (parts[0][0]+(parts.length>1?parts[parts.length-1][0]:'')).toUpperCase();
 }
 
+/* The six doctrine fields hang off the step, not the segment, so any brief row
+   for that step carries them. This matters because a contact's own segment is
+   often not where its copy is defined: Sussie sits in cpa_owner_niche and
+   inherits from cpa, so keying the lookup on her segment alone would miss. */
+function doctrineFor(step){
+  const k=Object.keys(BRIEFS).find(function(x){ return BRIEFS[x].step===step; });
+  return k?BRIEFS[k]:null;
+}
 
-function prospectCard(r,m){
-  const key='p'+r.id;
+/* Editable in place. Blur writes back to crm_contacts; the trigger stamps
+   brief_updated_at, so nothing here sets it. */
+function briefField(id,col,label,value,opts){
+  const o=opts||{};
+  const v=(value==null?'':String(value));
+  return '<div class="bfield">'+
+    '<div class="blabel">'+esc(label)+(o.badge||'')+'</div>'+
+    '<div class="bval'+(o.json?' json':'')+'" contenteditable="true" '+
+      'spellcheck="'+(o.json?'false':'true')+'" '+
+      'data-save-col="'+col+'" data-save-id="'+id+'"'+(o.json?' data-json="1"':'')+
+      ' data-empty="'+esc(o.empty||'Not recorded yet. Tap to add.')+'"'+
+      ' data-original="'+esc(v)+'">'+esc(v)+'</div>'+
+    '</div>';
+}
+
+function signalStrip(sig){
+  if(!sig||typeof sig!=='object') return '';
+  const bits=[];
+  if(sig.connections!=null) bits.push(esc(sig.connections)+' connections');
+  if(sig.followers!=null)   bits.push(esc(sig.followers)+' followers');
+  if(sig.posts!=null)       bits.push(esc(sig.posts)+' posts');
+  if(sig.degree)            bits.push(esc(sig.degree)+' degree');
+  if(sig.checked_at)        bits.push('checked '+esc(sig.checked_at));
+  return bits.length?'<div class="signals">'+bits.map(b=>'<span>'+b+'</span>').join('')+'</div>':'';
+}
+
+function timelineRows(tl){
+  if(!Array.isArray(tl)||!tl.length) return '<div class="whyrow">No timeline recorded.</div>';
+  return tl.map(function(e){
+    return '<div class="tlrow"><b>'+esc(e.when||'')+'</b>'+esc(e.what||'')+
+           (e.source?'<i>'+esc(e.source)+'</i>':'')+'</div>';
+  }).join('');
+}
+
+function defaultPanel(text,chars,limit){
+  const n=(chars==null?String(text||'').length:chars);
+  return '<details class="why"><summary>Segment default, not used &middot; '+
+    n+' / '+limit+(n>limit?', over':'')+'</summary><div class="whybody">'+
+    '<div class="whyrow"><b>Not sent</b>'+esc(text)+'</div>'+
+    '<div class="whyrow"><b>Why you are seeing it</b>Reference only. The note above is what '+
+    'gets sent, and this one carries no Copy button for that reason.</div>'+
+    '</div></details>';
+}
+
+function prospectCard(r){
+  const id=r.contact_id, key='p'+id;
   const seg=esc(r.segment_id||'');
-  let h='<div class="card">';
-  h+='<div class="chead"><div><div class="who">'+esc(r.full_name)+'</div>'+
-     '<div class="meta">'+esc(r.segment_id||'No segment')+
-     (r.employer?' &middot; '+esc(r.employer):'')+
-     (r.city?' &middot; '+esc(r.city):'')+'</div></div>'+
-     '<div class="right"><span class="pill">'+esc(r.linkedin_status||'')+'</span></div></div>';
+  const own=(r.custom_connect_note||'').trim();
+  const dflt=(r.segment_default_note||'').trim();
+  const primary=own||dflt;
+  const brief=BRIEFS[(r.segment_id||'')+'|connect|default']||doctrineFor('connect');
+  const limit=(brief&&brief.char_limit)||DEFAULT_LIMIT;
 
-  h+=notesBlock(r)+provenance(r);
+  CARDS[key]={contact:id,step:'connect',limit:limit,
+              sendId:null,loggedBody:null,rating:0,outcome:null};
+  const prior=SENDS[id+'|connect'];
+  if(prior){ CARDS[key].sendId=prior.id; CARDS[key].rating=prior.rating||0;
+             CARDS[key].outcome=prior.outcome||null; CARDS[key].loggedBody=prior.body_used||null; }
+
+  let h='<div class="card">';
+
+  /* No photograph is stored anywhere, and a stock or generated face on a real
+     person's record is worse than no image, so this is always initials. */
+  h+='<div class="bhead"><div class="avatar">'+esc(initials(r.full_name))+'</div>'+
+     '<div class="grow"><div class="who">'+esc(r.full_name)+'</div>'+
+     '<div class="meta">'+[r.title,r.employer,r.city].filter(Boolean).map(esc).join(' &middot; ')+'</div>'+
+     (r.segment_label?'<div class="seg">'+esc(r.segment_label)+'</div>':'')+
+     '</div><div class="right"><span class="pill">'+esc(r.linkedin_status||'')+'</span></div></div>';
+
+  /* Flag a thin record rather than rendering a column of empty panels. */
+  if(!r.brief_complete){
+    h+='<div class="thin">Thin record. This needs why they are on the list and one '+
+       'personalization fact before it is worth working.</div>';
+  }
+
+  /* Visible without expanding anything. This is the mistake the panel exists to
+     prevent, and it is no use folded away inside an accordion. */
+  if(r.do_not_misstate){
+    h+='<div class="danger"><div class="bfield" style="padding:0">'+
+       '<div class="blabel" style="color:inherit">Do not misstate</div>'+
+       '<div class="bval" contenteditable="true" spellcheck="true" '+
+       'data-save-col="do_not_misstate" data-save-id="'+id+'" '+
+       'data-empty="Nothing recorded." data-original="'+esc(r.do_not_misstate)+'">'+
+       esc(r.do_not_misstate)+'</div></div></div>';
+  }
+
+  h+=briefField(id,'why_on_list','Why they are on the list',r.why_on_list);
+  h+=briefField(id,'best_angle','Best angle',r.best_angle);
+  h+=briefField(id,'personalization_fact','Personalization fact',r.personalization_fact);
+  h+=briefField(id,'do_not_use','Do not use',r.do_not_use);
+  h+=briefField(id,'warming_decision','Warming decision',r.warming_decision);
+  h+=briefField(id,'hidden_objection','Hidden objection',r.hidden_objection,
+       {badge:'<span class="badge">'+(r.objection_is_from_segment?'from segment':'personal')+'</span>',
+        empty:'None for this person, and none inherited from the segment.'});
+  h+=signalStrip(r.linkedin_signals);
 
   const buttons=
     (r.linkedin_url?'<button class="btn ghost" data-act="open" data-url="'+esc(r.linkedin_url)+'">Open profile</button>':'')+
-    '<button class="btn ghost" data-act="sent" data-key="'+key+'" data-id="'+r.id+'" data-seg="'+seg+'">Sent note</button>'+
-    '<button class="btn ghost" data-act="accepted" data-id="'+r.id+'">Accepted</button>';
-
-  const own=(r.custom_connect_note||'').trim();
-  const primary=own||((m&&m.message)||'');
+    '<button class="btn ghost" data-act="sent" data-key="'+key+'" data-id="'+id+'" data-seg="'+seg+'">Sent note</button>'+
+    '<button class="btn ghost" data-act="accepted" data-id="'+id+'">Accepted</button>';
 
   if(primary){
-    const brief=m?briefFor(m.defined_at,'connect','default'):null;
-    CARDS[key]={contact:r.id,step:'connect',
-                limit:(brief&&brief.char_limit)||DEFAULT_LIMIT,
-                sendId:null,loggedBody:null,rating:0,outcome:null};
-    const prior=SENDS[r.id+'|connect'];
-    if(prior){ CARDS[key].sendId=prior.id; CARDS[key].rating=prior.rating||0;
-               CARDS[key].outcome=prior.outcome||null; CARDS[key].loggedBody=prior.body_used||null; }
-
-    h+='<div class="plabel'+(own?' own':'')+'">'+
-       (own?'Written for this person':'Segment copy')+'</div>';
+    h+='<div class="plabel'+(own?' own':'')+'">'+(own?'Written for this person':'Segment copy')+'</div>';
     h+=messageBody(key,primary);
     h+='<div class="cfoot">'+copyControls(key)+
-       '<button class="btn ghost" data-act="save-note" data-key="'+key+'" data-id="'+r.id+'">Save as this person’s note</button>'+
+       '<button class="btn ghost" data-act="save-note" data-key="'+key+'" data-id="'+id+'">Save as this person’s note</button>'+
        buttons+
-       '<span class="inh">'+(own
-          ? 'Overrides the segment copy'
-          : (m&&m.inherited?'Copy inherited from '+esc(m.defined_at):'Copy written for this segment'))+'</span>'+
+       '<span class="inh">'+(own?'Overrides the segment copy':'No note written for this person yet')+'</span>'+
        '</div>';
-    /* Only ever shown when it is NOT the thing to send, and never with a Copy
-       button, because a Copy button is what makes a message look sendable. */
-    if(own&&m) h+=defaultPanel(m,CARDS[key].limit);
     h+='<div id="hold_'+key+'">'+scoreBlock(key)+'</div>';
-    h+=whyPanel(brief);
-  }else if(PRE_INVITE.indexOf(r.linkedin_status)!==-1){
-    h+='<div class="cbody" style="color:#8c2f26">No connect copy found for this segment. '+
-       'Write it in the Segments tab, or at a parent segment so everything below inherits it.</div>'+
-       '<div class="cfoot">'+buttons+'</div>';
   }else{
-    h+='<div class="cfoot" style="padding-top:14px">'+buttons+'</div>';
+    h+='<div class="cbody" style="color:#8c2f26">No connect copy for this segment, and nothing '+
+       'written for this person. Write it in the Segments tab so everything beneath inherits it.</div>'+
+       '<div class="cfoot">'+buttons+'</div>';
   }
+
+  /* Fixed order: why this message, full research, segment default, technical. */
+  h+=whyPanel(brief);
+
+  h+='<details class="why"><summary>Full research and sources</summary><div class="whybody">'+
+       briefField(id,'notes','Research',r.full_research,{empty:'No research recorded yet.'})+
+       '<div class="whyrow"><b>Career timeline</b></div>'+timelineRows(r.career_timeline)+
+       briefField(id,'career_timeline','Timeline as JSON',
+         r.career_timeline?JSON.stringify(r.career_timeline,null,2):'',
+         {json:true,empty:'[]'})+
+     '</div></details>';
+
+  if(own&&dflt) h+=defaultPanel(dflt,r.segment_default_chars,limit);
+
+  h+='<details class="why"><summary>Technical details</summary><div class="whybody">'+
+       '<div class="whyrow"><b>Segment id</b>'+esc(r.segment_id||'unset')+'</div>'+
+       '<div class="whyrow"><b>Segment path</b>'+esc(r.segment_path||'')+'</div>'+
+       '<div class="whyrow"><b>Contact id</b>'+esc(id)+'</div>'+
+       '<div class="whyrow"><b>Lifecycle stage</b>'+esc(r.lifecycle_stage||'')+'</div>'+
+       '<div class="whyrow"><b>Brief updated</b>'+esc(r.brief_updated_at||'never')+'</div>'+
+       briefField(id,'linkedin_signals','LinkedIn signals as JSON',
+         r.linkedin_signals?JSON.stringify(r.linkedin_signals,null,2):'',
+         {json:true,empty:'{}'})+
+     '</div></details>';
+
   return h+'</div>';
 }
 
 async function loadProspects(){
-  const rows=await rest('crm_contacts',
-    'select=id,full_name,employer,city,notes,custom,custom_connect_note,lead_source,email_status,'+
-    'segment_id,linkedin_status,linkedin_url&order=created_at.desc&limit=200');
+  /* One query for the entire screen. */
+  const rows=await rest('crm_prospect_brief','select=*&order=created_at.desc&limit=200');
   $('cnt_pros').textContent=(rows||[]).length;
   const box=$('prosbox');
   if(!rows||!rows.length){ box.innerHTML='<div class="empty"><div class="big">No prospects yet.</div>'+
     '<p>Add one below, or send Claude a screenshot of a LinkedIn profile.</p></div>'; return; }
 
-  const pending=rows.filter(r=>PRE_INVITE.indexOf(r.linkedin_status)!==-1);
-  const pairs=await mapLimit(pending,6,async r=>{
-    try{
-      const msgs=await rpc('crm_prospect_card',{p_contact:r.id});
-      return [r.id,(msgs||[]).find(x=>x.step==='connect')||null];
-    }catch(e){ return [r.id,null]; }
-  });
-  const connect=new Map(pairs);
-  await loadSends(rows.map(r=>r.id));
-
-  box.innerHTML=rows.map(r=>prospectCard(r,connect.get(r.id)||null)).join('');
-  rows.forEach(r=>{ countCard('p'+r.id); paintStars('p'+r.id); });
+  await loadSends(rows.map(r=>r.contact_id));
+  box.innerHTML=rows.map(r=>prospectCard(r)).join('');
+  rows.forEach(r=>{ countCard('p'+r.contact_id); paintStars('p'+r.contact_id); });
 }
 
 /* Sends already logged, so the outcome panel survives a refresh and a reload
@@ -1051,6 +1173,51 @@ document.addEventListener('input',function(e){
   const k=e.target&&e.target.getAttribute?e.target.getAttribute('data-count'):null;
   if(k) countCard(k);
 });
+
+/* Brief fields save when you tap away. Capture phase, because blur does not
+   bubble. The message itself is deliberately NOT in here: it keeps its explicit
+   Save button, because it is the text that actually gets sent and a stray edit
+   should not silently become the canonical note. */
+document.addEventListener('blur',function(e){
+  const el=e.target;
+  if(el&&el.getAttribute&&el.getAttribute('data-save-col')) saveBriefField(el);
+},true);
+
+function flash(el,msg,bad){
+  const lab=el.parentNode&&el.parentNode.querySelector('.blabel');
+  if(!lab) return;
+  let f=lab.querySelector('.flash');
+  if(!f){ f=document.createElement('span'); f.className='flash'; lab.appendChild(f); }
+  f.textContent=msg;
+  f.classList.toggle('bad',!!bad);
+  clearTimeout(f._x);
+  f._x=setTimeout(function(){ f.remove(); }, bad?6000:1800);
+}
+
+async function saveBriefField(el){
+  const col=el.getAttribute('data-save-col');
+  const id=el.getAttribute('data-save-id');
+  const original=el.getAttribute('data-original')||'';
+  const text=el.innerText.replace(/ /g,' ').replace(/\s+$/,'');
+  if(text===original) return;
+
+  let value=(text==='')?null:text;
+  if(el.getAttribute('data-json')==='1'&&text!==''){
+    /* Refuse to write malformed JSON into a jsonb column: PostgREST would
+       reject it anyway, and the edit would be lost with no explanation. */
+    try{ value=JSON.parse(text); }
+    catch(err){ flash(el,'Not valid JSON, not saved',true); return; }
+  }
+  try{
+    const body={}; body[col]=value;
+    await api('/rest/v1/crm_contacts?id=eq.'+id,
+      {method:'PATCH',headers:{'Prefer':'return=minimal'},body:body});
+    el.setAttribute('data-original',text);
+    flash(el,'Saved');
+  }catch(e){
+    flash(el,'Not saved: '+e.message,true);
+  }
+}
 
 document.addEventListener('DOMContentLoaded',()=>{
   $('pw').addEventListener('keydown',e=>{ if(e.key==='Enter') login(); });
