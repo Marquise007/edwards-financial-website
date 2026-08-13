@@ -113,6 +113,47 @@ opacity:0;pointer-events:none;transition:opacity .18s;z-index:99;border-left:4px
 .pushnote{background:#fdf7e8;border-left:4px solid var(--gold);padding:10px 13px;font-size:13px;
 line-height:1.5;margin-bottom:14px;}
 .pushnote.bad{background:#fbeceb;border-left-color:var(--red);color:var(--red);}
+
+/* Why this message */
+details.why{margin:0 16px 14px 16px;border:1px solid var(--rule);background:#fcfbf7;}
+details.why>summary{cursor:pointer;padding:9px 12px;font-size:10px;letter-spacing:.13em;
+text-transform:uppercase;font-weight:700;color:var(--slate);list-style:none;}
+details.why>summary::-webkit-details-marker{display:none;}
+details.why>summary::before{content:'+ ';font-weight:700;}
+details.why[open]>summary::before{content:'\2212 ';}
+details.why[open]>summary{border-bottom:1px solid var(--rule);}
+.whybody{padding:4px 12px 12px;}
+.whyrow{margin-top:10px;font-size:13px;line-height:1.55;}
+.whyrow b{display:block;font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;
+color:var(--gold);margin-bottom:2px;}
+.whyrow.warn b{color:var(--red);}
+
+/* Outcome scoring */
+.score{margin:0 16px 15px 16px;background:#f4f7f5;border-left:4px solid var(--green);padding:11px 13px;}
+.score.saved{border-left-color:var(--slate);}
+.scorehead{font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;font-weight:700;
+color:var(--green);margin-bottom:9px;}
+.score.saved .scorehead{color:var(--slate);}
+.score select,.score input{margin-bottom:8px;}
+.stars{display:flex;gap:6px;margin-bottom:9px;}
+.stars .star{flex:1;padding:8px 0;font-size:12.5px;}
+.stars .star.on{background:var(--gold);color:var(--navy);}
+
+/* Where a value came from */
+.provrow{display:flex;flex-wrap:wrap;gap:6px;padding:0 16px 12px 16px;}
+.prov{font-size:10px;letter-spacing:.06em;text-transform:uppercase;font-weight:700;
+padding:3px 8px;border-radius:3px;background:#eef1f4;color:var(--slate);}
+.prov.guessed{background:#fbeceb;color:var(--red);}
+.prov.guessed::before{content:'? ';}
+
+/* Performance. Eleven columns will never fit a phone, so the table scrolls
+   inside its own box rather than making the whole page scroll sideways. */
+.tscroll{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+.tscroll table{min-width:720px;}
+td.edited{font-weight:700;}
+td.edited.hot{color:var(--red);}
+td.rate{font-weight:700;}
+.perfnote{font-size:12.5px;color:var(--ink-soft);margin-top:9px;line-height:1.5;}
 @media(max-width:640px){h1{font-size:31px;}.grid{grid-template-columns:1fr;}.chead .right{margin-left:0;text-align:left;}}
 </style></head><body>
 
@@ -139,6 +180,7 @@ line-height:1.5;margin-bottom:14px;}
     <button class="tab" onclick="show('pros',this)">Prospects <span class="cnt" id="cnt_pros">0</span></button>
     <button class="tab" onclick="show('seg',this)">Segments</button>
     <button class="tab" onclick="show('fun',this)">Numbers</button>
+    <button class="tab" onclick="show('perf',this)">Performance</button>
   </div>
 </div></header>
 
@@ -188,6 +230,14 @@ line-height:1.5;margin-bottom:14px;}
     <div class="bar"><span class="lbl">Acceptance by track</span></div>
     <div id="funbox"></div>
   </div>
+
+  <div class="panel" id="p_perf">
+    <div class="bar"><span class="lbl">What the copy is actually doing</span><span class="grow"></span>
+      <button class="btn ghost" onclick="loadPerformance()">Refresh</button></div>
+    <p style="font-size:13.5px;color:#4c545f;margin-bottom:12px">Every message you copy is recorded with the
+    exact text that went out. Score it afterwards and this fills in. Sorted by success rate, best first.</p>
+    <div id="perfbox"></div>
+  </div>
 </div>
 </div>
 
@@ -218,6 +268,161 @@ function clipFallback(text,done){
   document.body.appendChild(ta); ta.select();
   try{ document.execCommand('copy'); }catch(e){}
   ta.remove(); done();
+}
+
+/* ---------------- MESSAGE CARDS, SHARED BY TODAY AND PROSPECTS ----------------
+   One model, so a message behaves the same wherever it appears: editable,
+   counted against the limit the database sets rather than a number hard-coded
+   here, copied verbatim, and logged as what actually went out. */
+let BRIEFS={};
+const CARDS={};              /* key -> {contact, step, limit, sendId, loggedBody, rating} */
+const DEFAULT_LIMIT=200;
+const OUTCOMES=[['accepted','Accepted'],['replied','Replied'],['meeting_booked','Meeting booked'],
+                ['no_response','No response'],['declined','Declined'],['opted_out','Opted out']];
+
+/* The six doctrine fields hang off the step, not the segment, so the whole set
+   is small enough to fetch once instead of per card. */
+async function loadBriefs(){
+  try{
+    const rows=await rest('crm_message_brief','select=*');
+    BRIEFS={};
+    (rows||[]).forEach(b=>{ BRIEFS[b.segment_id+'|'+b.step+'|'+(b.variant||'default')]=b; });
+  }catch(e){ BRIEFS={}; }
+}
+/* Keyed on where the copy is DEFINED, which for inherited copy is a parent of
+   the contact's own segment. defined_at is exactly that. */
+function briefFor(definedAt,step,variant){
+  return BRIEFS[definedAt+'|'+step+'|'+(variant||'default')]||null;
+}
+
+function cardText(key){
+  const el=$('msg_'+key); if(!el) return '';
+  return el.innerText.replace(/ /g,' ').replace(/\s+$/,'');
+}
+function countCard(key){
+  const c=$('cnt_'+key), st=CARDS[key];
+  if(!c||!st) return;
+  const n=cardText(key).length;
+  c.textContent=n+' / '+st.limit;
+  c.classList.toggle('over',n>st.limit);
+}
+
+/* Editable, so an over-length message is trimmed here with the count following,
+   rather than discovered after LinkedIn truncates it. */
+function messageBody(key,message){
+  return '<div class="cbody" contenteditable="true" spellcheck="true" id="msg_'+key+'" '+
+         'data-count="'+key+'">'+esc(message)+'</div>';
+}
+function copyControls(key){
+  return '<span class="cc" id="cnt_'+key+'"></span>'+
+         '<button class="btn" data-act="copy" data-key="'+key+'">Copy</button>';
+}
+
+/* The per-person note. It exists precisely because the segment copy was not
+   specific enough, so it belongs above the message it is meant to change, on
+   every card that shows a message. */
+function notesBlock(c){
+  return (c&&c.notes)?'<div class="obj"><b>Your note on this person</b>'+esc(c.notes)+'</div>':'';
+}
+
+/* Where a value came from. A guessed employer and a verified one look identical
+   otherwise, and a week later nobody can tell which was which.
+   Read from custom.sources, a field -> source map, so this needs no new column. */
+function provenance(c){
+  if(!c) return '';
+  const src=(c.custom&&c.custom.sources)||{};
+  const bits=[];
+  if(c.lead_source) bits.push('<span class="prov">from '+esc(c.lead_source)+'</span>');
+  Object.keys(src).forEach(function(f){
+    const v=String(src[f]==null?'':src[f]);
+    const guessed=/guess|assum|infer|unverified|unknown/i.test(v);
+    bits.push('<span class="prov'+(guessed?' guessed':'')+'">'+
+              esc(f.replace(/_/g,' '))+': '+esc(v)+'</span>');
+  });
+  if(c.email_status) bits.push('<span class="prov'+(c.email_status==='verified'?'':' guessed')+'">'+
+                               'email '+esc(c.email_status)+'</span>');
+  return bits.length?'<div class="provrow">'+bits.join('')+'</div>':'';
+}
+
+function whyPanel(b){
+  if(!b) return '';
+  const row=(label,val,warn)=> val
+    ? '<div class="whyrow'+(warn?' warn':'')+'"><b>'+label+'</b>'+esc(val)+'</div>' : '';
+  const inner=row('The job',b.the_job)+
+              row('Why it works',b.why_it_works)+
+              row('Sourced from',b.sourced_from)+
+              row('Do not',b.do_not,true)+
+              row('Success signal',b.success_signal)+
+              row('Hard limits',b.hard_limits,true);
+  if(!inner) return '';
+  return '<details class="why"><summary>Why this message</summary>'+
+         '<div class="whybody">'+inner+'</div></details>';
+}
+
+async function copyCard(key){
+  const st=CARDS[key]; if(!st) return;
+  const text=cardText(key);
+  writeClip(text,'Copied. Paste it into LinkedIn.');
+  await logSend(key,text);
+}
+
+/* crm_log_send stamps last_touch_at and bumps touch_count, so a send is not a
+   free action. Copying the same text twice must not log twice; copying after an
+   edit must, because a genuinely different message went out. */
+async function logSend(key,text){
+  const st=CARDS[key];
+  if(!st||st.loggedBody===text) return;
+  try{
+    const id=await rpc('crm_log_send',{p_contact:st.contact,p_step:st.step,p_body:text});
+    st.sendId=(typeof id==='string')?id:(id&&id.crm_log_send)||id;
+    st.loggedBody=text;
+    renderScore(key);
+  }catch(e){
+    /* The copy already reached the clipboard, so say what did not happen. */
+    toast('Copied, but not logged. '+e.message);
+  }
+}
+
+function scoreBlock(key){
+  const st=CARDS[key];
+  if(!st||!st.sendId) return '';
+  return '<div class="score" id="sc_'+key+'">'+
+    '<div class="scorehead">Logged. How did it land?</div>'+
+    '<select id="so_'+key+'"><option value="">Outcome, once you know</option>'+
+      OUTCOMES.map(o=>'<option value="'+o[0]+'">'+esc(o[1])+'</option>').join('')+'</select>'+
+    '<div class="stars">'+[1,2,3,4,5].map(n=>
+      '<button class="btn ghost star" data-act="rate" data-key="'+key+'" data-n="'+n+'">'+n+'</button>'
+    ).join('')+'</div>'+
+    '<input id="sn_'+key+'" maxlength="280" placeholder="What happened, in a line">'+
+    '<button class="btn" data-act="save-score" data-key="'+key+'">Save outcome</button>'+
+    '</div>';
+}
+function renderScore(key){
+  const holder=$('hold_'+key);
+  if(!holder) return;
+  holder.innerHTML=scoreBlock(key);
+  paintStars(key);
+}
+function paintStars(key){
+  const st=CARDS[key]; if(!st) return;
+  document.querySelectorAll('[data-act="rate"][data-key="'+key+'"]').forEach(function(b){
+    b.classList.toggle('on', !!st.rating && Number(b.getAttribute('data-n'))<=st.rating);
+  });
+}
+async function saveScore(key){
+  const st=CARDS[key]; if(!st||!st.sendId) return;
+  const sel=$('so_'+key), note=$('sn_'+key);
+  const outcome=sel?sel.value:'';
+  if(!outcome){ toast('Pick an outcome first.'); return; }
+  try{
+    await rpc('crm_rate_send',{p_send:st.sendId,p_outcome:outcome,
+      p_rating:st.rating||null,p_note:(note&&note.value.trim())||null});
+    const box=$('sc_'+key);
+    if(box){ box.classList.add('saved');
+      const head=box.querySelector('.scorehead');
+      if(head) head.textContent='Outcome saved'; }
+    toast('Outcome saved.');
+  }catch(e){ toast('Could not save: '+e.message); }
 }
 
 /* Always send the current portal session. supabase-js refreshes it when stale. */
@@ -291,6 +496,19 @@ async function loadToday(){
     return;
   }
   const now=Date.now();
+
+  /* crm_linkedin_today carries no notes or provenance, so pull them for the
+     queue's contacts in one request rather than one per card. */
+  const META={};
+  const ids=Array.from(new Set(QUEUE.map(t=>t.contact_id).filter(Boolean)));
+  if(ids.length){
+    try{
+      const cs=await rest('crm_contacts',
+        'select=id,notes,custom,lead_source,email_status&id=in.('+ids.join(',')+')');
+      (cs||[]).forEach(c=>{ META[c.id]=c; });
+    }catch(e){}
+  }
+
   const cards=await Promise.all(QUEUE.map(async t=>{
     let msgs=[];
     try{ msgs=await rpc('crm_prospect_card',{p_contact:t.contact_id}); }catch(e){ msgs=[]; }
@@ -305,28 +523,34 @@ async function loadToday(){
        '<div class="right"><span class="pill '+(overdue?'due':'today')+'">'+
        (overdue?'Overdue':'Due')+' '+fmtDay(t.due_at)+'</span></div></div>';
     h+='<div class="ctask"><b>'+esc(t.title)+'</b>'+(t.detail?' &middot; '+esc(t.detail):'')+'</div>';
+    h+=notesBlock(META[t.contact_id])+provenance(META[t.contact_id]);
+    const key='t'+t.task_id;
     if(m){
+      const brief=briefFor(m.defined_at,step,'default');
+      CARDS[key]={contact:t.contact_id,step:step,
+                  limit:(brief&&brief.char_limit)||DEFAULT_LIMIT,
+                  sendId:null,loggedBody:null,rating:0};
       if(m.hidden_objection){
         h+='<div class="obj"><b>The objection this answers</b>'+esc(m.hidden_objection)+'</div>';
       }
-      h+='<div class="cbody" id="msg_'+t.task_id+'">'+esc(m.message)+'</div>';
-      const lim=(step==='connect')?200:null;
-      h+='<div class="cfoot">';
-      if(lim) h+='<span class="cc'+(m.char_count>lim?' over':'')+'">'+m.char_count+' / '+lim+'</span>';
-      h+='<button class="btn" onclick="copyMsg(\''+t.task_id+'\')">Copy</button>';
+      h+=messageBody(key,m.message);
+      h+='<div class="cfoot">'+copyControls(key);
       if(t.linkedin_url) h+='<button class="btn ghost" data-act="open" data-url="'+esc(t.linkedin_url)+'">Open profile</button>';
-      h+='<button class="btn ghost" onclick="doneTask(\''+t.task_id+'\')">Mark done</button>';
-      h+='<button class="btn ghost" onclick="stopCadence(\''+t.contact_id+'\')">They replied</button>';
+      h+='<button class="btn ghost" data-act="done" data-id="'+t.task_id+'">Mark done</button>';
+      h+='<button class="btn ghost" data-act="stop" data-id="'+t.contact_id+'">They replied</button>';
       h+='<span class="inh">'+(m.inherited?'Copy inherited from '+esc(m.defined_at):'Copy written for this segment')+'</span>';
       h+='</div>';
+      h+='<div id="hold_'+key+'"></div>';
+      h+=whyPanel(brief);
     }else{
       h+='<div class="cbody" style="color:#8c2f26">No copy found for this step in this segment. '+
          'Write it in the Segments tab, or at a parent segment so everything below inherits it.</div>'+
-         '<div class="cfoot"><button class="btn ghost" onclick="doneTask(\''+t.task_id+'\')">Mark done</button></div>';
+         '<div class="cfoot"><button class="btn ghost" data-act="done" data-id="'+t.task_id+'">Mark done</button></div>';
     }
     return h+'</div>';
   }));
   box.innerHTML=cards.join('');
+  QUEUE.forEach(t=>countCard('t'+t.task_id));
 }
 function stepFromTitle(t){
   t=(t||'').toLowerCase();
@@ -337,10 +561,6 @@ function stepFromTitle(t){
   return 'connect';
 }
 function fmtDay(d){const x=new Date(d);return x.toLocaleDateString(undefined,{month:'short',day:'numeric'});}
-function copyMsg(id){
-  const el=$('msg_'+id); if(!el) return;
-  writeClip(el.textContent);
-}
 async function doneTask(id){
   try{ await api('/rest/v1/crm_tasks?id=eq.'+id,{method:'PATCH',
         headers:{'Prefer':'return=minimal'},
@@ -358,7 +578,6 @@ async function stopCadence(cid){
    per-contact lookup to those rows is both the right workflow and what keeps
    this to a handful of calls rather than one per contact. */
 const PRE_INVITE=['not_started','warming'];
-const CONNECT_LIMIT=200;
 
 /* A few at a time. Firing 200 RPCs at once from a phone is not kind to it. */
 async function mapLimit(items,limit,fn){
@@ -368,23 +587,9 @@ async function mapLimit(items,limit,fn){
   return out;
 }
 
-/* Count and copy must agree exactly, or the counter lies about what you paste. */
-function connectText(el){
-  return el.innerText.replace(/ /g,' ').replace(/\s+$/,'');
-}
-function countConnect(id){
-  const el=$('pm_'+id), c=$('pcnt_'+id);
-  if(!el||!c) return;
-  const n=connectText(el).length;
-  c.textContent=n+' / '+CONNECT_LIMIT;
-  c.classList.toggle('over',n>CONNECT_LIMIT);
-}
-function copyConnect(id){
-  const el=$('pm_'+id); if(!el) return;
-  writeClip(connectText(el),'Connection note copied.');
-}
 
 function prospectCard(r,m){
+  const key='p'+r.id;
   const seg=esc(r.segment_id||'');
   let h='<div class="card">';
   h+='<div class="chead"><div><div class="who">'+esc(r.full_name)+'</div>'+
@@ -393,9 +598,7 @@ function prospectCard(r,m){
      (r.city?' &middot; '+esc(r.city):'')+'</div></div>'+
      '<div class="right"><span class="pill">'+esc(r.linkedin_status||'')+'</span></div></div>';
 
-  /* The per-person note. It was written precisely because the segment copy was
-     not specific enough, so it belongs above the message it is meant to change. */
-  if(r.notes) h+='<div class="obj"><b>Your note on this person</b>'+esc(r.notes)+'</div>';
+  h+=notesBlock(r)+provenance(r);
 
   const buttons=
     (r.linkedin_url?'<button class="btn ghost" data-act="open" data-url="'+esc(r.linkedin_url)+'">Open profile</button>':'')+
@@ -403,16 +606,16 @@ function prospectCard(r,m){
     '<button class="btn ghost" data-act="accepted" data-id="'+r.id+'">Accepted</button>';
 
   if(m){
-    /* Editable so an over-length note can be trimmed here and the count follows,
-       rather than being discovered after LinkedIn truncates it. */
-    h+='<div class="cbody" contenteditable="true" spellcheck="true" id="pm_'+r.id+'" '+
-       'data-count="'+r.id+'">'+esc(m.message)+'</div>';
-    h+='<div class="cfoot">'+
-       '<span class="cc" id="pcnt_'+r.id+'"></span>'+
-       '<button class="btn" data-act="copy-connect" data-id="'+r.id+'">Copy</button>'+
-       buttons+
+    const brief=briefFor(m.defined_at,'connect','default');
+    CARDS[key]={contact:r.id,step:'connect',
+                limit:(brief&&brief.char_limit)||DEFAULT_LIMIT,
+                sendId:null,loggedBody:null,rating:0};
+    h+=messageBody(key,m.message);
+    h+='<div class="cfoot">'+copyControls(key)+buttons+
        '<span class="inh">'+(m.inherited?'Copy inherited from '+esc(m.defined_at):'Copy written for this segment')+'</span>'+
        '</div>';
+    h+='<div id="hold_'+key+'"></div>';
+    h+=whyPanel(brief);
   }else if(PRE_INVITE.indexOf(r.linkedin_status)!==-1){
     h+='<div class="cbody" style="color:#8c2f26">No connect copy found for this segment. '+
        'Write it in the Segments tab, or at a parent segment so everything below inherits it.</div>'+
@@ -425,7 +628,8 @@ function prospectCard(r,m){
 
 async function loadProspects(){
   const rows=await rest('crm_contacts',
-    'select=id,full_name,employer,city,notes,segment_id,linkedin_status,linkedin_url&order=created_at.desc&limit=200');
+    'select=id,full_name,employer,city,notes,custom,lead_source,email_status,segment_id,linkedin_status,linkedin_url'+
+    '&order=created_at.desc&limit=200');
   $('cnt_pros').textContent=(rows||[]).length;
   const box=$('prosbox');
   if(!rows||!rows.length){ box.innerHTML='<div class="empty"><div class="big">No prospects yet.</div>'+
@@ -441,7 +645,7 @@ async function loadProspects(){
   const connect=new Map(pairs);
 
   box.innerHTML=rows.map(r=>prospectCard(r,connect.get(r.id)||null)).join('');
-  rows.forEach(r=>countConnect(r.id));
+  rows.forEach(r=>countCard('p'+r.id));
 }
 async function enrol(id,seg){
   if(!seg){ toast('Give this contact a segment first.'); return; }
@@ -630,11 +834,52 @@ function show(id,el){
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
   $('p_'+id).classList.add('on'); el.classList.add('on');
 }
+async function loadPerformance(){
+  const box=$('perfbox');
+  let rows=[];
+  try{
+    /* Nulls last matters: a row whose outcomes are all still pending has a null
+       rate, and Postgres sorts nulls first on desc, which would bury the winners. */
+    rows=await rest('crm_message_performance','select=*&order=success_rate_pct.desc.nullslast,sent.desc');
+  }catch(e){ box.innerHTML='<div class="empty"><p>'+esc(e.message)+'</p></div>'; return; }
+
+  if(!rows||!rows.length){
+    box.innerHTML='<div class="empty"><div class="big">Nothing sent yet.</div>'+
+      '<p>Copy a message from Today or Prospects and it lands here. Score the outcome and the rate fills in.</p></div>';
+    return;
+  }
+  let h='<div class="tscroll"><table><tr><th>Segment</th><th>Step</th><th>Sent</th><th>Edited first</th>'+
+        '<th>Positive</th><th>Replied</th><th>Meetings</th><th>No reply</th>'+
+        '<th>Rating</th><th>Success</th><th>Chars</th></tr>';
+  (rows||[]).forEach(r=>{
+    const sent=r.sent||0, ed=r.edited_before_sending||0;
+    const pct=sent?Math.round(100*ed/sent):0;
+    h+='<tr><td><b>'+esc(r.segment_name||r.segment_id||'')+'</b></td>'+
+       '<td>'+esc(r.label||r.step||'')+'</td>'+
+       '<td>'+sent+'</td>'+
+       '<td class="edited'+(pct>=50?' hot':'')+'">'+ed+' of '+sent+(sent?' &middot; '+pct+'%':'')+'</td>'+
+       '<td>'+(r.positive||0)+'</td>'+
+       '<td>'+(r.replied||0)+'</td>'+
+       '<td>'+(r.meetings||0)+'</td>'+
+       '<td>'+(r.ignored||0)+'</td>'+
+       '<td>'+(r.avg_rating==null?'&mdash;':r.avg_rating)+'</td>'+
+       '<td class="rate">'+(r.success_rate_pct==null?'&mdash;':r.success_rate_pct+'%')+'</td>'+
+       '<td>'+(r.avg_chars==null?'&mdash;':r.avg_chars)+'</td></tr>';
+  });
+  box.innerHTML=h+'</table></div>'+
+    '<p class="perfnote"><b>Edited first</b> is the number to act on. If you rewrite a template most times you '+
+    'reach for it, the template is wrong, not the sending. Fix it at the segment and everything beneath inherits '+
+    'the fix. Success is positive outcomes over outcomes you have actually scored, so it ignores anything still pending.</p>';
+}
+
 async function refreshAll(){
+  /* Briefs first: the cards read char_limit and the doctrine out of them. */
+  try{ await loadBriefs(); }catch(e){}
   try{ await loadSegments(); }catch(e){}
   try{ await loadToday(); }catch(e){ $('queue').innerHTML='<div class="empty"><p>'+esc(e.message)+'</p></div>'; }
   try{ await loadProspects(); }catch(e){}
   try{ await loadFunnel(); }catch(e){}
+  try{ await loadPerformance(); }catch(e){}
 }
 /* Delegated, so nothing has to build JavaScript out of a database value. A
    LinkedIn URL containing an apostrophe used to break straight out of the
@@ -643,15 +888,19 @@ async function refreshAll(){
 document.addEventListener('click',function(e){
   const t=e.target.closest?e.target.closest('[data-act]'):null;
   if(!t) return;
-  const act=t.getAttribute('data-act'), id=t.getAttribute('data-id');
+  const act=t.getAttribute('data-act'), id=t.getAttribute('data-id'), key=t.getAttribute('data-key');
   if(act==='open') window.open(t.getAttribute('data-url'),'_blank','noopener');
-  else if(act==='copy-connect') copyConnect(id);
+  else if(act==='copy') copyCard(key);
   else if(act==='enrol') enrol(id,t.getAttribute('data-seg')||'');
   else if(act==='accepted') accepted(id);
+  else if(act==='done') doneTask(id);
+  else if(act==='stop') stopCadence(id);
+  else if(act==='rate'){ const st=CARDS[key]; if(st){ st.rating=Number(t.getAttribute('data-n')); paintStars(key); } }
+  else if(act==='save-score') saveScore(key);
 });
 document.addEventListener('input',function(e){
-  const id=e.target&&e.target.getAttribute?e.target.getAttribute('data-count'):null;
-  if(id) countConnect(id);
+  const k=e.target&&e.target.getAttribute?e.target.getAttribute('data-count'):null;
+  if(k) countCard(k);
 });
 
 document.addEventListener('DOMContentLoaded',()=>{
