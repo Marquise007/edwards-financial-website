@@ -162,6 +162,7 @@ font-size:10px;letter-spacing:.13em;text-transform:uppercase;font-weight:700;col
 .srow .k{flex:0 0 40%;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;
 font-weight:700;color:var(--ink-soft);padding-top:2px;}
 .srow .v{flex:1;font-size:13px;line-height:1.5;}
+.srow .v .bval{font-size:13px;line-height:1.5;}
 .srow.warn .k,.srow.warn .v{color:var(--red);}
 .srow.warn .k{font-weight:700;}
 
@@ -892,18 +893,35 @@ function workflowPanel(r){
 }
 
 function snapshotPanel(r){
+  const id=r.contact_id;
   const sig=r.linkedin_signals||{};
   const row=function(k,v,warn){
     return '<div class="srow'+(warn?' warn':'')+'"><div class="k">'+esc(k)+'</div>'+
            '<div class="v">'+(v?esc(v):'&mdash;')+'</div></div>';
   };
+  /* Same blur-to-save contract as the brief fields, in the snapshot's two
+     column shape. flash() finds .k here rather than .blabel. */
+  const erow=function(k,col,v,empty,warn){
+    const s=(v==null?'':String(v));
+    return '<div class="srow'+(warn?' warn':'')+'"><div class="k">'+esc(k)+'</div><div class="v">'+
+      '<div class="bval" contenteditable="true" spellcheck="true" '+
+      'data-save-col="'+col+'" data-save-id="'+id+'" '+
+      'data-empty="'+esc(empty||'Not recorded')+'" '+
+      'data-original="'+esc(s)+'">'+esc(s)+'</div></div></div>';
+  };
   let h='<div class="pnl"><h4><span class="ic">&#9679;</span>Prospect snapshot</h4><div class="body">';
   h+=row('Role',r.title);
   h+=row('Firm',r.employer);
+  h+=erow('Niche','niche',r.niche,'What they specialise in');
   h+=row('Location',r.city);
+  h+=erow('Background','background',r.background,'What they did before this');
+  h+=erow('Mutual','mutual_connection',r.mutual_connection,'Nobody in common yet');
   h+=row('Segment',r.segment_label);
   h+=row('Verified',sig.checked_at?('Checked '+sig.checked_at):null);
-  if(r.do_not_misstate) h+=row('Do not misstate',r.do_not_misstate,true);
+  /* Editable like every other brief field, and still red and always visible:
+     this is the mistake the whole panel exists to prevent. */
+  h+=erow('Do not misstate','do_not_misstate',r.do_not_misstate,
+          'Anything that would be an outright error about this person',true);
   return h+'</div></div>';
 }
 
@@ -1359,8 +1377,12 @@ document.addEventListener('blur',function(e){
   if(el&&el.getAttribute&&el.getAttribute('data-save-col')) saveBriefField(el);
 },true);
 
+/* Editable fields live in two shapes: a .bfield with a .blabel, and a snapshot
+   .srow with a .k. Find whichever label this one has, or the confirmation
+   silently never appears. */
 function flash(el,msg,bad){
-  const lab=el.parentNode&&el.parentNode.querySelector('.blabel');
+  const holder=el.closest?(el.closest('.bfield')||el.closest('.srow')):null;
+  const lab=holder?(holder.querySelector('.blabel')||holder.querySelector('.k')):null;
   if(!lab) return;
   let f=lab.querySelector('.flash');
   if(!f){ f=document.createElement('span'); f.className='flash'; lab.appendChild(f); }
