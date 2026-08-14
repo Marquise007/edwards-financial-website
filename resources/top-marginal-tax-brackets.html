@@ -103,15 +103,19 @@ button.pill[aria-pressed="true"]{background:var(--navy);color:#fff;border-color:
 @media (max-height:860px){.hero h1{font-size:clamp(20px,2.3vw,33px)}.hero p{font-size:12.5px}.chart-title h2{font-size:23px}.side h3{font-size:20px}.side .helper{font-size:12px}.context-card .era{font-size:23px}.context-card p,.summary p{font-size:13px}.kpi .kvalue{font-size:20px}.kpi .ksub{font-size:11px}.side{gap:9px;padding:13px}.main{gap:11px;padding:11px}.chart-header{padding:12px 14px 6px}.chart-footer{padding:4px 14px 12px}.input-wrap input{padding:9px 10px;font-size:14px}}
 @media (max-height:740px){.module{grid-template-rows:minmax(132px,24%) 1fr}.hero{padding:11px 24px 11px}.hero h1{font-size:clamp(19px,2.1vw,28px)}.hero p{font-size:11.5px;margin-top:5px}.eyebrow{font-size:10px;margin-bottom:5px}.chart-title h2{font-size:20px}.side h3{font-size:18px}.context-card{padding:12px}.kpi{padding:11px}.summary{padding:12px}.context-card .era{font-size:20px}.kpi .kvalue{font-size:18px}.context-card p,.summary p{font-size:12.5px;line-height:1.42}.pill{padding:7px 10px;font-size:11.5px}}
 @media (max-width:900px){body{overflow:auto;height:auto;padding:8px}html,body{overflow:auto}.module{height:auto;min-height:100svh;grid-template-rows:auto auto}.main{grid-template-columns:1fr}.hero{align-items:flex-end}}
+
+.hero .hub-back{display:inline-block;margin-top:13px;color:#d4af5a;font-size:.82rem;letter-spacing:.06em;text-decoration:none;border-bottom:1px solid rgba(212,175,90,.45);padding-bottom:2px;}
+.hero .hub-back:hover{color:#f7f5f1;border-bottom-color:#f7f5f1;}
 </style>
 </head>
 <body>
 <section class="module">
   <header class="hero">
     <div class="hero-inner">
-      <div class="eyebrow">EDWARDS FINANCIAL &amp; ASSOCIATES</div>
+      <a class="eyebrow" href="/" aria-label="Back to home" style="text-decoration:none;color:inherit;display:inline-block">EDWARDS FINANCIAL &amp; ASSOCIATES</a>
       <h1>Top marginal tax brackets, <span>1913 to 2026</span></h1>
       <p>Implications for strategy evolution and why retirement vehicles often evolve far beyond their original purpose</p>
+      <a class="hub-back" href="/resources">&#8592; All Resources</a>
     </div>
   </header>
 

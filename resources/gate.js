@@ -32,6 +32,9 @@
       '#efaGate form{margin:0;}' +
       '#efaGate .gerr{color:#c0392b;font-size:.72rem;font-weight:600;margin-top:10px;text-align:center;min-height:16px;}' +
       '#efaGate .gnote{color:#9a9590;font-size:.62rem;text-align:center;margin-top:12px;line-height:1.5;}' +
+      '#efaGate .gback{display:block;text-align:center;margin-top:14px;font-family:Montserrat,Arial,sans-serif;font-size:.72rem;font-weight:600;color:#9a9590;text-decoration:none;}' +
+      '#efaGate .gback:hover{color:#b8972e;}' +
+      '#efaGate .gback:focus-visible{outline:2px solid #b8972e;outline-offset:2px;}' +
       '#efaGate .gcard.shake{animation:efaShake .35s;}' +
       '@keyframes efaShake{0%,100%{transform:translateX(0)}25%{transform:translateX(-7px)}75%{transform:translateX(7px)}}' +
       '</style>' +
@@ -48,8 +51,18 @@
       '</form>' +
       '<div class="gerr" id="efaGateErr"></div>' +
       '<div class="gnote">Access is provided by Edwards Financial &amp; Associates.<br>Need the password? Email joshua@edwardsfinancialassociates.com</div>' +
+      '<a class="gback" href="/" id="efaGateBack">&#8592; Back to the main site</a>' +
       '</div></div>';
     document.body.appendChild(ov);
+
+    /* the locked state must never be a dead end: go back to the page the visitor
+       came from when it was one of ours, otherwise to the home page */
+    document.getElementById('efaGateBack').addEventListener('click', function (e) {
+      if (document.referrer && document.referrer.indexOf(location.origin + '/') === 0 && history.length > 1) {
+        e.preventDefault();
+        history.back();
+      }
+    });
 
     var pw = document.getElementById('efaGatePw');
     var email = document.getElementById('efaGateEmail');

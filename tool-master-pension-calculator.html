@@ -121,6 +121,21 @@ select:focus,input:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 
 </head>
 <body>
 
+<div class="efa-backbar" role="navigation" aria-label="Portal navigation">
+  <a href="/portal-partner-dashboard"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M15.4 18.6 8.8 12l6.6-6.6L13.6 3.6 5.2 12l8.4 8.4z"/></svg>Back to Partner Portal</a>
+  <span class="efa-backbar-brand">Edwards <b>&amp;</b> Associates &nbsp;&middot;&nbsp; Partner Access</span>
+</div>
+<style>
+.efa-backbar{display:flex;align-items:center;justify-content:space-between;gap:14px;background:#0d1e3a;color:#f7f5f1;padding:9px 18px;font-size:13.5px;letter-spacing:.02em;line-height:1;flex:none;}
+.efa-backbar a{display:inline-flex;align-items:center;gap:7px;color:#f7f5f1;text-decoration:none;font-weight:600;padding:4px 2px;border-bottom:1px solid transparent;transition:border-color .15s ease,color .15s ease;}
+.efa-backbar a:hover{color:#b8972e;border-bottom-color:#b8972e;}
+.efa-backbar a:focus-visible{outline:2px solid #b8972e;outline-offset:2px;}
+.efa-backbar svg{width:14px;height:14px;fill:#b8972e;flex:none;}
+.efa-backbar-brand{opacity:.78;font-size:12.5px;white-space:nowrap;}
+.efa-backbar-brand b{color:#b8972e;}
+@media (max-width:560px){.efa-backbar-brand{display:none;}}
+@media print{.efa-backbar{display:none !important;}}
+</style>
 <div class="header">
   <div class="header-inner">
     <div>

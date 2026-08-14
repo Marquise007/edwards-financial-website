@@ -106,7 +106,7 @@
 <body>
 <div class="topbar">
   <span class="topbar-logo">Edwards <span>&amp;</span> Associates — Client Portal</span>
-  <button class="topbar-close" onclick="if(window.parent&&window.parent.closeTool)window.parent.closeTool();else window.close();">&#x2715; Close Tool</button>
+  <button class="topbar-close" onclick="if(window.parent&&window.parent.closeTool)window.parent.closeTool();else{window.close();setTimeout(function(){if(document.referrer&&document.referrer.indexOf(location.origin)===0&&history.length>1){history.back();}else{window.location.href='/';}},350);}">&#x2715; Close Tool</button>
 </div>
 <div class="header">
   <div class="header-inner">
