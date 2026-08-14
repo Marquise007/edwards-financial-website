@@ -809,11 +809,22 @@ async function authToken(){
 }
 async function api(path,opts){
   const o=opts||{};
-  const tok=await authToken();
+  let tok=await authToken();
+ if(!tok){
+   try{ const {data}=await sb.auth.refreshSession(); tok=(data&&data.session)?data.session.access_token:null; }catch(e){}
+ }
+ if(!tok){
+   /* Never fall back to the anonymous key: row security would answer every
+      query with an empty list and the desk would look wiped. Show sign-in. */
+   const app=$('app'), lb=$('loginbox');
+   if(app) app.classList.add('hide');
+   if(lb) lb.classList.remove('hide');
+   throw new Error('Your session ended. Sign in again to load your list.');
+ }
   const r=await fetch(SUPA_URL+path,{
     method:o.method||'GET',
     headers:Object.assign({'apikey':SUPA_KEY,'Content-Type':'application/json',
-      'Authorization':'Bearer '+(tok||SUPA_KEY)},o.headers||{}),
+      'Authorization':'Bearer '+tok},o.headers||{}),
     body:o.body?JSON.stringify(o.body):undefined});
   const txt=await r.text();
   let data=null; try{data=txt?JSON.parse(txt):null;}catch(e){data=txt;}

@@ -5792,7 +5792,7 @@ window.addEventListener('load',function(){
       <div id="efaBaStrip">${stripHTML()}</div>
       <div id="efaBaEditors">${editorTables()}</div>
       <div class="efa-ba-taxband">
-        <div class="tt"><span>Tax Status of the Plan — Diversification by Tax Treatment</span><span class="sub">carried into the report automatically</span></div>
+        <div class="tt"><span>Tax Status of the Plan — Diversification by Tax Treatment <button class="efa-taximpact-btn" type="button" aria-haspopup="dialog">&#9432;&nbsp;What taxable income touches</button></span><span class="sub">carried into the report automatically</span></div>
         <div id="efaBaTax">${taxBandInner()}</div>
       </div>
       <div class="efa-ba-rates" style="border-left-color:var(--navy);">
@@ -6383,5 +6383,110 @@ ${taxSec}
   .efa-step{padding:14px 15px;}
 }
 </style>
+
+<style>
+.efa-taximpact-btn{display:inline-flex;align-items:center;gap:4px;margin-left:10px;padding:3px 10px;
+border:1px solid rgba(184,151,46,.55);border-radius:999px;background:transparent;color:#b8972e;
+font-family:'DM Sans',Montserrat,system-ui,sans-serif;font-size:10px;font-weight:600;letter-spacing:.06em;
+text-transform:uppercase;line-height:1.4;cursor:pointer;vertical-align:middle;
+transition:color .15s ease,border-color .15s ease,background .15s ease;}
+.efa-taximpact-btn:hover{color:#0d1e3a;border-color:#b8972e;background:rgba(184,151,46,.12);}
+.efa-taximpact-btn:focus-visible{outline:2px solid #b8972e;outline-offset:2px;}
+.efa-taximpact-overlay{position:fixed;inset:0;z-index:2147483647;background:rgba(13,30,58,.78);
+-webkit-backdrop-filter:blur(7px);backdrop-filter:blur(7px);display:flex;align-items:center;
+justify-content:center;padding:24px;}
+.efa-taximpact-card{background:#f7f5f1;border-radius:16px;border-top:3px solid #b8972e;
+width:min(860px,94vw);max-height:min(780px,92vh);display:flex;flex-direction:column;overflow:hidden;
+box-shadow:0 30px 80px rgba(7,15,30,.5);}
+.efa-taximpact-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;
+padding:20px 24px 14px;border-bottom:1px solid rgba(184,151,46,.35);flex:none;}
+.efa-taximpact-title{font-family:'Cormorant Garamond',Georgia,serif;font-size:24px;font-weight:600;
+color:#0d1e3a;line-height:1.15;}
+.efa-taximpact-title small{display:block;font-family:'DM Sans',Montserrat,system-ui,sans-serif;
+font-size:10.5px;font-weight:600;color:#b8972e;letter-spacing:.14em;text-transform:uppercase;margin-top:6px;}
+.efa-taximpact-close{flex:none;width:34px;height:34px;border:1px solid rgba(13,30,58,.18);
+border-radius:999px;background:transparent;color:#0d1e3a;font-size:15px;line-height:1;cursor:pointer;
+display:inline-flex;align-items:center;justify-content:center;}
+.efa-taximpact-close:hover{color:#b8972e;border-color:#b8972e;}
+.efa-taximpact-close:focus-visible{outline:2px solid #b8972e;outline-offset:2px;}
+.efa-taximpact-body{padding:18px 24px 22px;overflow-y:auto;
+font-family:'DM Sans',Montserrat,system-ui,sans-serif;color:#2c2a26;
+font-variant-numeric:lining-nums tabular-nums;}
+.efa-taximpact-intro{font-size:13.5px;line-height:1.65;color:#4a463f;margin:0 0 16px;}
+.efa-taximpact-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.efa-taximpact-panel{background:#ffffff;border:1px solid rgba(13,30,58,.10);border-left:3px solid #b8972e;
+border-radius:10px;padding:14px 16px;}
+.efa-taximpact-panel h4{margin:0 0 7px;font-size:12px;font-weight:700;letter-spacing:.08em;
+text-transform:uppercase;color:#0d1e3a;}
+.efa-taximpact-panel p{margin:0 0 7px;font-size:12.5px;line-height:1.62;color:#4a463f;}
+.efa-taximpact-panel p:last-child{margin-bottom:0;}
+.efa-taximpact-panel b{color:#0d1e3a;font-weight:700;}
+.efa-taximpact-src{margin:14px 0 0;font-size:10.5px;line-height:1.6;color:#8a857c;}
+@media (max-width:680px){.efa-taximpact-grid{grid-template-columns:1fr;}
+.efa-taximpact-overlay{padding:0;}
+.efa-taximpact-card{width:100vw;max-height:100dvh;height:100dvh;border-radius:0;}}
+@media print{.efa-taximpact-btn,.efa-taximpact-overlay{display:none !important;}}
+</style>
+<script>
+(function(){
+  'use strict';
+  if (window.__efaTaxImpact) return;
+  window.__efaTaxImpact = true;
+  var opener = null;
+  function close(){
+    var ov = document.querySelector('.efa-taximpact-overlay');
+    if (ov) ov.remove();
+    document.removeEventListener('keydown', onKey, true);
+    if (opener && opener.focus) opener.focus();
+    opener = null;
+  }
+  function onKey(e){ if (e.key === 'Escape'){ e.preventDefault(); close(); } }
+  function open(){
+    if (document.querySelector('.efa-taximpact-overlay')) return;
+    var ov = document.createElement('div');
+    ov.className = 'efa-taximpact-overlay';
+    ov.setAttribute('role', 'dialog');
+    ov.setAttribute('aria-modal', 'true');
+    ov.setAttribute('aria-label', 'What taxable income touches');
+    ov.innerHTML =
+      '<div class="efa-taximpact-card">' +
+      '<div class="efa-taximpact-head">' +
+      '<div class="efa-taximpact-title">When Every Retirement Dollar Is Taxable' +
+      '<small>The income lines this plan is priced on</small></div>' +
+      '<button type="button" class="efa-taximpact-close" aria-label="Close">&#x2715;</button>' +
+      '</div>' +
+      '<div class="efa-taximpact-body">' +
+      '<p class="efa-taximpact-intro">Fully taxable income does more than pay income tax. Several other parts of retirement are priced on the same income lines, so a plan concentrated in one tax treatment moves all of them at once.</p>' +
+      '<div class="efa-taximpact-grid">' +
+      '<div class="efa-taximpact-panel"><h4>Medicare premiums (IRMAA)</h4>' +
+      '<p>Medicare sets each person\u2019s Part B and Part D premiums from income two years back. Cross a line by one dollar and the whole year reprices at the next tier, for each spouse separately.</p>' +
+      '<p>2026 amounts: the standard Part B premium is <b>$202.90</b> per person per month. Surcharges begin once that earlier income passes <b>$109,000</b> single or <b>$218,000</b> married filing jointly, and reach <b>$690.14</b> per person per month at the top tier. Tax-exempt interest counts toward this income.</p></div>' +
+      '<div class="efa-taximpact-panel"><h4>Social Security taxation</h4>' +
+      '<p>Combined income is adjusted gross income, plus tax-exempt interest, plus half of Social Security.</p>' +
+      '<p>Single: above <b>$25,000</b>, up to 50% of benefits become taxable; above <b>$34,000</b>, up to 85%. Married filing jointly: the same steps at <b>$32,000</b> and <b>$44,000</b>. A fully taxable pension raises combined income dollar for dollar, which is how it can pull Social Security into the taxable column.</p></div>' +
+      '<div class="efa-taximpact-panel"><h4>Required minimum distributions</h4>' +
+      '<p>Pre-tax accounts force income out whether it is needed or not: withdrawals must begin at age <b>73</b>, or <b>75</b> for anyone born in 1960 or later. Every forced dollar is ordinary income that feeds the two lines above.</p>' +
+      '<p>A missed withdrawal carries a <b>25%</b> excise tax, reduced to 10% when corrected promptly. Roth accounts have no lifetime withdrawal requirement.</p></div>' +
+      '<div class="efa-taximpact-panel"><h4>The survivor\u2019s position</h4>' +
+      '<p>A surviving spouse soon files as single: similar income, lower lines everywhere. The Social Security steps drop from $32,000 and $44,000 to $25,000 and $34,000, the Medicare lines fall by roughly half, and tax brackets compress.</p>' +
+      '<p>Income that is entirely taxable concentrates this risk on the survivor.</p></div>' +
+      '</div>' +
+      '<p class="efa-taximpact-src">2026 amounts shown; figures adjust over time under current law. Sources: IRS Publication 915; Social Security Administration; Centers for Medicare and Medicaid Services, 2026 premium announcement.</p>' +
+      '</div></div>';
+    ov.addEventListener('click', function(e){ if (e.target === ov) close(); });
+    ov.querySelector('.efa-taximpact-close').addEventListener('click', close);
+    document.addEventListener('keydown', onKey, true);
+    document.body.appendChild(ov);
+    ov.querySelector('.efa-taximpact-close').focus();
+  }
+  document.addEventListener('click', function(e){
+    var b = e.target && e.target.closest ? e.target.closest('.efa-taximpact-btn') : null;
+    if (!b) return;
+    e.preventDefault();
+    opener = b;
+    open();
+  }, true);
+})();
+</script>
 </body>
 </html>
