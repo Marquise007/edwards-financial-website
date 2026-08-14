@@ -69,6 +69,10 @@ svg{display:block}
 .navitem.active:after{content:"";position:absolute;left:0;right:0;bottom:0;height:2px;background:var(--gold)}
 .navitem .cnt{background:var(--gold);color:var(--navy);border-radius:9px;padding:0 6px;font-size:10px}
 .userarea{justify-self:end;display:flex;align-items:center;gap:10px;color:var(--navy);white-space:nowrap}
+/* Add Prospect is setup, not work, so it sits out of the run of tabs. */
+.addbtn{height:30px;padding:0 11px;border:1px solid var(--gold);border-radius:5px;background:#fff;
+  color:#8f6b12;text-transform:uppercase;letter-spacing:.09em;font-size:10px;font-weight:800;white-space:nowrap}
+.addbtn.on{background:var(--gold);border-color:var(--gold);color:var(--navy)}
 /* Phone only. A horizontal strip put Numbers and Performance off the right
    edge, where they stop being opened at all. */
 .navsel{display:none;width:100%;height:34px;border:1px solid var(--line);border-radius:5px;
@@ -91,23 +95,98 @@ svg{display:block}
 .export{height:32px;padding:0 15px;border:1px solid var(--line);border-radius:5px;background:#fff;
   text-transform:uppercase;letter-spacing:.11em;font-weight:700;font-size:10.5px;color:var(--navy)}
 
-/* ===== PROSPECT CARD ===== */
-.prospect{background:rgba(255,255,255,.84);border:1px solid var(--line);border-radius:5px;
-  box-shadow:var(--shadow);padding:11px 11px 8px}
-.prospect-head{display:grid;grid-template-columns:96px minmax(0,1fr) 250px;align-items:start;gap:16px;padding:0 4px 6px 2px}
+/* ===== YOUR LIST: ONE PROFILE, THREE PAGES, THE REST OF THE LIST =====
+   The shell is a fixed-height column so the three parts divide one screen
+   between them rather than stacking into a scroll: the header never moves, the
+   pages take what is left, and the roster keeps a fixed strip at the bottom. */
+.listshell{display:flex;flex-direction:column;gap:8px;height:calc(100vh - 122px);min-height:430px}
+.prosmain{flex:1;min-height:0;display:flex;flex-direction:column;gap:8px}
 .photo{width:84px;height:84px;border-radius:50%;background:linear-gradient(145deg,#d8d0c4,#f4f0e8);
   display:grid;place-items:center;color:var(--navy);font-family:var(--serif);font-size:26px;font-weight:700}
-.identity{padding-top:2px;min-width:0}
-.name{font-family:var(--serif);font-size:29px;line-height:1.05;color:var(--navy);font-weight:600}
-.subline{margin-top:7px;font-size:13.5px;color:#26334a}
-.segment{display:inline-block;margin-top:8px;padding:5px 9px;border-radius:7px;background:var(--gold-wash);
+.segment{display:inline-block;padding:5px 9px;border-radius:7px;background:var(--gold-wash);
   color:#9e6d12;font-size:12px}
-.head-actions{padding-top:4px;text-align:right}
 .status{display:inline-block;background:var(--navy);color:#fff;padding:7px 12px;border-radius:4px;
   text-transform:uppercase;font-weight:800;letter-spacing:.09em;font-size:10.5px}
-.action-row{margin-top:12px;display:flex;justify-content:flex-end;gap:10px}
+.action-row{display:flex;justify-content:flex-end;gap:10px}
 .action-btn{height:36px;padding:0 15px;border:1px solid var(--line);border-radius:5px;background:#fff;
   color:var(--navy);text-transform:uppercase;letter-spacing:.08em;font-size:11px;font-weight:800}
+
+/* The header. Identity and every warning, on every page, always. */
+.pfhead{flex:0 0 auto;background:#fff;border:1px solid var(--line);border-top:3px solid var(--gold);
+  border-radius:5px;box-shadow:var(--shadow);padding:10px 14px 9px}
+.pfhead-top{display:flex;align-items:flex-start;gap:13px}
+.pfhead .photo{width:54px;height:54px;font-size:19px;flex:0 0 auto}
+.pfid{min-width:0;flex:1}
+.pfname{font-family:var(--serif);font-size:27px;line-height:1.05;color:var(--navy);font-weight:600}
+.pfmeta{margin-top:4px;font-size:13px;color:#26334a}
+.pfchips{margin-top:7px;display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.pfchips .segment{padding:3px 8px;font-size:11px}
+.pfchips .status{padding:4px 9px;font-size:9.5px}
+.pfact{flex:0 0 auto;display:flex;flex-direction:column;align-items:flex-end;gap:7px}
+.pfact .action-btn{height:32px;padding:0 12px;font-size:10.5px}
+/* brief_is_dense. You are reading a trimmed version, and you are told so. */
+.densemark{font-size:8.5px;letter-spacing:.09em;text-transform:uppercase;font-weight:800;
+  padding:3px 7px;border-radius:3px;background:#fdf1e2;color:#a2560c;border:1px solid #f0d3ae}
+.densemark.thin{background:#fdecec;color:#8a1c1c;border-color:rgba(224,37,37,.35)}
+/* warnings, one per line. Never joined into a paragraph, never clamped. */
+.warnbox{margin-top:8px;padding-top:8px;border-top:1px solid var(--line-2);display:grid;gap:4px}
+.warnline{display:grid;grid-template-columns:13px minmax(0,1fr);gap:0 8px;align-items:start;
+  font-size:12px;line-height:1.42;color:#a01c1c}
+.warnline .wi{color:var(--red);font-weight:800;font-size:11px;line-height:1.5}
+
+/* The three pages. Horizontal scroll snapping, so a swipe is the native
+   gesture on the phone and the tabs are the same thing on a desktop. */
+.pages{flex:1;min-height:0;display:flex;flex-direction:column}
+.pagetabs{flex:0 0 auto;display:flex;border:1px solid var(--line);border-radius:5px;
+  background:#fff;overflow:hidden;box-shadow:var(--shadow)}
+.pagetab{flex:1;height:33px;border:0;border-right:1px solid var(--line);background:#fff;color:var(--muted);
+  text-transform:uppercase;letter-spacing:.08em;font-size:10px;font-weight:800}
+.pagetab:last-child{border-right:0}
+.pagetab.on{background:var(--navy);color:#fff}
+.swipe{flex:1;min-height:0;margin-top:8px;display:flex;overflow-x:auto;overflow-y:hidden;
+  scroll-snap-type:x mandatory;scroll-behavior:smooth;scrollbar-width:none;-ms-overflow-style:none}
+.swipe::-webkit-scrollbar{display:none}
+.swipepage{flex:0 0 100%;min-width:100%;scroll-snap-align:start;overflow-y:auto;padding-bottom:2px}
+.p1grid{display:grid;gap:8px}
+.p2grid{display:grid;grid-template-columns:1.05fr 1.45fr .75fr;gap:8px}
+.p3grid{display:grid;gap:8px}
+.p3grid .accordions{margin-top:0}
+/* From tablet up the three panels take the height of the page and any panel
+   whose contents outrun it scrolls inside its own box. The page boundary is
+   what must not move; a panel that scrolls a little is not the page scrolling,
+   and it beats clamping a field the view did not ask to have clamped. */
+@media (min-width:821px){
+  .p1grid{height:100%;grid-template-rows:auto minmax(0,1fr)}
+  .p2grid{height:100%;align-items:stretch}
+  .p3grid{height:100%;grid-template-rows:minmax(0,1fr) auto}
+  .p3grid .bottom-grid{min-height:0}
+}
+.pnl .body{overflow:auto}
+
+/* The rest of the list, so moving between people never leaves the screen. */
+.roster{flex:0 0 auto;position:relative;max-height:150px;overflow:auto;background:#fff;
+  border:1px solid var(--line);border-radius:5px;box-shadow:var(--shadow)}
+.rosterhead{position:sticky;top:0;z-index:2;background:var(--cream);border-bottom:1px solid var(--line);
+  padding:6px 12px;font-size:9px;letter-spacing:.12em;text-transform:uppercase;font-weight:800;color:#112545}
+.rrow{display:grid;grid-template-columns:28px minmax(0,1fr) auto;gap:10px;align-items:center;width:100%;
+  text-align:left;background:#fff;border:0;border-bottom:1px solid var(--line-2);padding:7px 12px}
+.rrow:last-child{border-bottom:0}
+.rrow.on{background:var(--gold-wash);box-shadow:inset 3px 0 0 var(--gold)}
+.rini{width:28px;height:28px;border-radius:50%;background:linear-gradient(145deg,#d8d0c4,#f4f0e8);
+  display:grid;place-items:center;font-family:var(--serif);font-size:11.5px;font-weight:700;color:var(--navy)}
+.rtext{min-width:0}
+.rname{display:block;font-size:13px;font-weight:700;color:var(--navy);line-height:1.2}
+.rsub{display:block;font-size:11px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rtags{display:flex;gap:6px;align-items:center;white-space:nowrap}
+.rstat{font-size:9px;letter-spacing:.07em;text-transform:uppercase;font-weight:800;color:var(--muted);
+  border:1px solid var(--line);border-radius:3px;padding:2px 6px}
+.rwarn{font-size:9px;font-weight:800;color:#fff;background:var(--red);border-radius:3px;padding:2px 6px}
+
+/* Density. A field named in brief_over_limit is clamped to three lines with a
+   control that opens it in place. Nothing is truncated without saying so. */
+.clampwrap{position:relative}
+.morebtn{margin-top:3px;background:none;border:0;padding:0;font-size:9.5px;letter-spacing:.08em;
+  text-transform:uppercase;font-weight:800;color:#9f6e14;text-decoration:underline}
 
 /* ===== WHY ===== */
 .why{margin-top:5px;border:1px solid #ead8b7;border-radius:5px;
@@ -118,7 +197,6 @@ svg{display:block}
 .section-kicker{color:#9f6e14;text-transform:uppercase;font-weight:800;letter-spacing:.15em;font-size:9.5px;margin-bottom:4px}
 
 /* ===== INFO GRID ===== */
-.info-grid{margin-top:10px;display:grid;grid-template-columns:1.28fr 1.13fr 1.49fr .75fr;gap:9px}
 .pnl{background:#fff;border:1px solid var(--line);border-radius:5px;overflow:hidden;display:flex;flex-direction:column}
 .pnl>h4{height:34px;flex:0 0 auto;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:9px;
   padding:0 14px;text-transform:uppercase;letter-spacing:.07em;font-weight:800;font-size:11px;color:#112545}
@@ -166,6 +244,9 @@ svg{display:block}
 /* do_not_misstate never clamps, at any width. It is the field that stops an
    embarrassing message going out, and half a warning is worse than none. */
 .bval.noclamp{display:block;-webkit-line-clamp:unset;overflow:visible}
+/* Three lines, and only for a field the view names in brief_over_limit. */
+.bval.clamp3{-webkit-line-clamp:3}
+.clampwrap.open .bval.clamp3{display:block;-webkit-line-clamp:unset;overflow:visible}
 .badge{display:inline-block;margin-left:6px;font-size:8.5px;letter-spacing:.06em;text-transform:uppercase;
   font-weight:800;padding:1px 6px;border-radius:3px;background:#eef1f4;color:var(--muted)}
 .flash{margin-left:7px;font-size:9px;letter-spacing:.06em;text-transform:uppercase;font-weight:800;color:var(--green)}
@@ -253,7 +334,9 @@ svg{display:block}
 .small-btn.reject{border-color:var(--red);color:var(--red)}
 
 /* ===== ACCORDIONS ===== */
-.accordions{margin-top:9px;display:grid;grid-template-columns:repeat(4,1fr);
+/* auto-fit, because Today emits two or three of these and a fixed four-column
+   grid left the last ones as empty columns. */
+.accordions{margin-top:9px;display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));
   border:1px solid var(--line);border-radius:5px;background:#fff;overflow:hidden}
 details.acc{border-right:1px solid var(--line);min-height:54px}
 details.acc:last-child{border-right:0}
@@ -303,12 +386,6 @@ td.rate{font-weight:800}
 .pushnote.bad{background:#fdecec;border-left-color:var(--red);color:var(--red)}
 .thin{background:var(--gold-wash);border:1px solid #ead8b7;border-radius:5px;padding:9px 12px;
   font-size:12.5px;line-height:1.5;margin-top:6px}
-/* Phone only. do_not_misstate is fourth in the priority order but lives in the
-   snapshot panel, which is behind the Brief control on a phone, so it is
-   surfaced here instead of being lost. */
-.dnm{margin-top:6px;background:#fdecec;border:1px solid rgba(224,37,37,.35);border-left:4px solid var(--red);
-  border-radius:0 5px 5px 0;padding:8px 11px;font-size:12.5px;line-height:1.45;color:#8a1c1c}
-.dnm b{display:block;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--red);margin-bottom:2px}
 
 /* Today card */
 .taskcard{background:#fff;border:1px solid var(--line);border-radius:5px;overflow:hidden}
@@ -346,9 +423,9 @@ td.rate{font-weight:800}
 
 /* ===== RESPONSIVE ===== */
 @media (max-width:1180px){
-  .topbar-inner{grid-template-columns:190px 1fr 150px}
+  .topbar-inner{grid-template-columns:190px 1fr auto}
   .mainnav{gap:14px}
-  .info-grid{grid-template-columns:1fr 1fr}
+  .p2grid{grid-template-columns:1fr 1fr}
   .accordions{grid-template-columns:1fr 1fr}
   details.acc:nth-child(2){border-right:0}
   details.acc:nth-child(-n+2){border-bottom:1px solid var(--line)}
@@ -360,54 +437,45 @@ td.rate{font-weight:800}
   .mainnav{grid-column:1/-1;justify-content:flex-start;gap:16px;height:40px}
   .user-name{display:none}
   .page{width:calc(100% - 20px);padding:8px 0 12px}
-  .prospect-head{grid-template-columns:64px 1fr}
-  .photo{width:56px;height:56px;font-size:19px}
-  .name{font-size:23px}
-  .head-actions{grid-column:1/-1;text-align:left;display:flex;justify-content:space-between;align-items:center;padding-top:2px}
-  .action-row{margin-top:0}
-  .info-grid,.bottom-grid{grid-template-columns:1fr}
+  .pfhead .photo{width:46px;height:46px;font-size:16px}
+  .pfname{font-size:23px}
+  .bottom-grid,.p2grid{grid-template-columns:1fr}
   .accordions{grid-template-columns:1fr}
   details.acc{border-right:0;border-bottom:1px solid var(--line)}
   details.acc:last-child{border-bottom:0}
   .grid{grid-template-columns:1fr}
 }
-/* Phone: one screen per section still applies, so the four info panels go
-   behind a control and only the six things that matter stay on the face. */
+/* Phone: one screen per page still applies. Nothing is hidden behind a control
+   any more, because the three pages are the control. */
 @media (max-width:560px){
   .page{width:100%;padding:5px 8px 4px}
-  .prospect{padding:10px 8px}
   .why{grid-template-columns:36px 1fr;padding:9px 10px}
-  .info-grid{display:none}
   .accordions{grid-template-columns:1fr 1fr}
   details.acc{border-right:1px solid var(--line);border-bottom:1px solid var(--line)}
   details.acc:nth-child(2n){border-right:0}
   .grid{grid-template-columns:1fr 1fr}
   .grid .wide{grid-column:1/-1}
-  .info-grid.shown{display:grid;gap:8px}
   .snapshot-row{grid-template-columns:20px 100px 1fr}
   .brief-row{grid-template-columns:24px 96px 1fr}
   .steps{grid-template-columns:repeat(4,1fr);row-gap:14px}
   .steps:before{display:none}
-  .workflow-card{display:none}
-  .workflow-card.shown{display:block}
   .message-meta{gap:6px}
   .personalization{flex-basis:100%}
   details.acc[open] .accbody{max-height:44vh}
   /* Measured compression to hold one screen at 390x844. Every number below
      came from measuring the block, not from taste. */
   .mainnav{display:none}
-  .navsel{display:block;grid-column:1/-1}
+  /* Explicit placement, so the section dropdown shares no row with the brand
+     and the user strip sits beside it instead of below. That is a whole row of
+     a phone screen given back to the record. */
+  .navsel{display:block;grid-column:1/-1;grid-row:2}
+  .brand{grid-column:1;grid-row:1}
+  .userarea{grid-column:2;grid-row:1}
   .utility{flex-wrap:nowrap;min-height:34px}
   .utility .kick{display:none}
   .pager-btn{padding:0 10px;height:30px}
   .pager-count{padding:0 9px}
   .export{height:30px;padding:0 10px;font-size:9.5px}
-  .photo{width:44px;height:44px;font-size:16px}
-  .prospect-head{grid-template-columns:52px 1fr;gap:10px}
-  .name{font-size:20px}
-  .subline{margin-top:4px;font-size:12.5px}
-  .segment{margin-top:5px;padding:3px 7px;font-size:11px}
-  .status{padding:5px 9px;font-size:9.5px}
   .action-btn{height:30px;padding:0 10px;font-size:10px}
   .small-btn{height:30px;padding:0 10px;font-size:9.5px}
 
@@ -419,10 +487,32 @@ td.rate{font-weight:800}
   .brand-shield{width:19px;height:23px}
   .avatar-mini{width:26px;height:26px;font-size:10px}
   .linkbtn{font-size:10px}
-  /* Not in the priority order, and the same fact is one tap away under Brief. */
+  .userarea{gap:7px}
+  .addbtn{height:28px;padding:0 8px;font-size:9px;letter-spacing:.06em}
+  /* Not in the priority order, and the same fact is on page 2 under Outreach. */
   .personalization{display:none}
+
+  /* The list shell. The topbar is two rows tall here, so the height the three
+     parts divide between them is smaller. */
+  .listshell{height:calc(100vh - 132px);min-height:400px;gap:6px}
+  .why{padding:8px 9px}
+  .prosmain{gap:6px}
+  .pfhead{padding:9px 10px 8px}
+  .pfhead-top{gap:9px}
+  .pfhead .photo{width:42px;height:42px;font-size:15px}
+  .pfname{font-size:20px}
+  .pfmeta{margin-top:3px;font-size:12px}
+  .pfchips{margin-top:5px;gap:5px}
+  .pfact .action-btn{height:28px;padding:0 9px;font-size:9.5px}
+  .warnbox{margin-top:6px;padding-top:6px;gap:3px}
+  .warnline{font-size:11.5px;line-height:1.35}
+  .pagetab{height:31px;font-size:9.5px;letter-spacing:.05em}
+  .swipe{margin-top:6px}
+  .roster{max-height:124px}
+  .rrow{padding:6px 10px;gap:8px}
+  .rsub{font-size:10.5px}
+  .rstat{display:none}
 }
-@media (min-width:561px){ .mobonly{display:none !important} }
 </style></head><body>
 
 <div id="loginbox" class="login hide">
@@ -448,17 +538,18 @@ td.rate{font-weight:800}
 
     <select class="navsel" id="navsel" aria-label="Section"></select>
 
+    <!-- The work, and only the work. Add Prospect is setup and lives top right. -->
     <nav class="mainnav">
       <button class="navitem active" data-tab="today">Today <span class="cnt" id="cnt_today">0</span></button>
-      <button class="navitem" data-tab="add">Add Prospect</button>
       <button class="navitem" data-tab="list">Your List <span class="cnt" id="cnt_pros">0</span></button>
-      <button class="navitem" data-tab="copy">Copy Inbox <span class="cnt" id="cnt_prop">0</span></button>
       <button class="navitem" data-tab="seg">Segments</button>
       <button class="navitem" data-tab="fun">Numbers</button>
       <button class="navitem" data-tab="perf">Performance</button>
+      <button class="navitem" data-tab="copy">Copy Inbox <span class="cnt" id="cnt_prop">0</span></button>
     </nav>
 
     <div class="userarea">
+      <button class="addbtn" data-tab="add" title="Add a prospect">+&nbsp; Add</button>
       <div class="avatar-mini" id="userInitials">&nbsp;</div>
       <div class="user-name" id="whoami"></div>
       <button class="linkbtn" onclick="location.href='portal-partner-dashboard.html'">Portal</button>
@@ -522,7 +613,11 @@ td.rate{font-weight:800}
       </div>
       <button class="export" onclick="exportCsv()">&#8681;&nbsp; Export CSV</button>
     </div>
-    <div id="prosbox"></div>
+    <!-- Fixed header and three pages up top, the rest of the list underneath. -->
+    <div class="listshell">
+      <div class="prosmain" id="prosbox"></div>
+      <div class="roster" id="prosroster"></div>
+    </div>
   </div>
 
   <div class="panel" id="p_copy">
@@ -911,8 +1006,10 @@ async function loadToday(){
   const ids=Array.from(new Set(QUEUE.map(t=>t.contact_id).filter(Boolean)));
   if(ids.length){
     try{
+      /* custom_connect_note comes with them. It is the message whenever it
+         exists, so Today must not render a card without knowing about it. */
       const cs=await rest('crm_contacts',
-        'select=id,notes,custom,lead_source,email_status&id=in.('+ids.join(',')+')');
+        'select=id,notes,custom,lead_source,email_status,custom_connect_note&id=in.('+ids.join(',')+')');
       (cs||[]).forEach(c=>{ TODAY_META[c.id]=c; });
     }catch(e){}
     await loadSends(ids);
@@ -946,6 +1043,14 @@ async function renderToday(){
   const key='t'+t.task_id;
   const brief=m?briefFor(m.defined_at,step,'default'):null;
 
+  /* The same rule Prospects follows. A note written for this person IS the
+     message; the segment default drops to the accordion and loses its Copy
+     button. Only the connect step has a per-person note to override with. */
+  const meta=TODAY_META[t.contact_id];
+  const own=(step==='connect'&&meta&&String(meta.custom_connect_note||'').trim())||'';
+  const dflt=m?String(m.message||'').trim():'';
+  const primary=own||dflt;
+
   let h='<div class="taskcard">';
   h+='<div class="taskhead"><div><div class="who">'+esc(t.full_name)+'</div>'+
      '<div class="meta">'+esc(t.segment_name||'No segment')+
@@ -955,7 +1060,7 @@ async function renderToday(){
      (overdue?'Overdue':'Due')+' '+fmtDay(t.due_at)+'</span></div></div>';
   h+='<div class="ctask"><b>'+esc(t.title)+'</b>'+(t.detail?' &middot; '+esc(t.detail):'')+'</div>';
 
-  if(m){
+  if(primary){
     CARDS[key]={contact:t.contact_id,step:step,
                 limit:(brief&&brief.char_limit)||DEFAULT_LIMIT,
                 sendId:null,loggedBody:null,rating:0,outcome:null};
@@ -963,19 +1068,23 @@ async function renderToday(){
     if(prior){ CARDS[key].sendId=prior.id; CARDS[key].rating=prior.rating||0;
                CARDS[key].outcome=prior.outcome||null; CARDS[key].loggedBody=prior.body_used||null; }
 
-    if(m.hidden_objection){
+    if(m&&m.hidden_objection){
       h+='<div class="obj"><b>The objection this answers</b>'+esc(m.hidden_objection)+'</div>';
     }
     h+='<div class="card-title" style="margin-top:12px;border-top:1px solid var(--line)">'+
        '<span>&#9635; &nbsp; The message</span><span class="counter" id="cnt_'+key+'"></span></div>';
+    h+='<div class="plabel'+(own?' own':'')+'">'+
+       (own?'Written for this person':'Segment copy, nothing written for this person yet')+'</div>';
     h+='<div class="message-text" contenteditable="true" spellcheck="true" id="msg_'+key+'" '+
-       'data-count="'+key+'">'+esc(m.message)+'</div>';
+       'data-count="'+key+'">'+esc(primary)+'</div>';
     h+='<div class="cfoot">'+
        '<button class="small-btn primary" data-act="copy" data-key="'+key+'">&#9635; &nbsp; Copy</button>'+
        (t.linkedin_url?'<button class="small-btn" data-act="open" data-url="'+esc(t.linkedin_url)+'">Open profile</button>':'')+
        '<button class="small-btn" data-act="done" data-key="'+key+'" data-id="'+t.task_id+'">Mark done</button>'+
        '<button class="small-btn" data-act="stop" data-id="'+t.contact_id+'">They replied</button>'+
-       '<span class="inh">'+(m.inherited?'Copy inherited from '+esc(m.defined_at):'Copy written for this segment')+'</span>'+
+       '<span class="inh">'+(own
+         ? 'This person’s own note. The segment default is below, for reference only.'
+         : (m&&m.inherited?'Copy inherited from '+esc(m.defined_at):'Copy written for this segment'))+'</span>'+
        '</div>';
     h+='<div id="hold_'+key+'">'+scoreBlock(key)+'</div>';
   }else{
@@ -986,14 +1095,15 @@ async function renderToday(){
   h+='</div>';
 
   /* The research note and the doctrine both live behind a control, never below
-     the fold. */
-  const meta=TODAY_META[t.contact_id];
+     the fold. The segment default joins them whenever it was overridden, so
+     exactly one message on this card looks like the one to send. */
   const research=(meta&&splitNotes(meta).research)||'';
   h+='<div class="accordions">'+
      whyPanel(brief,'The thinking behind this approach')+
      '<details class="acc"><summary><div class="acc-title">Research on this person</div>'+
      '<div class="acc-sub">What you recorded before reaching out</div></summary>'+
      '<div class="accbody"><div class="accrow">'+(research?esc(research):'Nothing recorded.')+'</div></div></details>'+
+     (own&&dflt?segDefaultAcc(dflt,(m&&m.char_count),(brief&&brief.char_limit)||DEFAULT_LIMIT):'')+
      '</div>';
 
   box.innerHTML=h;
@@ -1053,25 +1163,94 @@ function doctrineFor(step){
 function editable(id,col,value,opts){
   const o=opts||{};
   const v=(value==null?'':String(value));
-  return '<div class="bval'+(o.json?' json':'')+(o.noclamp?' noclamp':'')+'" contenteditable="true" '+
+  return '<div class="bval'+(o.json?' json':'')+(o.noclamp?' noclamp':'')+(o.clamp3?' clamp3':'')+
+    '" contenteditable="true" '+
     'spellcheck="'+(o.json?'false':'true')+'" '+
     'data-save-col="'+col+'" data-save-id="'+id+'"'+(o.json?' data-json="1"':'')+
     ' data-empty="'+esc(o.empty||'Not recorded')+'"'+
     ' data-original="'+esc(v)+'">'+esc(v)+'</div>';
 }
 
+/* ---------------- DENSITY ----------------
+   The view decides what is too long, not this file. A field it names in
+   brief_over_limit is clamped to three lines and given a control that opens it
+   in place; every other field renders whole. Nothing is cut without a way back
+   to the full text, which is the difference between clamping and truncating. */
+function isOver(r,col){
+  const a=Array.isArray(r.brief_over_limit)?r.brief_over_limit:[];
+  return a.indexOf(col)>=0;
+}
+function field(r,col,value,empty){
+  const over=isOver(r,col);
+  const inner=editable(r.contact_id,col,value,
+    {empty:empty,clamp3:over,noclamp:!over});
+  if(!over) return inner;
+  return '<div class="clampwrap">'+inner+
+    '<button class="morebtn" type="button" data-act="more">More</button></div>';
+}
+
+/* warnings is a jsonb array of short strings and each one gets its own line.
+   The column is the contract, but it is empty on any record written before it
+   existed, and a paragraph is exactly what this view exists to stop. So when it
+   is empty the lines are derived from do_not_misstate here, for display only.
+   Nothing is written back, and a populated warnings always wins. */
+function splitWarnings(text){
+  const s=String(text||'').replace(/\s+/g,' ').trim();
+  if(!s) return [];
+  const out=[]; let start=0;
+  for(let i=0;i<s.length-1;i++){
+    if('.!?'.indexOf(s.charAt(i))<0) continue;
+    /* A closing bracket or quote can sit between the stop and the space. */
+    let j=i+1;
+    while(j<s.length&&')"”’\']'.indexOf(s.charAt(j))>=0) j++;
+    if(s.charAt(j)!==' ') continue;
+    const c=s.charAt(j+1);
+    if(!c) continue;
+    if(!(c>='A'&&c<='Z')&&c!=='"') continue;
+    /* A lone capital before the stop is an initial, not the end of a sentence:
+       "Lisa D. Daniels" must stay one line. */
+    const prev=s.charAt(i-1), prev2=s.charAt(i-2);
+    if(prev>='A'&&prev<='Z'&&(prev2===''||prev2===' ')) continue;
+    out.push(s.slice(start,j).trim());
+    start=j+1; i=j;
+  }
+  const tail=s.slice(start).trim();
+  if(tail) out.push(tail);
+  return out;
+}
+function warningLines(r){
+  const w=Array.isArray(r.warnings)
+    ? r.warnings.map(function(x){ return String(x==null?'':x).trim(); }).filter(Boolean) : [];
+  return w.length?w:splitWarnings(r.do_not_misstate);
+}
+
+/* Shared by Today and Your List, so an overridden default reads the same on
+   both: present, labelled as not sent, and deliberately without a Copy button. */
+function segDefaultAcc(dflt,chars,limit){
+  const n=(chars==null?String(dflt||'').length:chars);
+  return '<details class="acc"><summary><div class="acc-title">Segment Default (Not Used)</div>'+
+    '<div class="acc-sub">Template copy from segment'+(dflt?(' &middot; '+n+' / '+limit+(n>limit?', over':'')):'')+
+    '</div></summary><div class="accbody">'+
+    (dflt?'<div class="accrow"><b>Not sent</b>'+esc(dflt)+'</div>'+
+          '<div class="accrow"><b>Why you are seeing it</b>Reference only, and deliberately without a Copy '+
+          'button. The note above is what gets sent.</div>'
+        :'<div class="accrow">No connect copy defined for this segment.</div>')+
+    '</div></details>';
+}
+
 function snapshotPanel(r){
-  const id=r.contact_id, sig=r.linkedin_signals||{};
+  const sig=r.linkedin_signals||{};
   const ro=function(icon,k,v){
     return '<div class="snapshot-row"><div class="si">'+icon+'</div>'+
       '<div class="lab">'+esc(k)+'</div><div class="val">'+(v?esc(v):'&mdash;')+'</div></div>';
   };
-  /* alert also means never clamp: a truncated warning is worse than none. */
   const ed=function(icon,k,col,v,empty,alert){
     return '<div class="snapshot-row'+(alert?' alert':'')+'"><div class="si">'+icon+'</div>'+
-      '<div class="lab">'+esc(k)+'</div><div class="val">'+
-      editable(id,col,v,{empty:empty,noclamp:!!alert})+'</div></div>';
+      '<div class="lab">'+esc(k)+'</div><div class="val">'+field(r,col,v,empty)+'</div></div>';
   };
+  /* do_not_misstate stays here because this is where it is edited, but it is no
+     longer the only place it is read: every warning in it is already on the
+     header as its own red line, so clamping the prose copy loses nothing. */
   return '<section class="pnl"><h4><span class="ico">&#9814;</span>Prospect Snapshot</h4><div class="body">'+
     ro('&#9817;','Role',r.title)+
     ro('&#9638;','Firm',r.employer)+
@@ -1079,7 +1258,8 @@ function snapshotPanel(r){
     ro('&#8982;','Location',r.city)+
     ed('&#9817;','Background','background',r.background,'What they did before this')+
     ed('&#9831;','Mutual','mutual_connection',r.mutual_connection,'Nobody in common yet')+
-    ed('&#8857;','Not a CPA','do_not_misstate',r.do_not_misstate,'Anything that would be an outright error',true)+
+    ed('&#8857;','Do not misstate','do_not_misstate',r.do_not_misstate,
+       'Anything that would be an outright error',true)+
     ro('&#9204;','Source',sig.checked_at?('Verified '+sig.checked_at):null)+
     '</div></section>';
 }
@@ -1099,11 +1279,10 @@ function timelinePanel(r){
 }
 
 function outreachPanel(r){
-  const id=r.contact_id;
   const row=function(icon,tone,label,col,v,empty,badge){
     return '<div class="brief-row '+tone+'"><div class="bi">'+icon+'</div>'+
       '<div class="blab">'+esc(label)+(badge||'')+'</div>'+
-      '<div>'+editable(id,col,v,{empty:empty})+'</div></div>';
+      '<div>'+field(r,col,v,empty)+'</div></div>';
   };
   return '<section class="pnl"><h4><span class="ico">&#9673;</span>Outreach Brief</h4><div class="body">'+
     row('&#9831;','good','Best Angle','best_angle',r.best_angle,'How to open with them')+
@@ -1181,7 +1360,8 @@ function accordions(key,r,brief,own,dflt,limit){
 
   let research='<details class="acc"><summary><div class="acc-title">Full Research &amp; Sources</div>'+
     '<div class="acc-sub">All facts, notes and links</div></summary><div class="accbody">'+
-    '<div class="accrow"><b>Research</b>'+editable(id,'notes',r.full_research,{empty:'No research recorded yet.'})+'</div>'+
+    '<div class="accrow"><b>Research</b>'+
+      editable(id,'notes',r.full_research,{empty:'No research recorded yet.',noclamp:true})+'</div>'+
     '<div class="accrow"><b>Career timeline</b></div>'+
     (tl.length?tl.map(function(e){
       return '<div class="accrow">'+esc(e.when||'')+' &mdash; '+esc(e.what||'')+
@@ -1191,15 +1371,7 @@ function accordions(key,r,brief,own,dflt,limit){
       editable(id,'career_timeline',tl.length?JSON.stringify(tl,null,2):'',{json:true,empty:'[]'})+'</div>'+
     '</div></details>';
 
-  const n=(r.segment_default_chars==null?String(dflt||'').length:r.segment_default_chars);
-  let segdef='<details class="acc"><summary><div class="acc-title">Segment Default (Not Used)</div>'+
-    '<div class="acc-sub">Template copy from segment'+(dflt?(' &middot; '+n+' / '+limit+(n>limit?', over':'')):'')+
-    '</div></summary><div class="accbody">'+
-    (dflt?'<div class="accrow"><b>Not sent</b>'+esc(dflt)+'</div>'+
-          '<div class="accrow"><b>Why you are seeing it</b>Reference only, and deliberately without a Copy '+
-          'button. The note above is what gets sent.</div>'
-        :'<div class="accrow">No connect copy defined for this segment.</div>')+
-    '</div></details>';
+  const segdef=segDefaultAcc(dflt,r.segment_default_chars,limit);
 
   let tech='<details class="acc"><summary><div class="acc-title">Technical Details</div>'+
     '<div class="acc-sub">Ids, history and system info</div></summary><div class="accbody">'+
@@ -1217,10 +1389,80 @@ function accordions(key,r,brief,own,dflt,limit){
   return '<div class="accordions">'+wm+research+segdef+tech+'</div>';
 }
 
+/* The header. Always visible, on all three pages, because these are the facts
+   that make a message wrong if you forget them. Initials only: no photograph is
+   stored, and a stock or generated face on a real person's record is worse than
+   no image. */
+function profileHeader(r){
+  const st=(r.linkedin_status||'').replace(/_/g,' ');
+  const over=Array.isArray(r.brief_over_limit)?r.brief_over_limit.length:0;
+  const w=warningLines(r);
+
+  return '<header class="pfhead">'+
+    '<div class="pfhead-top">'+
+      '<div class="photo">'+esc(initials(r.full_name))+'</div>'+
+      '<div class="pfid">'+
+        '<div class="pfname">'+esc(r.full_name)+'</div>'+
+        '<div class="pfmeta">'+
+          ([r.title,r.employer,r.city].filter(Boolean).map(esc).join(' &middot; ')||'&mdash;')+'</div>'+
+        '<div class="pfchips">'+
+          (r.segment_label?'<span class="segment">'+esc(r.segment_label)+'</span>':'')+
+          (st?'<span class="status">'+esc(st)+'</span>':'')+
+          (r.brief_is_dense
+            ? '<span class="densemark" title="'+over+' field'+(over===1?'':'s')+
+              ' are clamped to three lines. Tap More on any of them for the whole text.">'+
+              'Trimmed &middot; '+over+' long field'+(over===1?'':'s')+'</span>' : '')+
+          (r.brief_complete?'':'<span class="densemark thin">Thin record</span>')+
+        '</div>'+
+      '</div>'+
+      '<div class="pfact">'+
+        (r.linkedin_url
+          ? '<button class="action-btn" data-act="open" data-url="'+esc(r.linkedin_url)+'">'+
+            '&#8599; &nbsp; Open LinkedIn</button>' : '')+
+      '</div>'+
+    '</div>'+
+    /* One warning per line. Joining these into a paragraph is how a warning
+       gets skimmed past, which is the whole reason the view splits them. */
+    (w.length
+      ? '<div class="warnbox">'+w.map(function(x){
+          return '<div class="warnline"><span class="wi" aria-hidden="true">&#9888;</span>'+
+                 '<span>'+esc(x)+'</span></div>'; }).join('')+'</div>'
+      : '')+
+  '</header>';
+}
+
+function page1(r){
+  return '<div class="p1grid">'+
+    '<section class="why"><div class="target-icon" aria-hidden="true"></div><div>'+
+      '<div class="section-kicker">Why they are on the list</div>'+
+      field(r,'why_on_list',r.why_on_list,'Why is this person worth your time?')+
+    '</div></section>'+
+    snapshotPanel(r)+
+  '</div>';
+}
+function page2(r){
+  return '<div class="p2grid">'+timelinePanel(r)+outreachPanel(r)+signalsPanel(r)+'</div>';
+}
+function page3(key,r,brief,own,dflt,limit,primary){
+  return '<div class="p3grid">'+
+    '<div class="bottom-grid">'+
+      (primary?messageCard(key,r,own,primary)
+              :'<section class="message-card"><div class="card-title">&#9635; &nbsp; Connection Note</div>'+
+               '<div class="message-text">No connect copy for this segment, and nothing written for this '+
+               'person. Write it in the Segments tab so everything beneath inherits it.</div></section>')+
+      workflowPanel(r)+
+    '</div>'+
+    accordions(key,r,brief,own,dflt,limit)+
+  '</div>';
+}
+
+const PAGE_NAMES=['Snapshot','Career &amp; Brief','Message'];
+
 function prospectCard(r){
   const id=r.contact_id, key='p'+id;
   const own=(r.custom_connect_note||'').trim();
   const dflt=(r.segment_default_note||'').trim();
+  /* has_custom_note is true, so the custom note IS the message. */
   const primary=own||dflt;
   const brief=BRIEFS[(r.segment_id||'')+'|connect|default']||doctrineFor('connect');
   const limit=(brief&&brief.char_limit)||DEFAULT_LIMIT;
@@ -1231,52 +1473,40 @@ function prospectCard(r){
   if(prior){ CARDS[key].sendId=prior.id; CARDS[key].rating=prior.rating||0;
              CARDS[key].outcome=prior.outcome||null; CARDS[key].loggedBody=prior.body_used||null; }
 
-  let h='<section class="prospect">';
+  const pages=[page1(r),page2(r),page3(key,r,brief,own,dflt,limit,primary)];
 
-  /* Initials only. No photograph is stored, and a stock or generated face on a
-     real person's record is worse than no image. */
-  h+='<div class="prospect-head">'+
-     '<div class="photo">'+esc(initials(r.full_name))+'</div>'+
-     '<div class="identity">'+
-       '<div class="name">'+esc(r.full_name)+'</div>'+
-       '<div class="subline">'+[r.title,r.employer,r.city].filter(Boolean).map(esc).join(' &middot; ')+'</div>'+
-       (r.segment_label?'<div class="segment">'+esc(r.segment_label)+'</div>':'')+
-     '</div>'+
-     '<div class="head-actions"><span class="status">'+esc((r.linkedin_status||'').replace(/_/g,' '))+'</span>'+
-       '<div class="action-row">'+
-       (r.linkedin_url?'<button class="action-btn" data-act="open" data-url="'+esc(r.linkedin_url)+'">&#8599; &nbsp; Open LinkedIn</button>':'')+
-       '<button class="action-btn mobonly" data-act="toggle-brief">Brief</button>'+
-       '</div></div>'+
-     '</div>';
+  return profileHeader(r)+
+    '<div class="pages">'+
+      '<div class="pagetabs" role="tablist">'+
+        PAGE_NAMES.map(function(n,i){
+          return '<button class="pagetab'+(i?'':' on')+'" role="tab" aria-selected="'+(i?'false':'true')+'" '+
+                 'data-act="page" data-i="'+i+'">'+n+'</button>'; }).join('')+
+      '</div>'+
+      '<div class="swipe" id="swipe">'+
+        pages.map(function(p,i){
+          return '<section class="swipepage" role="tabpanel" aria-label="'+
+                 PAGE_NAMES[i].replace(/&amp;/g,'and')+'">'+p+'</section>'; }).join('')+
+      '</div>'+
+    '</div>';
+}
 
-  if(!r.brief_complete){
-    h+='<div class="thin">Thin record. This needs why they are on the list and one personalization '+
-       'fact before it is worth working.</div>';
-  }
-
-  h+='<section class="why"><div class="target-icon" aria-hidden="true"></div><div>'+
-     '<div class="section-kicker">Why they are on the list</div>'+
-     editable(id,'why_on_list',r.why_on_list,{empty:'Why is this person worth your time?'})+
-     '</div></section>';
-
-  /* Read-only on the phone on purpose: the editable copy of this field lives in
-     the snapshot panel, and two contenteditables bound to one column would
-     race on blur. */
-  if(r.do_not_misstate){
-    h+='<div class="dnm mobonly"><b>Do not misstate</b>'+esc(r.do_not_misstate)+'</div>';
-  }
-
-  h+='<div class="info-grid">'+snapshotPanel(r)+timelinePanel(r)+outreachPanel(r)+signalsPanel(r)+'</div>';
-
-  h+='<div class="bottom-grid">'+
-     (primary?messageCard(key,r,own,primary)
-             :'<section class="message-card"><div class="card-title">&#9635; &nbsp; Connection Note</div>'+
-              '<div class="message-text">No connect copy for this segment, and nothing written for this '+
-              'person. Write it in the Segments tab so everything beneath inherits it.</div></section>')+
-     workflowPanel(r)+'</div>';
-
-  h+=accordions(key,r,brief,own,dflt,limit);
-  return h+'</section>';
+/* The rest of the list, so moving between people never leaves this screen. */
+function rosterList(){
+  return '<div class="rosterhead">Your list &middot; '+PROS.length+
+         (PROS.length===1?' person':' people')+'</div>'+
+    PROS.map(function(p,i){
+      const n=warningLines(p).length;
+      return '<button class="rrow'+(i===PROS_AT?' on':'')+'" data-act="goto" data-i="'+i+'">'+
+        '<span class="rini">'+esc(initials(p.full_name))+'</span>'+
+        '<span class="rtext"><span class="rname">'+esc(p.full_name)+'</span>'+
+          '<span class="rsub">'+
+            ([p.title,p.employer].filter(Boolean).map(esc).join(' &middot; ')||'&mdash;')+'</span></span>'+
+        '<span class="rtags">'+
+          (n?'<span class="rwarn" title="'+n+' warning'+(n===1?'':'s')+'">'+n+'</span>':'')+
+          '<span class="rstat">'+esc((p.linkedin_status||'').replace(/_/g,' ')||'new')+'</span>'+
+        '</span>'+
+      '</button>';
+    }).join('');
 }
 
 /* One record per screen. */
@@ -1291,24 +1521,86 @@ async function loadProspects(){
   renderProspect();
 }
 function renderProspect(){
-  const box=$('prosbox');
+  const box=$('prosbox'), rost=$('prosroster');
   if(!PROS.length){
     $('prosIdx').textContent='0';
     box.innerHTML='<div class="empty"><div class="big">No prospects yet.</div>'+
-      '<p>Add one on the Add Prospect tab, or send Claude a screenshot of a LinkedIn profile.</p></div>';
+      '<p>Add one with the Add button, top right, or send Claude a screenshot of a LinkedIn profile.</p></div>';
+    if(rost){ rost.innerHTML=''; rost.classList.add('hide'); }
     return;
   }
   const r=PROS[PROS_AT];
   $('prosIdx').textContent=(PROS_AT+1);
   box.innerHTML=prospectCard(r);
+
+  if(rost){
+    rost.classList.remove('hide');
+    const keep=rost.scrollTop;
+    rost.innerHTML=rosterList();
+    rost.scrollTop=keep;
+    /* Paging past the visible strip must not leave the highlight off screen. */
+    const on=rost.querySelector('.rrow.on');
+    if(on&&(on.offsetTop<rost.scrollTop||
+            on.offsetTop+on.offsetHeight>rost.scrollTop+rost.clientHeight)){
+      rost.scrollTop=Math.max(0,on.offsetTop-28);
+    }
+  }
   countCard('p'+r.contact_id);
   paintStars('p'+r.contact_id);
+  wireSwipe();
+  syncMore();
+}
+
+/* brief_over_limit says a field is long, not that three lines actually cut it:
+   at this width several of them fit whole. Measure and drop the control where
+   there is nothing behind it, so More always means there is more. */
+function syncMore(){
+  document.querySelectorAll('.clampwrap').forEach(function(w){
+    const v=w.querySelector('.bval'), b=w.querySelector('.morebtn');
+    if(!v||!b||w.classList.contains('open')) return;
+    b.classList.toggle('hide',v.scrollHeight<=v.clientHeight+1);
+  });
 }
 function stepProspect(d){
   if(!PROS.length) return;
   PROS_AT=(PROS_AT+d+PROS.length)%PROS.length;
   renderProspect();
 }
+function gotoProspect(i){
+  i=Number(i);
+  if(!PROS.length||!(i>=0)||i>=PROS.length||i===PROS_AT) return;
+  PROS_AT=i;
+  renderProspect();
+}
+
+/* Scroll snapping does the swipe; this only keeps the tabs honest about which
+   page you landed on, whichever way you got there. */
+function wireSwipe(){
+  const sw=$('swipe');
+  if(!sw) return;
+  sw.addEventListener('scroll',function(){
+    const w=sw.clientWidth||1;
+    setPageTab(Math.round(sw.scrollLeft/w));
+  },{passive:true});
+}
+function setPageTab(i){
+  document.querySelectorAll('.pagetab').forEach(function(b,j){
+    b.classList.toggle('on',j===i);
+    b.setAttribute('aria-selected',j===i?'true':'false');
+  });
+}
+function showPage(i){
+  const sw=$('swipe');
+  if(!sw) return;
+  i=Number(i)||0;
+  sw.scrollTo({left:i*sw.clientWidth,behavior:'smooth'});
+  setPageTab(i);
+}
+/* A width change moves the line at which three lines start cutting. */
+window.addEventListener('resize',function(){
+  clearTimeout(window._mt);
+  window._mt=setTimeout(syncMore,150);
+});
 /* Sends already logged, so the outcome panel survives a refresh and a reload
    rather than living only in memory until the next render. */
 async function loadSends(contactIds){
@@ -1526,8 +1818,12 @@ async function enableReminders(){
 
 /* The phone dropdown and the desktop strip are two faces of one nav, so the
    labels, the counts and the selection all come from a single list. */
-const NAV=[['today','Today'],['add','Add Prospect'],['list','Your List'],['copy','Copy Inbox'],
-           ['seg','Segments'],['fun','Numbers'],['perf','Performance']];
+/* Six work sections. Add Prospect is setup, so it is not one of them: it has a
+   button top right, and it trails the dropdown behind a rule so the phone can
+   still reach it without it sitting in the middle of the run of work. */
+const NAV=[['today','Today'],['list','Your List'],['seg','Segments'],
+           ['fun','Numbers'],['perf','Performance'],['copy','Copy Inbox']];
+const SETUP=[['add','Add Prospect']];
 function syncNav(active){
   const sel=$('navsel'); if(!sel) return;
   const counts={today:($('cnt_today')||{}).textContent||'',
@@ -1538,6 +1834,10 @@ function syncNav(active){
     const c=counts[n[0]];
     return '<option value="'+n[0]+'"'+(n[0]===cur?' selected':'')+'>'+
            esc(n[1])+((c&&c!=='0')?(' ('+esc(c)+')'):'')+'</option>';
+  }).join('')+
+  SETUP.map(function(n){
+    return '<option value="'+n[0]+'"'+(n[0]===cur?' selected':'')+'>&mdash; '+
+           esc(n[1])+' (setup)</option>';
   }).join('');
 }
 function show(id){
@@ -1546,6 +1846,9 @@ function show(id){
   const p=$('p_'+id); if(p) p.classList.add('on');
   const nav=document.querySelector('.navitem[data-tab="'+id+'"]');
   if(nav) nav.classList.add('active');
+  /* No tab is lit for Add Prospect, so the button carries the state instead. */
+  const ab=document.querySelector('.addbtn');
+  if(ab) ab.classList.toggle('on',id==='add');
   syncNav(id);
 }
 document.addEventListener('change',function(e){
@@ -1757,8 +2060,10 @@ async function refreshAll(){
    the attribute is decoded before the JavaScript in it is parsed. */
 /* Tab switching. Buttons carry data-tab so nothing builds JavaScript from a
    string, and the active state is derived rather than passed in. */
+/* [data-tab] rather than .navitem[data-tab]: the Add button carries one too,
+   and it is deliberately not a tab. */
 document.addEventListener('click',function(e){
-  const nav=e.target.closest?e.target.closest('.navitem[data-tab]'):null;
+  const nav=e.target.closest?e.target.closest('[data-tab]'):null;
   if(nav){ show(nav.getAttribute('data-tab')); return; }
 });
 
@@ -1790,13 +2095,13 @@ document.addEventListener('click',function(e){
   else if(act==='paste-clear'){ $('pastebox').value=''; $('proposeout').classList.add('hide'); }
   else if(act==='prop-approve') decideProposal(id,true);
   else if(act==='prop-reject') decideProposal(id,false);
-  /* Phone only: the four info panels and the workflow are off the face of the
-     card by default, so the six things that matter are what you land on. */
-  else if(act==='toggle-brief'){
-    const card=t.closest('.prospect');
-    if(card){
-      card.querySelectorAll('.info-grid,.workflow-card').forEach(function(x){ x.classList.toggle('shown'); });
-    }
+  else if(act==='page') showPage(t.getAttribute('data-i'));
+  else if(act==='goto') gotoProspect(t.getAttribute('data-i'));
+  /* Opens the clamped field where it stands. Nothing is fetched and nothing
+     moves: the same text, unclamped, in the same place on the page. */
+  else if(act==='more'){
+    const w=t.closest('.clampwrap');
+    if(w) t.textContent=w.classList.toggle('open')?'Less':'More';
   }
 });
 document.addEventListener('input',function(e){
