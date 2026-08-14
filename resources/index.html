@@ -20,9 +20,6 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
-<!-- Calendly popup widget -->
-<link href="https://assets.calendly.com/assets/external/widget.css" rel="stylesheet">
-<script src="https://assets.calendly.com/assets/external/widget.js" type="text/javascript" async></script>
 <style>
   *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -291,7 +288,7 @@
       <span class="nav-links-cta">
         <a class="btn btn-ghost" href="/portal-partner-login.html">Partner Access</a>
         <a class="btn btn-ghost" href="/?portal=1" data-portal>Client Portal</a>
-        <a class="btn btn-gold" href="https://calendly.com/jedwards-finance/30min">Begin the Conversation</a>
+        <a class="btn btn-gold" href="https://calendly.com/jedwards-finance/30min" target="_blank" rel="noopener">Begin the Conversation</a>
       </span>
     </nav>
 
@@ -300,7 +297,7 @@
         <a href="/portal-partner-login.html">Partner Access</a>
         <a href="/?portal=1" data-portal>Client Portal</a>
       </span>
-      <a class="btn btn-gold" href="https://calendly.com/jedwards-finance/30min">Begin the Conversation</a>
+      <a class="btn btn-gold" href="https://calendly.com/jedwards-finance/30min" target="_blank" rel="noopener">Begin the Conversation</a>
       <button class="nav-toggle" id="navtoggle" aria-expanded="false" aria-controls="navlinks">
         <span class="bars" aria-hidden="true"></span>Menu
       </button>
@@ -401,5 +398,6 @@
   });
 })();
 </script>
+  <script src="/calendly-popup.js" defer></script>
 </body>
 </html>
