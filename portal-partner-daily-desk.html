@@ -203,11 +203,31 @@ svg{display:block}
 .densemark.thin{background:#fff5f3;color:#8c2f26;border-color:#eed0cb}
 .ph-actions{margin-left:auto;display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end}
 
-/* The header warnings. One per line, always, never a paragraph. */
-.hero-warn{padding:11px 22px 13px;border-bottom:1px solid var(--line);background:#fff8f6;display:grid;gap:4px}
+/* The warnings. A red chip carrying the count is always on the hero, and the
+   lines open under it on demand. Six of them permanently expanded took the top
+   third of every page for something you read once before sending. Still one per
+   line when open, never a paragraph, and the full list also sits on Snapshot. */
+.warnchip{border:1px solid #eec9c4;background:#fff1ef;color:#8c2f26;border-radius:7px;
+  padding:5px 9px;font:700 9.5px var(--sans);letter-spacing:.07em;text-transform:uppercase;
+  display:inline-flex;align-items:center;gap:6px}
+.warnchip:hover{background:#ffe6e2}
+.warnchip .wi{font-size:11px;color:var(--red)}
+.hero-warn{padding:10px 22px 12px;border-bottom:1px solid var(--line);background:#fff8f6;display:grid;gap:4px}
 .warnline{display:grid;grid-template-columns:14px minmax(0,1fr);gap:0 8px;align-items:start;
   font-size:12.2px;line-height:1.45;color:#8c2f26}
 .warnline .wi{color:var(--red);font-weight:700;font-size:11px;line-height:1.55}
+
+/* Prose the database holds as one block, read as a list. Split on sentences
+   for display only; Edit swaps the real field back in so the text that gets
+   saved is always the text that was typed. */
+.blist{list-style:none;display:grid;gap:6px;margin:0;padding:0}
+.blist li{display:grid;grid-template-columns:13px minmax(0,1fr);gap:0 9px;align-items:start}
+.blist li:before{content:"";width:5px;height:5px;border-radius:50%;background:var(--gold);margin-top:8px}
+.bullets .editwrap{margin-top:2px}
+.why-card .blist li{font-family:var(--serif);font-size:16.5px;line-height:1.45;color:#1b2c46}
+.why-card .blist li:before{background:#5b7fa8;margin-top:9px}
+.watch-card .blist li{font-size:12.6px;line-height:1.5;color:#7a2b23}
+.watch-card .blist li:before{background:var(--red);margin-top:7px}
 
 .pager{display:flex;align-items:center;border-bottom:1px solid var(--line);padding:0 18px;background:#fcfbf8}
 .pager button{border:0;background:transparent;padding:13px 15px;font:700 10px var(--sans);letter-spacing:.11em;
@@ -225,11 +245,13 @@ svg{display:block}
    whole page ends up three screens wide. */
 .profile-page{flex:0 0 100%;min-width:0;scroll-snap-align:start;overflow-y:auto;padding:17px 20px 22px}
 
-.why-card{border:1px solid #eadbb8;background:#fbf5e7;border-radius:12px;padding:14px 16px;
+/* Cool, not gold. Gold on this page means "the copy" and red means "do not";
+   why they are on the list is neither, and it was competing with both. */
+.why-card{border:1px solid #dbe5f0;background:#f5f8fc;border-radius:12px;padding:14px 16px;
   display:flex;gap:13px;align-items:flex-start}
-.why-icon{width:33px;height:33px;border-radius:50%;border:2px solid var(--gold);color:var(--gold);
+.why-icon{width:33px;height:33px;border-radius:50%;border:2px solid #7396bd;color:#4a70a0;
   display:grid;place-items:center;font-weight:700;flex:0 0 auto}
-.why-card b{display:block;color:#8c681c;font-size:9px;letter-spacing:.14em;text-transform:uppercase;margin-bottom:5px}
+.why-card b{display:block;color:#3d6088;font-size:9px;letter-spacing:.14em;text-transform:uppercase;margin-bottom:7px}
 .section-title{font-size:10px;text-transform:uppercase;letter-spacing:.14em;color:var(--navy);font-weight:700;margin:18px 0 10px}
 .fact-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
 .fact-card{border:1px solid var(--line);border-radius:10px;background:#fff;padding:12px 13px;min-height:82px}
@@ -443,6 +465,24 @@ td.rate{font-weight:700}
   .flow-nav{display:none}
   .navsel{display:block;grid-column:1/-1;grid-row:2}
   .desk-shell{padding:10px}
+  /* The document scrolls on a phone, the panels do not. Locking the app to
+     100vh and scrolling inside it is wrong here: 100vh is taller than the
+     visible area while the browser chrome is showing, so the last inch of the
+     record sat under the address bar with no way to reach it. Everything below
+     goes back to natural height and the page scrolls the way a phone expects. */
+  #app{height:auto;min-height:100vh}
+  .desk-shell,.panel.on,.focus-layout,.focus-stage,.sheet{flex:none;min-height:0}
+  .prospect-card,.task-focus{height:auto}
+  .task-body{overflow:visible}
+  /* The pages keep snapping sideways; their height is set from the active page
+     in sizePages() so the document, not the page, does the vertical scrolling.
+     flex-start is what makes that measurable: stretched pages report the
+     container's height as their own, so height fed back into itself and the
+     container could only ever grow. */
+  /* flex:none too, or the flex algorithm keeps sizing this from its tallest
+     child and the height sizePages() sets is ignored. */
+  .profile-pages{align-items:flex-start;flex:none}
+  .profile-page{overflow-y:hidden}
   /* One line for the whole head. The subtitle explains a screen you are
      already looking at, and on a phone it costs a third of the record. */
   .viewhead{align-items:center;flex-direction:row;gap:10px;margin-bottom:10px;padding:0}
@@ -456,7 +496,6 @@ td.rate{font-weight:700}
   .rail-scroll{display:flex;overflow-x:auto;padding:8px}
   .rail-item{min-width:212px;margin:0 6px 0 0}
   .ri-badges{margin-top:5px}
-  .focus-stage{flex:1;min-height:0}
   .task-hero,.prospect-hero{padding:14px 15px 12px;gap:11px}
   .bigavatar{width:48px;height:48px;font-size:18px}
   .prospect-hero .bigavatar{width:44px;height:44px;font-size:16px}
@@ -1260,6 +1299,24 @@ function warningLines(r){
   return w.length?w:splitWarnings(r.do_not_misstate);
 }
 
+/* A block of prose read as a list. The bullets are a view of the field, not a
+   second copy of it: Edit swaps the real contenteditable in, so what saves is
+   what was typed, and the bullets are rebuilt from the saved text afterwards. */
+function bulletBlock(r,col,value,lines,empty){
+  /* One span only. ::before is itself a grid item, so an extra empty span made
+     three items in a two-column grid and pushed the text into the 13px bullet
+     column. */
+  const body=lines.length
+    ? '<ul class="blist">'+lines.map(function(x){
+        return '<li><span>'+esc(x)+'</span></li>'; }).join('')+'</ul>'
+    : '<div class="bval noclamp" style="opacity:.6;font-style:italic">'+esc(empty)+'</div>';
+  return '<div class="bullets">'+
+    '<div class="readwrap">'+body+'</div>'+
+    '<div class="editwrap hide">'+editable(r.contact_id,col,value,{empty:empty,noclamp:true})+'</div>'+
+    '<button class="morebtn" type="button" data-act="bullet-edit">Edit</button>'+
+  '</div>';
+}
+
 /* Shared by Today and Your List, so an overridden default reads the same on
    both: present, labelled as not sent, and deliberately without a Copy button. */
 function segDefaultFold(dflt,chars,limit){
@@ -1286,9 +1343,10 @@ function factEd(r,label,col,value,empty){
 function snapshotPage(r){
   const sig=r.linkedin_signals||{};
   const w=warningLines(r);
-  return '<div class="why-card"><div class="why-icon" aria-hidden="true">&#9678;</div><div style="min-width:0">'+
+  return '<div class="why-card"><div class="why-icon" aria-hidden="true">&#9678;</div><div style="min-width:0;flex:1">'+
       '<b>Why this person is on the list</b>'+
-      field(r,'why_on_list',r.why_on_list,'Why is this person worth your time?')+
+      bulletBlock(r,'why_on_list',r.why_on_list,splitWarnings(r.why_on_list),
+                  'Why is this person worth your time?')+
     '</div></div>'+
     '<div class="section-title">Prospect snapshot</div>'+
     '<div class="fact-grid">'+
@@ -1299,12 +1357,13 @@ function snapshotPage(r){
       factEd(r,'Background','background',r.background,'What they did before this')+
       factEd(r,'Mutual','mutual_connection',r.mutual_connection,'Nobody in common yet')+
     '</div>'+
-    /* do_not_misstate is edited here because this is its home. It is not the
-       only place it is read: every warning in it is already on the header as
-       its own red line, so clamping the prose copy loses nothing. */
+    /* do_not_misstate is edited here because this is its home, and the full
+       warning list is open here rather than collapsed, so folding it down to a
+       chip on the hero costs nothing. */
     '<div class="watch-card"><b>Do not misstate'+
       (w.length?' &middot; '+w.length+' warning'+(w.length===1?'':'s'):'')+'</b>'+
-      field(r,'do_not_misstate',r.do_not_misstate,'Anything that would be an outright error')+
+      bulletBlock(r,'do_not_misstate',r.do_not_misstate,w,
+                  'Anything that would be an outright error')+
     '</div>'+
     '<div class="source-line">Source: '+esc(sig.source||'CRM record')+
       (sig.checked_at?' &middot; checked '+esc(sig.checked_at):'')+
@@ -1460,6 +1519,12 @@ function prospectHero(r){
         ([r.title,r.employer,r.city].filter(Boolean).map(esc).join(' &middot; ')||'&mdash;')+'</div>'+
       '<div class="ph-chips">'+
         (r.segment_label?'<span class="segment-tag">'+esc(r.segment_label)+'</span>':'')+
+        /* The count is always in view, in red. The lines are one tap under it,
+           and the same list is open on Snapshot. */
+        (w.length
+          ? '<button class="warnchip" type="button" data-act="warn-toggle" aria-expanded="false">'+
+            '<span class="wi" aria-hidden="true">&#9888;</span>'+
+            w.length+' warning'+(w.length===1?'':'s')+'</button>' : '')+
         (r.brief_is_dense
           ? '<span class="densemark" title="'+over+' field'+(over===1?'':'s')+
             ' are clamped to three lines. Tap More on any of them for the whole text.">'+
@@ -1474,10 +1539,10 @@ function prospectHero(r){
         : '')+
     '</div>'+
   '</div>'+
-  /* One warning per line. Joining these into a paragraph is how a warning gets
-     skimmed past, which is the whole reason the view splits them. */
+  /* One warning per line whenever it is open. Joining these into a paragraph is
+     how a warning gets skimmed past, which is the whole reason they are split. */
   (w.length
-    ? '<div class="hero-warn">'+w.map(function(x){
+    ? '<div class="hero-warn hide" id="heroWarn">'+w.map(function(x){
         return '<div class="warnline"><span class="wi" aria-hidden="true">&#9888;</span>'+
                '<span>'+esc(x)+'</span></div>'; }).join('')+'</div>'
     : '');
@@ -1591,6 +1656,7 @@ function renderProspect(){
   paintStars('p'+r.contact_id);
   wireSwipe();
   syncMore();
+  sizePages();
 }
 
 /* brief_over_limit says a field is long, not that three lines actually cut it:
@@ -1618,9 +1684,13 @@ function wireSwipe(){
   sw.addEventListener('scroll',function(){
     const w=sw.clientWidth||1;
     setPageTab(Math.round(sw.scrollLeft/w));
+    clearTimeout(sw._sz);
+    sw._sz=setTimeout(sizePages,90);
   },{passive:true});
 }
+let PAGE_AT=0;
 function setPageTab(i){
+  PAGE_AT=i;
   document.querySelectorAll('.pager [data-act="page"]').forEach(function(b,j){
     b.classList.toggle('on',j===i);
     b.setAttribute('aria-selected',j===i?'true':'false');
@@ -1634,11 +1704,31 @@ function showPage(i){
   i=Number(i)||0;
   sw.scrollTo({left:i*sw.clientWidth,behavior:'smooth'});
   setPageTab(i);
+  sizePages();
 }
-/* A width change moves the line at which three lines start cutting. */
+
+/* On a phone the document scrolls, not the page, so the swipe container has to
+   be exactly as tall as whichever page is showing. Without this it inherits the
+   tallest of the three and short pages end in dead space, or it stays short and
+   the bottom of a long page is unreachable. On desktop the pages fill a fixed
+   stage and scroll inside it, so the height is left alone. */
+function isPhone(){ return window.matchMedia('(max-width:760px)').matches; }
+function sizePages(){
+  const sw=$('swipe');
+  if(!sw) return;
+  if(!isPhone()){ sw.style.height=''; return; }
+  /* PAGE_AT rather than a fresh read of scrollLeft: changing the height relaid
+     the row and the browser could clamp the scroll position back to zero, so
+     measuring after the mutation always reported page one. align-items:flex-start
+     keeps each page at its natural height, so no release is needed either. */
+  const p=sw.children[PAGE_AT];
+  if(p) sw.style.height=p.scrollHeight+'px';
+}
+/* A width change moves the line at which three lines start cutting, and it
+   moves the phone breakpoint the page height depends on. */
 window.addEventListener('resize',function(){
   clearTimeout(window._mt);
-  window._mt=setTimeout(syncMore,150);
+  window._mt=setTimeout(function(){ syncMore(); sizePages(); },150);
 });
 /* Sends already logged, so the outcome panel survives a refresh and a reload
    rather than living only in memory until the next render. */
@@ -1903,7 +1993,7 @@ function show(id){
   syncNav(id);
   /* The rail and stage are sized from the viewport, so anything measured while
      the panel was hidden measured zero. */
-  setTimeout(syncMore,60);
+  setTimeout(function(){ syncMore(); sizePages(); },60);
 }
 function openAddModal(){
   $('addModal').classList.remove('hide');
@@ -2164,7 +2254,31 @@ document.addEventListener('click',function(e){
      moves: the same text, unclamped, in the same place on the page. */
   else if(act==='more'){
     const w=t.closest('.clampwrap');
-    if(w) t.textContent=w.classList.toggle('open')?'Less':'More';
+    if(w){ t.textContent=w.classList.toggle('open')?'Less':'More'; sizePages(); }
+  }
+  else if(act==='warn-toggle'){
+    const box=$('heroWarn'); if(!box) return;
+    const open=!box.classList.toggle('hide');
+    t.setAttribute('aria-expanded',open?'true':'false');
+    sizePages();
+  }
+  /* Bullets are the read view; Edit swaps the real field in so the saved text
+     is the typed text. Leaving edit re-renders, which rebuilds the bullets from
+     whatever was actually written. */
+  else if(act==='bullet-edit'){
+    const b=t.closest('.bullets'); if(!b) return;
+    const read=b.querySelector('.readwrap'), ed=b.querySelector('.editwrap');
+    const opening=ed.classList.contains('hide');
+    read.classList.toggle('hide',opening);
+    ed.classList.toggle('hide',!opening);
+    t.textContent=opening?'Done':'Edit';
+    if(opening){
+      const f=ed.querySelector('.bval'); if(f) f.focus();
+      sizePages();
+    }else{
+      /* The blur that saves fires first; re-read after it lands. */
+      setTimeout(function(){ renderProspect(); },350);
+    }
   }
 });
 document.addEventListener('input',function(e){
