@@ -1447,10 +1447,11 @@ async function optChoose(key){
   if(!body){ toast('An empty message cannot be chosen.'); return; }
   try{
     if(body!==o.body){
-      /* Nothing recomputes char_count on write, so send it with the body or
-         the count in the database drifts from the text it describes. */
-      await patchRows('/rest/v1/crm_contact_messages?id=eq.'+o.id,
-        {body:body,char_count:body.length});
+      /* Body only. char_count is GENERATED ALWAYS AS (length(body)) STORED, so
+         Postgres keeps it in step by itself, and any UPDATE that assigns to it
+         fails outright with 428C9. PostgREST builds its SET list straight from
+         the JSON keys, so sending char_count here would break the write. */
+      await patchRows('/rest/v1/crm_contact_messages?id=eq.'+o.id,{body:body});
     }
     await rpc('crm_choose_option',{p_id:o.id});
     toast('Chosen. This is now the message for this person.');
