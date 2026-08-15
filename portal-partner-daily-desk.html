@@ -284,6 +284,33 @@ svg{display:block}
 .signal b{font-family:var(--serif);font-size:20px;color:var(--navy);display:block;line-height:1.1}
 .signal span{display:block;font-size:8.5px;text-transform:uppercase;letter-spacing:.1em;color:#89919b;margin-top:3px}
 
+/* ===== THREE MESSAGE OPTIONS =====
+   One component, rendered by both Today and Your List. */
+.optwrap{display:flex;flex-direction:column;gap:11px}
+.opt{background:#fff;border:1px solid var(--line);border-radius:12px;overflow:hidden;transition:.14s}
+.opt.chosen{border-color:var(--gold);box-shadow:0 0 0 2px rgba(181,139,52,.16)}
+.opt-head{display:flex;align-items:center;gap:9px;padding:9px 14px;background:var(--soft);
+  border-bottom:1px solid var(--line)}
+.opt-no{width:22px;height:22px;border-radius:50%;background:var(--navy);color:#fff;
+  font:700 11px var(--sans);display:grid;place-items:center;flex:0 0 22px}
+.opt.chosen .opt-no{background:var(--gold);color:var(--navy)}
+.opt-approach{font:700 13px var(--sans);color:var(--navy);min-width:0}
+.opt-chip{margin-left:auto;display:flex;align-items:center;gap:8px;flex:0 0 auto}
+.opt-count{font:700 11px var(--sans);color:var(--green);background:#eef4ef;padding:3px 8px;border-radius:20px}
+.opt-count.over{background:var(--red);color:#fff}
+.opt-chosenflag{font:700 9.5px var(--sans);letter-spacing:.12em;text-transform:uppercase;color:#8f6b12}
+.opt-body{padding:12px 15px;font-size:14.5px;line-height:1.6;outline:none;color:#172538}
+.opt-body:focus{background:#fffdf7;box-shadow:inset 0 0 0 2px rgba(181,139,52,.20)}
+.opt-why{padding:0 15px 10px;font-size:12.5px;line-height:1.5;color:var(--muted)}
+.opt-why b{color:var(--navy)}
+.opt-auth{display:inline-block;margin:0 15px 12px;font:700 9.5px var(--sans);letter-spacing:.10em;
+  text-transform:uppercase;color:#8f6b12;background:rgba(181,139,52,.10);padding:4px 9px;border-radius:20px}
+.opt-actions{display:flex;gap:8px;padding:0 15px 13px;flex-wrap:wrap;align-items:center}
+.opt-actions .btn{padding:7px 13px;font-size:9.5px}
+.opt-note{font-size:11px;color:var(--muted);font-style:italic}
+.opt-empty{background:#fff;border:1px dashed var(--line);border-radius:12px;padding:26px 20px;
+  text-align:center;color:var(--muted);font-size:13.5px;line-height:1.55}
+
 .outreach-grid{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(280px,.8fr);gap:12px;align-items:start}
 .note-card,.workflow-card{border:1px solid var(--line);border-radius:11px;background:#fff;overflow:hidden}
 .note-head,.workflow-head{padding:11px 13px;border-bottom:1px solid var(--line);background:#fcfbf8;display:flex;align-items:center}
@@ -755,16 +782,15 @@ function briefFor(definedAt,step,variant){
   return BRIEFS[definedAt+'|'+step+'|'+(variant||'default')]||null;
 }
 
+/* The text a send is logged as. Where a card shows three options there is no
+   single msg_<key>, so the message is the chosen option's body, read live off
+   the screen exactly as the old single field was. CARDS[key].optKey is set at
+   render time by whichever panel drew the options. */
 function cardText(key){
-  const el=$('msg_'+key); if(!el) return '';
+  const st=CARDS[key];
+  const el=(st&&st.optKey&&optBodyEl(st.optKey))||$('msg_'+key);
+  if(!el) return '';
   return el.innerText.replace(/ /g,' ').replace(/\s+$/,'');
-}
-function countCard(key){
-  const c=$('cnt_'+key), st=CARDS[key];
-  if(!c||!st) return;
-  const n=cardText(key).length;
-  c.textContent=n+' / '+st.limit;
-  c.classList.toggle('over',n>st.limit);
 }
 /* The override now lives in crm_contacts.custom_connect_note. This only cleans
    up the research prose for display: notes written before that column existed
@@ -800,13 +826,6 @@ function whyFold(b){
          '<span class="fsub">The thinking behind this approach</span></summary>'+
          '<div class="fold-content">'+(inner||'No doctrine recorded for this step.')+
          '</div></details>';
-}
-
-/* Copying is not sending. This reaches the clipboard and does nothing else. */
-function copyCard(key){
-  const text=cardText(key);
-  if(!text) return;
-  writeClip(text,'Copied. Paste it into LinkedIn.');
 }
 
 /* The send is logged when you say you sent it, never before, and it logs
@@ -861,17 +880,6 @@ async function undoSend(key){
       ? 'Send removed. It no longer counts.'
       : 'Send removed, but the touch count on the contact could not be rolled back.');
   }catch(e){ toast('Could not undo: '+e.message); }
-}
-
-/* An edit made while looking at the card should outlive the refresh. */
-async function saveOwnNote(key,id){
-  const text=cardText(key);
-  if(!text){ toast('Nothing to save.'); return; }
-  try{
-    await patchRows('/rest/v1/crm_contacts?id=eq.'+id,{custom_connect_note:text});
-    toast('Saved as this person’s note.');
-    await loadProspects();
-  }catch(e){ toast('Not saved: '+e.message); }
 }
 
 function scoreBlock(key){
@@ -963,10 +971,11 @@ const rpc=(f,args)=>api('/rest/v1/rpc/'+f,{method:'POST',body:args||{}});
    silently changed nothing would report Saved. Ask for the rows back and treat
    an empty array as the failure it is.
 
-   Safe on these tables specifically: the SELECT policy on crm_contacts and
-   crm_tasks is at least as permissive as the UPDATE policy, so asking for the
-   row back cannot turn a working write into a 401. That is NOT true everywhere,
-   which is why the two public form endpoints must keep return=minimal. */
+   Safe on these tables specifically: the SELECT policy on crm_contacts,
+   crm_tasks and crm_contact_messages is at least as permissive as the UPDATE
+   policy (all three are the same owner_id check), so asking for the row back
+   cannot turn a working write into a 401. That is NOT true everywhere, which is
+   why the two public form endpoints must keep return=minimal. */
 async function patchRows(path,body){
   const rows=await api(path,{method:'PATCH',headers:{'Prefer':'return=representation'},body:body});
   if(!rows||!rows.length){
@@ -1024,6 +1033,8 @@ async function signOut(){
 let QUEUE=[], TODAY_AT=0, TODAY_META={}, TODAY_MSG={};
 
 async function loadToday(){
+  /* Reloading the queue means reloading what is on it, options included. */
+  Object.keys(OPT_CACHE).forEach(function(k){ delete OPT_CACHE[k]; });
   const rows=await rest('crm_linkedin_today','select=*&order=due_at.asc');
   QUEUE=rows||[];
   $('cnt_today').textContent=QUEUE.length; syncNav();
@@ -1085,14 +1096,14 @@ async function renderToday(){
   const key='t'+t.task_id;
   const brief=m?briefFor(m.defined_at,step,'default'):null;
 
-  /* The same rule Prospects follows. A note written for this person IS the
-     message; the segment default drops to the accordion and loses its Copy
-     button. Only the connect step has a per-person note to override with. */
-  const meta=TODAY_META[t.contact_id];
-  const own=(step==='connect'&&meta&&String(meta.custom_connect_note||'').trim())||'';
-  const dflt=m?String(m.message||'').trim():'';
-  const primary=own||dflt;
+  /* The same three options Your List shows, for whatever step this task is.
+     Only connect has bespoke rows today; every other step comes back as the
+     one inherited template, which the component renders without a chooser. */
+  const opts=await loadOptions(t.contact_id,step);
 
+  const meta=TODAY_META[t.contact_id];
+  const dflt=m?String(m.message||'').trim():'';
+  const hasBespoke=opts.some(function(o){ return o.is_bespoke; });
   const limit=(brief&&brief.char_limit)||DEFAULT_LIMIT;
 
   let h='<div class="task-focus">';
@@ -1109,37 +1120,32 @@ async function renderToday(){
   h+='<div class="task-instruction">'+
      esc(t.detail||'Work the message below, record the outcome, and move on.')+'</div>';
 
-  if(primary){
+  if(opts.length){
+    /* optKey is what makes the send log honest: cardText reads the chosen
+       option's body, so Mark done records the message that was actually on
+       screen rather than whatever the segment template happens to say. */
     CARDS[key]={contact:t.contact_id,step:step,limit:limit,
+                optKey:chosenOptKey(t.contact_id,step,opts),
                 sendId:null,loggedBody:null,rating:0,outcome:null};
     const prior=SENDS[t.contact_id+'|'+step];
     if(prior){ CARDS[key].sendId=prior.id; CARDS[key].rating=prior.rating||0;
                CARDS[key].outcome=prior.outcome||null; CARDS[key].loggedBody=prior.body_used||null; }
 
-    h+='<div class="message-work">'+
-       '<div class="message-head"><b>The message</b>'+
-       '<span class="cc2" id="cnt_'+key+'"></span></div>'+
-       '<div class="plabel'+(own?' own':'')+'">'+
-         (own?'Written for this person':'Segment copy, nothing written for this person yet')+'</div>'+
-       '<div class="message-copy" contenteditable="true" spellcheck="true" id="msg_'+key+'" '+
-         'data-count="'+key+'">'+esc(primary)+'</div>'+
-       '<div id="hold_'+key+'">'+scoreBlock(key)+'</div>'+
-       '</div>';
+    h+='<div class="section-title">Choose the message &middot; '+esc(stepLabel(step))+'</div>';
+    h+=optionsHtml(t.contact_id,step,opts);
 
     if(m&&m.hidden_objection){
       h+='<div class="why-answer"><b>What this handles</b><p>'+esc(m.hidden_objection)+'</p></div>';
     }
 
     h+='<div class="task-actions">'+
-       '<button class="btn" data-act="copy" data-key="'+key+'">Copy message</button>'+
        (t.linkedin_url?'<button class="btn ghost" data-act="open" data-url="'+esc(t.linkedin_url)+'">Open LinkedIn</button>':'')+
        '<button class="btn ghost" data-act="done" data-key="'+key+'" data-id="'+t.task_id+'">Mark done</button>'+
        '<button class="btn ghost" data-act="stop" data-id="'+t.contact_id+'">They replied</button>'+
        '<button class="btn ghost" data-act="jump" data-id="'+t.contact_id+'">View full profile</button>'+
-       '<span class="inh">'+(own
-         ? 'This person’s own note. The segment default is below, for reference only.'
-         : (m&&m.inherited?'Copy inherited from '+esc(m.defined_at):'Copy written for this segment'))+'</span>'+
+       '<span class="inh">Mark done logs the chosen option as the message that went out.</span>'+
        '</div>';
+    h+='<div id="hold_'+key+'">'+scoreBlock(key)+'</div>';
   }else{
     h+='<div class="watch-card" style="margin-top:18px"><b>No copy found</b>'+
        '<p>Nothing is written for this step in this segment. Write it in Segments, or at a parent '+
@@ -1158,12 +1164,15 @@ async function renderToday(){
      '<details class="fold"><summary><b>Research on this person</b>'+
        '<span class="fsub">What you recorded before reaching out</span></summary>'+
        '<div class="fold-content">'+(research?esc(research):'Nothing recorded.')+'</div></details>'+
-     (own&&dflt?segDefaultFold(dflt,(m&&m.char_count),limit)
+     /* Only worth showing when the options above are bespoke: otherwise the
+        one option on screen already IS the segment default. */
+     (hasBespoke&&dflt?segDefaultFold(dflt,(m&&m.char_count),limit)
               :'<details class="fold"><summary><b>Segment default</b>'+
-                '<span class="fsub">'+(own?'None defined for this segment':'This is the segment copy')+
+                '<span class="fsub">'+(hasBespoke?'None defined for this segment':'Shown above')+
                 '</span></summary><div class="fold-content">'+
-                (own?'No copy defined for this step in this segment.'
-                    :'The message above is the segment copy. Nothing has been written for this person yet.')+
+                (hasBespoke?'No copy defined for this step in this segment.'
+                    :'The single option above is the inherited segment template. Nothing bespoke has '+
+                     'been written for this person and step yet.')+
                 '</div></details>')+
      '<details class="fold"><summary><b>Technical details</b>'+
        '<span class="fsub">Ids and system state</span></summary>'+
@@ -1176,7 +1185,6 @@ async function renderToday(){
   h+='</div></div>';
 
   box.innerHTML=h;
-  countCard(key);
   paintStars(key);
 }
 function goToday(i){
@@ -1199,6 +1207,9 @@ function stepFromTitle(t){
   if(t.indexOf('day 12')===0) return 'day12';
   return 'connect';
 }
+const STEP_LABELS={connect:'Day 0 connection note',welcome:'Welcome message',
+  day2:'Day 2 first message',day6:'Day 6 follow-up',day12:'Day 12 close'};
+function stepLabel(step){ return STEP_LABELS[step]||step; }
 function fmtDay(d){const x=new Date(d);return x.toLocaleDateString(undefined,{month:'short',day:'numeric'});}
 async function doneTask(id){
   try{
@@ -1315,6 +1326,140 @@ function bulletBlock(r,col,value,lines,empty){
     '<div class="editwrap hide">'+editable(r.contact_id,col,value,{empty:empty,noclamp:true})+'</div>'+
     '<button class="morebtn" type="button" data-act="bullet-edit">Edit</button>'+
   '</div>';
+}
+
+/* ---------------- THE THREE MESSAGE OPTIONS ----------------
+   One component. Today renders it for whatever step the task is; Your List
+   renders it for connect. Nothing below knows which panel called it.
+
+   crm_message_options returns option_no but NOT the row id, and
+   crm_choose_option takes the id, so the ids are read from the table and
+   matched on (contact_id, step, option_no). That triple carries a unique
+   index, so the match is exact rather than a best guess.
+
+   Only 'connect' has bespoke rows today. For every other step the function
+   returns one synthetic row, approach 'Segment default', is_bespoke false,
+   char_limit null and no id: there is nothing in the table to choose, so that
+   card gets Copy and no Use this one. */
+const OPTS={};                 /* key -> the option row, with its id resolved */
+const OPT_CACHE={};            /* contact|step -> rows, so paging is free */
+
+function optKeyOf(contact,step,no){ return contact+'|'+step+'|'+no; }
+function cssId(k){ return String(k).replace(/[^a-zA-Z0-9]/g,'_'); }
+
+async function loadOptions(contactId,step){
+  const ck=contactId+'|'+step;
+  if(OPT_CACHE[ck]) return OPT_CACHE[ck];
+  let rows=[];
+  try{ rows=await rpc('crm_message_options',{p_contact:contactId,p_step:step})||[]; }
+  catch(e){ return []; }
+  if(rows.some(function(o){ return o.is_bespoke; })){
+    try{
+      const ids=await rest('crm_contact_messages',
+        'select=id,option_no&contact_id=eq.'+encodeURIComponent(contactId)+
+        '&step=eq.'+encodeURIComponent(step));
+      const byNo={};
+      (ids||[]).forEach(function(x){ byNo[x.option_no]=x.id; });
+      rows.forEach(function(o){ if(o.is_bespoke) o.id=byNo[o.option_no]||null; });
+    }catch(e){ /* leaves id null, which only disables Use this one */ }
+  }
+  OPT_CACHE[ck]=rows;
+  return rows;
+}
+
+/* Which option is the message. The chosen one, or the only one when nothing
+   has been chosen yet. Today logs this text as what went out. */
+function chosenOptKey(contactId,step,opts){
+  if(!opts||!opts.length) return null;
+  const pick=opts.find(function(o){ return o.is_chosen; })||opts[0];
+  return optKeyOf(contactId,step,pick.option_no);
+}
+
+function optionsHtml(contactId,step,opts){
+  if(!opts||!opts.length){
+    return '<div class="opt-empty">No copy resolved for this step yet. '+
+           'Write it in Segments, or at a parent segment so everything beneath inherits it.</div>';
+  }
+  let h='<div class="optwrap">';
+  opts.forEach(function(o){
+    const lim=o.char_limit||0;
+    const n=(o.char_count==null?String(o.body||'').length:o.char_count);
+    const over=lim&&n>lim;
+    const key=optKeyOf(contactId,step,o.option_no);
+    const cid=cssId(key);
+    OPTS[key]=o;
+    h+='<div class="opt'+(o.is_chosen?' chosen':'')+'" id="opt_'+cid+'">'+
+       '<div class="opt-head">'+
+         '<span class="opt-no">'+esc(o.option_no)+'</span>'+
+         '<span class="opt-approach">'+esc(o.approach||('Option '+o.option_no))+'</span>'+
+         '<span class="opt-chip">'+
+           (o.is_chosen?'<span class="opt-chosenflag">Chosen</span>':'')+
+           (lim?'<span class="opt-count'+(over?' over':'')+'" id="cnt_'+cid+'">'+
+                n+' / '+lim+'</span>':'')+
+         '</span>'+
+       '</div>'+
+       '<div class="opt-body" contenteditable="true" spellcheck="true" id="body_'+cid+'" '+
+         'data-optkey="'+esc(key)+'" data-limit="'+lim+'">'+esc(o.body)+'</div>'+
+       (o.why?'<div class="opt-why"><b>Why this one.</b> '+esc(o.why)+'</div>':'')+
+       (o.authority?'<div class="opt-auth">'+esc(o.authority)+'</div>':'')+
+       '<div class="opt-actions">'+
+         '<button class="btn" data-act="opt-copy" data-key="'+esc(key)+'">Copy</button>'+
+         (o.is_bespoke&&o.id
+           ? '<button class="btn ghost" data-act="opt-choose" data-key="'+esc(key)+'">'+
+             (o.is_chosen?'Chosen':'Use this one')+'</button>'
+           : '<span class="opt-note">Inherited template, nothing to choose between yet.</span>')+
+       '</div>'+
+       '</div>';
+  });
+  return h+'</div>';
+}
+
+/* Live count as you type, against the limit the database set. */
+function optCount(el){
+  const lim=parseInt(el.getAttribute('data-limit')||'0',10);
+  if(!lim) return;
+  const n=optText(el).length;
+  const c=$('cnt_'+cssId(el.getAttribute('data-optkey')));
+  if(!c) return;
+  c.textContent=n+' / '+lim;
+  c.classList.toggle('over',n>lim);
+}
+function optText(el){
+  return el?el.innerText.replace(/ /g,' ').replace(/\s+$/,''):'';
+}
+function optBodyEl(key){ return $('body_'+cssId(key)); }
+
+/* Copying is not sending, here as everywhere else on this desk. */
+function optCopy(key){
+  const t=optText(optBodyEl(key));
+  if(!t){ toast('Nothing to copy.'); return; }
+  writeClip(t,'Copied. Paste it into LinkedIn.');
+}
+
+/* Choosing writes the edit first, then flips the flag. crm_choose_option also
+   copies the body into crm_contacts.custom_connect_note on the connect step,
+   which is what makes the rest of the desk agree about which message is the
+   message, so both panels are reloaded afterwards rather than patched by hand. */
+async function optChoose(key){
+  const o=OPTS[key];
+  if(!o||!o.id){ toast('That is an inherited template, not a bespoke option.'); return; }
+  const body=optText(optBodyEl(key));
+  if(!body){ toast('An empty message cannot be chosen.'); return; }
+  try{
+    if(body!==o.body){
+      /* Nothing recomputes char_count on write, so send it with the body or
+         the count in the database drifts from the text it describes. */
+      await patchRows('/rest/v1/crm_contact_messages?id=eq.'+o.id,
+        {body:body,char_count:body.length});
+    }
+    await rpc('crm_choose_option',{p_id:o.id});
+    toast('Chosen. This is now the message for this person.');
+    Object.keys(OPT_CACHE).forEach(function(k){ delete OPT_CACHE[k]; });
+    const on=document.querySelector('.panel.on');
+    const which=on?on.id:'';
+    if(which==='p_list'){ await loadProspects(); }
+    else if(which==='p_today'){ await loadToday(); }
+  }catch(e){ toast('Not saved: '+e.message); }
 }
 
 /* Shared by Today and Your List, so an overridden default reads the same on
@@ -1439,27 +1584,28 @@ function workflowCard(r){
     }).join('')+'</div>'+
     '<div class="wf-note">Cadence books automatically when the connection is accepted.</div></div>';
 }
-function noteCard(key,r,own,primary){
+/* The message column of the Outreach page: the same three options Today shows,
+   then the actions that move the person through the cadence. The single
+   editable note this replaced is gone; choosing an option is what writes
+   crm_contacts.custom_connect_note now. */
+function noteCard(key,r,opts){
   const id=r.contact_id;
-  return '<div class="note-card">'+
-    '<div class="note-head"><b>Connection note</b><span class="cc2" id="cnt_'+key+'"></span></div>'+
-    '<div class="plabel'+(own?' own':'')+'">'+
-      (own?'Written for this person':'Segment copy, nothing written for this person yet')+'</div>'+
-    '<div class="note-body" contenteditable="true" spellcheck="true" id="msg_'+key+'" '+
-      'data-count="'+key+'">'+esc(primary)+'</div>'+
+  return '<div>'+
+    '<div class="section-title" style="margin-top:0">Choose the message &middot; '+
+      esc(stepLabel('connect'))+'</div>'+
+    optionsHtml(id,'connect',opts)+
     (r.personalization_fact
-      ? '<div class="personalization">Personalization used: '+esc(r.personalization_fact)+'</div>' : '')+
-    '<div class="note-actions">'+
-      '<button class="btn" data-act="copy" data-key="'+key+'">Copy note</button>'+
-      '<button class="btn ghost" data-act="focus-note" data-key="'+key+'">Edit</button>'+
-      '<button class="btn ghost" data-act="save-note" data-key="'+key+'" data-id="'+id+'">Save for this person</button>'+
+      ? '<div class="personalization" style="padding:10px 2px 0">Personalization used: '+
+        esc(r.personalization_fact)+'</div>' : '')+
+    '<div class="note-actions" style="padding:12px 2px 0">'+
       '<button class="btn ghost" data-act="sent" data-key="'+key+'" data-id="'+id+'" data-seg="'+esc(r.segment_id||'')+'">Sent note</button>'+
       '<button class="btn ghost" data-act="accepted" data-id="'+id+'">Accepted</button>'+
+      '<span class="inh">Sent note logs the chosen option and books the cadence.</span>'+
     '</div>'+
     '<div id="hold_'+key+'">'+scoreBlock(key)+'</div>'+
     '</div>';
 }
-function foldRow(key,r,brief,own,dflt,limit){
+function foldRow(key,r,brief,dflt,limit){
   const id=r.contact_id;
   const tl=Array.isArray(r.career_timeline)?r.career_timeline:[];
   const research='<details class="fold"><summary><b>Full research &amp; sources</b>'+
@@ -1491,15 +1637,12 @@ function foldRow(key,r,brief,own,dflt,limit){
   return '<div class="fold-row">'+whyFold(brief)+research+
          segDefaultFold(dflt,r.segment_default_chars,limit)+tech+'</div>';
 }
-function outreachPage(key,r,brief,own,dflt,limit,primary){
+function outreachPage(key,r,brief,dflt,limit,opts){
   return '<div class="outreach-grid">'+
-    (primary?noteCard(key,r,own,primary)
-            :'<div class="note-card"><div class="note-head"><b>Connection note</b></div>'+
-             '<div class="note-body">No connect copy for this segment, and nothing written for this '+
-             'person. Write it in Segments so everything beneath inherits it.</div></div>')+
+    noteCard(key,r,opts)+
     workflowCard(r)+
     '</div>'+
-    foldRow(key,r,brief,own,dflt,limit);
+    foldRow(key,r,brief,dflt,limit);
 }
 
 /* ---------------- HERO ----------------
@@ -1548,24 +1691,24 @@ function prospectHero(r){
     : '');
 }
 
-const PAGE_NAMES=['1 &middot; Snapshot','2 &middot; Intelligence','3 &middot; Outreach'];
+/* Outreach first. You come to a record to send something; the research is what
+   you check before you do, not what you wade through to get there. */
+const PAGE_NAMES=['1 &middot; Outreach','2 &middot; Intelligence','3 &middot; Snapshot'];
 
-function prospectCard(r){
+function prospectCard(r,opts){
   const id=r.contact_id, key='p'+id;
-  const own=(r.custom_connect_note||'').trim();
   const dflt=(r.segment_default_note||'').trim();
-  /* has_custom_note is true, so the custom note IS the message. */
-  const primary=own||dflt;
   const brief=BRIEFS[(r.segment_id||'')+'|connect|default']||doctrineFor('connect');
   const limit=(brief&&brief.char_limit)||DEFAULT_LIMIT;
 
   CARDS[key]={contact:id,step:'connect',limit:limit,
+              optKey:chosenOptKey(id,'connect',opts),
               sendId:null,loggedBody:null,rating:0,outcome:null};
   const prior=SENDS[id+'|connect'];
   if(prior){ CARDS[key].sendId=prior.id; CARDS[key].rating=prior.rating||0;
              CARDS[key].outcome=prior.outcome||null; CARDS[key].loggedBody=prior.body_used||null; }
 
-  const pages=[snapshotPage(r),intelPage(r),outreachPage(key,r,brief,own,dflt,limit,primary)];
+  const pages=[outreachPage(key,r,brief,dflt,limit,opts),intelPage(r),snapshotPage(r)];
 
   return '<div class="prospect-card">'+
     prospectHero(r)+
@@ -1609,6 +1752,8 @@ function prosRail(){
 
 let PROS=[], PROS_AT=0, PROS_FILTERED=[], PROS_Q='';
 async function loadProspects(){
+  /* Same reason as loadToday: reloading the list reloads what is on it. */
+  Object.keys(OPT_CACHE).forEach(function(k){ delete OPT_CACHE[k]; });
   const rows=await rest('crm_prospect_brief','select=*&order=created_at.desc&limit=200');
   PROS=rows||[];
   $('cnt_pros').textContent=PROS.length; syncNav();
@@ -1616,7 +1761,7 @@ async function loadProspects(){
   if(PROS_AT>=PROS.length) PROS_AT=0;
   applyProsFilter();
   await loadSends(PROS.map(r=>r.contact_id));
-  renderProspect();
+  await renderProspect();
 }
 function applyProsFilter(){
   const q=PROS_Q.trim().toLowerCase();
@@ -1630,7 +1775,7 @@ function filterProspects(q){
   applyProsFilter();
   const rail=$('prosRail'); if(rail) rail.innerHTML=prosRail();
 }
-function renderProspect(){
+async function renderProspect(){
   const box=$('prosFocus'), rail=$('prosRail');
   if(!PROS.length){
     if(rail) rail.innerHTML='';
@@ -1639,7 +1784,11 @@ function renderProspect(){
     return;
   }
   const r=PROS[PROS_AT];
-  box.innerHTML=prospectCard(r);
+  const opts=await loadOptions(r.contact_id,'connect');
+  /* Paging is faster than the network. If the selection moved while the
+     options were in flight, this render is stale, so drop it. */
+  if(PROS[PROS_AT]!==r) return;
+  box.innerHTML=prospectCard(r,opts);
 
   if(rail){
     const keep=rail.scrollTop;
@@ -1652,7 +1801,6 @@ function renderProspect(){
       rail.scrollTop=Math.max(0,on.offsetTop-30);
     }
   }
-  countCard('p'+r.contact_id);
   paintStars('p'+r.contact_id);
   wireSwipe();
   syncMore();
@@ -2224,19 +2372,16 @@ document.addEventListener('click',function(e){
   if(!t) return;
   const act=t.getAttribute('data-act'), id=t.getAttribute('data-id'), key=t.getAttribute('data-key');
   if(act==='open') window.open(t.getAttribute('data-url'),'_blank','noopener');
-  else if(act==='copy') copyCard(key);
   else if(act==='sent') sentNote(key,id,t.getAttribute('data-seg')||'');
   else if(act==='undo-send') undoSend(key);
-  else if(act==='save-note') saveOwnNote(key,id);
-  else if(act==='focus-note'){ const el=$('msg_'+key); if(el){ el.focus();
-    const rg=document.createRange(); rg.selectNodeContents(el); rg.collapse(false);
-    const sel=window.getSelection(); sel.removeAllRanges(); sel.addRange(rg); } }
   else if(act==='enrol') enrol(id,t.getAttribute('data-seg')||'');
   else if(act==='accepted') accepted(id);
   else if(act==='done') doneFromCard(key,id);
   else if(act==='stop') stopCadence(id);
   else if(act==='rate'){ const st=CARDS[key]; if(st){ st.rating=Number(t.getAttribute('data-n')); paintStars(key); } }
   else if(act==='save-score') saveScore(key);
+  else if(act==='opt-copy') optCopy(key);
+  else if(act==='opt-choose') optChoose(key);
   else if(act==='today-go') goToday(t.getAttribute('data-i'));
   else if(act==='jump') jumpToProspect(id);
   else if(act==='add-open') openAddModal();
@@ -2282,9 +2427,11 @@ document.addEventListener('click',function(e){
   }
 });
 document.addEventListener('input',function(e){
-  const k=e.target&&e.target.getAttribute?e.target.getAttribute('data-count'):null;
-  if(k) countCard(k);
-  if(e.target&&e.target.id==='prosSearch') filterProspects(e.target.value);
+  const el=e.target;
+  if(!el||!el.getAttribute) return;
+  /* Each option counts itself against the limit the database set for it. */
+  if(el.getAttribute('data-optkey')) optCount(el);
+  if(el.id==='prosSearch') filterProspects(el.value);
 });
 
 /* Brief fields save when you tap away. Capture phase, because blur does not
