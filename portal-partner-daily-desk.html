@@ -191,28 +191,47 @@ svg{display:block}
 
 /* ===== PROSPECT FOCUS ===== */
 .prospect-card{height:100%;display:flex;flex-direction:column}
-.prospect-hero{padding:17px 22px 13px;border-bottom:1px solid var(--line);display:flex;align-items:flex-start;gap:15px}
-.prospect-hero .bigavatar{width:58px;height:58px;font-size:21px}
+/* Every value in here is a chrome budget, not a taste. Two whole options have
+   to clear the fold at 1440x900, so anything that grows this block has to be
+   paid for out of the same block rather than out of the options below it. */
+.prospect-hero{padding:11px 20px 9px;border-bottom:1px solid var(--line);display:flex;align-items:flex-start;gap:13px}
+.prospect-hero .bigavatar{width:46px;height:46px;font-size:17px}
 .ph-main{min-width:0;flex:1}
-.prospect-name{font-family:var(--serif);font-size:29px;line-height:1;font-weight:700;color:var(--navy)}
-.prospect-meta{font-size:12.5px;color:var(--muted);margin-top:5px}
-.ph-chips{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-top:7px}
-.segment-tag{display:inline-block;padding:5px 8px;border-radius:7px;background:#f7edda;color:#987222;font-size:9.5px}
-.densemark{font-size:8.5px;letter-spacing:.09em;text-transform:uppercase;font-weight:700;padding:4px 7px;
+.prospect-name{font-family:var(--serif);font-size:23px;line-height:1.04;font-weight:700;color:var(--navy)}
+/* The role line and the chips share one row. On their own row the chips cost
+   26px of hero for two short labels, and that 26px is the difference between
+   one option and two clearing the fold. */
+.prospect-meta{font-size:12px;color:var(--muted);margin-top:3px;
+  display:flex;flex-wrap:wrap;align-items:center;gap:5px 7px}
+.segment-tag{display:inline-block;padding:3px 7px;border-radius:7px;background:#f7edda;color:#987222;font-size:9.5px}
+.densemark{font-size:8.5px;letter-spacing:.09em;text-transform:uppercase;font-weight:700;padding:3px 7px;
   border-radius:7px;background:#fdf1e2;color:#a2560c;border:1px solid #f0d3ae}
 .densemark.thin{background:#fff5f3;color:#8c2f26;border-color:#eed0cb}
 .ph-actions{margin-left:auto;display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end}
 
-/* The warnings. A red chip carrying the count is always on the hero, and the
-   lines open under it on demand. Six of them permanently expanded took the top
-   third of every page for something you read once before sending. Still one per
-   line when open, never a paragraph, and the full list also sits on Snapshot. */
-.warnchip{border:1px solid #eec9c4;background:#fff1ef;color:#8c2f26;border-radius:7px;
-  padding:5px 9px;font:700 9.5px var(--sans);letter-spacing:.07em;text-transform:uppercase;
-  display:inline-flex;align-items:center;gap:6px}
-.warnchip:hover{background:#ffe6e2}
-.warnchip .wi{font-size:11px;color:var(--red)}
-.hero-warn{padding:10px 22px 12px;border-bottom:1px solid var(--line);background:#fff8f6;display:grid;gap:4px}
+/* the_opening: one forward-facing line, and the only thing in the hero that is
+   about the message rather than about the record. Gold band, gold rule, so it
+   reads as the copy rather than as another fact. */
+.opening{margin-top:6px;padding:7px 12px;border-left:3px solid var(--gold);border-radius:0 8px 8px 0;
+  background:linear-gradient(90deg,rgba(181,139,52,.14),rgba(181,139,52,0))}
+.opening p{margin:0;font-family:var(--serif);font-size:15px;line-height:1.3;color:var(--navy)}
+
+/* Facts and checks. The neutral facts and the warnings both live in here, and
+   nowhere else on the hero: a warning expanded on every record took the top of
+   the screen for something read once before sending. The full warning list is
+   still open, uncollapsed, on Snapshot, which is where it is actually read. */
+.checkbar{margin-top:6px}
+.checkbar summary{font:700 9.5px var(--sans);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);
+  cursor:pointer;list-style:none;display:inline-flex;align-items:center;gap:6px}
+.checkbar summary::-webkit-details-marker{display:none}
+.checkbar summary:before{content:"+";color:var(--gold);font-size:12px;line-height:1}
+.checkbar[open] summary:before{content:"\2212"}
+.checkbar .cb{margin-top:6px;background:var(--soft);border:1px solid var(--line);border-radius:9px;padding:9px 11px}
+.facts{display:flex;flex-wrap:wrap;gap:5px}
+.facts span{font-size:10.5px;color:var(--navy);background:#fff;border:1px solid var(--line);
+  padding:3px 8px;border-radius:20px}
+.checkwarn{display:grid;gap:4px}
+.facts+.checkwarn{margin-top:8px;padding-top:8px;border-top:1px solid var(--line)}
 .warnline{display:grid;grid-template-columns:14px minmax(0,1fr);gap:0 8px;align-items:start;
   font-size:12.2px;line-height:1.45;color:#8c2f26}
 .warnline .wi{color:var(--red);font-weight:700;font-size:11px;line-height:1.55}
@@ -230,7 +249,7 @@ svg{display:block}
 .watch-card .blist li:before{background:var(--red);margin-top:7px}
 
 .pager{display:flex;align-items:center;border-bottom:1px solid var(--line);padding:0 18px;background:#fcfbf8}
-.pager button{border:0;background:transparent;padding:13px 15px;font:700 10px var(--sans);letter-spacing:.11em;
+.pager button{border:0;background:transparent;padding:9px 14px;font:700 10px var(--sans);letter-spacing:.11em;
   text-transform:uppercase;color:#6e7784;position:relative;white-space:nowrap}
 .pager button.on{color:var(--navy)}
 .pager button.on:after{content:'';height:3px;background:var(--gold);position:absolute;left:12px;right:12px;bottom:0}
@@ -243,7 +262,7 @@ svg{display:block}
 /* flex-basis, never min-width. A percentage minimum inside a flex row resolves
    against a width that is itself being derived from the row's contents, and the
    whole page ends up three screens wide. */
-.profile-page{flex:0 0 100%;min-width:0;scroll-snap-align:start;overflow-y:auto;padding:17px 20px 22px}
+.profile-page{flex:0 0 100%;min-width:0;scroll-snap-align:start;overflow-y:auto;padding:13px 20px 20px}
 
 /* Cool, not gold. Gold on this page means "the copy" and red means "do not";
    why they are on the list is neither, and it was competing with both. */
@@ -252,7 +271,7 @@ svg{display:block}
 .why-icon{width:33px;height:33px;border-radius:50%;border:2px solid #7396bd;color:#4a70a0;
   display:grid;place-items:center;font-weight:700;flex:0 0 auto}
 .why-card b{display:block;color:#3d6088;font-size:9px;letter-spacing:.14em;text-transform:uppercase;margin-bottom:7px}
-.section-title{font-size:10px;text-transform:uppercase;letter-spacing:.14em;color:var(--navy);font-weight:700;margin:18px 0 10px}
+.section-title{font-size:10px;text-transform:uppercase;letter-spacing:.14em;color:var(--navy);font-weight:700;margin:14px 0 8px}
 .fact-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
 .fact-card{border:1px solid var(--line);border-radius:10px;background:#fff;padding:12px 13px;min-height:82px}
 .fact-card .fk{font-size:8.5px;letter-spacing:.12em;text-transform:uppercase;color:#87909e;font-weight:700}
@@ -284,32 +303,83 @@ svg{display:block}
 .signal b{font-family:var(--serif);font-size:20px;color:var(--navy);display:block;line-height:1.1}
 .signal span{display:block;font-size:8.5px;text-transform:uppercase;letter-spacing:.1em;color:#89919b;margin-top:3px}
 
-/* ===== THREE MESSAGE OPTIONS =====
-   One component, rendered by both Today and Your List. */
-.optwrap{display:flex;flex-direction:column;gap:11px}
+/* ===== THE FIVE MESSAGE OPTIONS =====
+   One component, rendered by both Today and Your List. The density here is
+   load-bearing: two whole options have to clear the fold at 1440x900 with
+   five of them on the page, so this is deliberately tighter than the rest. */
+.optwrap{display:flex;flex-direction:column;gap:8px}
 .opt{background:#fff;border:1px solid var(--line);border-radius:12px;overflow:hidden;transition:.14s}
 .opt.chosen{border-color:var(--gold);box-shadow:0 0 0 2px rgba(181,139,52,.16)}
-.opt-head{display:flex;align-items:center;gap:9px;padding:9px 14px;background:var(--soft);
-  border-bottom:1px solid var(--line)}
-.opt-no{width:22px;height:22px;border-radius:50%;background:var(--navy);color:#fff;
-  font:700 11px var(--sans);display:grid;place-items:center;flex:0 0 22px}
+.opt-head{display:flex;align-items:center;gap:9px;padding:7px 13px;background:var(--soft);
+  border-bottom:1px solid var(--line);flex-wrap:wrap}
+.opt-no{width:21px;height:21px;border-radius:50%;background:var(--navy);color:#fff;
+  font:700 11px var(--sans);display:grid;place-items:center;flex:0 0 21px}
 .opt.chosen .opt-no{background:var(--gold);color:var(--navy)}
-.opt-approach{font:700 13px var(--sans);color:var(--navy);min-width:0}
-.opt-chip{margin-left:auto;display:flex;align-items:center;gap:8px;flex:0 0 auto}
+.opt-approach{font:700 12.5px var(--sans);color:var(--navy);min-width:0}
+.opt-chip{margin-left:auto;display:flex;align-items:center;gap:7px;flex:0 0 auto}
 .opt-count{font:700 11px var(--sans);color:var(--green);background:#eef4ef;padding:3px 8px;border-radius:20px}
 .opt-count.over{background:var(--red);color:#fff}
 .opt-chosenflag{font:700 9.5px var(--sans);letter-spacing:.12em;text-transform:uppercase;color:#8f6b12}
-.opt-body{padding:12px 15px;font-size:14.5px;line-height:1.6;outline:none;color:#172538}
+/* An option written for this person, against one inherited from the segment.
+   The distinction changes what the button below it can do, so it is stated
+   rather than implied by the missing button. */
+.opt-inherited{font:700 8.5px var(--sans);letter-spacing:.09em;text-transform:uppercase;color:#476078;
+  background:#eef2f6;border-radius:20px;padding:3px 8px}
+/* A token the database could not fill. The body still carries the bracket, so
+   this is the difference between catching it and pasting it into LinkedIn. */
+.opt-gap{font:700 8.5px var(--sans);letter-spacing:.09em;text-transform:uppercase;color:#8c2f26;
+  background:#fff1ef;border:1px solid #eec9c4;border-radius:20px;padding:2px 8px}
+.opt.hasgap{border-color:#eec9c4}
+.opt-gapline{padding:0 14px 8px;font-size:11.5px;line-height:1.4;color:#8c2f26}
+.opt-body{padding:10px 14px;font-size:13.5px;line-height:1.5;outline:none;color:#172538}
 .opt-body:focus{background:#fffdf7;box-shadow:inset 0 0 0 2px rgba(181,139,52,.20)}
-.opt-why{padding:0 15px 10px;font-size:12.5px;line-height:1.5;color:var(--muted)}
+.opt-why{padding:0 14px 8px;font-size:11.5px;line-height:1.4;color:var(--muted)}
 .opt-why b{color:var(--navy)}
-.opt-auth{display:inline-block;margin:0 15px 12px;font:700 9.5px var(--sans);letter-spacing:.10em;
-  text-transform:uppercase;color:#8f6b12;background:rgba(181,139,52,.10);padding:4px 9px;border-radius:20px}
-.opt-actions{display:flex;gap:8px;padding:0 15px 13px;flex-wrap:wrap;align-items:center}
-.opt-actions .btn{padding:7px 13px;font-size:9.5px}
+/* The authority, inline after the rationale it belongs to. */
+.opt-src{color:#8f6b12;font-weight:700}
+.opt-src:before{content:"\2014\00a0"}
+.opt-why>.opt-src:first-child:before{content:""}
+.opt-actions{display:flex;gap:8px;padding:0 14px 10px;flex-wrap:wrap;align-items:center}
+.opt-actions .btn{padding:6px 11px;font-size:9.5px}
 .opt-note{font-size:11px;color:var(--muted);font-style:italic}
 .opt-empty{background:#fff;border:1px dashed var(--line);border-radius:12px;padding:26px 20px;
   text-align:center;color:var(--muted);font-size:13.5px;line-height:1.55}
+
+/* ===== THE SEQUENCE =====
+   Every row and card here is a row of crm_step_doctrine or crm_approaches.
+   Nothing on this screen is written in this file. */
+.seqwrap{display:flex;flex-direction:column;gap:9px}
+.seqrow{display:grid;grid-template-columns:132px minmax(0,1fr);gap:14px;background:#fff;
+  border:1px solid var(--line);border-radius:11px;padding:13px 15px}
+.seqrow.alt{background:var(--soft);border-style:dashed}
+.seqday b{display:block;font-family:var(--serif);font-size:19px;font-weight:700;color:var(--navy);line-height:1.1}
+.seqday span{display:block;font-size:9px;letter-spacing:.11em;text-transform:uppercase;color:var(--muted);margin-top:4px}
+.seqday .altflag{display:inline-block;margin-top:6px;font-size:8px;letter-spacing:.09em;text-transform:uppercase;
+  font-weight:700;color:#8f6b12;background:var(--gold-wash);border-radius:99px;padding:3px 7px}
+.seqmain{min-width:0}
+.seqmain h4{font:700 13.5px var(--sans);color:var(--navy);margin:0 0 5px}
+.seqmain p{margin:0;font-size:12.7px;line-height:1.55;color:#3c4755}
+.seqdetail{margin-top:9px;display:grid;gap:0}
+.seqdetail>summary{list-style:none;font:700 9px var(--sans);letter-spacing:.12em;text-transform:uppercase;
+  color:#8f6b12;padding:2px 0}
+.seqdetail>summary::-webkit-details-marker{display:none}
+.seqdetail>summary:before{content:"+ ";}
+.seqdetail[open]>summary:before{content:"\2212 ";}
+.seqbody{padding-top:8px;display:grid;gap:8px}
+.seqfield b{display:block;font-size:8.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--navy);margin-bottom:3px}
+.seqfield.warn b{color:var(--red)}
+.seqfield p{margin:0;font-size:12.3px;line-height:1.5;color:#3c4755}
+.seqfield.warn p{color:#7a2b23}
+
+.appr{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:10px}
+.apprcard{border:1px solid var(--line);border-radius:11px;background:#fff;padding:13px 14px}
+.apprcard .au{font:700 8.5px var(--sans);letter-spacing:.1em;text-transform:uppercase;color:#8f6b12;
+  background:rgba(181,139,52,.10);border-radius:99px;padding:3px 8px;display:inline-block;margin-bottom:7px}
+.apprcard b{display:block;font-family:var(--serif);font-size:19px;font-weight:700;color:var(--navy);line-height:1.15}
+.apprcard p{margin:6px 0 0;font-size:12.3px;line-height:1.5;color:#3c4755}
+.apprcard .ashape{margin-top:8px;font-size:11.5px;line-height:1.45;color:var(--muted);
+  border-top:1px solid var(--line);padding-top:7px}
+.apprcard .ashape em{font-style:normal;font-weight:700;color:var(--navy)}
 
 .outreach-grid{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(280px,.8fr);gap:12px;align-items:start}
 .note-card,.workflow-card{border:1px solid var(--line);border-radius:11px;background:#fff;overflow:hidden}
@@ -530,7 +600,6 @@ td.rate{font-weight:700}
   .prospect-name{font-size:23px}
   .task-body{padding:15px 16px 18px}
   .profile-page{padding:14px 15px 18px}
-  .hero-warn{padding:9px 15px 11px}
   .message-copy,.note-body{font-size:15px;padding:14px 16px}
   .fact-grid{grid-template-columns:1fr}
   .fold-row{grid-template-columns:1fr}
@@ -574,7 +643,7 @@ td.rate{font-weight:700}
     <nav class="flow-nav" aria-label="Daily Desk">
       <button class="flowtab on" data-tab="today">Today <span class="navcount" id="cnt_today">0</span></button>
       <button class="flowtab" data-tab="list">Your List <span class="navcount" id="cnt_pros">0</span></button>
-      <button class="flowtab" data-tab="seg">Segments</button>
+      <button class="flowtab" data-tab="seq">Sequence</button>
       <button class="flowtab" data-tab="fun">Numbers</button>
       <button class="flowtab" data-tab="perf">Performance</button>
       <button class="flowtab" data-tab="copy">Copy Inbox <span class="navcount" id="cnt_prop">0</span></button>
@@ -638,15 +707,12 @@ td.rate{font-weight:700}
     </div>
   </section>
 
-  <section class="panel" id="p_seg">
+  <section class="panel" id="p_seq">
     <div class="viewhead compact">
-      <div><div class="eyebrow2">Message architecture</div><h1>Segments</h1>
-      <p>Parent copy flows down until a more specific segment overrides it.</p></div>
+      <div><div class="eyebrow2">Prospecting workspace</div><h1>The Sequence</h1>
+      <p>Four touches, three channels, then stop. Every step offers five approaches.</p></div>
     </div>
-    <div class="sheet">
-      <p class="note">Own copy shows how many messages are written at that exact level.</p>
-      <div id="segbox"></div>
-    </div>
+    <div class="sheet"><div id="seqbox"></div></div>
   </section>
 
   <section class="panel" id="p_fun">
@@ -762,8 +828,13 @@ function clipFallback(text,done){
    here, copied verbatim, and logged as what actually went out. */
 let BRIEFS={};
 let SENDS={};                /* contact|step -> the most recent logged send */
-const CARDS={};              /* key -> {contact, step, limit, sendId, loggedBody, rating} */
-const DEFAULT_LIMIT=200;
+const CARDS={};              /* key -> {contact, step, optKey, sendId, loggedBody, rating} */
+/* The connect note is 300 on Premium, which is what crm_message_options now
+   returns as char_limit. DEFAULT_LIMIT is only a fallback for when the database
+   states no limit; CONNECT_LIMIT is for the Copy Inbox, which reviews proposed
+   copy before any contact exists to ask the database about. */
+const DEFAULT_LIMIT=300;
+const CONNECT_LIMIT=300;
 const OUTCOMES=[['accepted','Accepted'],['replied','Replied'],['meeting_booked','Meeting booked'],
                 ['no_response','No response'],['declined','Declined'],['opted_out','Opted out']];
 
@@ -1124,7 +1195,7 @@ async function renderToday(){
     /* optKey is what makes the send log honest: cardText reads the chosen
        option's body, so Mark done records the message that was actually on
        screen rather than whatever the segment template happens to say. */
-    CARDS[key]={contact:t.contact_id,step:step,limit:limit,
+    CARDS[key]={contact:t.contact_id,step:step,
                 optKey:chosenOptKey(t.contact_id,step,opts),
                 sendId:null,loggedBody:null,rating:0,outcome:null};
     const prior=SENDS[t.contact_id+'|'+step];
@@ -1328,19 +1399,22 @@ function bulletBlock(r,col,value,lines,empty){
   '</div>';
 }
 
-/* ---------------- THE THREE MESSAGE OPTIONS ----------------
+/* ---------------- THE FIVE MESSAGE OPTIONS ----------------
    One component. Today renders it for whatever step the task is; Your List
-   renders it for connect. Nothing below knows which panel called it.
+   renders it for connect. Nothing below knows which panel called it, and
+   nothing below assumes how many options came back.
 
    crm_message_options returns option_no but NOT the row id, and
    crm_choose_option takes the id, so the ids are read from the table and
    matched on (contact_id, step, option_no). That triple carries a unique
    index, so the match is exact rather than a best guess.
 
-   Only 'connect' has bespoke rows today. For every other step the function
-   returns one synthetic row, approach 'Segment default', is_bespoke false,
-   char_limit null and no id: there is nothing in the table to choose, so that
-   card gets Copy and no Use this one. */
+   is_bespoke true means the five options were written for this person, and
+   each one can be chosen. False means they are the segment's five approach
+   templates, inherited from the nearest ancestor that defines them: there is
+   no row of this contact's own to flip, so those cards get Copy and a label
+   saying what they are. char_limit is whatever the database returned, 300 on
+   connect and null elsewhere, and is never assumed here. */
 const OPTS={};                 /* key -> the option row, with its id resolved */
 const OPT_CACHE={};            /* contact|step -> rows, so paging is free */
 
@@ -1377,8 +1451,9 @@ function chosenOptKey(contactId,step,opts){
 
 function optionsHtml(contactId,step,opts){
   if(!opts||!opts.length){
-    return '<div class="opt-empty">No copy resolved for this step yet. '+
-           'Write it in Segments, or at a parent segment so everything beneath inherits it.</div>';
+    return '<div class="opt-empty">No copy resolved for this step yet. Write it against this '+
+           'segment, or against a parent so everything beneath inherits it. Sequence shows what '+
+           'this step is for.</div>';
   }
   let h='<div class="optwrap">';
   opts.forEach(function(o){
@@ -1387,12 +1462,22 @@ function optionsHtml(contactId,step,opts){
     const over=lim&&n>lim;
     const key=optKeyOf(contactId,step,o.option_no);
     const cid=cssId(key);
+    /* Tokens the function could not fill. The body still carries the literal
+       bracket, so this marker is the difference between catching the gap and
+       pasting "[mutual connection]" into LinkedIn. */
+    const gaps=(Array.isArray(o.unfilled_tokens)?o.unfilled_tokens:[])
+      .map(function(x){ return String(x==null?'':x).trim(); }).filter(Boolean);
     OPTS[key]=o;
-    h+='<div class="opt'+(o.is_chosen?' chosen':'')+'" id="opt_'+cid+'">'+
+    h+='<div class="opt'+(o.is_chosen?' chosen':'')+(gaps.length?' hasgap':'')+'" id="opt_'+cid+'">'+
        '<div class="opt-head">'+
          '<span class="opt-no">'+esc(o.option_no)+'</span>'+
          '<span class="opt-approach">'+esc(o.approach||('Option '+o.option_no))+'</span>'+
          '<span class="opt-chip">'+
+           (gaps.length?'<span class="opt-gap">'+gaps.length+' gap'+(gaps.length===1?'':'s')+'</span>':'')+
+           /* Bespoke means written for this person, which is what makes it
+              choosable. Inherited means the segment's template, and it is
+              labelled rather than left to be inferred from a missing button. */
+           (o.is_bespoke?'':'<span class="opt-inherited">Segment template</span>')+
            (o.is_chosen?'<span class="opt-chosenflag">Chosen</span>':'')+
            (lim?'<span class="opt-count'+(over?' over':'')+'" id="cnt_'+cid+'">'+
                 n+' / '+lim+'</span>':'')+
@@ -1400,14 +1485,27 @@ function optionsHtml(contactId,step,opts){
        '</div>'+
        '<div class="opt-body" contenteditable="true" spellcheck="true" id="body_'+cid+'" '+
          'data-optkey="'+esc(key)+'" data-limit="'+lim+'">'+esc(o.body)+'</div>'+
-       (o.why?'<div class="opt-why"><b>Why this one.</b> '+esc(o.why)+'</div>':'')+
-       (o.authority?'<div class="opt-auth">'+esc(o.authority)+'</div>':'')+
+       (gaps.length
+         ? '<div class="opt-gapline"><b>Not filled:</b> '+esc(gaps.join(', '))+
+           '. The brackets are still in the text above &mdash; write over them before you send.</div>'
+         : '')+
+       /* The authority is the source of the rationale, so it reads on the same
+          line as the rationale. On its own row it cost every option a whole
+          line of height for four words, and that height is what decides
+          whether the second option clears the fold. */
+       ((o.why||o.authority)
+         ? '<div class="opt-why">'+
+           (o.why?'<b>Why this one.</b> '+esc(o.why):'')+
+           (o.authority?'<span class="opt-src">'+esc(o.authority)+'</span>':'')+
+           '</div>'
+         : '')+
        '<div class="opt-actions">'+
          '<button class="btn" data-act="opt-copy" data-key="'+esc(key)+'">Copy</button>'+
          (o.is_bespoke&&o.id
            ? '<button class="btn ghost" data-act="opt-choose" data-key="'+esc(key)+'">'+
              (o.is_chosen?'Chosen':'Use this one')+'</button>'
-           : '<span class="opt-note">Inherited template, nothing to choose between yet.</span>')+
+           : '<span class="opt-note">Inherited from the segment, so there is nothing to choose '+
+             'between yet. Copy still takes what is on screen.</span>')+
        '</div>'+
        '</div>';
   });
@@ -1647,34 +1745,55 @@ function outreachPage(key,r,brief,dflt,limit,opts){
 }
 
 /* ---------------- HERO ----------------
-   Always visible above all three pages, because these are the facts that make
-   a message wrong if you forget them. Initials only: no photograph is stored,
-   and a stock or generated face on a real person's record is worse than none. */
+   Always visible above all three pages. It leads with the_opening, the one
+   forward-facing line, and everything backward-facing (the neutral facts, the
+   warnings) folds into one drawer beneath it. Nothing else belongs here: two
+   whole options have to clear the fold, and this block is what they compete
+   with. Initials only: no photograph is stored, and a stock or generated face
+   on a real person's record is worse than none. */
+function heroDrawer(r){
+  const facts=(Array.isArray(r.key_facts)?r.key_facts:[])
+    .map(function(x){ return String(x==null?'':x).trim(); }).filter(Boolean);
+  const w=warningLines(r);
+  if(!facts.length&&!w.length) return '';
+  return '<details class="checkbar"><summary>Facts and checks</summary><div class="cb">'+
+    (facts.length?'<div class="facts">'+facts.map(function(f){
+       return '<span>'+esc(f)+'</span>'; }).join('')+'</div>':'')+
+    /* One warning per line. Joining these into a paragraph is how a warning
+       gets skimmed past, which is the whole reason they are split. */
+    (w.length?'<div class="checkwarn">'+w.map(function(x){
+       return '<div class="warnline"><span class="wi" aria-hidden="true">&#9888;</span>'+
+              '<span>'+esc(x)+'</span></div>'; }).join('')+'</div>':'')+
+    '</div></details>';
+}
 function prospectHero(r){
   const st=(r.linkedin_status||'').replace(/_/g,' ');
   const over=Array.isArray(r.brief_over_limit)?r.brief_over_limit.length:0;
-  const w=warningLines(r);
 
   return '<div class="prospect-hero">'+
     '<div class="bigavatar">'+esc(initials(r.full_name))+'</div>'+
     '<div class="ph-main">'+
       '<div class="prospect-name">'+esc(r.full_name)+'</div>'+
+      /* Role line and chips on one row. */
       '<div class="prospect-meta">'+
-        ([r.title,r.employer,r.city].filter(Boolean).map(esc).join(' &middot; ')||'&mdash;')+'</div>'+
-      '<div class="ph-chips">'+
+        '<span>'+([r.title,r.employer,r.city].filter(Boolean).map(esc).join(' &middot; ')||'&mdash;')+'</span>'+
         (r.segment_label?'<span class="segment-tag">'+esc(r.segment_label)+'</span>':'')+
-        /* The count is always in view, in red. The lines are one tap under it,
-           and the same list is open on Snapshot. */
-        (w.length
-          ? '<button class="warnchip" type="button" data-act="warn-toggle" aria-expanded="false">'+
-            '<span class="wi" aria-hidden="true">&#9888;</span>'+
-            w.length+' warning'+(w.length===1?'':'s')+'</button>' : '')+
-        (r.brief_is_dense
+        /* has_trigger says there is a live reason to be writing this week. It
+           is forward-facing, so it earns its place next to the opening. */
+        (r.has_trigger&&r.trigger_note
+          ? '<span class="densemark" title="'+esc(r.trigger_note)+'">Trigger</span>' : '')+
+        /* Read off brief_over_limit, which is the column the view actually
+           returns. This tested r.brief_is_dense, which the view has never had,
+           so the chip was silently unreachable and a clamped record looked
+           identical to a short one. */
+        (over
           ? '<span class="densemark" title="'+over+' field'+(over===1?'':'s')+
             ' are clamped to three lines. Tap More on any of them for the whole text.">'+
             'Trimmed &middot; '+over+' long field'+(over===1?'':'s')+'</span>' : '')+
         (r.brief_complete?'':'<span class="densemark thin">Thin record</span>')+
       '</div>'+
+      (r.the_opening?'<div class="opening"><p>'+esc(r.the_opening)+'</p></div>':'')+
+      heroDrawer(r)+
     '</div>'+
     '<div class="ph-actions">'+
       '<span class="status-pill">'+esc(st||'not started')+'</span>'+
@@ -1682,14 +1801,7 @@ function prospectHero(r){
         ? '<button class="btn ghost" data-act="open" data-url="'+esc(r.linkedin_url)+'">Open LinkedIn</button>'
         : '')+
     '</div>'+
-  '</div>'+
-  /* One warning per line whenever it is open. Joining these into a paragraph is
-     how a warning gets skimmed past, which is the whole reason they are split. */
-  (w.length
-    ? '<div class="hero-warn hide" id="heroWarn">'+w.map(function(x){
-        return '<div class="warnline"><span class="wi" aria-hidden="true">&#9888;</span>'+
-               '<span>'+esc(x)+'</span></div>'; }).join('')+'</div>'
-    : '');
+  '</div>';
 }
 
 /* Outreach first. You come to a record to send something; the research is what
@@ -1702,7 +1814,7 @@ function prospectCard(r,opts){
   const brief=BRIEFS[(r.segment_id||'')+'|connect|default']||doctrineFor('connect');
   const limit=(brief&&brief.char_limit)||DEFAULT_LIMIT;
 
-  CARDS[key]={contact:id,step:'connect',limit:limit,
+  CARDS[key]={contact:id,step:'connect',
               optKey:chosenOptKey(id,'connect',opts),
               sendId:null,loggedBody:null,rating:0,outcome:null};
   const prior=SENDS[id+'|connect'];
@@ -1944,18 +2056,97 @@ async function addProspect(){
 
 /* ---------------- SEGMENTS + FUNNEL ---------------- */
 async function loadSegments(){
+  /* The segment tree no longer has a tab of its own, but Add Prospect still
+     needs the list, so this keeps filling that select and nothing else. */
   const rows=await rest('crm_segment_tree','select=*');
   const sel=$('f_seg');
+  if(!sel) return;
   sel.innerHTML='<option value="">No segment yet</option>'+
     (rows||[]).filter(r=>r.depth>0).map(r=>'<option value="'+r.id+'">'+
       '&nbsp;'.repeat(r.depth*3)+esc(r.name)+'</option>').join('');
-  let h='<table><tr><th>Segment</th><th>Level</th><th>Own copy</th><th>Path</th></tr>';
-  (rows||[]).forEach(r=>{
-    h+='<tr><td class="tree-name"><b>'+esc(r.indented_name)+'</b></td>'+
-       '<td>'+esc(r.kind)+'</td><td>'+(r.own_messages||0)+'</td>'+
-       '<td class="mono">'+esc(r.path)+'</td></tr>';
+}
+
+/* ---------------- THE SEQUENCE ----------------
+   Every touch and every approach on this screen is a row of crm_step_doctrine
+   or crm_approaches. Nothing here is written in this file, so changing the
+   doctrine is a database edit rather than a deploy. Fetched once, the first
+   time the tab is opened. */
+let SEQ_LOADED=false;
+function seqNameParts(name){
+  /* The rows do not agree on a delimiter: the five core steps use " · " and
+     the two alternatives use " - ". Split on either, and fall back to the
+     whole string when there is no delimiter at all. */
+  const s=String(name||'').trim();
+  const m=s.match(/^(.*?)\s*(?:·|–|—|-)\s*(.*)$/);
+  return m?{lead:m[1],rest:m[2]}:{lead:s,rest:''};
+}
+function seqField(label,value,warn){
+  return value
+    ? '<div class="seqfield'+(warn?' warn':'')+'"><b>'+esc(label)+'</b><p>'+esc(value)+'</p></div>'
+    : '';
+}
+async function loadSequence(){
+  const box=$('seqbox');
+  if(!box) return;
+  let steps=[],appr=[];
+  try{
+    steps=await rest('crm_step_doctrine','select=*&order=ord.asc');
+    appr=await rest('crm_approaches','select=*&order=ord.asc');
+  }catch(e){
+    box.innerHTML='<div class="empty"><div class="big">Sequence unavailable.</div><p>'+esc(e.message)+'</p></div>';
+    return;
+  }
+  if(!steps.length&&!appr.length){
+    box.innerHTML='<div class="empty"><div class="big">Nothing recorded.</div>'+
+      '<p>crm_step_doctrine and crm_approaches are readable but empty.</p></div>';
+    return;
+  }
+
+  let h='<div class="seqwrap">';
+  (steps||[]).forEach(function(s){
+    const p=seqNameParts(s.name);
+    /* Anything past the five core touches is an alternative channel, not a
+       sixth and seventh touch. The table says so in its own name field. */
+    const alt=/alternative/i.test(s.name||'');
+    const detail=seqField('Why it works',s.why_it_works)+
+                 seqField('Sourced from',s.sourced_from)+
+                 seqField('Do not',s.do_not,true)+
+                 seqField('Success signal',s.success_signal)+
+                 seqField('Hard limits',s.hard_limits,true);
+    h+='<div class="seqrow'+(alt?' alt':'')+'">'+
+       '<div class="seqday"><b>'+esc(p.lead)+'</b>'+
+         (p.rest?'<span>'+esc(p.rest)+'</span>':'')+
+         (alt?'<span class="altflag">Alternative</span>':'')+
+       '</div>'+
+       '<div class="seqmain">'+
+         '<h4>'+esc(s.the_job||p.rest||p.lead)+'</h4>'+
+         /* First sentence only on the face; the rest is under The doctrine.
+            splitWarnings rather than a lookbehind, which Safari only learned
+            recently and which this file already has a tested substitute for. */
+         (s.why_it_works?'<p>'+esc(splitWarnings(s.why_it_works)[0]||'')+'</p>':'')+
+         (detail?'<details class="seqdetail"><summary>The doctrine</summary>'+
+                 '<div class="seqbody">'+detail+'</div></details>':'')+
+       '</div>'+
+       '</div>';
   });
-  $('segbox').innerHTML=h+'</table>';
+  h+='</div>';
+
+  h+='<div class="section-title" style="margin-top:18px">The five approaches, offered at every step</div>'+
+     '<div class="appr">';
+  (appr||[]).forEach(function(a){
+    h+='<div class="apprcard">'+
+       (a.authority?'<div class="au">'+esc(a.authority)+'</div>':'')+
+       '<b>'+esc(a.approach||a.variant)+'</b>'+
+       (a.the_rule?'<p>'+esc(a.the_rule)+'</p>':'')+
+       ((a.the_shape||a.use_when)
+         ? '<div class="ashape">'+
+           (a.the_shape?'<em>Shape.</em> '+esc(a.the_shape):'')+
+           (a.the_shape&&a.use_when?'<br>':'')+
+           (a.use_when?'<em>Use when.</em> '+esc(a.use_when):'')+
+           '</div>' : '')+
+       '</div>';
+  });
+  box.innerHTML=h+'</div>';
 }
 async function loadFunnel(){
   const rows=await rest('crm_linkedin_funnel','select=*&depth=lte.1');
@@ -2140,6 +2331,9 @@ function show(id){
   const nav=document.querySelector('.flowtab[data-tab="'+id+'"]');
   if(nav) nav.classList.add('on');
   syncNav(id);
+  /* The doctrine does not change between renders, so it is fetched the first
+     time the tab is opened rather than on every refresh. */
+  if(id==='seq'&&!SEQ_LOADED){ SEQ_LOADED=true; loadSequence().catch(function(){ SEQ_LOADED=false; }); }
   /* The rail and stage are sized from the viewport, so anything measured while
      the panel was hidden measured zero. */
   setTimeout(function(){ syncMore(); sizePages(); },60);
@@ -2247,13 +2441,13 @@ function renderProposal(){
   $('propIdx').textContent=(PROP_AT+1);
 
   const chars='<span class="cc'+(p.over_limit?' over':'')+'">'+(p.char_count||0)+
-              (p.step==='connect'?' / 200':' chars')+'</span>';
+              (p.step==='connect'?' / '+CONNECT_LIMIT:' chars')+'</span>';
 
   let h='<section class="note-card">';
   h+='<div class="note-head"><b>'+esc(p.segment_label||p.segment_id||'Unknown segment')+
      ' &middot; '+esc(p.step||'')+(p.variant&&p.variant!=='default'?(' &middot; '+esc(p.variant)):'')+'</b>'+
      '<span class="cc2'+(p.over_limit?' over':'')+'">'+(p.over_limit?'Over limit &middot; ':'')+
-     (p.char_count||0)+(p.step==='connect'?' / 200':'')+'</span></div>';
+     (p.char_count||0)+(p.step==='connect'?' / '+CONNECT_LIMIT:'')+'</span></div>';
 
   /* Side by side only when it would actually replace something. */
   h+='<div class="compare'+(p.replaces_existing?'':' solo')+'">'+
@@ -2402,12 +2596,6 @@ document.addEventListener('click',function(e){
     const w=t.closest('.clampwrap');
     if(w){ t.textContent=w.classList.toggle('open')?'Less':'More'; sizePages(); }
   }
-  else if(act==='warn-toggle'){
-    const box=$('heroWarn'); if(!box) return;
-    const open=!box.classList.toggle('hide');
-    t.setAttribute('aria-expanded',open?'true':'false');
-    sizePages();
-  }
   /* Bullets are the read view; Edit swaps the real field in so the saved text
      is the typed text. Leaving edit re-renders, which rebuilds the bullets from
      whatever was actually written. */
@@ -2427,6 +2615,13 @@ document.addEventListener('click',function(e){
     }
   }
 });
+/* Opening a fold changes the page height, which on a phone is the swipe
+   container's explicit height. toggle does not bubble, so this listens in the
+   capture phase rather than relying on the click that opened it. */
+document.addEventListener('toggle',function(e){
+  const el=e.target;
+  if(el&&el.tagName==='DETAILS') sizePages();
+},true);
 document.addEventListener('input',function(e){
   const el=e.target;
   if(!el||!el.getAttribute) return;
