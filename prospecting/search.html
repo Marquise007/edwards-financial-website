@@ -22,6 +22,14 @@ main{padding:26px 6vw 72px;max-width:1360px;margin:0 auto}
 .presets button{font-family:'DM Sans',sans-serif;font-size:12.5px;font-weight:700;letter-spacing:.04em;color:var(--navy);
   background:#fff;border:1px solid var(--gold);padding:9px 14px;cursor:pointer;border-radius:2px}
 .presets button:hover{background:var(--gold);color:#fff}
+.saves{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:0 0 16px}
+.saves input{font-family:'DM Sans',sans-serif;font-size:12.5px;padding:8px 10px;border:1px solid #d8d4c8;border-radius:2px;width:190px}
+.saves button{font-family:'DM Sans',sans-serif;font-size:12px;font-weight:700;color:#fff;background:var(--navy);border:none;padding:9px 13px;cursor:pointer;border-radius:2px}
+.saves button:hover{background:var(--gold)}
+.chip{display:inline-flex;align-items:center;gap:6px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;color:var(--navy);
+  background:#fff;border:1px solid #d8d4c8;border-left:3px solid var(--gold);padding:7px 10px;border-radius:2px;cursor:pointer}
+.chip:hover{border-color:var(--gold)}
+.chip .x{color:#a33;font-weight:800;cursor:pointer;padding:0 2px}
 .filters{display:grid;grid-template-columns:repeat(auto-fill,minmax(172px,1fr));gap:14px;background:#fff;
   padding:18px;border-top:4px solid var(--gold);box-shadow:0 1px 3px rgba(13,30,58,.08);margin-bottom:18px;align-items:end}
 .cell label{font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);font-weight:700;
@@ -60,7 +68,14 @@ td.money,td.num{white-space:nowrap;text-align:right}
     <button data-preset="wa-window">WA · Retirement window (25+ yrs)</button>
     <button data-preset="ca-fresh">CA · Fresh retirees (2022&ndash;2024)</button>
     <button data-preset="ca-big">CA · $100K+ pensions</button>
+    <button data-preset="ca-safety">CA · First responders, separated</button>
     <button data-preset="calstrs">CalSTRS only</button>
+  </div>
+  <div class="saves">
+    <input id="f-savename" placeholder="save this search as&hellip;">
+    <button id="save-btn">Save search</button>
+    <button id="link-btn">Copy link</button>
+    <span id="saved-chips"></span>
   </div>
   <div class="filters">
     <div class="cell"><label>State / Dataset</label>
@@ -76,6 +91,9 @@ td.money,td.num{white-space:nowrap;text-align:right}
         <option value="CAW">CA · Working (counties, City of LA, LAUSD)</option>
       </select></div>
     <div class="cell"><label>Name contains</label><input id="f-name" placeholder="last or first name"></div>
+    <div class="cell"><label>Role contains (comma = any of)</label><input id="f-role" placeholder="sheriff, fire, police"></div>
+    <div class="cell"><label>Role excludes (comma = none of)</label><input id="f-rolex" placeholder="nurse, clerk, aide"></div>
+    <div class="cell"><label>Department contains</label><input id="f-dept" placeholder="sheriff, harbor-ucla"></div>
     <div class="cell" id="wrap-sys" style="display:none"><label>System</label>
       <select id="f-sys"><option value="">All systems</option></select></div>
     <div class="cell" id="wrap-county"><label>County</label>
@@ -85,7 +103,8 @@ td.money,td.num{white-space:nowrap;text-align:right}
     <div class="cell" id="wrap-org" style="display:none"><label id="org-label">Agency</label>
       <select id="f-org"><option value="">All</option></select></div>
     <div class="cell"><label>Min service years</label><input id="f-yrs" type="number" min="0" step="1" placeholder="e.g. 25"></div>
-    <div class="cell"><label>Min amount ($)</label><input id="f-amt" type="number" min="0" step="1000" placeholder="salary / pension"></div>
+    <div class="cell"><label>Amount range ($)</label>
+      <div class="pair"><input id="f-amt" type="number" min="0" step="1000" placeholder="min"><input id="f-amt2" type="number" min="0" step="1000" placeholder="max"></div></div>
     <div class="cell" id="wrap-retyr" style="display:none"><label>Retired between</label>
       <div class="pair"><input id="f-ry1" type="number" placeholder="2016"><input id="f-ry2" type="number" placeholder="2024"></div></div>
     <div class="cell"><label>Sort by</label>
@@ -190,7 +209,46 @@ async function loadOptions(){
 $("f-state").addEventListener("change",stateUI);
 $("f-county").addEventListener("change",fillDistricts);
 stateUI();
-loadOptions();
+
+/* ---- saved searches ---- */
+const FIELDS=["f-state","f-name","f-role","f-rolex","f-dept","f-sys","f-county","f-dist","f-org","f-yrs","f-amt","f-amt2","f-ry1","f-ry2","f-sort"];
+function collectState(){const o={};FIELDS.forEach(i=>o[i]=$(i).value);return o;}
+function applyState(o){
+  if(o["f-state"])$("f-state").value=o["f-state"];
+  stateUI();
+  if(o["f-county"]!==undefined)$("f-county").value=o["f-county"];
+  fillDistricts();
+  FIELDS.forEach(i=>{if(i!=="f-state"&&i!=="f-county"&&o[i]!==undefined)$(i).value=o[i];});
+}
+function getSaves(){try{return JSON.parse(localStorage.getItem("tc_saved_searches")||"[]");}catch(e){return[];}}
+function putSaves(a){localStorage.setItem("tc_saved_searches",JSON.stringify(a));}
+function renderChips(){
+  const a=getSaves();
+  $("saved-chips").innerHTML=a.map((s,i)=>
+    `<span class="chip" data-i="${i}">${esc(s.name)}<span class="x" data-x="${i}">&times;</span></span>`).join("");
+  $("saved-chips").querySelectorAll(".chip").forEach(ch=>ch.addEventListener("click",e=>{
+    if(e.target.dataset.x!==undefined){const a2=getSaves();a2.splice(Number(e.target.dataset.x),1);putSaves(a2);renderChips();e.stopPropagation();return;}
+    const s=getSaves()[Number(ch.dataset.i)];if(s){applyState(s.state);page=0;run();}
+  }));
+}
+$("save-btn").addEventListener("click",()=>{
+  const nm=$("f-savename").value.trim()||"Saved "+new Date().toLocaleDateString();
+  const a=getSaves();const ix=a.findIndex(s=>s.name===nm);
+  const rec={name:nm,state:collectState()};
+  if(ix>=0)a[ix]=rec;else a.push(rec);
+  putSaves(a);$("f-savename").value="";renderChips();
+});
+$("link-btn").addEventListener("click",()=>{
+  const url=location.origin+location.pathname+"#q="+encodeURIComponent(JSON.stringify(collectState()));
+  navigator.clipboard.writeText(url).then(()=>{$("link-btn").textContent="Copied!";setTimeout(()=>$("link-btn").textContent="Copy link",1400);});
+});
+renderChips();
+loadOptions().then(()=>{
+  if(location.hash.startsWith("#q=")){
+    try{applyState(JSON.parse(decodeURIComponent(location.hash.slice(3))));page=0;run();}catch(e){}
+  }
+});
+
 
 /* Rows and the total are two parallel requests on purpose. Asking PostgREST for
    count=exact *and* an ORDER BY in one request makes it materialise the whole
@@ -204,6 +262,16 @@ function buildQuery(head){
     ? db.from("tc_records").select("id",{count:"exact",head:true}).eq("state",st).eq("dataset",ds)
     : db.from("tc_records").select("*").eq("state",st).eq("dataset",ds);
   const nm=$("f-name").value.trim(); if(nm)q=q.ilike("person_name","%"+nm+"%");
+  const role=$("f-role").value.trim();
+  if(role){
+    const terms=role.split(",").map(t=>t.trim()).filter(Boolean);
+    if(terms.length===1)q=q.ilike("job_title","%"+terms[0]+"%");
+    else if(terms.length>1)q=q.or(terms.map(t=>"job_title.ilike.%"+t.replace(/[,()]/g,"")+"%").join(","));
+  }
+  const rolex=$("f-rolex").value.trim();
+  if(rolex)rolex.split(",").map(t=>t.trim()).filter(Boolean).forEach(t=>{q=q.not("job_title","ilike","%"+t+"%");});
+  const dept=$("f-dept").value.trim();
+  if(dept)q=q.ilike("raw->>department","%"+dept+"%");
   if(sel==="CA"){
     const sys=$("f-sys").value; if(sys)q=q.eq("system_name",sys);
     const a=$("f-ry1").value,b=$("f-ry2").value;
@@ -220,6 +288,7 @@ function buildQuery(head){
   }
   const yrs=$("f-yrs").value; if(yrs)q=q.gte("years_service",Number(yrs));
   const amt=$("f-amt").value; if(amt)q=q.gte("amount",Number(amt));
+  const amt2=$("f-amt2").value; if(amt2)q=q.lte("amount",Number(amt2));
   if(head)return q;
   const[col,dir]=$("f-sort").value.split(".");
   q=q.order(col,{ascending:dir==="asc",nullsFirst:false});
@@ -246,7 +315,7 @@ async function run(){
   const sel2=$("f-state").value, seg2=SEG[sel2];
   const st=sel2.startsWith("CA")?"CA":"WA";
   const isPen=sel2==="CA", isSep=sel2==="CASEP";
-  const CAGEO={"Los Angeles County":"Los Angeles","City of Los Angeles":"Los Angeles","Los Angeles Unified":"Los Angeles","Orange County":"Orange County","San Diego County":"San Diego","Ventura County":"Ventura"};
+  const CAGEO={"Los Angeles County":"Los Angeles","City of Los Angeles":"Los Angeles","Los Angeles Unified":"Los Angeles","Orange County":"Orange County","San Diego County":"San Diego","Ventura County":"Ventura","City of San Diego":"San Diego","San Diego Unified":"San Diego","SD County Emergency Services":"San Diego","Orange County Fire Authority":"Orange County","Ventura Unified":"Ventura"};
   const orgHdr=seg2.kind==="school"?"District":seg2.kind==="agency"?"Agency":seg2.kind==="college"?"Institution":seg2.kind==="ca_org"?"Employer":"System";
   $("results").innerHTML=`<table><thead><tr>
     <th>Name</th><th>${orgHdr}</th><th>${isPen?"Last employer":"Role"}</th>
@@ -272,9 +341,10 @@ $("prev").addEventListener("click",()=>{if(page>0){page--;run();}});
 $("next").addEventListener("click",()=>{page++;run();});
 document.querySelectorAll(".presets button").forEach(b=>b.addEventListener("click",()=>{
   const p=b.dataset.preset;
-  ["f-name","f-yrs","f-amt","f-ry1","f-ry2"].forEach(i=>$(i).value="");
+  ["f-name","f-role","f-rolex","f-dept","f-yrs","f-amt","f-amt2","f-ry1","f-ry2"].forEach(i=>$(i).value="");
   $("f-sys").value="";$("f-county").value="";fillDistricts();$("f-dist").value="";$("f-org").value="";
   if(p==="wa-window"){$("f-state").value="WA";$("f-yrs").value=25;$("f-sort").value="years_service.desc";}
+  if(p==="ca-safety"){$("f-state").value="CASEP";$("f-role").value="sheriff, police, fire, paramedic, EMT, lifeguard, corrections, deputy";$("f-sort").value="amount.desc";}
   if(p==="ca-fresh"){$("f-state").value="CA";$("f-ry1").value=2022;$("f-ry2").value=2024;$("f-sort").value="retirement_year.desc";}
   if(p==="ca-big"){$("f-state").value="CA";$("f-amt").value=100000;$("f-sort").value="amount.desc";}
   if(p==="calstrs"){$("f-state").value="CA";$("f-sys").value="CalSTRS";$("f-sort").value="amount.desc";}
