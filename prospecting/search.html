@@ -65,9 +65,15 @@ td.money,td.num{white-space:nowrap;text-align:right}
   <div class="filters">
     <div class="cell"><label>State / Dataset</label>
       <select id="f-state">
-        <option value="WA">WA · School employees</option>
-        <option value="WASEP">WA · Retired / separated</option>
+        <option value="WA">WA · Schools — working</option>
+        <option value="WASEP">WA · Schools — retired / separated</option>
+        <option value="WAST">WA · State agencies — working</option>
+        <option value="WASTSEP">WA · State agencies — retired / separated</option>
+        <option value="WAHE">WA · Higher ed — working</option>
+        <option value="WAHESEP">WA · Higher ed — retired / separated</option>
         <option value="CA">CA · Pension retirees</option>
+        <option value="CASEP">CA · Separated / retired — derived</option>
+        <option value="CAW">CA · Working (counties, City of LA, LAUSD)</option>
       </select></div>
     <div class="cell"><label>Name contains</label><input id="f-name" placeholder="last or first name"></div>
     <div class="cell" id="wrap-sys" style="display:none"><label>System</label>
@@ -76,6 +82,8 @@ td.money,td.num{white-space:nowrap;text-align:right}
       <select id="f-county"><option value="">All counties</option></select></div>
     <div class="cell" id="wrap-dist"><label>District</label>
       <select id="f-dist"><option value="">All districts</option></select></div>
+    <div class="cell" id="wrap-org" style="display:none"><label id="org-label">Agency</label>
+      <select id="f-org"><option value="">All</option></select></div>
     <div class="cell"><label>Min service years</label><input id="f-yrs" type="number" min="0" step="1" placeholder="e.g. 25"></div>
     <div class="cell"><label>Min amount ($)</label><input id="f-amt" type="number" min="0" step="1000" placeholder="salary / pension"></div>
     <div class="cell" id="wrap-retyr" style="display:none"><label>Retired between</label>
@@ -92,14 +100,18 @@ td.money,td.num{white-space:nowrap;text-align:right}
   <div class="resmeta"><div><b id="count">&nbsp;</b> <span id="countcap"></span></div><div id="pageinfo"></div></div>
   <div id="results"><div class="empty">Pick a preset or set filters and hit Search.</div></div>
   <div class="pager"><button id="prev" disabled>&larr; Prev</button><button id="next" disabled>Next &rarr;</button></div>
-  <p class="note" id="note-wa">WA · School employees are current district personnel with salary and experience years —
-     reach 25+ year staff while the retirement decision is still ahead of them. WA · Retired / separated is derived by
-     comparing school personnel files year over year: 20+ year staff present one year and gone the next, with their final
-     district, salary, and service years. County covers 303 of 326 employers; charter and tribal compact schools carry
-     no county and appear only under All counties. Find links open name + city searches — confirm identity before outreach.</p>
+  <p class="note" id="note-wa">Three separate WA populations, never mixed: Schools (S-275 district personnel with true
+     experience years), State agencies, and Higher ed (UW, WSU, and the community and technical colleges) from the state
+     salary files. On State agencies and Higher ed, Yrs means years observed in the annual salary files — a tenure floor,
+     not full service years. Each population has a retired / separated counterpart built by year-over-year comparison.
+     School county covers 303 of 326 employers; charter and tribal compact schools appear only under All counties.
+     Find links: schools use name + city; state and higher ed use name + Washington until duty-station data is confirmed.
+     Confirm identity before outreach.</p>
   <p class="note" id="note-ca" style="display:none">CA pension records are system-level: no last employer or city on file
      for most rows, so find links pair the name with California. CalPERS coverage spans retirement years 2016&ndash;2024.
-     Confirm identity before outreach.</p>
+     CA Working and Separated segments come from employer salary rolls (counties, City of LA, LAUSD); on those, Yrs means
+     years observed in the salary files, and a Separated row showing a system name has been matched to that system's
+     pension roll — confirmed retired, not just departed. Confirm identity before outreach.</p>
 </main>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
@@ -130,14 +142,24 @@ function findLinks(nm,geo){
           <a target="_blank" rel="noopener" href="https://www.google.com/search?q=${enc((nm+" "+g+" instagram").toLowerCase())}">IG</a>`;
 }
 
+const SEG={
+  WA:{ds:"salary",kind:"school"}, WASEP:{ds:"separated",kind:"school"},
+  WAST:{ds:"state_salary",kind:"agency"}, WASTSEP:{ds:"state_separated",kind:"agency"},
+  WAHE:{ds:"higher_ed_salary",kind:"college"}, WAHESEP:{ds:"higher_ed_separated",kind:"college"},
+  CA:{ds:"pension",kind:"ca"},
+  CAW:{ds:"ca_salary",kind:"ca_org"}, CASEP:{ds:"ca_separated",kind:"ca_org"}
+};
 function stateUI(){
-  const ca=$("f-state").value==="CA";
-  $("wrap-sys").style.display=ca?"block":"none";
-  $("wrap-retyr").style.display=ca?"block":"none";
-  $("wrap-county").style.display=ca?"none":"block";
-  $("wrap-dist").style.display=ca?"none":"block";
-  $("note-ca").style.display=ca?"block":"none";
-  $("note-wa").style.display=ca?"none":"block";
+  const sel=$("f-state").value, k=SEG[sel].kind;
+  $("wrap-sys").style.display=k==="ca"?"block":"none";
+  $("wrap-retyr").style.display=k==="ca"?"block":"none";
+  $("wrap-county").style.display=k==="school"?"block":"none";
+  $("wrap-dist").style.display=k==="school"?"block":"none";
+  $("wrap-org").style.display=(k==="agency"||k==="college"||k==="ca_org")?"block":"none";
+  $("org-label").textContent=k==="college"?"Institution":k==="ca_org"?"Employer":"Agency";
+  if(k==="agency"||k==="college"||k==="ca_org")fillOrg(k);
+  $("note-ca").style.display=(k==="ca"||k==="ca_org")?"block":"none";
+  $("note-wa").style.display=(k==="ca"||k==="ca_org")?"none":"block";
 }
 function fillDistricts(){
   const cty=$("f-county").value;
@@ -145,12 +167,20 @@ function fillDistricts(){
   $("f-dist").innerHTML='<option value="">All districts</option>'+
     list.map(d=>`<option value="${esc(d.value)}">${esc(d.value)}</option>`).join("");
 }
+function fillOrg(kind){
+  const list=(kind==="agency"?OPT.agencies:kind==="ca_org"?OPT.caorgs:OPT.colleges)||[];
+  $("f-org").innerHTML='<option value="">All</option>'+
+    list.map(o=>`<option value="${esc(o.value)}">${esc(o.value)}${o.cnt?` (${Number(o.cnt).toLocaleString()})`:""}</option>`).join("");
+}
 async function loadOptions(){
   const {data,error}=await db.from("tc_filter_options").select("state,kind,value,county,cnt").order("value");
   if(error||!data)return;
   OPT.systems=data.filter(r=>r.kind==="system");
   OPT.districts=data.filter(r=>r.kind==="district");
   OPT.counties=data.filter(r=>r.kind==="county").sort((a,b)=>b.cnt-a.cnt);
+  OPT.agencies=data.filter(r=>r.kind==="agency");
+  OPT.colleges=data.filter(r=>r.kind==="college");
+  OPT.caorgs=data.filter(r=>r.kind==="ca_employer");
   $("f-sys").innerHTML='<option value="">All systems</option>'+
     OPT.systems.map(s=>`<option value="${esc(s.value)}">${esc(s.value)} (${Number(s.cnt).toLocaleString()})</option>`).join("");
   $("f-county").innerHTML='<option value="">All counties</option>'+
@@ -168,9 +198,8 @@ loadOptions();
    rows) then dies on the statement timeout. Split apart, both are fast.
    Estimates are not an option here: the planner guesses 1,001 for CalSTRS. */
 function buildQuery(head){
-  const sel=$("f-state").value;
-  const st=sel==="CA"?"CA":"WA";
-  const ds=sel==="CA"?"pension":(sel==="WASEP"?"separated":"salary");
+  const sel=$("f-state").value, seg=SEG[sel];
+  const st=sel.startsWith("CA")?"CA":"WA", ds=seg.ds;
   let q=head
     ? db.from("tc_records").select("id",{count:"exact",head:true}).eq("state",st).eq("dataset",ds)
     : db.from("tc_records").select("*").eq("state",st).eq("dataset",ds);
@@ -179,13 +208,15 @@ function buildQuery(head){
     const sys=$("f-sys").value; if(sys)q=q.eq("system_name",sys);
     const a=$("f-ry1").value,b=$("f-ry2").value;
     if(a)q=q.gte("retirement_year",Number(a)); if(b)q=q.lte("retirement_year",Number(b));
-  }else{
+  }else if(seg.kind==="school"){
     const dist=$("f-dist").value, cty=$("f-county").value;
     if(dist)q=q.eq("employer",dist);
     else if(cty){
       const ds2=OPT.districts.filter(d=>d.county===cty).map(d=>d.value);
       if(ds2.length)q=q.in("employer",ds2);
     }
+  }else{
+    const org=$("f-org").value; if(org)q=q.eq("employer",org);
   }
   const yrs=$("f-yrs").value; if(yrs)q=q.gte("years_service",Number(yrs));
   const amt=$("f-amt").value; if(amt)q=q.gte("amount",Number(amt));
@@ -205,24 +236,35 @@ async function run(){
   $("pageinfo").textContent="Page "+(page+1);
   $("prev").disabled=page===0; $("next").disabled=!data||data.length<PAGE;
   if(!data||!data.length){
-    const msg=$("f-state").value==="WASEP"
-      ?"No records yet — the Retired / separated list fills when the year-over-year comparison job runs."
-      :"No matches. Loosen a filter.";
+    const sel0=$("f-state").value;
+    const msg=sel0.endsWith("SEP")
+      ?"No records yet in this separated list — it fills when its year-over-year comparison job runs."
+      :(SEG[sel0].kind==="agency"||SEG[sel0].kind==="college"||SEG[sel0].kind==="ca_org")
+        ?"No records yet — this segment fills when its salary load runs."
+        :"No matches. Loosen a filter.";
     $("results").innerHTML='<div class="empty">'+msg+'</div>';return;}
-  const st=$("f-state").value==="CA"?"CA":"WA";
+  const sel2=$("f-state").value, seg2=SEG[sel2];
+  const st=sel2.startsWith("CA")?"CA":"WA";
+  const isPen=sel2==="CA", isSep=sel2==="CASEP";
+  const CAGEO={"Los Angeles County":"Los Angeles","City of Los Angeles":"Los Angeles","Los Angeles Unified":"Los Angeles","Orange County":"Orange County","San Diego County":"San Diego","Ventura County":"Ventura"};
+  const orgHdr=seg2.kind==="school"?"District":seg2.kind==="agency"?"Agency":seg2.kind==="college"?"Institution":seg2.kind==="ca_org"?"Employer":"System";
   $("results").innerHTML=`<table><thead><tr>
-    <th>Name</th><th>${st==="WA"?"District":"System"}</th><th>${st==="WA"?"Role":"Last employer"}</th>
-    <th style="text-align:right">Yrs</th><th style="text-align:right">${st==="WA"?"Salary":"Pension"}</th>
-    ${st==="CA"?"<th>Retired</th>":""}<th>Find</th></tr></thead><tbody>`+
+    <th>Name</th><th>${orgHdr}</th><th>${isPen?"Last employer":"Role"}</th>
+    <th style="text-align:right">Yrs</th><th style="text-align:right">${isPen?"Pension":"Salary"}</th>
+    ${(isPen||isSep)?"<th>Retired</th>":""}<th>Find</th></tr></thead><tbody>`+
     data.map(r=>{
       const nm=displayName(r.person_name,st);
-      const geo=st==="WA"?cityFromDistrict(r.employer):"California";
+      const geo=seg2.kind==="ca_org"?(CAGEO[r.employer]||"California")
+        :st!=="WA"?"California"
+        :(seg2.kind==="school"?cityFromDistrict(r.employer):"Washington");
+      const retCell=isPen?(r.retirement_year??"")
+        :isSep?((r.retirement_year??"")+(r.system_name?" · "+esc(r.system_name):"")):"";
       return `<tr><td class="nm">${esc(nm)}</td>
-      <td>${esc(st==="WA"?(r.employer||r.system_name):r.system_name)}</td>
-      <td>${esc(st==="WA"?(r.job_title||""):(r.employer||""))}</td>
+      <td>${esc(isPen?r.system_name:(r.employer||r.system_name||""))}</td>
+      <td>${esc(isPen?(r.employer||""):(r.job_title||""))}</td>
       <td class="num">${r.years_service??""}</td>
       <td class="money">${fmtM(r.amount)}</td>
-      ${st==="CA"?`<td>${r.retirement_year??""}</td>`:""}
+      ${(isPen||isSep)?`<td>${retCell}</td>`:""}
       <td class="links">${findLinks(nm,geo)}</td></tr>`;}).join("")+"</tbody></table>";
 }
 $("go").addEventListener("click",()=>{page=0;run();});
@@ -231,7 +273,7 @@ $("next").addEventListener("click",()=>{page++;run();});
 document.querySelectorAll(".presets button").forEach(b=>b.addEventListener("click",()=>{
   const p=b.dataset.preset;
   ["f-name","f-yrs","f-amt","f-ry1","f-ry2"].forEach(i=>$(i).value="");
-  $("f-sys").value="";$("f-county").value="";fillDistricts();$("f-dist").value="";
+  $("f-sys").value="";$("f-county").value="";fillDistricts();$("f-dist").value="";$("f-org").value="";
   if(p==="wa-window"){$("f-state").value="WA";$("f-yrs").value=25;$("f-sort").value="years_service.desc";}
   if(p==="ca-fresh"){$("f-state").value="CA";$("f-ry1").value=2022;$("f-ry2").value=2024;$("f-sort").value="retirement_year.desc";}
   if(p==="ca-big"){$("f-state").value="CA";$("f-amt").value=100000;$("f-sort").value="amount.desc";}
