@@ -81,7 +81,7 @@ const SUPABASE_ANON_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYm
 const db=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
 const fmt=n=>n==null?"–":Number(n).toLocaleString("en-US");
 (async()=>{
-  const t=await db.from("tc_records").select("id",{count:"estimated",head:true});
+  const t=await db.from("tc_records").select("id",{count:"exact",head:true});
   document.getElementById("c-tc").textContent=fmt(t.count);
   const b=await db.from("board_retirements").select("id",{count:"exact",head:true});
   document.getElementById("c-board").textContent=fmt(b.count);

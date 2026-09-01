@@ -111,7 +111,7 @@ $("f-state").addEventListener("change",()=>{stateUI();});
 stateUI();
 function buildQuery(head){
   const st=$("f-state").value, ds=st==="CA"?"pension":"salary";
-  let q=db.from("tc_records").select(head?"id":"*",head?{count:"estimated",head:true}:{count:"estimated"});
+  let q=db.from("tc_records").select(head?"id":"*",head?{count:"exact",head:true}:{count:"exact"});
   q=q.eq("state",st).eq("dataset",ds);
   const nm=$("f-name").value.trim(); if(nm)q=q.ilike("person_name","%"+nm+"%");
   const emp=$("f-emp").value.trim(); if(emp)q=q.or(`employer.ilike.%${emp}%,system_name.ilike.%${emp}%`);
@@ -129,7 +129,7 @@ async function run(){
   const {data,count,error}=await buildQuery(false);
   if(error){$("results").innerHTML='<div class="empty">Query error: '+esc(error.message)+'</div>';return;}
   $("count").textContent=(count??0).toLocaleString();
-  $("countcap").textContent="matching records (estimated)";
+  $("countcap").textContent="matching records";
   $("pageinfo").textContent="Page "+(page+1);
   $("prev").disabled=page===0; $("next").disabled=!data||data.length<PAGE;
   if(!data||!data.length){$("results").innerHTML='<div class="empty">No matches. Loosen a filter.</div>';return;}
