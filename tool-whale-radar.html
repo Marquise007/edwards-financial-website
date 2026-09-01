@@ -125,7 +125,11 @@ main{max-width:1280px; margin:0 auto; padding:0 24px 60px;}
   background:#eef2ec; color:var(--green); border:1px solid #d5e2d3;
 }
 .flag.db{background:#fdf6e6; color:#8a6d13; border-color:#ecd9a2;}
-.contact{font-size:.85rem; color:var(--ink); margin-bottom:10px; line-height:1.5;}
+.contact{font-size:.85rem; color:var(--ink); margin-bottom:10px; line-height:1.6;}
+.owner{font-weight:700; color:var(--navy);}
+.owner.hi{color:var(--green);}
+.unconf{font-size:.62rem; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); border:1px solid var(--line); border-radius:3px; padding:1px 5px; margin-left:5px;}
+.noowner{color:var(--muted); font-style:italic;}
 .contact .mi{float:right; color:var(--muted); font-size:.75rem;}
 .actions{display:flex; gap:6px; flex-wrap:wrap;}
 .abtn{
@@ -206,6 +210,7 @@ footer.tool .fpuo{
       <button class="chip" data-f="dbcb">DB / cash balance only</button>
       <button class="chip" data-f="cpa">CPA firms</button>
       <button class="chip" data-f="prof">Professional practices</button>
+      <button class="chip" data-f="hasowner">Owner identified</button>
       <button class="chip" data-f="hideworked">Hide worked</button>
     </div>
 
@@ -257,7 +262,7 @@ const esc = (s) => (s == null ? "" : String(s)
 
 let session = null, rows = [], view = [], map = null, layer = null, origin = null;
 let radius = 25;
-const filters = { dbcb:false, cpa:false, prof:false, hideworked:false };
+const filters = { dbcb:false, cpa:false, prof:false, hasowner:false, hideworked:false };
 
 /* ---------- auth ---------- */
 async function boot(){
@@ -332,6 +337,7 @@ function applyView(){
     (!filters.dbcb || r.is_db || r.is_cash_balance) &&
     (!filters.cpa || r.is_cpa) &&
     (!filters.prof || r.is_professional) &&
+    (!filters.hasowner || !!r.owner_name) &&
     (!filters.hideworked || !r.worked_at)
   );
   const s = $("sortSel").value;
@@ -339,17 +345,21 @@ function applyView(){
     : s === "per" ? (b.assets_per_active||0)-(a.assets_per_active||0)
     : s === "distance" ? (a.distance_mi||9e9)-(b.distance_mi||9e9)
     : (b.score||0)-(a.score||0));
-  renderMap(); renderCards();
+  $("results").classList.remove("hidden");
+  renderCards();
+  try { renderMap(); }
+  catch (e) { console.error("Whale Radar: map render failed, list unaffected.", e); }
 }
 
 /* ---------- map ---------- */
 function renderMap(){
-  $("results").classList.remove("hidden");
   if (!map){
     map = L.map("map", { scrollWheelZoom: true });
     L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png",
       { maxZoom: 18, attribution: "&copy; OpenStreetMap contributors" }).addTo(map);
   }
+  map.setView([origin.lat, origin.lng], radius >= 50 ? 9 : radius >= 25 ? 10 : 11);
+  map.invalidateSize();
   if (layer) layer.remove();
   layer = L.layerGroup().addTo(map);
   const circle = L.circle([origin.lat, origin.lng], {
@@ -364,7 +374,8 @@ function renderMap(){
       .bindTooltip(esc(r.sponsor_name) + " \u00b7 " + money(Number(r.tot_assets_eoy)))
       .addTo(layer);
   });
-  map.fitBounds(circle.getBounds(), { padding: [16, 16] });
+  try { map.fitBounds(circle.getBounds(), { padding: [16, 16] }); }
+  catch (_e) { /* container not measurable yet; setView above already framed it */ }
 }
 
 /* ---------- cards ---------- */
@@ -385,10 +396,13 @@ function renderCards(){
         cell("Bus. code", esc(r.business_code) || "\u2013") +
       '</div>' +
       flagsHtml(r) +
-      '<div class="contact"><span class="mi">' + (r.distance_mi != null ? r.distance_mi.toFixed(1) + " mi" : "") + '</span>' +
-        (r.phone ? "\u260e " + esc(r.phone) + " \u00b7 " : "") + esc(r.signer_name || "") + '</div>' +
+      '<div class="contact"><span class="mi">' + (r.distance_mi != null ? Number(r.distance_mi).toFixed(1) + " mi" : "") + '</span>' +
+        ownerHtml(r) +
+        (r.phone ? '<br>\u260e ' + esc(r.phone) : "") +
+        (r.signer_name ? ' \u00b7 signed ' + esc(r.signer_name) : "") + '</div>' +
       '<div class="actions">' +
         (r.phone ? '<button class="abtn" data-copy="' + esc(r.phone) + '">Copy phone</button>' : "") +
+        (r.owner_name ? '<button class="abtn" data-copy="' + esc(r.owner_name) + '">Copy owner</button>' : "") +
         '<button class="abtn" data-copy="' + esc(r.ein) + '">Copy EIN</button>' +
         '<button class="abtn" data-copy="' + esc(r.ack_id) + '">Copy ACK_ID</button>' +
         '<a class="abtn" href="https://www.efast.dol.gov/5500Search/" target="_blank" rel="noopener">EFAST2 \u2197</a>' +
@@ -404,6 +418,13 @@ function renderCards(){
     setTimeout(() => renderCards(), 900);
   });
   box.querySelectorAll("[data-work]").forEach(b => b.onclick = () => markWorked(b.dataset.work));
+}
+function ownerHtml(r){
+  if (!r.owner_name) return '<span class="noowner">Owner not identified</span>';
+  const cred = r.owner_credential ? ", " + esc(r.owner_credential) : "";
+  const hi = r.owner_confidence === "high";
+  return '<span class="owner' + (hi ? " hi" : "") + '">' + esc(r.owner_name) + cred + '</span>' +
+         (hi ? "" : '<span class="unconf">unconfirmed</span>');
 }
 function cell(k, v){ return '<div class="cell"><div class="k">' + k + '</div><div class="v">' + v + '</div></div>'; }
 function flagsHtml(r){
@@ -431,6 +452,7 @@ async function markWorked(ackId){
 /* ---------- csv ---------- */
 $("csvBtn").onclick = () => {
   const cols = ["score","sponsor_name","plan_name","city","state","zip5","phone","signer_name",
+                "owner_name","owner_credential","owner_confidence",
                 "tot_assets_eoy","active_participants","assets_per_active","business_code",
                 "pension_codes","is_db","is_cash_balance","is_cpa","ein","plan_num","ack_id","distance_mi","worked_at"];
   const lines = [cols.join(",")].concat(view.map(r => cols.map(c => {
