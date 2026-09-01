@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Prospecting · The Triangulation Stack · Edwards Financial &amp; Associates</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#0d1e3a; --navy-soft:#1c3055; --gold:#b8972e; --gold-tint:#e8dcc2;
+    --cream:#f7f5f1; --cream-deep:#efece4; --ink:#22262e; --ink-soft:#4c545f;
+    --rule:#d8cfbb; --line:#e3ddd0; --muted:#5b6473; --red:#a32b2b; --green:#2a6248;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'DM Sans',sans-serif;color:var(--ink);background:var(--cream);
+       font-variant-numeric:lining-nums tabular-nums;font-feature-settings:"lnum" 1,"tnum" 1}
+  a{color:var(--navy)}
+  .hidden{display:none !important;}
+
+  .portal-strip{
+    background:var(--navy); color:#fff; padding:10px 24px; font-size:.8rem;
+    letter-spacing:.08em; display:flex; justify-content:space-between; align-items:center;
+  }
+  .portal-strip a{color:#fff; text-decoration:none;}
+  .portal-strip a:hover{color:var(--gold);}
+  .portal-strip .who{color:#c9d2e2; font-size:.75rem;}
+  .portal-strip .who button{
+    background:none; border:1px solid #43506a; color:#c9d2e2; border-radius:4px;
+    padding:2px 10px; margin-left:10px; cursor:pointer; font-family:inherit; font-size:.72rem;
+  }
+
+  header.hero{background:var(--navy);color:#fff;padding:56px 6vw 40px;border-bottom:4px solid var(--gold)}
+  .goldmark{width:72px;height:3px;background:var(--gold);margin-bottom:14px}
+  .eyebrow{font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold-tint);font-weight:500}
+  h1{font-family:'Cormorant Garamond',serif;font-weight:700;font-size:clamp(34px,4.5vw,52px);line-height:1.04;margin-top:10px}
+  h1 em{font-style:normal;color:var(--gold)}
+  .deck{margin-top:12px;max-width:720px;font-size:15px;line-height:1.55;color:#d4dae5}
+
+  main{padding:36px 6vw 72px;max-width:1240px;margin:0 auto}
+  section{margin-bottom:44px}
+  h2{font-family:'DM Sans',sans-serif;font-weight:700;font-size:13px;letter-spacing:.16em;
+     text-transform:uppercase;color:var(--gold);border-top:1px solid var(--rule);padding-top:12px;margin-bottom:14px}
+
+  .btn{border:none; border-radius:6px; padding:11px 22px; cursor:pointer; font-family:inherit;
+       font-weight:700; font-size:.85rem; letter-spacing:.06em;}
+  .btn.gold{background:var(--gold); color:#fff;}
+  .btn.gold:hover{background:#a3841f;}
+
+  #authCard{
+    max-width:420px; margin:40px auto; background:#fff; border:1px solid var(--line);
+    border-radius:10px; padding:30px; box-shadow:0 8px 30px rgba(13,30,58,.08);
+  }
+  #authCard h2{font-family:'Cormorant Garamond',serif; font-size:1.5rem; color:var(--navy);
+               border-top:none; padding-top:0; letter-spacing:normal; text-transform:none; margin-bottom:6px;}
+  #authCard p{color:var(--muted); font-size:.85rem; margin-bottom:18px;}
+  #authCard label{display:block; font-size:.72rem; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); margin:12px 0 4px;}
+  #authCard input{
+    width:100%; display:block; padding:10px 12px; border:1px solid var(--line); border-radius:6px;
+    font-family:inherit; font-size:.95rem; background:#fdfcf9;
+  }
+  #authErr{color:var(--red); font-size:.82rem; margin-top:10px; display:none;}
+
+  .digest{background:#fff;border-left:5px solid var(--gold);padding:22px 26px;box-shadow:0 1px 3px rgba(13,30,58,.06)}
+  .digest h3{font-family:'Cormorant Garamond',serif;font-size:24px;color:var(--navy);font-weight:700;margin-bottom:6px}
+  .digest .meta{font-size:12px;color:var(--ink-soft);letter-spacing:.06em;text-transform:uppercase;margin-bottom:12px}
+  .digest .counts{display:flex;gap:28px;flex-wrap:wrap;margin-bottom:14px}
+  .digest .counts div{text-align:center}
+  .digest .counts .num{font-family:'Cormorant Garamond',serif;font-weight:700;font-size:34px;color:var(--navy);line-height:1}
+  .digest .counts .cap{font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);font-weight:700;margin-top:5px}
+  .digest .body{font-size:14px;line-height:1.55}
+  .digest .body table{margin-top:10px}
+
+  .tablewrap{overflow-x:auto}
+  table{width:100%;border-collapse:collapse;background:#fff;box-shadow:0 1px 3px rgba(13,30,58,.06)}
+  thead th{background:var(--navy);color:#fff;font-size:11px;font-weight:700;letter-spacing:.08em;
+           text-transform:uppercase;text-align:left;padding:11px 14px;line-height:1.25}
+  tbody td{font-size:13.5px;padding:10px 14px;border-bottom:1px solid var(--rule);line-height:1.35;vertical-align:top}
+  tbody tr:nth-child(even) td{background:var(--cream)}
+  td.name{font-weight:700;color:var(--navy)}
+  td.money{font-weight:500;white-space:nowrap}
+  .pill{display:inline-block;font-size:10.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;
+        padding:3px 9px;border:1px solid var(--gold-tint);background:var(--cream);color:var(--gold);border-radius:2px}
+  .pill.new{border-color:var(--gold);color:var(--navy);background:#fdf7e8}
+  .links a{display:inline-block;margin-right:10px;font-size:12.5px;font-weight:500;text-decoration:none;
+           border-bottom:1px solid var(--gold);padding-bottom:1px;white-space:nowrap}
+  .empty{background:#fff;border:1px dashed var(--rule);padding:26px;text-align:center;
+         font-size:14px;color:var(--ink-soft)}
+  .srcstrip{display:flex;gap:14px;flex-wrap:wrap}
+  .src{background:#fff;border-top:3px solid var(--gold);padding:14px 16px;flex:1 1 210px;box-shadow:0 1px 3px rgba(13,30,58,.06)}
+  .src .t{font-weight:700;color:var(--navy);font-size:13.5px;line-height:1.3}
+  .src .s{font-size:12px;color:var(--ink-soft);margin-top:4px}
+  .srcnote{font-size:12px;color:var(--ink-soft);margin-bottom:12px}
+
+  footer.tool{
+    max-width:1240px; margin:30px auto 0; padding:20px 6vw 40px; border-top:1px solid var(--line);
+    font-size:.72rem; color:var(--muted); line-height:1.6;
+  }
+  footer.tool .fpuo{
+    font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--navy); margin-bottom:6px;
+  }
+  @media (max-width:720px){ thead{display:none} tbody td{display:block;border-bottom:none}
+    tbody tr{display:block;border-bottom:1px solid var(--rule);padding:8px 0} }
+</style>
+</head>
+<body>
+
+<div class="portal-strip">
+  <a href="/portal-partner-dashboard">&#8249; Back to Partner Portal</a>
+  <span class="who" id="whoami"></span>
+</div>
+
+<header class="hero">
+  <div class="goldmark"></div>
+  <div class="eyebrow">Partner Access · Internal</div>
+  <h1>Prospecting <em>· The Triangulation Stack</em></h1>
+  <p class="deck">Named individuals with an open retirement decision window, assembled each morning from
+     public board personnel reports, Transparent California records, and California WARN filings.
+     Review here, finish in Sales Navigator, push to the CRM.</p>
+</header>
+
+<main>
+
+  <!-- AUTH -->
+  <section id="authCard">
+    <h2>Partner sign in</h2>
+    <p>This instrument is for appointed partners of Edwards Financial &amp; Associates. Sign in with your Daily Desk account.</p>
+    <label for="authEmail">Email</label>
+    <input type="text" id="authEmail" autocomplete="username">
+    <label for="authPass">Password</label>
+    <input type="password" id="authPass" autocomplete="current-password">
+    <div id="authErr"></div>
+    <div style="margin-top:18px"><button class="btn gold" id="authBtn">Sign in</button></div>
+  </section>
+
+  <!-- TOOL -->
+  <div id="tool" class="hidden">
+
+    <section id="digest-section">
+      <h2>Morning Digest</h2>
+      <div id="digest" class="empty">Loading&hellip;</div>
+    </section>
+
+    <section>
+      <h2>New Names · Board Personnel Reports</h2>
+      <div id="names-wrap"><div class="empty">Loading&hellip;</div></div>
+    </section>
+
+    <section>
+      <h2>WARN Tracker · Latest Report</h2>
+      <div id="warn-wrap"><div class="empty">Loading&hellip;</div></div>
+    </section>
+
+    <section>
+      <h2>Source Roster</h2>
+      <div class="srcnote" id="src-note"></div>
+      <div id="src-wrap" class="srcstrip"><div class="empty" style="flex:1">Loading&hellip;</div></div>
+    </section>
+
+  </div>
+
+</main>
+
+<footer class="tool">
+  <div class="fpuo">For financial professional use only. Not for use with or distribution to the public.</div>
+  Every name shown is drawn from public records &mdash; district board personnel reports, Transparent California
+  compensation and pension records, and California EDD WARN filings &mdash; and is reproduced as published by the
+  source agency. Figures are as reported and are not verified by Edwards Financial &amp; Associates. Nothing here is
+  an assertion about any individual&rsquo;s finances, employment status, or intentions. This is a research and
+  prospecting tool for licensed professionals, who remain responsible for their own solicitation, do-not-call,
+  privacy, and regulatory compliance.<br>
+  Edwards Financial &amp; Associates &middot; Life &amp; Annuities &middot; Retirement Consulting &middot; Estate Strategy
+  &middot; CA Insurance License #0G52544 &middot; NPN #13411537 &middot; Triangulation Stack &middot; v1.0
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+"use strict";
+const SUPABASE_URL = "https://rybnzvlogmbjlgdziswj.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ5Ym56dmxvZ21iamxnZHppc3dqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0NjE3MjgsImV4cCI6MjA5NjAzNzcyOH0.m7oH-z4yI1AbchocncJU2TB7SawyijiXsTbcz3slwn0";
+const db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+const $ = (id) => document.getElementById(id);
+const fmtMoney = v => v == null ? "" : "$" + Number(v).toLocaleString("en-US", {maximumFractionDigits:0});
+const fmtDate  = v => v == null ? "" : new Date(v + "T00:00:00").toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"});
+const esc = s => (s ?? "").toString().replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+
+let session = null, loaded = false;
+
+/* ---------- auth ---------- */
+async function boot(){
+  const { data } = await db.auth.getSession();
+  session = data.session;
+  if (!session){
+    const ref = await db.auth.refreshSession();
+    session = ref.data ? ref.data.session : null;
+  }
+  session ? showTool() : showAuth();
+  db.auth.onAuthStateChange((_e, s) => { session = s; s ? showTool() : showAuth(); });
+}
+function showAuth(){
+  $("authCard").classList.remove("hidden");
+  $("tool").classList.add("hidden");
+  $("whoami").innerHTML = "";
+}
+function showTool(){
+  $("authCard").classList.add("hidden");
+  $("tool").classList.remove("hidden");
+  $("whoami").innerHTML = esc(session.user.email) + ' <button id="outBtn">Sign out</button>';
+  $("outBtn").onclick = async () => { await db.auth.signOut(); };
+  if (!loaded){ loaded = true; loadDigest(); loadNames(); loadWarn(); loadSources(); }
+}
+$("authBtn").onclick = async () => {
+  $("authErr").style.display = "none";
+  const { error } = await db.auth.signInWithPassword({
+    email: $("authEmail").value.trim(), password: $("authPass").value
+  });
+  if (error){ $("authErr").textContent = "Sign in failed: " + error.message; $("authErr").style.display = "block"; }
+};
+$("authPass").addEventListener("keydown", (e) => { if (e.key === "Enter") $("authBtn").click(); });
+
+/* ---------- panels ---------- */
+function fail(el, what, error){
+  el.className = "empty";
+  el.textContent = "Could not load " + what + ": " + (error && error.message ? error.message : "unknown error");
+}
+
+async function loadDigest(){
+  const el = $("digest");
+  const {data, error} = await db.from("prospecting_digests").select("*").order("digest_date",{ascending:false}).limit(1);
+  if (error) return fail(el, "the digest", error);
+  if(!data || !data.length){ el.textContent = "No digest yet. First scheduled run will populate this."; return; }
+  const d = data[0], c = d.counts || {};
+  el.className = "digest";
+  el.innerHTML = `<h3>${esc(d.headline || "Morning digest")}</h3>
+    <div class="meta">${fmtDate(d.digest_date)} &middot; ${esc(d.kind).replace(/_/g," ")}</div>
+    <div class="counts">
+      <div><div class="num">${c.new_names ?? 0}</div><div class="cap">New names</div></div>
+      <div><div class="num">${c.tc_matches ?? 0}</div><div class="cap">TC matched</div></div>
+      <div><div class="num">${c.warn_companies ?? 0}</div><div class="cap">WARN companies</div></div>
+    </div>
+    <div class="body">${d.body_html || ""}</div>`;
+}
+
+async function loadNames(){
+  const el = $("names-wrap");
+  const {data, error} = await db.from("board_retirements").select("*")
+    .in("status",["new","reviewed"]).order("created_at",{ascending:false}).limit(100);
+  if (error) return fail(el, "board retirements", error);
+  if(!data || !data.length){ el.innerHTML = '<div class="empty">No names yet. The daily board sweep fills this table.</div>'; return; }
+  el.innerHTML = `<div class="tablewrap"><table><thead><tr>
+      <th>Name</th><th>Employer</th><th>County</th><th>Effective</th><th>System</th>
+      <th>TC Salary</th><th>TC Pension</th><th>Find</th><th>Status</th>
+    </tr></thead><tbody>` + data.map(r => `<tr>
+      <td class="name">${esc(r.person_name)}</td>
+      <td>${esc(r.employer)}${r.doc_url ? ` <a href="${esc(r.doc_url)}" target="_blank" rel="noopener" title="Source document">&#128196;</a>` : ""}</td>
+      <td>${esc(r.county ?? "")}</td>
+      <td>${fmtDate(r.effective_date)}</td>
+      <td>${esc(r.pension_system ?? "")}</td>
+      <td class="money">${fmtMoney(r.tc_salary)}</td>
+      <td class="money">${fmtMoney(r.tc_pension)}</td>
+      <td class="links">
+        ${r.li_search_url ? `<a href="${esc(r.li_search_url)}" target="_blank" rel="noopener">LinkedIn</a>` : ""}
+        ${r.fb_search_url ? `<a href="${esc(r.fb_search_url)}" target="_blank" rel="noopener">Facebook</a>` : ""}
+        ${r.ig_search_url ? `<a href="${esc(r.ig_search_url)}" target="_blank" rel="noopener">IG</a>` : ""}
+      </td>
+      <td><span class="pill ${r.status === "new" ? "new" : ""}">${esc(r.status)}</span></td>
+    </tr>`).join("") + "</tbody></table></div>";
+}
+
+async function loadWarn(){
+  const el = $("warn-wrap");
+  const {data: latest, error: e1} = await db.from("warn_notices").select("report_date").order("report_date",{ascending:false}).limit(1);
+  if (e1) return fail(el, "WARN notices", e1);
+  if(!latest || !latest.length){ el.innerHTML = '<div class="empty">No WARN rows yet. The Tuesday/Thursday task fills this table.</div>'; return; }
+  const {data, error} = await db.from("warn_notices").select("*").eq("report_date", latest[0].report_date)
+    .order("employees_affected",{ascending:false}).limit(200);
+  if (error) return fail(el, "WARN notices", error);
+  el.innerHTML = `<div class="tablewrap"><table><thead><tr>
+      <th>Company</th><th>City</th><th>County</th><th>Affected</th><th>Type</th><th>Effective</th><th>Find</th>
+    </tr></thead><tbody>` + data.map(r => `<tr>
+      <td class="name">${esc(r.company)}</td>
+      <td>${esc(r.location_city ?? "")}</td>
+      <td>${esc(r.county ?? "")}</td>
+      <td class="money">${r.employees_affected ?? ""}</td>
+      <td>${esc(r.layoff_type ?? "")}</td>
+      <td>${fmtDate(r.effective_date)}</td>
+      <td class="links">
+        ${r.li_search_url ? `<a href="${esc(r.li_search_url)}" target="_blank" rel="noopener">LinkedIn</a>` : ""}
+        ${r.fb_search_url ? `<a href="${esc(r.fb_search_url)}" target="_blank" rel="noopener">Facebook</a>` : ""}
+      </td>
+    </tr>`).join("") + "</tbody></table></div>";
+}
+
+async function loadSources(){
+  const el = $("src-wrap");
+  const {count} = await db.from("prospecting_sources").select("*",{count:"exact",head:true}).eq("active", true);
+  const {data, error} = await db.from("prospecting_sources").select("name,layer,county,tier,last_swept_at,active")
+    .eq("active", true)
+    .order("tier").order("last_swept_at",{ascending:true,nullsFirst:true}).order("name")
+    .limit(60);
+  if (error) return fail(el, "the source roster", error);
+  if(!data || !data.length){ el.innerHTML = '<div class="empty" style="flex:1">No sources.</div>'; return; }
+  $("src-note").textContent = count
+    ? "Showing the " + data.length + " sources next in line to be swept, of " + count.toLocaleString("en-US") +
+      " active. Tier 1 (Los Angeles, Orange, San Diego) goes first, then longest-unswept."
+    : "";
+  el.innerHTML = data.map(s => `<div class="src">
+      <div class="t">${esc(s.name)}</div>
+      <div class="s">Layer ${s.layer}${s.county ? " &middot; " + esc(s.county) : ""} &middot; Tier ${s.tier}
+      ${s.last_swept_at ? " &middot; swept " + new Date(s.last_swept_at).toLocaleDateString() : " &middot; not yet swept"}</div>
+    </div>`).join("");
+}
+
+boot();
+</script>
+</body>
+</html>
