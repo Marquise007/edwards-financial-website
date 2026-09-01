@@ -22,16 +22,20 @@ main{padding:26px 6vw 72px;max-width:1360px;margin:0 auto}
 .presets button{font-family:'DM Sans',sans-serif;font-size:12.5px;font-weight:700;letter-spacing:.04em;color:var(--navy);
   background:#fff;border:1px solid var(--gold);padding:9px 14px;cursor:pointer;border-radius:2px}
 .presets button:hover{background:var(--gold);color:#fff}
-.filters{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;background:#fff;
-  padding:18px;border-top:4px solid var(--gold);box-shadow:0 1px 3px rgba(13,30,58,.08);margin-bottom:18px}
-.filters label{font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);font-weight:700;display:block;margin-bottom:5px}
-.filters input,.filters select{width:100%;font-family:'DM Sans',sans-serif;font-size:13.5px;padding:8px 10px;border:1px solid var(--rule);border-radius:2px;background:var(--cream)}
-.filters .go{align-self:end}
-.filters .go button{width:100%;font-family:'DM Sans',sans-serif;font-size:13.5px;font-weight:700;background:var(--navy);color:#fff;border:none;padding:10px;cursor:pointer;border-radius:2px}
+.filters{display:grid;grid-template-columns:repeat(auto-fill,minmax(172px,1fr));gap:14px;background:#fff;
+  padding:18px;border-top:4px solid var(--gold);box-shadow:0 1px 3px rgba(13,30,58,.08);margin-bottom:18px;align-items:end}
+.cell label{font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);font-weight:700;
+  display:block;margin-bottom:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cell input,.cell select{width:100%;height:40px;font-family:'DM Sans',sans-serif;font-size:13.5px;
+  padding:0 10px;border:1px solid var(--rule);border-radius:2px;background:var(--cream)}
+.cell .pair{display:flex;gap:6px}
+.cell .pair input{width:50%}
+.cell button#go{width:100%;height:40px;font-family:'DM Sans',sans-serif;font-size:13.5px;font-weight:700;
+  background:var(--navy);color:#fff;border:none;cursor:pointer;border-radius:2px}
 .resmeta{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px;font-size:13px;color:var(--ink-soft)}
 .resmeta b{font-family:'Cormorant Garamond',serif;font-size:20px;color:var(--navy)}
 table{width:100%;border-collapse:collapse;background:#fff;box-shadow:0 1px 3px rgba(13,30,58,.06)}
-thead th{background:var(--navy);color:#fff;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;text-align:left;padding:11px 13px;position:sticky;top:0}
+thead th{background:var(--navy);color:#fff;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;text-align:left;padding:11px 13px}
 tbody td{font-size:13.5px;padding:9px 13px;border-bottom:1px solid var(--rule);vertical-align:top}
 tbody tr:nth-child(even) td{background:var(--cream)}
 td.nm{font-weight:700;color:var(--navy);white-space:nowrap}
@@ -53,41 +57,47 @@ td.money,td.num{white-space:nowrap;text-align:right}
 </header>
 <main>
   <div class="presets">
-    <button data-preset="wa-window">WA · Retirement window (25+ yrs, still working)</button>
+    <button data-preset="wa-window">WA · Retirement window (25+ yrs)</button>
     <button data-preset="ca-fresh">CA · Fresh retirees (2022&ndash;2024)</button>
     <button data-preset="ca-big">CA · $100K+ pensions</button>
     <button data-preset="calstrs">CalSTRS only</button>
   </div>
   <div class="filters">
-    <div><label>State / Dataset</label>
+    <div class="cell"><label>State / Dataset</label>
       <select id="f-state">
-        <option value="WA">WA · School personnel (working)</option>
+        <option value="WA">WA · School employees</option>
         <option value="CA">CA · Pension retirees</option>
       </select></div>
-    <div><label>Name contains</label><input id="f-name" placeholder="last or first name"></div>
-    <div><label>Employer / System contains</label><input id="f-emp" placeholder="district, CalSTRS, LACERA&hellip;"></div>
-    <div><label>Min service years</label><input id="f-yrs" type="number" min="0" step="1" placeholder="e.g. 25"></div>
-    <div><label>Min amount ($)</label><input id="f-amt" type="number" min="0" step="1000" placeholder="salary or pension"></div>
-    <div id="wrap-retyr"><label>Retired between</label>
-      <div style="display:flex;gap:6px">
-        <input id="f-ry1" type="number" placeholder="2016" style="width:50%">
-        <input id="f-ry2" type="number" placeholder="2024" style="width:50%">
-      </div></div>
-    <div><label>Sort by</label>
+    <div class="cell"><label>Name contains</label><input id="f-name" placeholder="last or first name"></div>
+    <div class="cell" id="wrap-sys" style="display:none"><label>System</label>
+      <select id="f-sys"><option value="">All systems</option></select></div>
+    <div class="cell" id="wrap-county"><label>County</label>
+      <select id="f-county"><option value="">All counties</option></select></div>
+    <div class="cell" id="wrap-dist"><label>District</label>
+      <select id="f-dist"><option value="">All districts</option></select></div>
+    <div class="cell"><label>Min service years</label><input id="f-yrs" type="number" min="0" step="1" placeholder="e.g. 25"></div>
+    <div class="cell"><label>Min amount ($)</label><input id="f-amt" type="number" min="0" step="1000" placeholder="salary / pension"></div>
+    <div class="cell" id="wrap-retyr" style="display:none"><label>Retired between</label>
+      <div class="pair"><input id="f-ry1" type="number" placeholder="2016"><input id="f-ry2" type="number" placeholder="2024"></div></div>
+    <div class="cell"><label>Sort by</label>
       <select id="f-sort">
         <option value="years_service.desc">Service years ↓</option>
         <option value="amount.desc">Amount ↓</option>
         <option value="retirement_year.desc">Retirement year ↓</option>
         <option value="person_name.asc">Name A&ndash;Z</option>
       </select></div>
-    <div class="go"><button id="go">Search</button></div>
+    <div class="cell"><label>&nbsp;</label><button id="go">Search</button></div>
   </div>
   <div class="resmeta"><div><b id="count">&nbsp;</b> <span id="countcap"></span></div><div id="pageinfo"></div></div>
   <div id="results"><div class="empty">Pick a preset or set filters and hit Search.</div></div>
   <div class="pager"><button id="prev" disabled>&larr; Prev</button><button id="next" disabled>Next &rarr;</button></div>
-  <p class="note">CA pension records: system-level only (no last employer on file for most rows); CalPERS coverage spans retirement
-     years 2016&ndash;2024. WA records: school district personnel with salary and experience years; names are shown Last, First
-     as filed. Find links open pre-built searches — confirm identity in Sales Navigator before any outreach.</p>
+  <p class="note" id="note-wa">WA records are current school district personnel with salary and experience years — Washington
+     publishes no statewide name-level retiree roll, so the play is reaching 25+ year staff while the retirement
+     decision is still ahead of them. County covers 303 of 326 employers; charter and tribal compact schools carry
+     no county and appear only under All counties. Find links open name + city searches — confirm identity before outreach.</p>
+  <p class="note" id="note-ca" style="display:none">CA pension records are system-level: no last employer or city on file
+     for most rows, so find links pair the name with California. CalPERS coverage spans retirement years 2016&ndash;2024.
+     Confirm identity before outreach.</p>
 </main>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
@@ -95,38 +105,96 @@ const SUPABASE_URL="https://rybnzvlogmbjlgdziswj.supabase.co";
 const SUPABASE_ANON_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ5Ym56dmxvZ21iamxnZHppc3dqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0NjE3MjgsImV4cCI6MjA5NjAzNzcyOH0.m7oH-z4yI1AbchocncJU2TB7SawyijiXsTbcz3slwn0";
 const db=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
 const PAGE=50; let page=0;
+let OPT={systems:[],districts:[],counties:[]};
 const $=id=>document.getElementById(id);
 const esc=s=>(s??"").toString().replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const fmtM=v=>v==null?"":"$"+Number(v).toLocaleString("en-US",{maximumFractionDigits:0});
 const enc=encodeURIComponent;
-function displayName(n,st){ if(st==="WA"&&n&&n.includes(",")){const[a,b]=n.split(",");return (b||"").trim()+" "+a.trim();} return n; }
-function findLinks(nm,emp,sys){
-  const q=`"${nm}"`+(emp?` "${emp}"`:sys?` "${sys}"`:"");
-  return `<a target="_blank" rel="noopener" href="https://www.linkedin.com/search/results/people/?keywords=${enc(q)}">LinkedIn</a>
-          <a target="_blank" rel="noopener" href="https://www.facebook.com/search/people/?q=${enc(nm+" "+(emp||sys||""))}">Facebook</a>
-          <a target="_blank" rel="noopener" href="https://www.google.com/search?q=${enc(q)}">Google</a>`;
+
+function displayName(n,st){ if(st==="WA"&&n&&n.includes(",")){const[a,b]=n.split(",");return((b||"").trim()+" "+a.trim()).trim();} return n||""; }
+/* District -> city: strip the district-y words; "Seattle School District No. 1" -> "Seattle" */
+function cityFromDistrict(d){
+  if(!d)return"";
+  let c=d.replace(/\(.*?\)/g,"")
+         .replace(/#\s*\d+/g,"")
+         .replace(/\b(Public Schools|School District|Schools|SD|No\.?\s*\d+|\d+)\b/gi,"")
+         .replace(/\s+/g," ").trim();
+  return c;
 }
-function stateUI(){ $("wrap-retyr").style.display = $("f-state").value==="CA"?"block":"none"; }
-$("f-state").addEventListener("change",()=>{stateUI();});
+function findLinks(nm,geo){
+  const g=geo||"";
+  return `<a target="_blank" rel="noopener" href="https://www.linkedin.com/search/results/people/?keywords=${enc('"'+nm+'" '+g)}">LinkedIn</a>
+          <a target="_blank" rel="noopener" href="https://www.facebook.com/search/people/?q=${enc(nm+" "+g)}">Facebook</a>
+          <a target="_blank" rel="noopener" href="https://www.google.com/search?q=${enc((nm+" "+g+" instagram").toLowerCase())}">IG</a>`;
+}
+
+function stateUI(){
+  const ca=$("f-state").value==="CA";
+  $("wrap-sys").style.display=ca?"block":"none";
+  $("wrap-retyr").style.display=ca?"block":"none";
+  $("wrap-county").style.display=ca?"none":"block";
+  $("wrap-dist").style.display=ca?"none":"block";
+  $("note-ca").style.display=ca?"block":"none";
+  $("note-wa").style.display=ca?"none":"block";
+}
+function fillDistricts(){
+  const cty=$("f-county").value;
+  const list=OPT.districts.filter(d=>!cty||d.county===cty);
+  $("f-dist").innerHTML='<option value="">All districts</option>'+
+    list.map(d=>`<option value="${esc(d.value)}">${esc(d.value)}</option>`).join("");
+}
+async function loadOptions(){
+  const {data,error}=await db.from("tc_filter_options").select("state,kind,value,county,cnt").order("value");
+  if(error||!data)return;
+  OPT.systems=data.filter(r=>r.kind==="system");
+  OPT.districts=data.filter(r=>r.kind==="district");
+  OPT.counties=data.filter(r=>r.kind==="county").sort((a,b)=>b.cnt-a.cnt);
+  $("f-sys").innerHTML='<option value="">All systems</option>'+
+    OPT.systems.map(s=>`<option value="${esc(s.value)}">${esc(s.value)} (${Number(s.cnt).toLocaleString()})</option>`).join("");
+  $("f-county").innerHTML='<option value="">All counties</option>'+
+    OPT.counties.map(c=>`<option value="${esc(c.value)}">${esc(c.value)} (${Number(c.cnt).toLocaleString()})</option>`).join("");
+  fillDistricts();
+}
+$("f-state").addEventListener("change",stateUI);
+$("f-county").addEventListener("change",fillDistricts);
 stateUI();
+loadOptions();
+
+/* Rows and the total are fetched as two parallel requests on purpose.
+   Asking PostgREST for count=exact *and* an ORDER BY in one request makes it
+   materialise the whole sorted set to count it, which defeats the top-N sort:
+   CalSTRS (308K rows) ordered by amount then times out at the statement limit.
+   Split apart, the sort is a cheap LIMIT 50 and the count is a plain scan. */
 function buildQuery(head){
   const st=$("f-state").value, ds=st==="CA"?"pension":"salary";
-  let q=db.from("tc_records").select(head?"id":"*",head?{count:"exact",head:true}:{count:"exact"});
-  q=q.eq("state",st).eq("dataset",ds);
+  let q=head
+    ? db.from("tc_records").select("id",{count:"exact",head:true}).eq("state",st).eq("dataset",ds)
+    : db.from("tc_records").select("*").eq("state",st).eq("dataset",ds);
   const nm=$("f-name").value.trim(); if(nm)q=q.ilike("person_name","%"+nm+"%");
-  const emp=$("f-emp").value.trim(); if(emp)q=q.or(`employer.ilike.%${emp}%,system_name.ilike.%${emp}%`);
+  if(st==="CA"){
+    const sys=$("f-sys").value; if(sys)q=q.eq("system_name",sys);
+    const a=$("f-ry1").value,b=$("f-ry2").value;
+    if(a)q=q.gte("retirement_year",Number(a)); if(b)q=q.lte("retirement_year",Number(b));
+  }else{
+    const dist=$("f-dist").value, cty=$("f-county").value;
+    if(dist)q=q.eq("employer",dist);
+    else if(cty){
+      const ds2=OPT.districts.filter(d=>d.county===cty).map(d=>d.value);
+      if(ds2.length)q=q.in("employer",ds2);
+    }
+  }
   const yrs=$("f-yrs").value; if(yrs)q=q.gte("years_service",Number(yrs));
   const amt=$("f-amt").value; if(amt)q=q.gte("amount",Number(amt));
-  if(st==="CA"){const a=$("f-ry1").value,b=$("f-ry2").value;
-    if(a)q=q.gte("retirement_year",Number(a)); if(b)q=q.lte("retirement_year",Number(b));}
+  if(head)return q;
   const[col,dir]=$("f-sort").value.split(".");
   q=q.order(col,{ascending:dir==="asc",nullsFirst:false});
-  if(!head)q=q.range(page*PAGE,page*PAGE+PAGE-1);
-  return q;
+  return q.range(page*PAGE,page*PAGE+PAGE-1);
 }
 async function run(){
   $("results").innerHTML='<div class="empty">Searching&hellip;</div>';
-  const {data,count,error}=await buildQuery(false);
+  $("count").textContent="…"; $("countcap").textContent="";
+  const [res,tot]=await Promise.all([buildQuery(false),buildQuery(true)]);
+  const {data,error}=res, count=tot.count;
   if(error){$("results").innerHTML='<div class="empty">Query error: '+esc(error.message)+'</div>';return;}
   $("count").textContent=(count??0).toLocaleString();
   $("countcap").textContent="matching records";
@@ -138,25 +206,28 @@ async function run(){
     <th>Name</th><th>${st==="WA"?"District":"System"}</th><th>${st==="WA"?"Role":"Last employer"}</th>
     <th style="text-align:right">Yrs</th><th style="text-align:right">${st==="WA"?"Salary":"Pension"}</th>
     ${st==="CA"?"<th>Retired</th>":""}<th>Find</th></tr></thead><tbody>`+
-    data.map(r=>{const nm=displayName(r.person_name,st);
+    data.map(r=>{
+      const nm=displayName(r.person_name,st);
+      const geo=st==="WA"?cityFromDistrict(r.employer):"California";
       return `<tr><td class="nm">${esc(nm)}</td>
       <td>${esc(st==="WA"?(r.employer||r.system_name):r.system_name)}</td>
       <td>${esc(st==="WA"?(r.job_title||""):(r.employer||""))}</td>
       <td class="num">${r.years_service??""}</td>
       <td class="money">${fmtM(r.amount)}</td>
       ${st==="CA"?`<td>${r.retirement_year??""}</td>`:""}
-      <td class="links">${findLinks(nm,st==="WA"?r.employer:r.employer,r.system_name)}</td></tr>`;}).join("")+"</tbody></table>";
+      <td class="links">${findLinks(nm,geo)}</td></tr>`;}).join("")+"</tbody></table>";
 }
 $("go").addEventListener("click",()=>{page=0;run();});
 $("prev").addEventListener("click",()=>{if(page>0){page--;run();}});
 $("next").addEventListener("click",()=>{page++;run();});
 document.querySelectorAll(".presets button").forEach(b=>b.addEventListener("click",()=>{
   const p=b.dataset.preset;
-  $("f-name").value="";$("f-emp").value="";$("f-yrs").value="";$("f-amt").value="";$("f-ry1").value="";$("f-ry2").value="";
+  ["f-name","f-yrs","f-amt","f-ry1","f-ry2"].forEach(i=>$(i).value="");
+  $("f-sys").value="";$("f-county").value="";fillDistricts();$("f-dist").value="";
   if(p==="wa-window"){$("f-state").value="WA";$("f-yrs").value=25;$("f-sort").value="years_service.desc";}
   if(p==="ca-fresh"){$("f-state").value="CA";$("f-ry1").value=2022;$("f-ry2").value=2024;$("f-sort").value="retirement_year.desc";}
   if(p==="ca-big"){$("f-state").value="CA";$("f-amt").value=100000;$("f-sort").value="amount.desc";}
-  if(p==="calstrs"){$("f-state").value="CA";$("f-emp").value="CalSTRS";$("f-sort").value="amount.desc";}
+  if(p==="calstrs"){$("f-state").value="CA";$("f-sys").value="CalSTRS";$("f-sort").value="amount.desc";}
   stateUI();page=0;run();
 }));
 </script>
