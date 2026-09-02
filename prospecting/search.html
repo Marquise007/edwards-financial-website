@@ -104,15 +104,27 @@ thead th .arr{color:var(--gold);margin-left:4px}
         <option value="CAW">CA · Working (counties, City of LA, LAUSD)</option>
       </select></div>
     <div class="cell"><label>Name contains</label><input id="f-name" placeholder="last or first name"></div>
-    <div class="cell"><label>Role contains (comma = any of)</label><input id="f-role" placeholder="sheriff, fire, police"></div>
-    <div class="cell"><label>Role excludes (comma = none of)</label><input id="f-rolex" placeholder="nurse, clerk, aide"></div>
+    <div class="cell"><label>Role contains (comma = any of)</label><input id="f-role" list="dl-roles" placeholder="sheriff, fire, police"></div>
+    <div class="cell"><label>Role excludes (comma = none of)</label><input id="f-rolex" list="dl-roles" placeholder="nurse, clerk, aide"></div>
+    <datalist id="dl-roles">
+      <option value="Teacher"><option value="Substitute Teacher"><option value="Principal"><option value="Assistant Principal">
+      <option value="Counselor"><option value="Librarian"><option value="Instructional Aide"><option value="Superintendent">
+      <option value="Deputy Sheriff"><option value="Sheriff Sergeant"><option value="Police Officer"><option value="Police Sergeant">
+      <option value="Detective"><option value="Firefighter"><option value="Fire Captain"><option value="Fire Engineer">
+      <option value="Paramedic"><option value="EMT"><option value="Lifeguard"><option value="Correctional Officer">
+      <option value="Probation Officer"><option value="Dispatcher"><option value="Registered Nurse"><option value="Physician">
+      <option value="Social Worker"><option value="Eligibility Worker"><option value="Engineer"><option value="Accountant">
+      <option value="Analyst"><option value="Administrative Assistant"><option value="Clerk"><option value="Manager">
+      <option value="Director"><option value="Custodian"><option value="Bus Driver"><option value="Food Service">
+      <option value="Groundskeeper"><option value="Mechanic"><option value="Electrician"><option value="Plumber">
+    </datalist>
     <div class="cell"><label>Department contains</label><input id="f-dept" placeholder="sheriff, harbor-ucla"></div>
     <div class="cell" id="wrap-sys" style="display:none"><label>System</label>
       <select id="f-sys"><option value="">All systems</option></select></div>
     <div class="cell" id="wrap-county"><label>County</label>
       <select id="f-county"><option value="">All counties</option></select></div>
     <div class="cell" id="wrap-dist"><label>District</label>
-      <select id="f-dist"><option value="">All districts</option></select></div>
+      <input id="f-dist" list="dl-dist" placeholder="type or pick a district"><datalist id="dl-dist"></datalist></div>
     <div class="cell" id="wrap-org" style="display:none"><label id="org-label">Agency</label>
       <select id="f-org"><option value="">All</option></select></div>
     <div class="cell"><label>Min service years</label><input id="f-yrs" type="number" min="0" step="1" placeholder="e.g. 25"></div>
@@ -137,7 +149,7 @@ thead th .arr{color:var(--gold);margin-left:4px}
      salary files. On State agencies and Higher ed, Yrs means years observed in the annual salary files — a tenure floor,
      not full service years. Each population has a retired / separated counterpart built by year-over-year comparison.
      School county covers 303 of 326 employers; charter and tribal compact schools appear only under All counties.
-     Find links: schools use name + city; state and higher ed use name + Washington until duty-station data is confirmed.
+     Find links pair first and last name with Washington for all three populations; district city is not used.
      Confirm identity before outreach.</p>
   <p class="note" id="note-ca" style="display:none">CA pension records are system-level: no last employer or city on file
      for most rows, so find links pair the name with California. CalPERS coverage spans retirement years 2016&ndash;2024.
@@ -161,17 +173,26 @@ function displayName(n,st){ if(st==="WA"&&n&&n.includes(",")){const[a,b]=n.split
 /* District -> city: strip the district-y words; "Seattle School District No. 1" -> "Seattle" */
 function cityFromDistrict(d){
   if(!d)return"";
+  /* Strip "#12" before the \b(...) pass, not inside it: \b can never match between a
+     space and a "#" (both non-word), so a "#\s*\d+" branch there never fires and the
+     bare \d+ branch eats only the digits — "Wellpinit #1" came out as "Wellpinit #". */
   let c=d.replace(/\(.*?\)/g,"")
          .replace(/#\s*\d+/g,"")
          .replace(/\b(Public Schools|School District|Schools|SD|No\.?\s*\d+|\d+)\b/gi,"")
          .replace(/\s+/g," ").trim();
   return c;
 }
-function findLinks(nm,geo){
-  const g=geo||"";
-  return `<a target="_blank" rel="noopener" href="https://www.linkedin.com/search/results/people/?keywords=${enc('"'+nm+'" '+g)}">LinkedIn</a>
-          <a target="_blank" rel="noopener" href="https://www.facebook.com/search/people/?q=${enc(nm+" "+g)}">Facebook</a>
-          <a target="_blank" rel="noopener" href="https://www.google.com/search?q=${enc((nm+" "+g+" instagram").toLowerCase())}">IG</a>`;
+function firstLast(n){
+  const t=(n||"").replace(/[.,]/g," ").split(/\s+/).filter(Boolean)
+    .filter(w=>!/^(JR|SR|II|III|IV|V)$/i.test(w));
+  if(!t.length)return"";
+  return t.length===1?t[0]:t[0]+" "+t[t.length-1];
+}
+function findLinks(nm,stName){
+  const fl=firstLast(nm);
+  return `<a target="_blank" rel="noopener" href="https://www.linkedin.com/search/results/people/?keywords=${enc('"'+fl+'" '+stName)}">LinkedIn</a>
+          <a target="_blank" rel="noopener" href="https://www.facebook.com/search/people/?q=${enc('"'+fl+'" '+stName)}">Facebook</a>
+          <a target="_blank" rel="noopener" href="https://www.google.com/search?q=${enc(fl+" Instagram")}">IG</a>`;
 }
 
 const SEG={
@@ -196,8 +217,7 @@ function stateUI(){
 function fillDistricts(){
   const cty=$("f-county").value;
   const list=OPT.districts.filter(d=>!cty||d.county===cty);
-  $("f-dist").innerHTML='<option value="">All districts</option>'+
-    list.map(d=>`<option value="${esc(d.value)}">${esc(d.value)}</option>`).join("");
+  $("dl-dist").innerHTML=list.map(d=>`<option value="${esc(d.value)}">`).join("");
 }
 function fillOrg(kind){
   const list=(kind==="agency"?OPT.agencies:kind==="ca_org"?OPT.caorgs:OPT.colleges)||[];
@@ -292,8 +312,11 @@ function buildQuery(head){
     const a=$("f-ry1").value,b=$("f-ry2").value;
     if(a)q=q.gte("retirement_year",Number(a)); if(b)q=q.lte("retirement_year",Number(b));
   }else if(seg.kind==="school"){
-    const dist=$("f-dist").value, cty=$("f-county").value;
-    if(dist)q=q.eq("employer",dist);
+    const dist=$("f-dist").value.trim(), cty=$("f-county").value;
+    if(dist){
+      const hit=OPT.districts.find(d=>d.value.toLowerCase()===dist.toLowerCase());
+      q=hit?q.eq("employer",hit.value):q.ilike("employer","%"+dist+"%");
+    }
     else if(cty){
       const ds2=OPT.districts.filter(d=>d.county===cty).map(d=>d.value);
       if(ds2.length)q=q.in("employer",ds2);
@@ -313,10 +336,17 @@ async function run(){
   $("results").innerHTML='<div class="empty">Searching&hellip;</div>';
   $("count").textContent="…"; $("countcap").textContent="";
   const [res,tot]=await Promise.all([buildQuery(false),buildQuery(true)]);
-  const {data,error}=res, count=tot.count;
+  const {data,error}=res;
   if(error){$("results").innerHTML='<div class="empty">Query error: '+esc(error.message)+'</div>';return;}
-  $("count").textContent=(count??0).toLocaleString();
-  $("countcap").textContent="matching records";
+  /* The total rides a separate request, so it can fail on its own. Never fall back to
+     0 here: a "0" printed above a table of rows reads as a real answer. Say unknown. */
+  if(tot.error||tot.count==null){
+    $("count").textContent="—";
+    $("countcap").textContent="total unavailable"+(tot.error?" — "+esc(tot.error.message):"");
+  }else{
+    $("count").textContent=tot.count.toLocaleString();
+    $("countcap").textContent="matching records";
+  }
   $("pageinfo").textContent="Page "+(page+1);
   $("prev").disabled=page===0; $("next").disabled=!data||data.length<PAGE;
   if(!data||!data.length){
@@ -330,7 +360,6 @@ async function run(){
   const sel2=$("f-state").value, seg2=SEG[sel2];
   const st=sel2.startsWith("CA")?"CA":"WA";
   const isPen=sel2==="CA", isSep=sel2==="CASEP";
-  const CAGEO={"Los Angeles County":"Los Angeles","City of Los Angeles":"Los Angeles","Los Angeles Unified":"Los Angeles","Orange County":"Orange County","San Diego County":"San Diego","Ventura County":"Ventura","City of San Diego":"San Diego","San Diego Unified":"San Diego","SD County Emergency Services":"San Diego","Orange County Fire Authority":"Orange County","Ventura Unified":"Ventura"};
   const orgHdr=seg2.kind==="school"?"District":seg2.kind==="agency"?"Agency":seg2.kind==="college"?"Institution":seg2.kind==="ca_org"?"Employer":"System";
   const[scol,sdir]=SORT.split(".");
   const arr=f=>f===scol?`<span class="arr">${sdir==="asc"?"&#9650;":"&#9660;"}</span>`:"";
@@ -341,9 +370,7 @@ async function run(){
     ${(isPen||isSep)?TH("Retired","retirement_year"):""}<th>Find</th></tr></thead><tbody>`+
     data.map(r=>{
       const nm=displayName(r.person_name,st);
-      const geo=seg2.kind==="ca_org"?(CAGEO[r.employer]||"California")
-        :st!=="WA"?"California"
-        :(seg2.kind==="school"?cityFromDistrict(r.employer):"Washington");
+      const stName=st==="WA"?"Washington":"California";
       const retCell=isPen?(r.retirement_year??"")
         :isSep?((r.retirement_year??"")+(r.system_name?" · "+esc(r.system_name):"")):"";
       return `<tr><td class="nm">${esc(nm)}</td>
@@ -352,7 +379,7 @@ async function run(){
       <td class="num">${r.years_service??""}</td>
       <td class="money">${fmtM(r.amount)}</td>
       ${(isPen||isSep)?`<td>${retCell}</td>`:""}
-      <td class="links">${findLinks(nm,geo)}</td></tr>`;}).join("")+"</tbody></table>";
+      <td class="links">${findLinks(nm,stName)}</td></tr>`;}).join("")+"</tbody></table>";
   $("results").querySelectorAll("th[data-sort]").forEach(h=>h.addEventListener("click",()=>{
     const f=h.dataset.sort;
     if(f===scol)SORT=f+"."+(sdir==="asc"?"desc":"asc");
