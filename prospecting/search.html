@@ -54,7 +54,20 @@ td.money,td.num{white-space:nowrap;text-align:right}
 .pager button:disabled{opacity:.35;cursor:default}
 .empty{background:#fff;border:1px dashed var(--rule);padding:26px;text-align:center;font-size:14px;color:var(--ink-soft)}
 .note{font-size:12px;color:var(--ink-soft);margin-top:14px;line-height:1.5}
-@media(max-width:820px){thead{display:none}tbody td{display:block}tbody tr{display:block;border-bottom:2px solid var(--rule);padding:8px 0}td.money,td.num{text-align:left}}
+#results{overflow-x:auto;-webkit-overflow-scrolling:touch}
+thead th[data-sort]{cursor:pointer;user-select:none}
+thead th[data-sort]:hover{color:var(--gold)}
+thead th .arr{color:var(--gold);margin-left:4px}
+@media(max-width:820px){
+  header.hero{padding:26px 4vw 20px}
+  main{padding:18px 4vw 56px}
+  .filters{grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px}
+  .presets button{font-size:11.5px;padding:8px 10px}
+  .saves input{width:150px}
+  #results table{min-width:720px}
+  thead th{padding:9px 10px;font-size:10.5px}
+  tbody td{font-size:13px;padding:8px 10px}
+}
 </style>
 </head>
 <body>
@@ -137,7 +150,7 @@ td.money,td.num{white-space:nowrap;text-align:right}
 const SUPABASE_URL="https://rybnzvlogmbjlgdziswj.supabase.co";
 const SUPABASE_ANON_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ5Ym56dmxvZ21iamxnZHppc3dqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0NjE3MjgsImV4cCI6MjA5NjAzNzcyOH0.m7oH-z4yI1AbchocncJU2TB7SawyijiXsTbcz3slwn0";
 const db=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
-const PAGE=50; let page=0;
+const PAGE=50; let page=0; let SORT="years_service.desc";
 let OPT={systems:[],districts:[],counties:[]};
 const $=id=>document.getElementById(id);
 const esc=s=>(s??"").toString().replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
@@ -199,7 +212,7 @@ async function loadOptions(){
   OPT.counties=data.filter(r=>r.kind==="county").sort((a,b)=>b.cnt-a.cnt);
   OPT.agencies=data.filter(r=>r.kind==="agency");
   OPT.colleges=data.filter(r=>r.kind==="college");
-  OPT.caorgs=data.filter(r=>r.kind==="ca_employer");
+  OPT.caorgs=data.filter(r=>r.kind==="ca_employer").sort((a,b)=>b.cnt-a.cnt);
   $("f-sys").innerHTML='<option value="">All systems</option>'+
     OPT.systems.map(s=>`<option value="${esc(s.value)}">${esc(s.value)} (${Number(s.cnt).toLocaleString()})</option>`).join("");
   $("f-county").innerHTML='<option value="">All counties</option>'+
@@ -212,13 +225,14 @@ stateUI();
 
 /* ---- saved searches ---- */
 const FIELDS=["f-state","f-name","f-role","f-rolex","f-dept","f-sys","f-county","f-dist","f-org","f-yrs","f-amt","f-amt2","f-ry1","f-ry2","f-sort"];
-function collectState(){const o={};FIELDS.forEach(i=>o[i]=$(i).value);return o;}
+function collectState(){const o={};FIELDS.forEach(i=>o[i]=$(i).value);o["_sort"]=SORT;return o;}
 function applyState(o){
   if(o["f-state"])$("f-state").value=o["f-state"];
   stateUI();
   if(o["f-county"]!==undefined)$("f-county").value=o["f-county"];
   fillDistricts();
   FIELDS.forEach(i=>{if(i!=="f-state"&&i!=="f-county"&&o[i]!==undefined)$(i).value=o[i];});
+  SORT=o["_sort"]||o["f-sort"]||SORT;
 }
 function getSaves(){try{return JSON.parse(localStorage.getItem("tc_saved_searches")||"[]");}catch(e){return[];}}
 function putSaves(a){localStorage.setItem("tc_saved_searches",JSON.stringify(a));}
@@ -254,7 +268,8 @@ loadOptions().then(()=>{
    count=exact *and* an ORDER BY in one request makes it materialise the whole
    sorted set to count it, defeating the top-N sort — the CalSTRS preset (308K
    rows) then dies on the statement timeout. Split apart, both are fast.
-   Estimates are not an option here: the planner guesses 1,001 for CalSTRS. */
+   Estimates are not an option here: the planner guesses 1,001 for CalSTRS.
+   The head query deliberately skips the ORDER BY and range. */
 function buildQuery(head){
   const sel=$("f-state").value, seg=SEG[sel];
   const st=sel.startsWith("CA")?"CA":"WA", ds=seg.ds;
@@ -290,7 +305,7 @@ function buildQuery(head){
   const amt=$("f-amt").value; if(amt)q=q.gte("amount",Number(amt));
   const amt2=$("f-amt2").value; if(amt2)q=q.lte("amount",Number(amt2));
   if(head)return q;
-  const[col,dir]=$("f-sort").value.split(".");
+  const[col,dir]=SORT.split(".");
   q=q.order(col,{ascending:dir==="asc",nullsFirst:false});
   return q.range(page*PAGE,page*PAGE+PAGE-1);
 }
@@ -317,10 +332,13 @@ async function run(){
   const isPen=sel2==="CA", isSep=sel2==="CASEP";
   const CAGEO={"Los Angeles County":"Los Angeles","City of Los Angeles":"Los Angeles","Los Angeles Unified":"Los Angeles","Orange County":"Orange County","San Diego County":"San Diego","Ventura County":"Ventura","City of San Diego":"San Diego","San Diego Unified":"San Diego","SD County Emergency Services":"San Diego","Orange County Fire Authority":"Orange County","Ventura Unified":"Ventura"};
   const orgHdr=seg2.kind==="school"?"District":seg2.kind==="agency"?"Agency":seg2.kind==="college"?"Institution":seg2.kind==="ca_org"?"Employer":"System";
+  const[scol,sdir]=SORT.split(".");
+  const arr=f=>f===scol?`<span class="arr">${sdir==="asc"?"&#9650;":"&#9660;"}</span>`:"";
+  const TH=(lab,f,r)=>`<th ${f?`data-sort="${f}"`:""}${r?' style="text-align:right"':""}>${lab}${f?arr(f):""}</th>`;
   $("results").innerHTML=`<table><thead><tr>
-    <th>Name</th><th>${orgHdr}</th><th>${isPen?"Last employer":"Role"}</th>
-    <th style="text-align:right">Yrs</th><th style="text-align:right">${isPen?"Pension":"Salary"}</th>
-    ${(isPen||isSep)?"<th>Retired</th>":""}<th>Find</th></tr></thead><tbody>`+
+    ${TH("Name","person_name")}${TH(orgHdr,isPen?"system_name":"employer")}${TH(isPen?"Last employer":"Role",isPen?"employer":"job_title")}
+    ${TH("Yrs","years_service",1)}${TH(isPen?"Pension":"Salary","amount",1)}
+    ${(isPen||isSep)?TH("Retired","retirement_year"):""}<th>Find</th></tr></thead><tbody>`+
     data.map(r=>{
       const nm=displayName(r.person_name,st);
       const geo=seg2.kind==="ca_org"?(CAGEO[r.employer]||"California")
@@ -335,8 +353,17 @@ async function run(){
       <td class="money">${fmtM(r.amount)}</td>
       ${(isPen||isSep)?`<td>${retCell}</td>`:""}
       <td class="links">${findLinks(nm,geo)}</td></tr>`;}).join("")+"</tbody></table>";
+  $("results").querySelectorAll("th[data-sort]").forEach(h=>h.addEventListener("click",()=>{
+    const f=h.dataset.sort;
+    if(f===scol)SORT=f+"."+(sdir==="asc"?"desc":"asc");
+    else SORT=f+"."+(["years_service","amount","retirement_year"].includes(f)?"desc":"asc");
+    const opt=[...$("f-sort").options].find(o=>o.value===SORT);
+    if(opt)$("f-sort").value=SORT;
+    page=0;run();
+  }));
 }
 $("go").addEventListener("click",()=>{page=0;run();});
+$("f-sort").addEventListener("change",e=>{SORT=e.target.value;});
 $("prev").addEventListener("click",()=>{if(page>0){page--;run();}});
 $("next").addEventListener("click",()=>{page++;run();});
 document.querySelectorAll(".presets button").forEach(b=>b.addEventListener("click",()=>{
@@ -348,6 +375,7 @@ document.querySelectorAll(".presets button").forEach(b=>b.addEventListener("clic
   if(p==="ca-fresh"){$("f-state").value="CA";$("f-ry1").value=2022;$("f-ry2").value=2024;$("f-sort").value="retirement_year.desc";}
   if(p==="ca-big"){$("f-state").value="CA";$("f-amt").value=100000;$("f-sort").value="amount.desc";}
   if(p==="calstrs"){$("f-state").value="CA";$("f-sys").value="CalSTRS";$("f-sort").value="amount.desc";}
+  SORT=$("f-sort").value;
   stateUI();page=0;run();
 }));
 </script>
