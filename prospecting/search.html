@@ -235,7 +235,7 @@ const MPDB={"sd:teachers":{"state":"CAW","sep":"CASEP","sort":"amount.desc","org
 function setMultiOrg(list){
   const sel=$("f-org"); let o=sel.querySelector('option[value="__multi"]');
   if(!o){o=document.createElement("option");o.value="__multi";sel.insertBefore(o,sel.firstChild);}
-  o.textContent=list.length+" employers · "+list.join(" + "); sel.value="__multi";
+  o.textContent=list.length+" employer"+(list.length===1?"":"s")+" · "+list.join(" + "); sel.value="__multi";
 }
 function markMP(){document.querySelectorAll(".metro button").forEach(b=>b.classList.toggle("on",b.dataset.mp===MP));}
 const SEG={
@@ -283,7 +283,14 @@ async function loadOptions(){
     OPT.counties.map(c=>`<option value="${esc(c.value)}">${esc(c.value)} (${Number(c.cnt).toLocaleString()})</option>`).join("");
   fillDistricts();
 }
-$("f-state").addEventListener("change",stateUI);
+/* CC fix: a manual State/Dataset change voids any preset employer set (ORGS). Otherwise the
+   employer=in.(...) from a CA chip rides silently into the WA agency/college queries and the
+   page shows a false zero under an Agency select that reads "All". The drawer re-renders so
+   its Working/Separated highlight follows the dataset actually selected. */
+$("f-state").addEventListener("change",()=>{
+  ORGS=null; const mo=$("f-org").querySelector('option[value="__multi"]'); if(mo)mo.remove();
+  stateUI(); if(MP)renderDrawer();
+});
 $("f-county").addEventListener("change",fillDistricts);
 $("f-org").addEventListener("change",()=>{if($("f-org").value!=="__multi"){ORGS=null;const o=$("f-org").querySelector('option[value="__multi"]');if(o)o.remove();}});
 stateUI();
@@ -292,6 +299,12 @@ stateUI();
 const FIELDS=["f-state","f-name","f-role","f-rolex","f-dept","f-sys","f-county","f-dist","f-org","f-yrs","f-amt","f-amt2","f-ry1","f-ry2","f-sort"];
 function collectState(){const o={};FIELDS.forEach(i=>o[i]=$(i).value);o["_sort"]=SORT;o["_orgs"]=ORGS;o["_mp"]=MP;return o;}
 function applyState(o){
+  /* CC fix: drop the previous preset's employer set before stateUI/fillOrg runs, or its
+     "__multi" option is re-inserted as an orphan that sends employer=eq.__multi. A restored
+     search with no playbook also clears the chip and drawer, so they cannot be re-saved
+     onto a search they do not belong to. */
+  ORGS=null; {const mo=$("f-org").querySelector('option[value="__multi"]'); if(mo)mo.remove();}
+  if(!(o["_mp"]&&RECIPES[o["_mp"].split(":")[0]])){MP=null;markMP();$("drawer").hidden=true;}
   if(o["f-state"])$("f-state").value=o["f-state"];
   stateUI();
   if(o["f-county"]!==undefined)$("f-county").value=o["f-county"];
@@ -309,7 +322,7 @@ function renderChips(){
     `<span class="chip" data-i="${i}">${esc(s.name)}<span class="x" data-x="${i}">&times;</span></span>`).join("");
   $("saved-chips").querySelectorAll(".chip").forEach(ch=>ch.addEventListener("click",e=>{
     if(e.target.dataset.x!==undefined){const a2=getSaves();a2.splice(Number(e.target.dataset.x),1);putSaves(a2);renderChips();e.stopPropagation();return;}
-    const s=getSaves()[Number(ch.dataset.i)];if(s){applyState(s.state);page=0;run();}
+    const s=getSaves()[Number(ch.dataset.i)];if(s)OPTS_READY.then(()=>{applyState(s.state);page=0;run();});
   }));
 }
 $("save-btn").addEventListener("click",()=>{
@@ -323,8 +336,11 @@ $("link-btn").addEventListener("click",()=>{
   const url=location.origin+location.pathname+"#q="+encodeURIComponent(JSON.stringify(collectState()));
   navigator.clipboard.writeText(url).then(()=>{$("link-btn").textContent="Copied!";setTimeout(()=>$("link-btn").textContent="Copy link",1400);});
 });
+/* CC fix: saved chips are clickable before tc_filter_options arrives; restoring against
+   empty selects silently drops the agency / system / county filter. Wait for the options. */
+const OPTS_READY=loadOptions();
 renderChips();
-loadOptions().then(()=>{
+OPTS_READY.then(()=>{
   if(location.hash.startsWith("#q=")){
     try{applyState(JSON.parse(decodeURIComponent(location.hash.slice(3))));page=0;run();}catch(e){}
   }
@@ -370,7 +386,7 @@ function buildQuery(head){
     }
   }else{
     if(ORGS&&ORGS.length)q=q.in("employer",ORGS);
-    else{const org=$("f-org").value; if(org)q=q.eq("employer",org);}
+    else{const org=$("f-org").value; if(org&&org!=="__multi")q=q.eq("employer",org);}
   }
   const yrs=$("f-yrs").value; if(yrs)q=q.gte("years_service",Number(yrs));
   const amt=$("f-amt").value; if(amt)q=q.gte("amount",Number(amt));
@@ -380,10 +396,15 @@ function buildQuery(head){
   q=q.order(col,{ascending:dir==="asc",nullsFirst:false});
   return q.range(page*PAGE,page*PAGE+PAGE-1);
 }
+let RUN_SEQ=0;
 async function run(){
+  /* CC fix: only the latest run may paint. Two chips clicked in quick succession otherwise
+     let the slower, earlier response overwrite the later one. */
+  const seq=++RUN_SEQ;
   $("results").innerHTML='<div class="empty">Searching&hellip;</div>';
   $("count").textContent="…"; $("countcap").textContent="";
   const [res,tot]=await Promise.all([buildQuery(false),buildQuery(true)]);
+  if(seq!==RUN_SEQ)return;
   const {data,error}=res;
   if(error){$("results").innerHTML='<div class="empty">Query error: '+esc(error.message)+'</div>';return;}
   /* The total rides a separate request, so it can fail on its own. Never fall back to
@@ -396,7 +417,10 @@ async function run(){
     $("countcap").textContent="matching records";
   }
   $("pageinfo").textContent="Page "+(page+1);
-  $("prev").disabled=page===0; $("next").disabled=!data||data.length<PAGE;
+  $("prev").disabled=page===0;
+  /* CC fix: with the exact total in hand, Next switches off once this page reaches it; a
+     segment of exactly 50 rows otherwise offers a page 2 that says "No matches". */
+  $("next").disabled=!data||data.length<PAGE||(tot.count!=null&&(page+1)*PAGE>=tot.count);
   if(!data||!data.length){
     const sel0=$("f-state").value;
     const msg=sel0.endsWith("SEP")
@@ -471,7 +495,7 @@ function applyMP(key, sep){
     $("f-sort").value=d.sort; SORT=d.sort;
     renderDrawer(); page=0; run();
   }else{
-    renderDrawer();
+    renderDrawer(); page=0; $("prev").disabled=true; $("next").disabled=true;
     $("count").textContent="\u00a0"; $("countcap").textContent=""; $("pageinfo").textContent="";
     $("results").innerHTML='<div class="empty">No database rows for this segment yet. The LinkedIn recipe above is the route.</div>';
   }
