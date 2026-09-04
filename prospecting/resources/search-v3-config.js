@@ -7,5 +7,5 @@ window.EFA_SEARCH_V3_CONFIG = {
   supabasePublicKey: 'sb_publishable_HfmpHTebHafZwIOJGmFang__PEaiC85',
   loginPath: '/portal-partner-login.html',
   searchPath: '/prospecting/search-v3.html',
-  pageSize: 50
+  pageSize: 25
 };
