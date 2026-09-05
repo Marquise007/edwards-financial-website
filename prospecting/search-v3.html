@@ -33,12 +33,14 @@
 
   <div class="templates">
     <span class="lab">Smart templates</span>
-    <button class="template" data-template="laRetire">LA · Fresh retirement signals</button>
-    <button class="template" data-template="safety">Public safety · 20+ years</button>
-    <button class="template" data-template="educators">Educators · 25+ years</button>
-    <button class="template" data-template="highComp">$150K+ economic signal</button>
-    <button class="template" data-template="waLong">WA · 25+ service years</button>
-    <button class="template" data-template="uncontacted">High priority + evidence</button>
+    <button class="template" data-template="fresh">Fresh retirement signals</button>
+    <button class="template" data-template="safety">Public safety</button>
+    <button class="template" data-template="educators">Educators</button>
+    <button class="template" data-template="highpay">$150K+ pay or pension</button>
+    <button class="template" data-template="waedu">WA educators</button>
+    <button class="template" data-template="hipri">High priority + evidence</button>
+    <span class="customTemplates" id="customTemplates"></span>
+    <button class="template newtpl" id="newTemplateBtn" title="Save current filters as a named template">+ New template</button>
   </div>
 
   <div class="workspace">
@@ -64,10 +66,10 @@
           <div class="field"><label>Role sub-family</label><select id="subRoleSel"><option value="">All sub-families</option></select></div>
           <div class="field"><label>Role level</label><select id="levelSel"><option value="">All levels</option></select></div>
           <div class="field"><label>Title logic</label><div class="logic" id="titleLogic"><button class="on" data-mode="any">ANY</button><button data-mode="all">ALL</button><button data-mode="exact">EXACT</button></div></div>
-          <div class="field"><label>Title terms</label><input id="titleQ" placeholder="sheriff, captain, teacher"></div>
-          <div class="field"><label>Title excludes</label><input id="titleEx" placeholder="clerk, aide, nurse"></div>
-          <div class="field"><label>Verified service years</label><div class="twocol"><input id="svcMin" type="number" step="0.1" placeholder="Min"><input id="svcMax" type="number" step="0.1" placeholder="Max"></div></div>
-          <div class="field"><label>Years observed in source</label><div class="twocol"><input id="obsMin" type="number" step="0.1" placeholder="Min"><input id="obsMax" type="number" step="0.1" placeholder="Max"></div></div>
+          <div class="field"><label>Title terms (pick or type, comma-separated)</label><input id="titleQ" list="titleSuggest" placeholder="sheriff, captain, teacher"></div>
+          <div class="field"><label>Title excludes (pick or type, comma-separated)</label><input id="titleEx" list="titleSuggest" placeholder="clerk, aide, nurse"></div>
+          <div class="field"><label>Verified service years (type, or step by 5)</label><div class="twocol"><input id="svcMin" type="number" step="5" min="0" max="50" list="yearSteps" placeholder="Min"><input id="svcMax" type="number" step="5" min="0" max="50" list="yearSteps" placeholder="Max"></div></div>
+          <div class="field"><label>Years observed in source (type, or step by 5)</label><div class="twocol"><input id="obsMin" type="number" step="5" min="0" max="50" list="yearSteps" placeholder="Min"><input id="obsMax" type="number" step="5" min="0" max="50" list="yearSteps" placeholder="Max"></div></div>
           <div class="helpbox"><b>Data quality rule:</b> Verified service years represent source-provided career service only. Years observed is kept separate so a two-year file history never looks like a two-year career.</div>
         </div>
       </details>
@@ -114,11 +116,28 @@
 
       <div class="results-toolbar">
         <div class="result-title">Results <span id="resultSub"></span></div>
-        <div class="toolbar-right"><select id="sortSel"><option value="priority">Best retirement opportunity</option><option value="evidence">Evidence coverage</option><option value="retirement">Most recently retired</option><option value="separation">Most recently separated</option><option value="service">Service years</option><option value="amount">Highest amount</option><option value="name">Name A–Z</option></select><button class="iconbtn on" id="cardView" title="Card view">▦</button><button class="iconbtn" id="tableView" title="Table view">☷</button></div>
+        <div class="toolbar-right"><select id="sortSel" class="hidden-sort"><option value="priority">Best retirement opportunity</option><option value="evidence">Evidence coverage</option><option value="retirement">Most recently retired</option><option value="separation">Most recently separated</option><option value="service">Service years</option><option value="amount">Highest amount</option><option value="name">Name A–Z</option></select><button class="iconbtn on" id="cardView" title="Card view">▦</button><button class="iconbtn" id="tableView" title="Table view">☷</button></div>
+      </div>
+
+      <div class="sortbar">
+        <span class="sortlab">Organize by</span>
+        <button class="sortchip on" data-sort="priority">Priority</button>
+        <button class="sortchip" data-sort="service">Yrs of Service</button>
+        <button class="sortchip" data-sort="amount">Annual Pension</button>
+        <button class="sortchip" data-sort="retirement">Retirement</button>
+        <button class="sortchip" data-sort="separation">Separation</button>
+        <button class="sortchip" data-sort="evidence">Evidence</button>
+        <button class="sortchip" data-sort="name">Name A–Z</button>
+        <button class="sortchip syschip" id="sysSortNote" title="Group by pension system using the filter">Pension System ▾</button>
+      </div>
+
+      <div class="selectbar-row">
+        <label class="selall"><input type="checkbox" id="selectAllPage"> Select all on this page</label>
+        <div class="selectionBar" id="selectionBar"></div>
       </div>
 
       <div class="cards" id="cards"></div>
-      <div class="tablewrap" id="tableWrap"><table class="tbl"><thead><tr><th>Name</th><th>Status</th><th>Employer</th><th>Role</th><th>Service</th><th>Retired / Left</th><th>Amount</th><th>System</th><th>Score</th><th>Evidence</th></tr></thead><tbody id="tableBody"></tbody></table></div>
+      <div class="tablewrap" id="tableWrap"><table class="tbl"><thead><tr><th class="tsel"></th><th>Name</th><th>Status</th><th>Employer</th><th>Role</th><th>Service</th><th>Retired / Left</th><th>Amount</th><th>System</th><th>Score</th><th>Evidence</th></tr></thead><tbody id="tableBody"></tbody></table></div>
       <div class="pager" id="pager"></div>
     </main>
   </div>
@@ -136,6 +155,16 @@
 <div class="modalbg" id="savedModal"><div class="modal"><h3>Saved Searches</h3><div class="modal-body"><input id="saveName" placeholder="Name this search"><div class="modal-actions"><button class="btn white" id="closeSaved">Close</button><button class="btn primary" id="saveCurrent">Save current search</button></div><div class="saved-list" id="savedList"></div></div></div></div>
 <div class="toast" id="toast"></div>
 
+<datalist id="titleSuggest">
+  <option>Teacher</option><option>Principal</option><option>Assistant Principal</option><option>Superintendent</option><option>Counselor</option><option>Professor</option><option>Librarian</option>
+  <option>Deputy Sheriff</option><option>Sheriff</option><option>Sergeant</option><option>Lieutenant</option><option>Captain</option><option>Fire Captain</option><option>Firefighter</option><option>Battalion Chief</option><option>Police Officer</option><option>Detective</option><option>Probation Officer</option><option>Corrections Officer</option>
+  <option>Nurse</option><option>Registered Nurse</option><option>Nurse Practitioner</option><option>Physician</option><option>Psychiatrist</option><option>Social Worker</option>
+  <option>Engineer</option><option>Civil Engineer</option><option>Transportation Engineer</option><option>Analyst</option><option>Accountant</option><option>Auditor</option><option>Attorney</option><option>Public Defender</option>
+  <option>Manager</option><option>Director</option><option>Administrator</option><option>Supervisor</option><option>Program Manager</option><option>Administrative Services Manager</option>
+</datalist>
+<datalist id="yearSteps">
+  <option>0</option><option>5</option><option>10</option><option>15</option><option>20</option><option>25</option><option>30</option><option>35</option><option>40</option><option>45</option><option>50</option>
+</datalist>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="resources/search-v3-config.js"></script>
 <script src="assets/priority-v1.js"></script>

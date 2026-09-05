@@ -44,3 +44,46 @@ nav{height:64px;background:#fff;border-bottom:1px solid var(--rule);display:flex
 .helpbox{padding:11px 12px;background:#f7f4eb;border:1px solid #e4dcc6;border-radius:7px;font-size:10.5px;color:#645d4d;line-height:1.45;margin-top:9px}.helpbox b{color:var(--navy)}
 @media(max-width:1180px){.workspace{grid-template-columns:285px minmax(0,1fr)}.prospect{grid-template-columns:70px minmax(0,1fr) 210px}.actions{grid-column:1/-1;border-left:0;border-top:1px solid var(--rule);flex-direction:row}.actions .action{width:auto;flex:1}.contact-dots{margin:0 0 0 auto;align-items:center}.kpis{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:860px){nav{padding:0 16px}.navlinks a:not(.active){display:none}.hero{padding:24px 16px}.hero-inner{align-items:flex-start;flex-direction:column}.shell{padding:14px 12px 60px}.workspace{display:block}.filters-panel{position:relative;top:auto;max-height:none;margin-bottom:12px}.prospect{grid-template-columns:62px minmax(0,1fr)}.facts{grid-column:1/-1;border-left:0;border-top:1px solid var(--rule)}.actions{grid-column:1/-1}.kpis{grid-template-columns:1fr 1fr}.search-row{flex-wrap:wrap}.mastersearch{flex-basis:100%}.previewbar{padding:8px 15px}.detail{width:100vw}.dgrid{grid-template-columns:1fr 1fr}}
+/* v2 additions: per-row search launchers + user-created template chips */
+.launch-links{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-top:5px}
+.launch-links a{font-size:9.5px;font-weight:800;color:var(--navy);text-decoration:none;border:1px solid var(--rule);border-radius:6px;padding:5px 7px;background:#fff;line-height:1}
+.launch-links a:hover{border-color:var(--gold);color:#84691e;background:#fbf7ec}
+.customTemplates{display:inline-flex;gap:7px}
+.template.custom{border-color:var(--gold);background:#fbf7ec;position:relative;padding-right:26px}
+.template .tdel{position:absolute;right:8px;top:50%;transform:translateY(-50%);color:#a5794f;font-weight:900;font-size:14px;line-height:1;cursor:pointer}
+.template .tdel:hover{color:#7a1f1f}
+.template.newtpl{border-style:dashed;color:var(--gold);font-weight:800}
+.template.newtpl:hover{background:#fbf7ec}
+@media(max-width:1180px){.actions .launch-links{justify-content:flex-start}}
+/* v3 additions: sort chips, selection system */
+.hidden-sort{display:none}
+.sortbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:0 0 12px}
+.sortbar .sortlab{font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#6b7686;margin-right:2px}
+.sortchip{font-size:12px;font-weight:700;color:var(--navy);background:#fff;border:1px solid var(--rule);border-radius:99px;padding:7px 13px;cursor:pointer;transition:.12s}
+.sortchip:hover{border-color:var(--gold)}
+.sortchip.on{background:var(--navy);color:#fff;border-color:var(--navy)}
+.sortchip.syschip{border-style:dashed;color:#84691e}
+.sortchip.syschip:hover{background:#fbf7ec}
+
+.selectbar-row{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin:0 0 14px;min-height:22px}
+.selall{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;font-weight:700;color:#41506a;cursor:pointer}
+.selall input{width:15px;height:15px;accent-color:var(--gold)}
+.selectionBar{display:none;align-items:center;gap:14px;flex-wrap:wrap;background:var(--navy);border-radius:12px;padding:9px 14px;box-shadow:0 6px 18px rgba(13,30,58,.18)}
+.selectionBar.on{display:inline-flex}
+.selectionBar .selcount{color:#fff;font-size:13px;font-weight:700}
+.selectionBar .selcount b{color:var(--gold);font-size:15px}
+.selectionBar .selactions{display:inline-flex;gap:8px;flex-wrap:wrap}
+.selectionBar button{font-size:12px;font-weight:800;border-radius:8px;padding:8px 13px;cursor:pointer;border:1px solid transparent}
+.selectionBar .sel-primary{background:var(--gold);color:#1a1206}
+.selectionBar .sel-primary:hover{filter:brightness(1.06)}
+.selectionBar button:not(.sel-primary):not(.sel-ghost){background:#fff;color:var(--navy)}
+.selectionBar .sel-ghost{background:transparent;color:#cdd6e5;border-color:#33456a}
+.selectionBar .sel-ghost:hover{color:#fff}
+
+.prospect{position:relative}
+.prospect .selbox{position:absolute;top:12px;left:12px;z-index:3;cursor:pointer}
+.prospect .selbox input{width:17px;height:17px;accent-color:var(--gold);cursor:pointer}
+.prospect.picked{border-color:var(--gold);box-shadow:0 0 0 2px rgba(184,151,46,.35)}
+.tbl td.tsel,.tbl th.tsel{width:34px;text-align:center;padding-left:10px;padding-right:6px}
+.tbl td.tsel input{width:15px;height:15px;accent-color:var(--gold);cursor:pointer}
+.tbl tr.picked td{background:#fbf7ec}

@@ -21,7 +21,8 @@
       const {data:profile,error:pe}=await client.from('partner_profiles').select('approved,role').eq('id',session.user.id).maybeSingle();
       if(pe) throw pe;
       if(!profile||profile.approved!==true) throw new Error('Your partner account is not approved for Prospect Search V3.');
-      return {mode:this.mode,user_id:session.user.id};
+      this.isAdmin=!!(profile&&['admin','owner'].includes(profile.role));
+      return {mode:this.mode,user_id:session.user.id,is_admin:this.isAdmin};
     },
     async facets(){
       const {data,error}=await client.rpc('tc_search_facets_v3');
@@ -62,6 +63,11 @@
         next_cursor:body.next_cursor||null,
         has_more:Boolean(body.next_cursor)
       };
+    },
+    async pipelineAdd(sourceIds,channel,campaign){
+      const {data,error}=await client.rpc('pipeline_add_v3',{p_source_ids:sourceIds||[],p_channel:channel||'linkedin',p_campaign:campaign||null});
+      if(error) throw error;
+      return data||{};
     }
   };
   root.EFASearchV3Adapter=Adapter;
