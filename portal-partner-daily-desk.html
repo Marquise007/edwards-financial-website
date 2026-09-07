@@ -614,6 +614,24 @@ td.rate{font-weight:700}
   .wf-step span{font-size:7px}
   .sheet{max-height:none}
 }
+
+/* ===== COMMANDS ===== */
+/* A reference block, not a workspace: flex:0 0 auto so it takes its own height
+   and nothing more, and the panels above keep the rest of the screen. */
+.cmd-card{flex:0 0 auto;margin-top:14px}
+.cmd-rows{padding:11px 13px 12px;display:grid;gap:7px}
+.cmd-row{display:grid;grid-template-columns:200px minmax(0,1fr) auto;gap:9px;align-items:center}
+.cmd-label{font-size:11px;font-weight:700;color:var(--navy);min-width:0}
+.cmd-text{display:block;min-width:0;white-space:nowrap;overflow-x:auto;
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+  font-size:11.5px;line-height:1.5;color:var(--ink);background:var(--soft);
+  border:1px solid var(--line);border-radius:7px;padding:7px 9px}
+.cmd-copy{min-width:84px;text-align:center}
+.cmd-note{margin:9px 2px 0;flex:0 0 auto;font-size:11px;color:var(--muted)}
+@media(max-width:820px){
+  .cmd-row{grid-template-columns:minmax(0,1fr) auto;row-gap:5px}
+  .cmd-label{grid-column:1 / -1}
+}
 </style></head><body>
 
 <div id="loginbox" class="login hide">
@@ -762,6 +780,34 @@ td.rate{font-weight:700}
     </div>
   </section>
 
+  <!-- Commands: the four things this desk is started with, as text to copy. -->
+  <section class="note-card cmd-card" id="cmdCard">
+    <div class="note-head"><b>Commands</b></div>
+    <div class="cmd-rows">
+      <div class="cmd-row">
+        <span class="cmd-label">Start Burst (Dispatch)</span>
+        <code class="cmd-text">Open C:\Users\Marqu\Documents\EFA\EFA_BURST.md and run it exactly as written.</code>
+        <button class="btn ghost cmd-copy" type="button">Copy</button>
+      </div>
+      <div class="cmd-row">
+        <span class="cmd-label">Start Reverse Funnel (Dispatch)</span>
+        <code class="cmd-text">Open C:\Users\Marqu\Documents\EFA\EFA_REVERSE_FUNNEL.md and run it exactly as written.</code>
+        <button class="btn ghost cmd-copy" type="button">Copy</button>
+      </div>
+      <div class="cmd-row">
+        <span class="cmd-label">Night report (chat)</span>
+        <code class="cmd-text">how did the night go</code>
+        <button class="btn ghost cmd-copy" type="button">Copy</button>
+      </div>
+      <div class="cmd-row">
+        <span class="cmd-label">Plan tomorrow (chat)</span>
+        <code class="cmd-text">Tomorrow stage 30 from ca-teachers-approaching with default</code>
+        <button class="btn ghost cmd-copy" type="button">Copy</button>
+      </div>
+    </div>
+  </section>
+  <p class="cmd-note">Rows 1 and 2 go into Dispatch in the Claude app; rows 3 and 4 go to Claude in the Edwards Financial project.</p>
+
 </main>
 
 <div class="modal-backdrop hide" id="addModal" data-act="add-backdrop">
@@ -821,6 +867,17 @@ function clipFallback(text,done){
   try{ document.execCommand('copy'); }catch(e){}
   ta.remove(); done();
 }
+
+/* Commands card. The text that gets copied is the text on the page, read back
+   out of the element, so the two can never drift apart. */
+document.addEventListener('click',e=>{
+  const b=e.target.closest('.cmd-copy'); if(!b) return;
+  const row=b.closest('.cmd-row'), el=row&&row.querySelector('.cmd-text');
+  if(!el) return;
+  writeClip(el.textContent,'Copied.');
+  b.textContent='Copied';
+  clearTimeout(b._x); b._x=setTimeout(()=>{b.textContent='Copy';},1400);
+});
 
 /* ---------------- MESSAGE CARDS, SHARED BY TODAY AND PROSPECTS ----------------
    One model, so a message behaves the same wherever it appears: editable,
