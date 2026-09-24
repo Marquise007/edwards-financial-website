@@ -20,7 +20,7 @@
 <meta property="og:image" content="https://edwardsfinancialassociates.com/edwards-og-image.jpg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -38,7 +38,9 @@
   html { scroll-behavior: smooth; }
 
   body {
-    font-family: 'Montserrat', sans-serif;
+    font-family: 'DM Sans', sans-serif;
+    font-variant-numeric: lining-nums tabular-nums;
+    font-feature-settings: "lnum" 1, "tnum" 1;
     background: var(--parchment);
     color: var(--ink);
     overflow-x: hidden;
@@ -127,6 +129,10 @@
   .nav-more > a{padding:13px 0;font-size:13px;border-bottom:1px solid var(--line)}
   .nav-more .nav-links-cta{display:grid;gap:8px;margin-top:16px}
   .nav-more .nav-links-cta .btn{width:100%;justify-content:center;min-height:44px;font-size:9.5px}
+  /* Above phone width: a 320px dropdown under the Menu button, right edges aligned. */
+  @media not all and (max-width:640px){
+    .nav-more{left:auto;width:320px}
+  }
   /* No-JS fallback: the old fixed collapse point. */
   @media (max-width:1360px){
     .nav:not(.nav-fit) .nav-links,.nav:not(.nav-fit) .nav-signin{display:none}
@@ -678,7 +684,7 @@
     letter-spacing: 0.2em; text-transform: uppercase; color: var(--warm-gray);
   }
   .portal-input {
-    font-family: 'Montserrat', sans-serif;
+    font-family: 'DM Sans', sans-serif;
     font-size: 13px; font-weight: 300;
     color: var(--ink); background: var(--white);
     border: 1px solid var(--rule);
@@ -690,7 +696,7 @@
   .portal-input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
   .portal-btn {
     width: 100%; padding: 16px;
-    font-family: 'Montserrat', sans-serif;
+    font-family: 'DM Sans', sans-serif;
     font-size: 10px; font-weight: 600;
     letter-spacing: 0.22em; text-transform: uppercase;
     background: var(--ink); color: var(--white);

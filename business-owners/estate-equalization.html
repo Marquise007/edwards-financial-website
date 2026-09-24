@@ -131,6 +131,10 @@ h1 em,h2 em{font-style:italic;color:var(--gold)}
 .nav-more > a{padding:13px 0;font-size:13px;border-bottom:1px solid var(--line)}
 .nav-more .nav-links-cta{display:grid;gap:8px;margin-top:16px}
 .nav-more .nav-links-cta .btn{width:100%;justify-content:center;min-height:44px;font-size:9.5px}
+/* Above phone width: a 320px dropdown under the Menu button, right edges aligned. */
+@media not all and (max-width:640px){
+  .nav-more{left:auto;width:320px}
+}
 /* No-JS fallback: the old fixed collapse point. */
 @media (max-width:1360px){
   .nav:not(.nav-fit) .nav-links,.nav:not(.nav-fit) .nav-signin{display:none}
