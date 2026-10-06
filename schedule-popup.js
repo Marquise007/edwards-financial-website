@@ -1,24 +1,27 @@
 /* Edwards Financial & Associates — branded scheduling popup
  *
- * One script, included on every page that links to Calendly. Any click on a
- * calendly.com link opens the calendar in a popup styled to the practice:
- * navy overlay, cream card, gold accents, Cormorant heading. Nobody leaves
- * the site to book a meeting.
+ * One script, included on every page with a "Schedule a Conversation" button.
+ * Every button links to /schedule, the single address the practice hands out
+ * (the same address behind the QR code on printed pieces). /schedule is a
+ * Pages Function (functions/schedule.js) that forwards to whichever scheduler
+ * the practice uses. To change schedulers, edit that one file; this script
+ * never needs to know what is behind /schedule.
  *
- * - The calendar itself is themed through Calendly's supported URL
- *   parameters (background, text, and button colors match the brand).
+ * - Any click on a /schedule link opens the calendar in a popup styled to the
+ *   practice: navy overlay, cream card, gold accents, Cormorant heading.
+ *   Nobody leaves the site to book a meeting.
+ * - Theme parameters ride along on the URL; Calendly honors them and other
+ *   schedulers ignore them.
  * - Esc, the close button, or a click outside the card closes it.
  * - Cmd/Ctrl/Shift-click and middle-click keep their browser meaning.
- * - Without JavaScript the links still work: they open Calendly in a new
+ * - Without JavaScript the links still work: they open /schedule in a new
  *   tab, so no visitor is ever stranded.
- * - Works for every current and future Calendly link on the site, any
- *   event type, with no per-link setup.
  */
 (function () {
   'use strict';
 
-  if (window.__efaCalendlyPopup) return;
-  window.__efaCalendlyPopup = true;
+  if (window.__efaSchedulePopup) return;
+  window.__efaSchedulePopup = true;
 
   var BRAND = {
     background: '#f7f5f1',
@@ -26,9 +29,10 @@
     accent: '#b8972e'
   };
 
-  function isCalendly(href) {
+  function isSchedule(href) {
     try {
       var u = new URL(href, window.location.href);
+      if (u.origin === window.location.origin && u.pathname.replace(/\/+$/, '') === '/schedule') return true;
       return u.hostname === 'calendly.com' || u.hostname.endsWith('.calendly.com');
     } catch (e) { return false; }
   }
@@ -138,7 +142,7 @@
     if (e.defaultPrevented) return;
     if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
     var a = e.target && e.target.closest ? e.target.closest('a[href]') : null;
-    if (!a || !isCalendly(a.href)) return;
+    if (!a || !isSchedule(a.href)) return;
     e.preventDefault();
     opener = a;
     open(a.href);
