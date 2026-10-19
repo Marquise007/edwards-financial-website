@@ -7,7 +7,9 @@
      - signing in here unlocks the Partner Portal,
    on this browser, until that person signs out. Each partner has their own
    email and password; there is no shared site password any more.
-   Accounts are managed in Supabase (Authentication → Users). */
+   Accounts are managed in Supabase (Authentication → Users). A session is not
+   enough on its own: the account must also be an approved partner
+   (partner_profiles.approved, checked through crm_is_operator()). */
 (function () {
   'use strict';
 
@@ -51,14 +53,29 @@
   });
   clientP.catch(function () {}); /* failures are handled where the client is used */
 
-  /* resolves true when this browser holds a live (or refreshable) portal session */
-  function hasSession() {
+  /* An approved partner, not merely a signed-in account. Sign-up is possible on the
+     auth service, so a session alone proves nothing; crm_is_operator() is the same
+     test row security applies to the CRM tables (approved row in partner_profiles).
+     Resolves 'ok', 'none' (no session), 'denied' (signed in, not approved) or 'error'. */
+  function partnerCheck(sb) {
+    return sb.rpc('crm_is_operator').then(function (r) {
+      if (r && !r.error && r.data === true) return 'ok';
+      if (r && !r.error && r.data === false) return 'denied';
+      return 'error';
+    }, function () { return 'error'; });
+  }
+  function access() {
     return clientP.then(function (sb) {
       return sb.auth.getSession().then(function (r) {
-        return !!(r && r.data && r.data.session);
+        if (!(r && r.data && r.data.session)) return 'none';
+        return partnerCheck(sb);
       });
-    }).catch(function () { return false; });
+    }).catch(function () { return 'error'; });
   }
+  var NOTE = {
+    denied: 'This account is not approved for partner access. Request access below, or sign in with your partner account.',
+    error: 'We could not confirm your access. Check your connection and refresh the page.'
+  };
 
   function storedSession() {
     try {
@@ -72,10 +89,15 @@
     else fn();
   }
 
-  function showGate() {
-    if (revealed || shown) return;
+  function showGate(note) {
+    if (revealed) return;
+    if (shown) { setNote(note); return; }
     shown = true;
-    whenReady(build);
+    whenReady(function () { build(); setNote(note); });
+  }
+  function setNote(note) {
+    var m = document.getElementById('efaGateMsg');
+    if (m && note) { m.className = 'gmsg err'; m.textContent = note; }
   }
 
   function build() {
@@ -147,6 +169,16 @@
     var btn = document.getElementById('efaGateGo');
     var msg = document.getElementById('efaGateMsg');
 
+    function remember(em, p) {
+      /* Chromium: ask the password manager to save this login (same one the portal uses) */
+      try {
+        if (window.PasswordCredential && navigator.credentials && navigator.credentials.store) {
+          navigator.credentials.store(new PasswordCredential({
+            id: em, name: 'Edwards Financial Partner', password: p
+          })).catch(function () {});
+        }
+      } catch (er) {}
+    }
     function say(kind, text) { msg.className = 'gmsg ' + kind; msg.textContent = text; }
     function shake() {
       var card = ov.querySelector('.gcard');
@@ -170,15 +202,21 @@
           say('err', m); shake(); pw.select();
           return;
         }
-        /* Chromium: ask the password manager to save this login (same one the portal uses) */
-        try {
-          if (window.PasswordCredential && navigator.credentials && navigator.credentials.store) {
-            navigator.credentials.store(new PasswordCredential({
-              id: em, name: 'Edwards Financial Partner', password: p
-            })).catch(function () {});
+        return clientP.then(partnerCheck).then(function (st) {
+          if (st !== 'ok') {
+            busy(false);
+            if (st === 'denied') {
+              clientP.then(function (sb) { sb.auth.signOut(); });
+              say('err', NOTE.denied);
+            } else {
+              say('err', NOTE.error);
+            }
+            shake();
+            return;
           }
-        } catch (er) {}
-        reveal();
+          remember(em, p);
+          reveal();
+        });
       }).catch(function () {
         busy(false);
         say('err', 'Could not reach the sign-in service. Check your connection and try again.');
@@ -206,16 +244,17 @@
   /* signing in from another tab (the portal, or another gated page) unlocks this one too */
   window.addEventListener('storage', function (e) {
     if (e.key === STORE && e.newValue && !revealed) {
-      hasSession().then(function (ok) { if (ok) reveal(); });
+      access().then(function (st) { if (st === 'ok') reveal(); });
     }
   });
 
   if (storedSession()) {
     /* a saved portal session exists: confirm it (refreshing if stale) before showing anything */
-    var fallback = setTimeout(showGate, 6000);
-    hasSession().then(function (ok) {
+    var fallback = setTimeout(function () { showGate(); }, 6000);
+    access().then(function (st) {
       clearTimeout(fallback);
-      ok ? reveal() : showGate();
+      if (st === 'ok') reveal();
+      else showGate(NOTE[st]);
     });
   } else {
     showGate();

@@ -1124,6 +1124,11 @@ async function gate(){
     location.replace('portal-partner-login.html?next='+back);
     return;
   }
+  /* Approved partners only; row security already returns nothing to anyone else. */
+  try{
+    const {data:ok,error}=await sb.rpc('crm_is_operator');
+    if(!error&&ok===false){ await sb.auth.signOut(); location.replace('portal-partner-login.html'); return; }
+  }catch(e){}
   await start(session);
 }
 async function start(session){

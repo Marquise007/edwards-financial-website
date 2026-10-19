@@ -774,6 +774,13 @@ button{font-family:inherit}
   async function init() {
     const { data: { session } } = await sb.auth.getSession();
     if (!session) { window.location.href = 'portal-partner-login.html'; return; }
+    // A session alone is not enough: the account must be an approved partner.
+    const { data: ok, error } = await sb.rpc('crm_is_operator');
+    if (!error && ok === false) {
+      await sb.auth.signOut();
+      window.location.href = 'portal-partner-login.html';
+      return;
+    }
     document.getElementById('user-email').textContent = session.user.email;
   }
 

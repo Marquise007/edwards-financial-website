@@ -1,0 +1,14 @@
+{
+  "version": 1,
+  "include": [
+    "/api/*",
+    "/schedule",
+    "/CLAUDE.md",
+    "/README.md",
+    "/package.json",
+    "/migrate/*",
+    "/supabase/*",
+    "/scripts/*"
+  ],
+  "exclude": []
+}

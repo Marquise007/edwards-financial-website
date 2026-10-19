@@ -611,198 +611,6 @@
   .footer-copy { font-size: 9px; font-weight: 400; letter-spacing: 0.15em; color: rgba(247,244,239,0.2); }
   .footer-disc { font-size: 9px; color: rgba(247,244,239,0.2); text-align: right; max-width: 300px; line-height: 1.6; }
 
-  /* CLIENT PORTAL MODAL */
-  .portal-overlay {
-    position: fixed; inset: 0; z-index: 999;
-    background: rgba(6,15,30,0.88);
-    backdrop-filter: blur(8px);
-    display: flex; align-items: center; justify-content: center;
-    opacity: 0; pointer-events: none;
-    transition: opacity 0.35s;
-  }
-  .portal-overlay.active { opacity: 1; pointer-events: all; }
-  .portal-modal {
-    background: var(--parchment);
-    width: 100%; max-width: 480px;
-    position: relative;
-    transform: translateY(20px);
-    transition: transform 0.35s;
-  }
-  .portal-overlay.active .portal-modal { transform: translateY(0); }
-  .portal-modal-header {
-    background: var(--ink); padding: 40px 48px 32px;
-    position: relative;
-  }
-  .portal-modal-header::after {
-    content: ''; position: absolute; bottom: 0; left: 48px;
-    width: 40px; height: 2px; background: var(--gold);
-  }
-  .portal-modal-label {
-    font-size: 9px; font-weight: 500;
-    letter-spacing: 0.3em; text-transform: uppercase;
-    color: var(--gold); margin-bottom: 12px;
-  }
-  .portal-modal-title {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 30px; font-weight: 300; color: var(--white); line-height: 1.2;
-  }
-  .portal-close {
-    position: absolute; top: 20px; right: 20px;
-    background: none; border: none; cursor: pointer;
-    color: rgba(247,244,239,0.4); font-size: 20px;
-    transition: color 0.2s; line-height: 1;
-    font-family: sans-serif;
-  }
-  .portal-close:hover { color: var(--gold); }
-  .portal-modal-body { padding: 40px 48px; }
-
-  /* PORTAL TABS */
-  .portal-tabs { display: flex; gap: 0; margin-bottom: 32px; border-bottom: 1px solid var(--rule); }
-  .portal-tab {
-    font-size: 10px; font-weight: 500;
-    letter-spacing: 0.18em; text-transform: uppercase;
-    color: var(--warm-gray); padding: 0 0 14px;
-    margin-right: 32px; cursor: pointer;
-    border-bottom: 2px solid transparent;
-    margin-bottom: -1px;
-    transition: color 0.3s, border-color 0.3s;
-    background: none; border-left: none; border-right: none; border-top: none;
-  }
-  .portal-tab.active { color: var(--ink); border-bottom-color: var(--gold); }
-
-  /* PORTAL PANELS */
-  .portal-panel { display: none; }
-  .portal-panel.active { display: block; }
-
-  /* PORTAL STEPS */
-  .portal-step { display: none; flex-direction: column; gap: 20px; }
-  .portal-step.active { display: flex; }
-
-  .portal-field { display: flex; flex-direction: column; gap: 8px; }
-  .portal-label {
-    font-size: 9px; font-weight: 600;
-    letter-spacing: 0.2em; text-transform: uppercase; color: var(--warm-gray);
-  }
-  .portal-input {
-    font-family: 'DM Sans', sans-serif;
-    font-size: 13px; font-weight: 300;
-    color: var(--ink); background: var(--white);
-    border: 1px solid var(--rule);
-    padding: 14px 16px; outline: none;
-    transition: border-color 0.3s;
-    width: 100%;
-  }
-  .portal-input:focus { border-color: var(--gold); }
-  .portal-input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-  .portal-btn {
-    width: 100%; padding: 16px;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 10px; font-weight: 600;
-    letter-spacing: 0.22em; text-transform: uppercase;
-    background: var(--ink); color: var(--white);
-    border: none; cursor: pointer;
-    transition: background 0.3s; margin-top: 8px;
-  }
-  .portal-btn:hover { background: var(--gold-muted); }
-  .portal-btn-gold {
-    background: var(--gold); color: var(--ink);
-  }
-  .portal-btn-gold:hover { background: var(--gold-light); }
-  .portal-link {
-    font-size: 10px; font-weight: 400;
-    color: var(--warm-gray); text-align: center;
-    cursor: pointer; transition: color 0.2s;
-  }
-  .portal-link span { color: var(--gold); text-decoration: underline; }
-  .portal-link span:hover { color: var(--gold-muted); }
-  .portal-divider { display: flex; align-items: center; gap: 12px; margin: 4px 0; }
-  .portal-divider-line { flex: 1; height: 1px; background: var(--rule); }
-  .portal-divider-text { font-size: 9px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--rule); }
-
-  .portal-code-hint {
-    font-size: 11px; font-weight: 300; color: var(--warm-gray);
-    line-height: 1.7; padding: 16px; background: rgba(184,151,46,0.06);
-    border-left: 2px solid var(--gold);
-  }
-  .portal-code-inputs { display: flex; gap: 10px; justify-content: center; }
-  .portal-code-box {
-    width: 48px; height: 56px; text-align: center;
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 28px; font-weight: 400;
-    color: var(--ink); border: 1px solid var(--rule);
-    background: var(--white); outline: none;
-    transition: border-color 0.3s;
-  }
-  .portal-code-box:focus { border-color: var(--gold); }
-  .portal-resend {
-    font-size: 10px; color: var(--warm-gray); text-align: center;
-  }
-  .portal-resend span { color: var(--gold); cursor: pointer; }
-  .portal-resend span:hover { text-decoration: underline; }
-
-  .portal-success {
-    text-align: center; padding: 20px 0;
-  }
-  .portal-success-icon {
-    width: 56px; height: 56px;
-    border: 1px solid var(--gold); border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    margin: 0 auto 24px; color: var(--gold); font-size: 22px;
-  }
-  .portal-success-title {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 28px; font-weight: 300; color: var(--ink); margin-bottom: 12px;
-  }
-  .portal-success-sub { font-size: 12px; font-weight: 300; color: var(--warm-gray); line-height: 1.7; margin-bottom: 28px; }
-
-  /* PORTAL DASHBOARD (members view) */
-  .portal-dashboard { display: none; flex-direction: column; gap: 0; }
-  .portal-dashboard.active { display: flex; }
-  .portal-dash-header {
-    background: var(--ink); padding: 40px 48px 32px; position: relative;
-  }
-  .portal-dash-header::after {
-    content: ''; position: absolute; bottom: 0; left: 48px;
-    width: 40px; height: 2px; background: var(--gold);
-  }
-  .portal-dash-welcome {
-    font-size: 9px; font-weight: 500; letter-spacing: 0.3em;
-    text-transform: uppercase; color: var(--gold); margin-bottom: 8px;
-  }
-  .portal-dash-name {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 28px; font-weight: 300; color: var(--white);
-  }
-  .portal-dash-body { padding: 36px 48px; display: flex; flex-direction: column; gap: 12px; }
-  .portal-dash-label {
-    font-size: 9px; font-weight: 600; letter-spacing: 0.2em;
-    text-transform: uppercase; color: var(--warm-gray); margin-bottom: 4px;
-  }
-  .portal-tool {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 18px 20px; background: var(--white);
-    border: 1px solid var(--rule); cursor: pointer;
-    transition: border-color 0.3s, background 0.3s;
-  }
-  .portal-tool:hover { border-color: var(--gold); background: rgba(184,151,46,0.04); }
-  .portal-tool-name {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 20px; font-weight: 400; color: var(--ink);
-  }
-  .portal-tool-arrow { color: var(--gold); font-size: 16px; }
-  .portal-tool-coming {
-    font-size: 8px; font-weight: 600;
-    letter-spacing: 0.2em; text-transform: uppercase;
-    color: var(--warm-gray); opacity: 0.6;
-  }
-  .portal-dash-logout {
-    font-size: 9px; font-weight: 500; letter-spacing: 0.2em;
-    text-transform: uppercase; color: rgba(247,244,239,0.3);
-    padding: 0 48px 28px; cursor: pointer; transition: color 0.2s;
-    background: var(--ink); border: none; text-align: left;
-  }
-  .portal-dash-logout:hover { color: var(--gold); }
-
   /* ANIMATIONS */
   @keyframes fadeUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
   @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
@@ -821,8 +629,6 @@
     .serve, .services, .about, .contact, .philosophy, .process, .leverage-banner, .pension { padding-left: 32px; padding-right: 32px; }
     footer { flex-direction: column; gap: 16px; text-align: center; }
     .footer-disc { text-align: center; }
-    .portal-modal { margin: 16px; }
-    .portal-modal-header, .portal-modal-body, .portal-dash-body, .portal-dash-header { padding-left: 28px; padding-right: 28px; }
     .contact-info { flex-direction: column; gap: 28px; }
   }
 
@@ -903,7 +709,7 @@
       <a href="/#about">About</a>
       <span class="nav-links-cta">
         <a class="btn btn-ghost" href="/portal-partner-login.html">Partner Access</a>
-        <a class="btn btn-ghost" href="/?portal=1" data-portal>Client Portal</a>
+        <a class="btn btn-ghost" href="/portal-client-login" data-portal>Client Portal</a>
         <a class="btn btn-gold" href="/schedule" target="_blank" rel="noopener">Begin the Conversation</a>
       </span>
     </nav>
@@ -911,7 +717,7 @@
     <div class="nav-cta">
       <span class="nav-signin">
         <a href="/portal-partner-login.html">Partner Access</a>
-        <a href="/?portal=1" data-portal>Client Portal</a>
+        <a href="/portal-client-login" data-portal>Client Portal</a>
       </span>
       <a class="btn btn-gold" href="/schedule" target="_blank" rel="noopener">Begin the Conversation</a>
       <button class="nav-toggle" id="navtoggle" aria-expanded="false" aria-controls="navlinks">
@@ -1245,149 +1051,6 @@
   <p class="footer-disc">Investment and insurance products are not FDIC insured. This website is for informational purposes only and does not constitute financial advice.</p>
 </footer>
 
-<!-- CLIENT PORTAL MODAL -->
-<div class="portal-overlay" id="portalOverlay">
-
-  <!-- AUTH FLOW -->
-  <div class="portal-modal" id="authModal">
-    <div class="portal-modal-header">
-      <button class="portal-close" id="closePortal">&#x2715;</button>
-      <p class="portal-modal-label">Edwards Financial & Associates</p>
-      <p class="portal-modal-title">Client Portal</p>
-    </div>
-    <div class="portal-modal-body">
-      <div class="portal-tabs">
-        <button class="portal-tab active" data-tab="login">Sign In</button>
-        <button class="portal-tab" data-tab="register">Create Account</button>
-      </div>
-
-      <!-- LOGIN PANEL -->
-      <div class="portal-panel active" id="tab-login">
-        <div class="portal-step active" id="login-step1">
-          <div class="portal-field">
-            <label class="portal-label">Email Address</label>
-            <input class="portal-input" type="email" placeholder="you@example.com" id="login-email">
-          </div>
-          <div class="portal-field">
-            <label class="portal-label">Password</label>
-            <input class="portal-input" type="password" placeholder="••••••••••" id="login-password">
-          </div>
-          <button class="portal-btn portal-btn-gold" onclick="handleLogin()">Sign In</button>
-          <p class="portal-link">Forgot your password? <span onclick="alert('Password reset link sent.')">Reset it here</span></p>
-        </div>
-      </div>
-
-      <!-- REGISTER PANEL -->
-      <div class="portal-panel" id="tab-register">
-
-        <!-- Step 1: Basic Info -->
-        <div class="portal-step active" id="reg-step1">
-          <div class="portal-input-row">
-            <div class="portal-field">
-              <label class="portal-label">First Name</label>
-              <input class="portal-input" type="text" placeholder="First" id="reg-first">
-            </div>
-            <div class="portal-field">
-              <label class="portal-label">Last Name</label>
-              <input class="portal-input" type="text" placeholder="Last" id="reg-last">
-            </div>
-          </div>
-          <div class="portal-field">
-            <label class="portal-label">Email Address</label>
-            <input class="portal-input" type="email" placeholder="you@example.com" id="reg-email">
-          </div>
-          <div class="portal-field">
-            <label class="portal-label">Create Password</label>
-            <input class="portal-input" type="password" placeholder="Min. 8 characters" id="reg-password">
-          </div>
-          <button class="portal-btn" onclick="goToPhoneStep()">Continue</button>
-          <p class="portal-link">Already have an account? <span onclick="switchTab('login')">Sign in</span></p>
-        </div>
-
-        <!-- Step 2: Phone -->
-        <div class="portal-step" id="reg-step2">
-          <div class="portal-field">
-            <label class="portal-label">Mobile Phone Number</label>
-            <input class="portal-input" type="tel" placeholder="+1 (000) 000-0000" id="reg-phone">
-          </div>
-          <div class="portal-code-hint">
-            We'll send a 6-digit verification code to your mobile number. Standard message rates may apply.
-          </div>
-          <button class="portal-btn portal-btn-gold" onclick="sendCode()">Send Verification Code</button>
-          <p class="portal-link"><span onclick="backToStep1()">&#8592; Back</span></p>
-        </div>
-
-        <!-- Step 3: Verify Code -->
-        <div class="portal-step" id="reg-step3">
-          <div class="portal-code-hint" id="code-hint-text">
-            Enter the 6-digit code sent to your mobile number.
-          </div>
-          <div class="portal-code-inputs">
-            <input class="portal-code-box" type="text" maxlength="1" id="c0">
-            <input class="portal-code-box" type="text" maxlength="1" id="c1">
-            <input class="portal-code-box" type="text" maxlength="1" id="c2">
-            <input class="portal-code-box" type="text" maxlength="1" id="c3">
-            <input class="portal-code-box" type="text" maxlength="1" id="c4">
-            <input class="portal-code-box" type="text" maxlength="1" id="c5">
-          </div>
-          <button class="portal-btn portal-btn-gold" onclick="verifyCode()">Verify & Create Account</button>
-          <p class="portal-resend">Didn't receive it? <span onclick="sendCode()">Resend code</span></p>
-        </div>
-
-        <!-- Step 4: Success -->
-        <div class="portal-step" id="reg-step4">
-          <div class="portal-success">
-            <div class="portal-success-icon">&#10003;</div>
-            <p class="portal-success-title">Account Created</p>
-            <p class="portal-success-sub">Your identity has been verified and your account is active. Welcome to the Edwards Financial client portal.</p>
-            <button class="portal-btn portal-btn-gold" onclick="openDashboard()">Enter Portal</button>
-          </div>
-        </div>
-
-      </div>
-    </div>
-  </div>
-
-  <!-- DASHBOARD (members only) -->
-  <div class="portal-modal portal-dashboard" id="dashModal">
-    <div class="portal-dash-header">
-      <button class="portal-close" id="closeDash">&#x2715;</button>
-      <p class="portal-dash-welcome">Welcome Back</p>
-      <p class="portal-dash-name" id="dash-name">Client</p>
-    </div>
-    <div class="portal-dash-body">
-      <p class="portal-dash-label">Advanced Strategies</p>
-      <div class="portal-tool" onclick="openTool('premium-finance-illustrator.html')">
-        <span class="portal-tool-name">Premium Finance Illustrator</span>
-        <span class="portal-tool-arrow">&#8594;</span>
-      </div>
-      <div class="portal-tool" style="opacity:0.5;cursor:default;">
-        <span class="portal-tool-name">Estate Multiplication Calculator</span>
-        <span class="portal-tool-coming">Coming Soon</span>
-      </div>
-      <div class="portal-tool" style="opacity:0.5;cursor:default;">
-        <span class="portal-tool-name">Annuity Income Planner</span>
-        <span class="portal-tool-coming">Coming Soon</span>
-      </div>
-      <p class="portal-dash-label" style="margin-top:16px;">Portal</p>
-      <div class="portal-tool" style="opacity:0.5;cursor:default;">
-        <span class="portal-tool-name">Client Document Vault</span>
-        <span class="portal-tool-coming">Coming Soon</span>
-      </div>
-      <div class="portal-tool" style="opacity:0.5;cursor:default;">
-        <span class="portal-tool-name">Policy Review Center</span>
-        <span class="portal-tool-coming">Coming Soon</span>
-      </div>
-    </div>
-    <button class="portal-dash-logout" onclick="logout()">Sign Out</button>
-  </div>
-
-</div>
-
-<!-- TOOL VIEWER OVERLAY -->
-<div id="toolOverlay" style="position:fixed;inset:0;z-index:200;background:#060f1e;display:none;flex-direction:column;">
-  <iframe id="toolFrame" style="flex:1;width:100%;height:100%;border:none;" src="" title="Client Tool"></iframe>
-</div>
 
 <script>
 
@@ -1398,140 +1061,9 @@
   }, { threshold: 0.12 });
   reveals.forEach(el => observer.observe(el));
 
-  // Portal open/close
-  const overlay = document.getElementById('portalOverlay');
-  const authModal = document.getElementById('authModal');
-  const dashModal = document.getElementById('dashModal');
-
-  function openPortalModal() {
-    overlay.classList.add('active');
-    document.body.style.overflow = 'hidden';
-    const loggedIn = sessionStorage.getItem('efa_user');
-    if (loggedIn) {
-      authModal.style.display = 'none';
-      dashModal.classList.add('active');
-      document.getElementById('dash-name').textContent = sessionStorage.getItem('efa_name') || 'Client';
-    } else {
-      authModal.style.display = '';
-      dashModal.classList.remove('active');
-    }
-  }
-  function closePortalModal() {
-    overlay.classList.remove('active');
-    document.body.style.overflow = '';
-  }
-
-  // The standard nav's Client Portal links call this; see the [data-portal] handler.
-  window.openClientPortal = openPortalModal;
-
-  // Arriving from another page's Client Portal link (/?portal=1) opens the modal.
-  if (new URLSearchParams(location.search).get('portal') === '1') {
-    openPortalModal();
-  }
-
-  document.getElementById('closePortal').addEventListener('click', closePortalModal);
-  document.getElementById('closeDash').addEventListener('click', closePortalModal);
-  overlay.addEventListener('click', e => { if (e.target === overlay) closePortalModal(); });
-
-  // Tabs
-  document.querySelectorAll('.portal-tab').forEach(tab => {
-    tab.addEventListener('click', () => switchTab(tab.dataset.tab));
-  });
-  function switchTab(name) {
-    document.querySelectorAll('.portal-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === name));
-    document.querySelectorAll('.portal-panel').forEach(p => p.classList.toggle('active', p.id === 'tab-' + name));
-  }
-
-  // Login
-  function handleLogin() {
-    const email = document.getElementById('login-email').value.trim();
-    const pass = document.getElementById('login-password').value;
-    if (!email || !pass) { alert('Please enter your email and password.'); return; }
-    // Demo: accept any credentials
-    sessionStorage.setItem('efa_user', email);
-    sessionStorage.setItem('efa_name', email.split('@')[0]);
-    openDashboard();
-  }
-
-  // Register step navigation
-  function showStep(panel, step) {
-    document.querySelectorAll('#' + panel + ' .portal-step').forEach(s => s.classList.remove('active'));
-    document.getElementById(step).classList.add('active');
-  }
-  function goToPhoneStep() {
-    const first = document.getElementById('reg-first').value.trim();
-    const last = document.getElementById('reg-last').value.trim();
-    const email = document.getElementById('reg-email').value.trim();
-    const pass = document.getElementById('reg-password').value;
-    if (!first || !last || !email || !pass) { alert('Please complete all fields.'); return; }
-    if (pass.length < 8) { alert('Password must be at least 8 characters.'); return; }
-    showStep('tab-register', 'reg-step2');
-  }
-  function backToStep1() { showStep('tab-register', 'reg-step1'); }
-
-  function sendCode() {
-    const phone = document.getElementById('reg-phone').value.trim();
-    if (!phone) { alert('Please enter your mobile number.'); return; }
-    // Store demo code
-    sessionStorage.setItem('efa_code', '123456');
-    document.getElementById('code-hint-text').textContent = 'Enter the 6-digit code sent to ' + phone + '. (Demo code: 123456)';
-    showStep('tab-register', 'reg-step3');
-    // Auto-advance code boxes
-    for (let i = 0; i < 6; i++) {
-      document.getElementById('c' + i).addEventListener('input', function() {
-        this.value = this.value.replace(/[^0-9]/g,'');
-        if (this.value && i < 5) document.getElementById('c' + (i+1)).focus();
-      });
-      document.getElementById('c' + i).addEventListener('keydown', function(e) {
-        if (e.key === 'Backspace' && !this.value && i > 0) document.getElementById('c' + (i-1)).focus();
-      });
-    }
-  }
-
-  function verifyCode() {
-    const entered = [0,1,2,3,4,5].map(i => document.getElementById('c'+i).value).join('');
-    const stored = sessionStorage.getItem('efa_code') || '123456';
-    if (entered !== stored) { alert('Incorrect code. Please try again.'); return; }
-    showStep('tab-register', 'reg-step4');
-  }
-
-  function openDashboard() {
-    const first = document.getElementById('reg-first').value.trim();
-    const email = document.getElementById('login-email').value.trim();
-    const name = first || (email ? email.split('@')[0] : 'Client');
-    sessionStorage.setItem('efa_user', 'active');
-    sessionStorage.setItem('efa_name', name.charAt(0).toUpperCase() + name.slice(1));
-    authModal.style.display = 'none';
-    dashModal.classList.add('active');
-    document.getElementById('dash-name').textContent = sessionStorage.getItem('efa_name');
-  }
-
-  // Tool launcher
-  function openTool(src) {
-    const overlay = document.getElementById('toolOverlay');
-    const frame = document.getElementById('toolFrame');
-    frame.src = src;
-    overlay.style.display = 'flex';
-    document.body.style.overflow = 'hidden';
-  }
-  window.closeTool = function() {
-    const overlay = document.getElementById('toolOverlay');
-    const frame = document.getElementById('toolFrame');
-    overlay.style.display = 'none';
-    frame.src = '';
-    document.body.style.overflow = 'hidden'; // keep portal scroll locked
-  };
-
-  function logout() {
-    sessionStorage.removeItem('efa_user');
-    sessionStorage.removeItem('efa_name');
-    dashModal.classList.remove('active');
-    authModal.style.display = '';
-    switchTab('login');
-    showStep('tab-register', 'reg-step1');
-    document.getElementById('login-email').value = '';
-    document.getElementById('login-password').value = '';
-  }
+  // Client Portal: the secure client sign-in lives at /portal-client-login.
+  // Old links and bookmarks that still carry /?portal=1 are forwarded there.
+  if (new URLSearchParams(location.search).get('portal') === '1') location.replace('/portal-client-login');
 </script>
 <script>
 /* Priority+ nav. Links stay in the bar while they fit and move into the Menu one at a
@@ -1583,17 +1115,6 @@
   t.addEventListener('click',function(){setOpen(!menu.classList.contains('open'));});
   document.addEventListener('keydown',function(e){
     if(e.key==='Escape'&&menu.classList.contains('open')){setOpen(false);t.focus();}
-  });
-})();
-</script>
-<script>
-(function(){
-  /* Client Portal. On the home page the modal opens in place; everywhere else the
-     link carries ?portal=1 home and index.html opens it on load. */
-  document.querySelectorAll('[data-portal]').forEach(function(a){
-    a.addEventListener('click',function(e){
-      if(typeof window.openClientPortal==='function'){e.preventDefault();window.openClientPortal();}
-    });
   });
 })();
 </script>
