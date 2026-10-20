@@ -668,6 +668,16 @@ footer .views{opacity:.7}
         <div class="f c2"><label>Gender <span class="optional">as listed on the application</span></label>
           <span class="yn" data-seg="gender" data-a="M" data-b="F"><button type="button">M</button><button type="button">F</button></span>
         </div>
+        <div class="f c6"><label>Marital status</label>
+          <div class="chips" data-pick="marital">
+            <button type="button" class="chip" data-v="Single">Single</button>
+            <button type="button" class="chip" data-v="Married">Married</button>
+            <button type="button" class="chip" data-v="Domestic partner">Domestic partner</button>
+            <button type="button" class="chip" data-v="Divorced">Divorced</button>
+            <button type="button" class="chip" data-v="Widowed">Widowed</button>
+            <button type="button" class="chip" data-v="Separated">Separated</button>
+          </div>
+        </div>
         <div class="f c6"><label>Home address</label><input type="text" data-m="street" name="street_address" placeholder="Street" autocomplete="street-address"></div>
         <div class="f c3"><label>City</label><input type="text" data-m="city" name="city" autocomplete="address-level2"></div>
         <div class="f c1"><label>State</label><input type="text" data-m="state" name="state" maxlength="2" autocomplete="address-level1"></div>
@@ -675,6 +685,10 @@ footer .views{opacity:.7}
       </div>
       <div class="toggleRow"><input type="checkbox" class="tgl" data-t="mail_diff"><span>My mailing address is different</span></div>
       <div class="grid" id="mailWrap" style="display:none"><div class="f c6"><label>Mailing address</label><input type="text" data-m="mail_addr" name="mailing_address" autocomplete="section-mailing street-address"></div></div>
+      <div class="qrow"><p>Have you moved to this home address within the past 3 months?</p><span class="yn" data-yn="addr_chg"><button type="button">Yes</button><button type="button">No</button></span></div>
+      <div class="grid" id="addrChgWrap" style="display:none"><div class="f c6"><label>Your previous address</label><input type="text" data-m="prev_addr" autocomplete="off"></div></div>
+      <div class="qrow"><p>Have you ever used another name, such as a maiden name?</p><span class="yn" data-yn="aka"><button type="button">Yes</button><button type="button">No</button></span></div>
+      <div class="grid" id="akaWrap" style="display:none"><div class="f c6"><label>Other names used</label><input type="text" data-m="aka_names" autocomplete="off"></div></div>
       <div class="grid">
         <div class="f c2"><label>Mobile phone</label><input type="tel" data-phone data-m="mobile" name="mobile_phone" autocomplete="mobile tel" inputmode="tel" placeholder="(555) 555-5555"></div>
         <div class="f c2"><label>Home phone <span class="optional">optional</span></label><input type="tel" data-phone data-m="home" name="home_phone" autocomplete="home tel" inputmode="tel" placeholder="(555) 555-5555"></div>
@@ -697,6 +711,12 @@ footer .views{opacity:.7}
         <div class="f c3"><label>Industry</label><input type="text" data-m="industry" name="industry"></div>
         <div class="f c3"><label>Annual income <span class="optional">estimate is fine</span></label><input type="text" data-m="income" name="annual_income" inputmode="numeric"></div>
         <div class="f c3"><label>Net worth <span class="optional">estimate is fine</span></label><input type="text" data-m="networth" name="net_worth" inputmode="numeric"></div>
+      </div>
+      <div class="qrow"><p>Are you on active military duty, or the spouse or dependent of someone who is?</p><span class="yn" data-yn="military"><button type="button">Yes</button><button type="button">No</button></span></div>
+      <div class="qrow" style="border-bottom:0"><p>How would you like to receive your policy?</p></div>
+      <div class="chips" data-pick="delivery">
+        <button type="button" class="chip" data-v="email">Email (electronic delivery)</button>
+        <button type="button" class="chip" data-v="paper">Paper, by mail</button>
       </div>
       <button type="button" class="next" data-go="about">That's everything about me</button>
       <p class="warn" id="w1">Name, date of birth, and email help us start; add what you can.</p>
@@ -780,7 +800,9 @@ footer .views{opacity:.7}
       <div class="toggleRow"><input type="checkbox" class="tgl" data-t="notify"><span>Notify me of every premium change, even $25 or less</span></div>
       <div class="qrow" style="border-bottom:0"><p>Where will the premium come from? <span class="hint">Pick all that apply.</span></p></div>
       <div class="chips" data-multi="src">
-        <button type="button" class="chip" data-v="income">Income or savings</button>
+        <button type="button" class="chip" data-v="income">Salary or earned income</button>
+        <button type="button" class="chip" data-v="savings">Savings or investments</button>
+        <button type="button" class="chip" data-v="x1035">An existing policy or annuity (1035 exchange)</button>
         <button type="button" class="chip" data-v="home">Home equity</button>
         <button type="button" class="chip" data-v="third">A third party</button>
         <button type="button" class="chip" data-v="loan">A loan or premium financing</button>
@@ -817,6 +839,8 @@ footer .views{opacity:.7}
         <div class="qrow"><p>Are you considering using money from any of them to help pay for the new policy?</p><span class="yn" data-yn="funds"><button type="button">Yes</button><button type="button">No</button></span></div>
       </div>
       <div class="qrow"><p>In the past 12 months, have you applied for life or disability insurance anywhere, or is an application pending?</p><span class="yn" data-yn="applied"><button type="button">Yes</button><button type="button">No</button></span></div>
+      <div class="qrow"><p>In the past 10 years, has an application for life insurance been declined or postponed, or offered to you at a higher rate or with changes?</p><span class="yn" data-yn="declined"><button type="button">Yes</button><button type="button">No</button></span></div>
+      <div class="grid" id="declWrap" style="display:none"><div class="f c6"><label>Company, year, and what happened</label><input type="text" data-m="declined_details"></div></div>
       <button type="button" class="next" data-go="exist">That covers my existing coverage</button>
       <p class="warn" id="w5">Answer both questions to continue.</p>
     </div>
@@ -828,12 +852,12 @@ footer .views{opacity:.7}
     <div class="body">
       <p class="hint">Every carrier asks these. Tap anything that applies to you; a yes is common and rarely a problem. If none apply, one tap covers them all.</p>
       <div class="chips" data-flag="life">
-        <button type="button" class="chip" data-k="l1">Tickets, DUI, or suspended license · past 5 yrs</button>
+        <button type="button" class="chip" data-k="l1">Tickets, at-fault accidents, DUI, or suspended license · past 5 yrs</button>
         <button type="button" class="chip" data-k="l2">Felony or misdemeanor charge · past 10 yrs</button>
         <button type="button" class="chip" data-k="l3">Bankruptcy not yet discharged</button>
         <button type="button" class="chip" data-k="l4">Racing, scuba, skydiving, climbing, BASE, or caving</button>
         <button type="button" class="chip" data-k="l5">I fly aircraft (not as a passenger)</button>
-        <button type="button" class="chip" data-k="l6">Living or traveling abroad · next 2 yrs</button>
+        <button type="button" class="chip" data-k="l6">Abroad 30+ days in the past 12 months, or plans to live or travel abroad · next 2 yrs</button>
         <button type="button" class="chip" data-k="l7">Offered cash or free insurance to apply</button>
         <button type="button" class="chip" data-k="l8">Discussed selling this policy to a third party</button>
       </div>
@@ -848,6 +872,7 @@ footer .views{opacity:.7}
   <section class="card locked" id="sec7">
     <header><span class="stepnum num">7</span><h2>Your health</h2><span class="receipt" id="r7"></span><span class="edit">Edit</span></header>
     <div class="body">
+      <div class="qrow"><p>Do you currently have health insurance coverage?</p><span class="yn" data-yn="healthins"><button type="button">Yes</button><button type="button">No</button></span></div>
       <div class="qrow"><p>Do you have a primary doctor or clinic?</p><span class="yn" data-yn="doc"><button type="button">Yes</button><button type="button">No</button></span></div>
       <div class="grid" id="docWrap" style="display:none">
         <div class="f c6"><label>Doctor or clinic, name and address</label><input type="text" data-m="doc_name"></div>
@@ -866,7 +891,7 @@ footer .views{opacity:.7}
       <div class="qrow"><p>Gained or lost weight in the past 12 months?</p><span class="yn" data-yn="wt"><button type="button">Yes</button><button type="button">No</button></span></div>
       <div class="grid" id="wtWrap" style="display:none"><div class="f c6"><label>Roughly how much, and why</label><input type="text" data-m="wt_details"></div></div>
       <div class="qrow"><p>Any prescription or over-the-counter medications in the past 12 months, including aspirin or supplements?</p><span class="yn" data-yn="meds"><button type="button">Yes</button><button type="button">No</button></span></div>
-      <div class="grid" id="medsWrap" style="display:none"><div class="f c6"><label>Medications and the reason for each</label><input type="text" data-m="meds_list"></div></div>
+      <div class="grid" id="medsWrap" style="display:none"><div class="f c6"><label>Medications and the reason for each</label><input type="text" data-m="meds_list" placeholder="Medication, dose if you know it, and the reason your doctor prescribed it"></div></div>
       <div class="qrow"><p>Any tobacco or nicotine in the past 5 years? Cigarettes, vaping, cigars, chew, gum, or patch.</p><span class="yn" data-yn="nic"><button type="button">Yes</button><button type="button">No</button></span></div>
       <div class="grid" id="nicWrap" style="display:none">
         <div class="f c2"><label>Type</label><input type="text" data-m="nic_type"></div>
@@ -909,6 +934,8 @@ footer .views{opacity:.7}
           <button type="button" class="chip" data-k="appt">Upcoming medical appointment</button>
           <button type="button" class="chip" data-k="workless">Worked less than full time, or a disability claim</button>
         </div>
+        <div class="grid" id="testsWrap" style="display:none"><div class="f c6"><label>Which tests or doctor, when, the reason, and the result</label><input type="text" data-m="tests_details"></div></div>
+        <div class="grid" id="hospWrap" style="display:none"><div class="f c6"><label>Hospital or ER, when, the reason, and the outcome</label><input type="text" data-m="hosp_details"></div></div>
         <div class="grid" id="apptWrap" style="display:none"><div class="f c6"><label>Appointment date, provider, and reason</label><input type="text" data-m="appt_details"></div></div>
       </div>
 
@@ -1049,7 +1076,7 @@ function newState(){return{
   jc_on:false,jc_kind:null,jc_name:'',jc_dob:'',jc_rel:'',
   pben:[],cb_on:false,cben:[],
   coverage:'',premium:'',freq:null,draft:'',notify:false,
-  src:{income:false,home:false,third:false,loan:false,other:false},src_other:'',
+  src:{income:false,savings:false,x1035:false,home:false,third:false,loan:false,other:false},src_other:'',
   bank_now:false,bank_name:'',acct_name:'',routing:'',acct:'',acct_type:null,
   inforce:null,ifRows:[],replace:null,funds:null,applied:null,
   life:{l1:null,l2:null,l3:null,l4:null,l5:null,l6:null,l7:null,l8:null},life_details:'',
@@ -1060,7 +1087,9 @@ function newState(){return{
   sub:null,adl:null,adlSel:{a:null,b:null,c:null},
   f_liv:null,f_age:'',f_cause:'',m_liv:null,m_age:'',m_cause:'',famdx:null,
   kids:false,kRows:[],kq1:null,kq2:null,kq3:null,kq4:null,juv:false,guard:null,jRows:[],
-  anything:'',derived:[]
+  anything:'',derived:[],
+  marital:null,addr_chg:null,prev_addr:'',aka:null,aka_names:'',military:null,delivery:null,
+  declined:null,declined_details:'',healthins:null,tests_details:'',hosp_details:''
 };}
 
 const COND_LABELS={a:'Heart or blood pressure',b:'Stroke or circulation',c:'Lungs or breathing',d:'Digestive or liver',e:'Brain or nerves',f:'Eyes, ears, nose, throat',g:'Thyroid or glands',h:'Bones, joints, back',i:'Kidney or urinary',j:'Reproductive or breast',k:'Skin',l:'Mental or emotional health',m:'Blood disorders',n:'HIV or AIDS',o:'Cancer or growths',p:'Diabetes or blood sugar',q:'Amputation from illness',r:'Autoimmune, lupus related',s:"Parkinson's, ALS, MS"};
@@ -1074,7 +1103,12 @@ function gapsFor(key,S){
     need(_has(S.dob),'date of birth');
     need(_has(S.birth),'birth state and country');
     need(S.gender!==null,'gender as listed on the application');
+    need(S.marital!==null,'marital status');
     need(_has(S.street)&&_has(S.city)&&_has(S.state)&&_has(S.zip),'home address');
+    need(S.addr_chg!==null,'whether you moved in the past 3 months');
+    if(S.addr_chg===true)need(_has(S.prev_addr),'your previous address');
+    need(S.aka!==null,'whether you have used another name');
+    if(S.aka===true)need(_has(S.aka_names),'the other names you have used');
     need(_has(S.mobile)||_has(S.home)||_has(S.workph),'a phone number');
     need(_has(S.email),'email address');
     need(_has(S.dl)&&_has(S.dl_state),"driver's license number and state");
@@ -1085,6 +1119,8 @@ function gapsFor(key,S){
     need(_has(S.industry),'industry');
     need(_has(S.income),'annual income');
     need(_has(S.networth),'net worth');
+    need(S.military!==null,'the active military question');
+    need(S.delivery!==null,'how you would like to receive your policy');
   }
   if(key==='own'&&S.own_self===false){
     need(S.own_type!==null,'what kind of owner this is');
@@ -1121,6 +1157,8 @@ function gapsFor(key,S){
   if(key==='exist'){
     need(S.inforce!==null,'whether you have coverage in force');
     need(S.applied!==null,'whether you applied anywhere in the past 12 months');
+    need(S.declined!==null,'whether coverage was ever declined, postponed, or rated');
+    if(S.declined===true)need(_has(S.declined_details),'details of the declined or rated application');
     if(S.inforce===true){
       need(S.ifRows.filter(r=>_has(r.co)).length>0,'details of your existing contracts');
       S.ifRows.filter(r=>_has(r.co)).forEach(r=>{
@@ -1138,6 +1176,7 @@ function gapsFor(key,S){
     if(Object.values(S.life).some(v=>v===true))need(_has(S.life_details),'details for the lifestyle items you flagged');
   }
   if(key==='health'){
+    need(S.healthins!==null,'whether you have health insurance');
     need(S.doc!==null,'whether you have a primary doctor');
     if(S.doc===true){need(_has(S.doc_name),"your doctor's name and address");need(_has(S.doc_last),'the date you were last seen');need(_has(S.doc_reason),'the reason for that visit');}
     need(_has(S.height),'height');need(_has(S.weight),'weight');
@@ -1156,6 +1195,8 @@ function gapsFor(key,S){
     need(S.ev!==null,'the recent medical events question');
     if(S.ev===true){
       need(Object.values(S.evSel).some(v=>v===true),'which recent events apply');
+      if(S.evSel.tests===true)need(_has(S.tests_details),'details of the tests or doctor visits');
+      if(S.evSel.hosp===true)need(_has(S.hosp_details),'details of the hospital or ER visit');
       if(S.evSel.appt===true)need(_has(S.appt_details),'your upcoming appointment details');
     }
     need(S.sub!==null,'the substance question');
@@ -1247,7 +1288,8 @@ function buildFields(S){
   if(S.coverage)F.c_coverage_amt=S.coverage; if(S.premium)F.c_premium_amt=S.premium;
   if(S.freq==='m')F.c_fq_m=true; if(S.freq==='q')F.c_fq_q=true; if(S.freq==='s')F.c_fq_s=true; if(S.freq==='a')F.c_fq_a=true;
   if(S.draft)F.c_draft_day=S.draft; if(S.notify)F.c_notify_small=true;
-  if(S.src.income)F.c_src_income=true; if(S.src.home)F.c_src_home=true; if(S.src.third)F.c_src_third=true; if(S.src.loan)F.c_src_loan=true;
+  /* the questionnaire PDF has one "income or savings" box; the finer split prints on the Additional Answers page */
+  if(S.src.income||S.src.savings||S.src.x1035)F.c_src_income=true; if(S.src.home)F.c_src_home=true; if(S.src.third)F.c_src_third=true; if(S.src.loan)F.c_src_loan=true;
   if(S.src.other&&S.src_other)F.c_src_other_txt=S.src_other;
   if(S.bank_now){
     if(S.bank_name)F.c_bank_name=S.bank_name; if(S.acct_name)F.c_bank_acct_name=S.acct_name;
@@ -1310,14 +1352,40 @@ function buildFields(S){
         if(r.person)F['c_j'+n+'_person']=r.person; if(r.co)F['c_j'+n+'_co']=r.co; if(r.amt)F['c_j'+n+'_amt']=r.amt;});
     }
   }
-  const extraP=S.pben.slice(2).map(b=>'Additional primary beneficiary: '+b.name+' ('+(b.rel||'')+', '+(b.share||'')+'%)');
-  const extraC=(S.cb_on?S.cben:[]).slice(2).map(b=>'Additional backup beneficiary: '+b.name+' ('+(b.rel||'')+', '+(b.share||'')+'%)');
-  const extras=[...extraP,...extraC];
-  const anyth=[S.anything,...extras].filter(Boolean).join('  ');
+  const nExtra=S.pben.slice(2).filter(b=>_has(b.name)).length+(S.cb_on?S.cben.slice(2).filter(b=>_has(b.name)).length:0);
+  const pointer=nExtra?(nExtra+' additional beneficiar'+(nExtra===1?'y':'ies')+' listed in full on the Additional Answers page.'):'';
+  const anyth=[S.anything,pointer].filter(Boolean).join('  ');
   if(anyth)F.c_anything=anyth;
   return F;
 }
-if(typeof module!=='undefined')module.exports={newState,buildFields,COND_LABELS,gapsFor,allGaps,SECTION_TITLE};
+
+/* Answers the questionnaire template has no box for. They print on an
+   "Additional Answers" page appended after the template, show in the review,
+   and on the agent entry sheet. Each row: {section,label,value}. */
+const SRC_LABELS={income:'Salary or earned income',savings:'Savings or investments',x1035:'Existing policy or annuity (1035 exchange)',home:'Home equity',third:'A third party',loan:'Loan or premium financing',other:'Other'};
+function _yn(v){return v===true?'Yes':v===false?'No':'';}
+function supplementLines(S){
+  const L=[];const add=(section,label,value)=>{if(_has(value))L.push({section,label,value:String(value)});};
+  add('About you','Marital status',S.marital);
+  add('About you','Moved to this address in the past 3 months',_yn(S.addr_chg));
+  if(S.addr_chg===true)add('About you','Previous address',S.prev_addr);
+  add('About you','Has used another name',_yn(S.aka));
+  if(S.aka===true)add('About you','Other names used',S.aka_names);
+  add('About you','Active military, or spouse or dependent of active military',_yn(S.military));
+  add('About you','Policy delivery',S.delivery==='email'?'Email (electronic delivery)':S.delivery==='paper'?'Paper, by mail':'');
+  const src=Object.keys(SRC_LABELS).filter(k=>S.src&&S.src[k]).map(k=>k==='other'&&S.src_other?'Other: '+S.src_other:SRC_LABELS[k]);
+  if(src.length)add('Payment','Premium source',src.join('; '));
+  add('Existing coverage','Declined, postponed, or rated in the past 10 years',_yn(S.declined));
+  if(S.declined===true)add('Existing coverage','Details',S.declined_details);
+  add('Health','Has health insurance coverage',_yn(S.healthins));
+  if(S.ev===true&&S.evSel.tests===true)add('Health','Tests or other doctor, details',S.tests_details);
+  if(S.ev===true&&S.evSel.hosp===true)add('Health','Hospital or ER visit, details',S.hosp_details);
+  const benLine=(b)=>[b.rel,_has(b.share)?b.share+'%':'',_has(b.dob)?'born '+b.dob:'',b.phone,(b.lives?homeAddr(S):b.addr)].filter(_has).join(' · ');
+  S.pben.slice(2).forEach((b,i)=>{if(_has(b.name))add('Additional beneficiaries','Primary '+(i+3)+': '+b.name,benLine(b)||'details to follow');});
+  if(S.cb_on)S.cben.slice(2).forEach((b,i)=>{if(_has(b.name))add('Additional beneficiaries','Backup '+(i+3)+': '+b.name,benLine(b)||'details to follow');});
+  return L;
+}
+if(typeof module!=='undefined')module.exports={newState,buildFields,COND_LABELS,gapsFor,allGaps,SECTION_TITLE,supplementLines};
 </script>
 
 <script>
@@ -1486,7 +1554,11 @@ $$('[data-noneflag]').forEach(btn=>{
 function flagSideEffects(grp){
   if(grp==='life')$('#lifeDetail').style.display=Object.values(S.life).some(v=>v===true)?'block':'none';
   if(grp==='cond')renderCondDetails();
-  if(grp==='ev')$('#apptWrap').style.display=S.evSel.appt===true?'grid':'none';
+  if(grp==='ev'){
+    $('#apptWrap').style.display=S.evSel.appt===true?'grid':'none';
+    $('#testsWrap').style.display=S.evSel.tests===true?'grid':'none';
+    $('#hospWrap').style.display=S.evSel.hosp===true?'grid':'none';
+  }
 }
 function renderCondDetails(){
   const host=$('#condDetails');host.innerHTML='';
@@ -1509,7 +1581,7 @@ function benRow(list,i,host){
   d.innerHTML='<button type="button" class="rm" title="Remove">Remove</button>'+
    '<div class="grid">'+
    '<div class="f c3"><label>Full name</label><input type="text" data-bk="name" name="bene_name" autocomplete="section-'+sec+' name"></div>'+
-   '<div class="f c2"><label>Relationship</label><select data-bk="rel" name="bene_relationship"><option value=""></option><option>Spouse</option><option>Child</option><option>Parent</option><option>Sibling</option><option>Partner</option><option>Trust</option><option>Charitable organization</option><option>Other</option></select></div>'+
+   '<div class="f c2"><label>Relationship</label><select data-bk="rel" name="bene_relationship"><option value=""></option><option>Spouse</option><option>Child</option><option>Parent</option><option>Sibling</option><option>Grandchild</option><option>Niece/Nephew</option><option>Friend</option><option>Partner</option><option>Trust</option><option>Charitable organization</option><option>Other</option></select></div>'+
    '<div class="f c1"><label>Share %</label><input type="text" data-bk="share" inputmode="numeric"></div>'+
    '<div class="f c3"><label>Date of birth</label><input type="text" data-bk="dob" data-date name="bene_birth_date" autocomplete="section-'+sec+' bday" placeholder="mm/dd/yyyy" inputmode="numeric"></div>'+
    '<div class="f c3"><label>Phone <span class="optional">optional</span></label><input type="tel" data-phone data-bk="phone" name="bene_phone" autocomplete="section-'+sec+' tel" inputmode="tel" placeholder="(555) 555-5555"></div>'+
@@ -1584,6 +1656,11 @@ function syncVis(){
   $('#condWrap').style.display=S.cond===true?'block':'none';
   $('#evWrap').style.display=S.ev===true?'block':'none';
   $('#apptWrap').style.display=(S.ev===true&&S.evSel.appt===true)?'grid':'none';
+  $('#testsWrap').style.display=(S.ev===true&&S.evSel.tests===true)?'grid':'none';
+  $('#hospWrap').style.display=(S.ev===true&&S.evSel.hosp===true)?'grid':'none';
+  $('#addrChgWrap').style.display=S.addr_chg===true?'grid':'none';
+  $('#akaWrap').style.display=S.aka===true?'grid':'none';
+  $('#declWrap').style.display=S.declined===true?'grid':'none';
   $('#adlWrap').style.display=S.adl===true?'block':'none';
   $('#kidsWrap').style.display=S.kids===true?'block':'none';
   $('#juvWrap').style.display=S.juv?'block':'none';
@@ -1717,6 +1794,8 @@ function buildReview(){
   const condY=Object.keys(S.condSel).filter(k=>S.condSel[k]);
   add('Health',[['Doctor',S.doc===true?S.doc_name:'None on record'],['Height / weight',[S.height,S.weight].filter(Boolean).join(' · ')],['Medications',S.meds===true?(S.meds_list||'Yes'):'None'],['Nicotine (5 yrs)',S.nic===true?'Yes':'No'],['Conditions (10 yrs)',S.cond===true?condY.map(k=>COND_LABELS[k]).join(', '):'None'],['Recent medical events',S.ev===true?'Yes':'None'],['Substance question',S.sub===true?'Yes':'No'],['Daily living help',S.adl===true?'Yes':'No'],['Family history flag',S.famdx===true?'Yes':'No']]);
   if(S.kids)add('Children',[['Covered',S.kRows.filter(r=>r.name).map(r=>r.name).join(', ')]]);
+  const sup=supplementLines(S).filter(r=>MODE==='agent'||r.section!=='Payment');
+  if(sup.length)add('Additional answers',sup.map(r=>[r.label,r.value]));
   /* derived attestations */
   const dl=$('#derivedList');dl.innerHTML='';const items=[];
   if(S.derived.includes('life'))Object.entries(S.life).forEach(([k,v])=>{if(v===false){const lbl=$('[data-flag=life] .chip[data-k='+k+']');items.push(lbl?lbl.textContent:k);}});
@@ -1779,9 +1858,50 @@ async function makePdf(){
   if(!fonts){fonts=doc.context.obj({});DR.set(PDFName.of('Font'),fonts);}
   fonts.set(PDFName.of('Helvetica'),font.ref);
   form.updateFieldAppearances(font);
+  await appendSupplement(doc,font);
   const out=await doc.save();
   if(failed.length)console.warn('unwritten fields:',failed);
   return {bytes:out,blob:new Blob([out],{type:'application/pdf'}),name:'EFA_Intake_'+(S.last||'client')+'.pdf',filled:filled,failed:failed};
+}
+/* Additional Answers page(s): portrait Letter, appended after the questionnaire template */
+async function appendSupplement(doc,font){
+  const rows=supplementLines(S);
+  if(!rows.length)return 0;
+  const {rgb,StandardFonts}=PDFLib;
+  const bold=await doc.embedFont(StandardFonts.HelveticaBold);
+  const NAVY=rgb(13/255,30/255,58/255),GOLD=rgb(184/255,151/255,46/255),INK=rgb(0.16,0.18,0.24),MUT=rgb(0.42,0.45,0.52);
+  const W=612,H=792,M=54,COLW=W-2*M;
+  /* Helvetica covers Latin-1 only; normalize smart punctuation and drop anything else */
+  const clean=s=>String(s).replace(/[‘’]/g,"'").replace(/[“”]/g,'"').replace(/[–—]/g,'-').replace(/[^\x20-\x7E\xA0-\xFF]/g,'');
+  const wrap=(text,f,size,width)=>{const out=[];clean(text).split(/\n/).forEach(para=>{let line='';
+    para.split(/\s+/).forEach(w=>{const t=line?line+' '+w:w;
+      if(f.widthOfTextAtSize(t,size)<=width)line=t;
+      else{if(line)out.push(line);
+        while(f.widthOfTextAtSize(w,size)>width){let k=w.length;while(k>1&&f.widthOfTextAtSize(w.slice(0,k),size)>width)k--;out.push(w.slice(0,k));w=w.slice(k);}
+        line=w;}});
+    out.push(line);});return out;};
+  let page,y,pages=0;
+  const newPage=()=>{page=doc.addPage([W,H]);pages++;y=H-M;
+    page.drawText(pages===1?'Additional Answers':'Additional Answers (continued)',{x:M,y:y-18,size:20,font:bold,color:NAVY});
+    y-=28;page.drawRectangle({x:M,y:y,width:COLW,height:1.5,color:GOLD});y-=14;
+    if(pages===1){wrap('Prepared for '+(fullName(S)||'the applicant')+' on '+today()+'. These answers accompany the questionnaire and have no box on the preceding pages.',font,9.5,COLW).forEach(l=>{page.drawText(l,{x:M,y:y-10,size:9.5,font,color:MUT});y-=13;});y-=6;}
+  };
+  const need=h=>{if(y-h<M+20)newPage();};
+  newPage();
+  let sec='';
+  const LBLW=200,VALX=M+LBLW+12,VALW=COLW-LBLW-12;
+  rows.forEach(r=>{
+    if(r.section!==sec){sec=r.section;need(34);y-=8;
+      page.drawText(clean(sec.toUpperCase()),{x:M,y:y-10,size:9.5,font:bold,color:GOLD});y-=18;}
+    const lab=wrap(r.label,bold,9.5,LBLW),val=wrap(r.value,font,10,VALW);
+    const n=Math.max(lab.length,val.length),h=n*13+6;
+    need(h);
+    lab.forEach((l,i)=>page.drawText(l,{x:M,y:y-10-i*13,size:9.5,font:bold,color:NAVY}));
+    val.forEach((l,i)=>page.drawText(l,{x:VALX,y:y-10-i*13,size:10,font,color:INK}));
+    y-=h;page.drawRectangle({x:M,y:y+2,width:COLW,height:0.5,color:rgb(0.85,0.83,0.78)});
+  });
+  doc.getPages().slice(-pages).forEach((p,i)=>p.drawText('Edwards Financial & Associates  ·  Additional Answers  ·  '+(i+1)+' of '+pages,{x:M,y:30,size:8,font,color:MUT}));
+  return pages;
 }
 async function packageFile(){
   const p=await makePdf();
@@ -1869,6 +1989,8 @@ function buildSheet(){
     if(!rows.length)return;
     html+='<h2>'+t+'</h2><table>'+rows.map(([k,v])=>'<tr><td>'+label(k)+'</td><td>'+(v===true?'Yes ✓':String(v).replace(/</g,'&lt;'))+'</td></tr>').join('')+'</table>';
   });
+  const sup=supplementLines(S);
+  if(sup.length)html+='<h2>Supplement · answers with no box on form 8121CA</h2><table>'+sup.map(r=>'<tr><td>'+r.section+': '+r.label.replace(/</g,'&lt;')+'</td><td>'+r.value.replace(/</g,'&lt;')+'</td></tr>').join('')+'</table>';
   $('#sheet').innerHTML=html;
 }
 
