@@ -154,11 +154,15 @@ export async function onRequestPost(context) {
     const pdf = String(body.pdfBase64);
     if (pdf.length > MAX_BODY_BYTES) return json({ ok: false, error: 'Attachment too large.' }, 413);
     attachments.push({ filename: `${fileBase}.pdf`, content: pdf });
-  } else if (body.answers) {
-    attachments.push({ filename: `${fileBase}.json`, content: b64utf8(JSON.stringify(body.answers, null, 2)) });
-  } else {
-    return json({ ok: false, error: 'Nothing submitted.' }, 400);
   }
+  // v1 sends answers only when the PDF could not be built; v2 always sends them, so the
+  // machine-readable answers ride along with the PDF for the illustration and e-app routines.
+  if (body.answers) {
+    const ans = JSON.stringify(body.answers, null, 2);
+    if (ans.length > MAX_BODY_BYTES) return json({ ok: false, error: 'Answers too large.' }, 413);
+    attachments.push({ filename: `${fileBase}.json`, content: b64utf8(ans) });
+  }
+  if (!attachments.length) return json({ ok: false, error: 'Nothing submitted.' }, 400);
 
   const clientEmail = String(meta.email || '').trim();
   const out = Array.isArray(meta.outstanding) ? meta.outstanding : [];
@@ -170,8 +174,9 @@ export async function onRequestPost(context) {
     ['Phone', meta.phone || 'not provided'],
     ['Application fields captured', meta.fields || 0],
     ['Completed in', meta.mode === 'agent' ? 'agent view' : 'client view'],
+    ['Intake version', String(meta.version || 'v1').slice(0, 10)],
     ['Submitted', today],
-    ['Still outstanding', outCount ? `${outCount} item${outCount > 1 ? 's' : ''}` : 'nothing — complete'],
+    ['Still outstanding', outCount ? `${outCount} item${outCount > 1 ? 's' : ''}` : 'nothing, complete'],
   ];
   const outHtml = outCount
     ? `<div style="background:#fdf7e6;border:1px solid #dfc477;border-left:3px solid #b8972e;border-radius:6px;padding:10px 16px;margin-top:18px;">
