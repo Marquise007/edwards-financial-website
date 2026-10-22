@@ -468,7 +468,8 @@
         const ready = presReady(p);
         const cat = p.cats.filter((c) => c !== 'calc').map((c) => CAT_LABEL[c]).slice(0, 2).join(' · ') || 'Concept';
         return `<div class="card ${ready ? '' : 'is-pending'}" role="button" tabindex="0" data-key="${p.key}" aria-disabled="${!ready}">
-          <div class="card-top"><span class="card-cat">${esc(cat)}</span><button class="star" type="button" aria-label="Favorite" aria-pressed="${this.favs.includes(p.key)}" data-fav="${p.key}">${I.star}</button></div>
+          <div class="card-top"><span class="card-ic">${EFA.topicIcons ? EFA.topicIcons.svg(p.key) : ''}</span><button class="star" type="button" aria-label="Favorite" aria-pressed="${this.favs.includes(p.key)}" data-fav="${p.key}">${I.star}</button></div>
+          <span class="card-cat">${esc(cat)}</span>
           <h3 class="card-title">${cp(LIB, 'p.' + p.key)}</h3>
           <div class="card-meta"><span><span class="num">${p.screens.length}</span> ${p.screens.length === 1 ? 'screen' : 'screens'}</span>${ready ? '' : '<span class="tag-pending">In build</span>'}</div>
         </div>`;
