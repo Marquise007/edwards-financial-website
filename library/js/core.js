@@ -78,6 +78,12 @@
         } else {
           this.canEdit = true; // a standalone copy: edits stay on this device
         }
+        if (!this.db && EFA.supabaseSync && window.EFA_SYNC) {
+          // the website copy: wording and client files live in the firm's own database
+          const shared = await EFA.supabaseSync(window.EFA_SYNC);
+          if (shared) { this.db = shared; this.shared = shared; this.canEdit = shared.isAdmin; }
+          else this.canEdit = true;
+        }
         this.known = true;
         return this;
       });
