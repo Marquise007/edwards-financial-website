@@ -123,31 +123,38 @@ body.editing .ghost-pen { opacity: 1; color: var(--gold-deep); }
 .chip .ct { color: var(--muted); margin-left: 4px; font-size: 11.5px; }
 .chip[aria-pressed="true"] .ct { color: var(--gold-lt); }
 
-.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 14px; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 14px; }
 .card {
-  position: relative; display: grid; gap: 10px; align-content: start; text-align: left; min-width: 0;
-  background: var(--paper); border: 1px solid var(--rule); border-radius: 4px; padding: 16px 16px 14px;
-  transition: border-color .2s ease, box-shadow .2s ease, transform .2s ease; color: var(--navy);
+  position: relative; display: grid; grid-template-columns: 78px 1fr; gap: 16px; align-items: center; text-align: left; min-width: 0;
+  background: var(--navy); color: var(--cream); border: 1px solid rgba(184, 151, 46, .45); border-radius: 4px; padding: 16px 40px 16px 16px;
+  transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease;
 }
-.card:hover { border-color: var(--gold); box-shadow: 0 10px 24px rgba(13, 30, 58, .08); transform: translateY(-1px); }
-.card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
-.card-ic { width: 66px; height: 66px; border-radius: 17px; background: var(--navy); display: grid; place-items: center; box-shadow: inset 0 0 0 1px rgba(184, 151, 46, .38), 0 4px 10px rgba(13, 30, 58, .12); transition: transform .25s ease, background .25s ease; }
-.card-ic svg { width: 52px; height: 52px; overflow: visible; }
-.card:hover .card-ic { transform: translateY(-1px) scale(1.04); background: #12284d; }
-.card.is-pending .card-ic { filter: saturate(.6); }
+.card:hover { transform: translateY(-2px); box-shadow: 0 14px 30px rgba(8, 20, 42, .22); border-color: var(--gold); }
+.card-ic {
+  width: 78px; height: 78px; border-radius: 50%; display: grid; place-items: center;
+  background: radial-gradient(circle at 50% 38%, #2b4c86 0%, #1a335f 55%, #12264a 100%);
+  box-shadow: 0 0 0 3.5px #c4a443, 0 0 0 6px rgba(184, 151, 46, .22), inset 0 3px 8px rgba(0, 0, 0, .35);
+  transition: transform .3s ease;
+}
+.card-ic svg { width: 50px; height: 50px; overflow: visible; }
+.card:hover .card-ic { transform: rotate(-4deg) scale(1.05); }
+.card-body { display: grid; gap: 5px; min-width: 0; }
 .ei-s, .ei-a, .ei-m { fill: none; stroke-linecap: round; stroke-linejoin: round; }
 .ei-s { stroke: #f7f5f1; stroke-width: 2.1; }
 .ei-a { stroke: #d5bd68; stroke-width: 2.3; }
 .ei-f { fill: #d5bd68; }
 .ei-c { fill: #f7f5f1; }
-.ei-bd { fill: #d5bd68; stroke: #0d1e3a; stroke-width: 2.2; }
+.ei-bd { fill: #d5bd68; stroke: #13264a; stroke-width: 2.2; }
 .ei-m { stroke: #0d1e3a; stroke-width: 1.8; }
 .ei-mf { fill: #0d1e3a; }
-.card-cat { font-size: 10px; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; color: var(--gold-deep); }
-.card-title { font: 600 21px/1.12 var(--f-display); margin: 0; overflow-wrap: anywhere; }
-.card-meta { display: flex; gap: 10px; align-items: center; font-size: 12px; color: var(--muted); }
-.card.is-pending { cursor: default; opacity: .62; }
-.card.is-pending:hover { transform: none; box-shadow: none; border-color: var(--rule); }
+.card-cat { font-size: 10px; font-weight: 700; letter-spacing: .2em; text-transform: uppercase; color: var(--gold-lt); }
+.card-title { font: 600 22px/1.08 var(--f-display); margin: 0; overflow-wrap: break-word; color: var(--cream); }
+.card-meta { display: flex; gap: 10px; align-items: center; font-size: 12.5px; color: var(--mist-2); }
+.card .star { position: absolute; top: 10px; right: 10px; color: rgba(247, 245, 241, .28); }
+.card .star[aria-pressed="true"] { color: var(--gold-lt); }
+.card .tag-pending { color: var(--gold-lt); border-color: rgba(213, 189, 104, .5); }
+.card.is-pending { cursor: default; opacity: .6; }
+.card.is-pending:hover { transform: none; box-shadow: none; border-color: rgba(184, 151, 46, .45); }
 .tag-pending { font-size: 10px; letter-spacing: .12em; text-transform: uppercase; font-weight: 700; color: var(--warm-gray); border: 1px dashed var(--rule); border-radius: 999px; padding: 2px 8px; }
 .star { border: 0; background: transparent; padding: 2px; color: var(--rule); line-height: 0; }
 .star[aria-pressed="true"] { color: var(--gold); }
