@@ -396,9 +396,14 @@ Object.assign(EFA.data, {
       ["2023-09", 4409.09], ["2023-10", 4269.4], ["2023-11", 4460.06], ["2023-12", 4685.05], ["2024-01", 4804.49], ["2024-02", 5011.96], ["2024-03", 5170.57], ["2024-04", 5112.49],
       ["2024-05", 5235.23], ["2024-06", 5415.14], ["2024-07", 5538], ["2024-08", 5478.21], ["2024-09", 5621.26], ["2024-10", 5792.32], ["2024-11", 5929.92], ["2024-12", 6010.91],
       ["2025-01", 5979.52], ["2025-02", 6038.69], ["2025-03", 5683.98], ["2025-04", 5369.5], ["2025-05", 5810.92], ["2025-06", 6029.95], ["2025-07", 6296.5], ["2025-08", 6408.95],
-      ["2025-09", 6584.02], ["2025-10", 6735.69], ["2025-11", 6740.89], ["2025-12", 6853.03], ["2026-01", 6929.12]
+      ["2025-09", 6584.02], ["2025-10", 6735.69], ["2025-11", 6740.89], ["2025-12", 6853.03], ["2026-01", 6929.12],
+      ["2026-02", 6893.81], ["2026-03", 6654.42], ["2026-04", 6957.01], ["2026-05", 7412.55], ["2026-06", 7450.03],
+      ["2026-07", 7481.34], ["2026-08", 7711.32], ["2026-09", 7669.41]
     ],
-    // OPEN: monthly Nasdaq Composite level (FRED NASDAQCOM was unavailable during verification).
+    // OPEN: monthly Nasdaq Composite level. FRED NASDAQCOM is daily only and its CSV download returns
+    // binary content through the one web fetcher that can reach fred.stlouisfed.org, while the shell
+    // cannot reach that host at all; no GitHub or package mirror of the Nasdaq Composite index level
+    // was found (Nasdaq, Inc. restricts republication of the series). See Open items for the route.
     nasdaqMonthly: null,
     // Social Security cost-of-living adjustment by the year it takes effect (December of that year; June for 1975-1982), 1975-2026. [2025, 0.028] is paid from January 2026; [2026, 0.036] (announced October 2026) from January 2027.
     ssCola: [
@@ -449,7 +454,75 @@ Object.assign(EFA.data, {
       ],
       equityRange2025: [0.3, 0.5],
       equityRange2024: [0.2, 0.5]
-    }
+    },
+    // Federal acts since ERISA that changed income-tax or retirement-plan law, for gi1 ("The Rules Keep
+    // Changing"). `year` is the enactment year (the year the act was signed, which is not always the year
+    // in its name: the American Taxpayer Relief Act of 2012 was signed January 2, 2013). `name` is the
+    // act's customary short title and `acr` its usual acronym, which gi1 appends in parentheses.
+    // `desc` is a one-line description drawn from the source named in `descSrc`, and is null where no
+    // source read in this session described the act; gi1 does not render it, and the gi1 spec asks for a
+    // historical list with no claims about what each act did, so keep descriptions out of client output.
+    // Every `name` and `year` traces to a source read in this session. `acr` does not: ERISA, COBRA, HIPAA,
+    // EGTRRA, JGTRRA, AJCA, SECURE Act and SECURE 2.0 were printed by the sources, and the rest (ERTA,
+    // TEFRA, DEFRA, OBRA, SBJPA, TRA, PPA, EESA, ACA, ATRA, TCJA, OBBBA) are the abbreviations in general
+    // use, carried for recognition only. Drop `acr` if a slide needs sourced text only.
+    // This is not the full list: the original deck carries about 109 entries. These are the ones whose
+    // name and enactment year could be traced. See Open items.
+    taxActs: [
+      { year: 1974, name: "Employee Retirement Income Security Act of 1974", acr: "ERISA", pl: "93-406",
+        desc: "Set minimum standards for job-based retirement, health and other welfare benefit plans.", descSrc: "dolErisaTimeline" },
+      { year: 1978, name: "Revenue Act of 1978", acr: "",
+        desc: "Widened the individual brackets and cut the number of rates, raised the personal exemption and the joint standard deduction, and raised the capital gains exclusion to 60 percent.", descSrc: "tpcMajorBills" },
+      { year: 1981, name: "Economic Recovery Tax Act of 1981", acr: "ERTA",
+        desc: "Cut individual marginal rates over three years, lowered the top rate and the maximum capital gains rate, and indexed the brackets for inflation.", descSrc: "tpcMajorBills" },
+      { year: 1982, name: "Tax Equity and Fiscal Responsibility Act of 1982", acr: "TEFRA",
+        desc: "Imposed withholding on interest and dividends, strengthened the individual minimum tax, and raised several excise and federal employment tax rates.", descSrc: "tpcMajorBills" },
+      { year: 1984, name: "Deficit Reduction Act of 1984", acr: "DEFRA",
+        desc: "Restricted tax-exempt leasing, lengthened the depreciable life of structures to 18 years, and shortened the long-term capital gains holding period to six months.", descSrc: "tpcMajorBills" },
+      { year: 1984, name: "Retirement Equity Act of 1984", acr: "REA",
+        desc: "Amended ERISA to spread pension benefits more fairly and improve retirement security for women.", descSrc: "dolErisaTimeline" },
+      { year: 1986, name: "Tax Reform Act of 1986", acr: "TRA 1986",
+        desc: "Lowered the top individual rate to 28 percent and the top corporate rate to 34 percent, raised the standard deduction and personal exemption, and repealed many deductions, exclusions and the investment tax credit.", descSrc: "tpcMajorBills" },
+      { year: 1986, name: "Consolidated Omnibus Budget Reconciliation Act of 1985", acr: "COBRA",
+        desc: "Let workers who lose a job keep their health coverage for a limited time.", descSrc: "dolErisaTimeline" },
+      { year: 1987, name: "Omnibus Budget Reconciliation Act of 1987", acr: "OBRA 1987",
+        desc: "Repealed the installment sales method for dealers, reduced the intercorporate dividends received deduction, and limited the mortgage interest deduction.", descSrc: "tpcMajorBills" },
+      { year: 1989, name: "Omnibus Budget Reconciliation Act of 1989", acr: "OBRA 1989",
+        desc: "Amended ERISA to require civil penalties for certain fiduciary violations.", descSrc: "dolErisaTimeline" },
+      { year: 1990, name: "Omnibus Budget Reconciliation Act of 1990", acr: "OBRA 1990",
+        desc: "Raised the top individual rate from 28 to 31 percent, added luxury excise taxes, raised tobacco and alcohol taxes, and expanded the earned income tax credit.", descSrc: "tpcMajorBills" },
+      { year: 1993, name: "Omnibus Budget Reconciliation Act of 1993", acr: "OBRA 1993",
+        desc: "Added the 36 and 39.6 percent brackets, removed the cap on the Hospital Insurance tax base, and raised the taxable share of Social Security benefits to 85 percent.", descSrc: "tpcMajorBills" },
+      { year: 1996, name: "Small Business Job Protection Act of 1996", acr: "SBJPA",
+        desc: "Raised small business expensing to $25,000, created a Social Security tax credit for employee cash tips, and allowed spousal IRA contributions along with pension simplification changes.", descSrc: "tpcMajorBills" },
+      { year: 1996, name: "Health Insurance Portability and Accountability Act of 1996", acr: "HIPAA",
+        desc: "Amended ERISA to expand workers' health benefits.", descSrc: "dolErisaTimeline" },
+      { year: 1997, name: "Taxpayer Relief Act of 1997", acr: "TRA 1997", pl: "105-34",
+        desc: "Created the $500 per-child credit and the Hope and Lifetime Learning credits, cut capital gains rates to 20 and 10 percent, and created Roth and education IRAs.", descSrc: "tpcMajorBills" },
+      { year: 2001, name: "Economic Growth and Tax Relief Reconciliation Act of 2001", acr: "EGTRRA",
+        desc: "Created a 10 percent bracket and lowered other rates, doubled the child credit to $1,000, raised IRA and 401(k) limits, and phased out the estate tax with repeal scheduled for 2010.", descSrc: "tpcMajorBills" },
+      { year: 2003, name: "Jobs and Growth Tax Relief Reconciliation Act of 2003", acr: "JGTRRA",
+        desc: "Accelerated the 2001 rate cuts and child credit and taxed most capital gains and dividends at 15 percent through 2007.", descSrc: "tpcMajorBills" },
+      { year: 2004, name: "American Jobs Creation Act of 2004", acr: "AJCA",
+        desc: "Repealed the extraterritorial income exclusion, created a deduction for U.S. production activities, and raised section 179 expensing to $100,000.", descSrc: "tpcMajorBills" },
+      { year: 2006, name: "Pension Protection Act of 2006", acr: "PPA",
+        desc: "Made the 2001 IRA and pension provisions permanent, set new minimum funding standards for defined benefit plans, strengthened automatic enrollment protections, and allowed tax-free IRA distributions to certain charities from age 70 and a half.", descSrc: "tpcMajorBills, dolErisaTimeline" },
+      { year: 2008, name: "Emergency Economic Stabilization Act of 2008", acr: "EESA",
+        desc: "Limited executive compensation deductions for troubled-asset program participants, extended the forgiven-debt exclusion, and extended renewable energy and alternative minimum tax relief.", descSrc: "tpcMajorBills" },
+      { year: 2009, name: "American Recovery and Reinvestment Tax Act of 2009", acr: "",
+        desc: "Created the Making Work Pay and American Opportunity credits, raised the earned income credit rate for larger families, and exempted up to $2,400 of unemployment compensation.", descSrc: "tpcMajorBills" },
+      { year: 2010, name: "Patient Protection and Affordable Care Act", acr: "ACA",
+        desc: "Expanded health coverage, banned coverage limits, protected people with preexisting conditions, and improved benefit claims and appeals processes.", descSrc: "dolErisaTimeline" },
+      { year: 2013, name: "American Taxpayer Relief Act of 2012", acr: "ATRA", pl: "112-240", desc: null, descSrc: "" },
+      { year: 2017, name: "Tax Cuts and Jobs Act", acr: "TCJA", pl: "115-97", desc: null, descSrc: "" },
+      { year: 2019, name: "Setting Every Community Up for Retirement Enhancement Act of 2019", acr: "SECURE Act", pl: "116-94",
+        desc: "Changed retirement plan rules, including safe harbor plans for small businesses, plan participation for part-time workers, and the age for required distributions.", descSrc: "dolErisaTimeline" },
+      { year: 2020, name: "Coronavirus Aid, Relief, and Economic Security Act", acr: "CARES Act", pl: "116-136",
+        desc: "Required health plans and issuers to cover COVID-19 testing and related services without cost sharing.", descSrc: "dolErisaTimeline" },
+      { year: 2022, name: "SECURE 2.0 Act of 2022", acr: "SECURE 2.0", pl: "117-328",
+        desc: "Built on the 2019 SECURE Act with automatic enrollment requirements, pension-linked emergency savings accounts, catch-up contribution changes and more early distribution exceptions.", descSrc: "dolErisaTimeline" },
+      { year: 2025, name: "One Big Beautiful Bill Act", acr: "OBBBA", pl: "119-21", desc: null, descSrc: "" }
+    ]
   },
   lifeTable: {
     source: "SSA Office of the Chief Actuary, Period Life Table, 2023, as used in the 2026 Trustees Report",
@@ -587,13 +660,61 @@ EFA.data.sources = Object.assign(EFA.data.sources || {}, {
     note: "2011-2026 exclusions from the IRS 'What's new' table (2026: $15,000,000 under Public Law 119-21). 2005: $1,500,000 (IRS Pub. 950, Rev. December 2009, irs.gov/pub/irs-prior/p950--2009.pdf) and 47% maximum rate (Instructions for Form 706, Rev. August 2005, i706--2005.pdf). 2010: $5,000,000 exclusion and 35% maximum rate, or an election out of the estate tax with modified carryover basis (Instructions for Form 706, Rev. July 2011, for 2010 decedents, i706--2010.pdf). 40% top rate for 2013 onward: 26 U.S.C. 2001(c) as amended by Public Law 112-240.",
     check: "IRS exclusion table fetched twice, identical. Wolters Kluwer's historical table agrees on 2005, 2010, 2015, 2020 (it lists $12,620,000 for 2023 where the IRS shows $12,920,000; the IRS figure is used)."
   },
+  "history.taxActs": {
+    title: "Federal acts since ERISA that changed income-tax or retirement-plan law",
+    url: "https://www.dol.gov/agencies/ebsa/about-ebsa/about-us/erisa-50th/timeline",
+    publisher: "U.S. Department of Labor, Employee Benefits Security Administration (50 years of ERISA and EBSA timeline) for the retirement and benefits acts; Tax Policy Center, Summary of Major Enacted Tax Legislation from 1940-2009, for the tax acts; GPO govinfo Public and Private Laws for public law numbers and dates approved; IRS Notice 2026-34 for the SECURE, CARES and SECURE 2.0 statutory names",
+    retrieved: "2026-10-22",
+    note: "28 acts. `year` is the enactment year, not the year in the act's name: the American Taxpayer Relief Act of 2012 was approved January 2, 2013 and the Consolidated Omnibus Budget Reconciliation Act of 1985 (COBRA) was signed in 1986, where the DOL timeline places it. Descriptions come only from the sources read in this session and are null where none described the act (ATRA, the Tax Cuts and Jobs Act, the One Big Beautiful Bill Act). gi1 renders name and year only.",
+    check: "Dates approved read from govinfo: Public Law 105-34 August 5, 1997; 112-240 January 2, 2013; 115-97 December 22, 2017; 119-21 July 4, 2025. Statutory names and public law numbers for the SECURE Act (116-94), the CARES Act (116-136) and SECURE 2.0 (117-328) read from IRS Notice 2026-34. The Pension Protection Act of 2006 appears in both the DOL timeline and the Tax Policy Center list with the same year. This is a partial list: the original deck carries about 109 entries (see Open items)."
+  },
+  dolErisaTimeline: {
+    title: "50 years of ERISA and EBSA (timeline)",
+    url: "https://www.dol.gov/agencies/ebsa/about-ebsa/about-us/erisa-50th/timeline",
+    publisher: "U.S. Department of Labor, Employee Benefits Security Administration",
+    retrieved: "2026-10-22",
+    note: "Year-by-year timeline naming and describing the laws that amended ERISA: ERISA 1974, Retirement Equity Act 1984, COBRA 1986, OBRA 1989, HIPAA 1996, Pension Protection Act 2006, ACA 2010, SECURE Act 2019, CARES Act 2020, SECURE 2.0 2022, plus health-benefit acts not used here.",
+    check: "Primary (the agency that administers ERISA Title I). The Pension Protection Act description agrees with the Tax Policy Center summary."
+  },
+  tpcMajorBills: {
+    title: "Summary of Major Enacted Tax Legislation from 1940-2009",
+    url: "https://taxpolicycenter.org/sites/default/files/statistics/pdf/major_bills_description.pdf",
+    publisher: "Tax Policy Center (Urban Institute and Brookings Institution), citing Library of Congress public law summaries (secondary)",
+    retrieved: "2026-10-22",
+    note: "Chronological list of 55 acts from 1975 to 2009 with a description of each. Used for the tax acts' names, years and one-line descriptions. The document prints no public law numbers.",
+    check: "Secondary, used because no single primary document lists these acts together; congress.gov and the U.S. Code popular name tool could not be fetched from this environment. The four acts whose public law records were read on govinfo (105-34, 112-240, 115-97, 119-21) match on name and year, and the Pension Protection Act of 2006 matches the DOL timeline."
+  },
+  irsN2026_34: {
+    title: "Notice 2026-34: 2026 Cumulative List of Changes in Plan Qualification Requirements",
+    url: "https://www.irs.gov/pub/irs-drop/n-26-34.pdf",
+    publisher: "Internal Revenue Service",
+    retrieved: "2026-10-22",
+    note: "Gives the full statutory names and citations: Setting Every Community Up for Retirement Enhancement Act of 2019, Division O of Pub. L. 116-94; Coronavirus Aid, Relief, and Economic Security Act, Pub. L. 116-136; SECURE 2.0 Act of 2022, Division T of Pub. L. 117-328.",
+    check: "Years agree with the DOL ERISA timeline entries for the same three acts."
+  },
+  govinfoPublicLaws: {
+    title: "govinfo Public and Private Laws: PLAW-105publ34, PLAW-112publ240, PLAW-115publ97, PLAW-119publ21",
+    url: "https://www.govinfo.gov/app/details/PLAW-119publ21",
+    publisher: "U.S. Government Publishing Office",
+    retrieved: "2026-10-22",
+    note: "Dates approved: Taxpayer Relief Act of 1997 (105-34) August 5, 1997; American Taxpayer Relief Act of 2012 (112-240) January 2, 2013; Public Law 115-97, the Tax Cuts and Jobs Act, December 22, 2017; Public Law 119-21, the One Big Beautiful Bill Act, July 4, 2025. Neither 115-97 nor 119-21 carries a short title on its govinfo record; both are reconciliation acts titled only by the budget resolution they implement.",
+    check: "Primary. The customary short titles 'Tax Cuts and Jobs Act' and 'One Big Beautiful Bill Act' come from the IRS newsroom pages for those laws."
+  },
+  "lifeTable.crossCheck2026": {
+    title: "Period Life Tables and other downloadable files for the 2026 Trustees Report",
+    url: "https://www.ssa.gov/oact/Downloadables/CY/index.html",
+    publisher: "Social Security Administration, Office of the Chief Actuary",
+    retrieved: "2026-10-22",
+    note: "Identifies the separately published full copies of the 2023 period life table: PerLifeTables_M_Hist_TR2026 and PerLifeTables_F_Hist_TR2026 (historical, 1900-2023) in XLSX, CSV and TXT at https://www.ssa.gov/oact/Downloadables/CY/. Requests for those files were refused by this environment's fetch gate, so the file-level comparison is still open.",
+    check: "A third independent read of the SSA actuarial life table page on 2026-10-22 returned male and female life expectancy at exact ages 0, 1, 5, 10, 20, 30, 40, 50, 60, 62, 65, 67, 70, 75, 80, 85, 90, 95, 100, 110 and 119 identical to all 42 values in lifeTable, and confirmed the page is the 2023 period life table used in the 2026 Trustees Report (certified May 28, 2026)."
+  },
   lifeTable: {
     title: "Actuarial Life Table: Period Life Table, 2023, as used in the 2026 Trustees Report",
     url: "https://www.ssa.gov/oact/STATS/table4c6.html",
     publisher: "Social Security Administration, Office of the Chief Actuary",
     retrieved: "2026-10-21",
     note: "Remaining period life expectancy at each exact age 0-119, male and female (male, female), plus the one-year death probabilities (maleDeathProb, femaleDeathProb). Period table: it reflects 2023 death rates and does not project future mortality improvement.",
-    check: "Two independent transcriptions of the SSA page agree on all 480 values (life expectancy and death probability, both sexes, ages 0-119). Life expectancy recomputed from the printed death probabilities matches every printed value within rounding (max difference 0.005). 2026 Trustees Report Table V.A4 (2023: at birth 75.8 male / 81.1 female, at 65 18.1 / 20.7) agrees. A second full publication of the 2023 table (SSA's downloadable period life table files for the 2026 report) could not be retrieved."
+    check: "Two independent transcriptions of the SSA page agree on all 480 values (life expectancy and death probability, both sexes, ages 0-119). Life expectancy recomputed from the printed death probabilities matches every printed value within rounding (max difference 0.005). 2026 Trustees Report Table V.A4 (2023: at birth 75.8 male / 81.1 female, at 65 18.1 / 20.7) agrees. A third read of the page on 2026-10-22 returned 42 sampled values (both sexes at 21 ages from 0 to 119) identical to this table. Still open: the file-level comparison against SSA's separately published PerLifeTables_*_Hist_TR2026 download, which this environment refused to fetch (see lifeTable.crossCheck2026)."
   },
   "history.sp500PriceReturn": {
     title: "S&P 500 Price Return, Dividend Return, and Total Return by year (1928-2025)",
@@ -656,8 +777,9 @@ EFA.data.sources = Object.assign(EFA.data.sources || {}, {
     url: "https://github.com/datasets/s-and-p-500",
     publisher: "Robert Shiller's stock market data (Yale) via the GitHub datasets/s-and-p-500 mirror (commit 2026-10-01); FRED series SP500 daily closes (S&P Dow Jones Indices) archived in the same repository",
     retrieved: "2026-10-21",
-    note: "One convention throughout: the monthly average of daily closes. 1987-01 to 2016-02 from Shiller; 2016-03 to 2026-01 recomputed here from FRED daily closes (the mirror's own FRED-era rows include a partial month, e.g. September 2023 = one day, so they were not used). February-September 2026 still open (FRED down).",
-    check: "Shiller's monthly values equal the average of FRED daily closes to the cent in 88 of 89 overlapping months (2016-03 to 2023-06); August 2016 differs by 6.53 points (0.3%) and uses the FRED-based value."
+    retrieved2: "2026-10-22",
+    note: "One convention throughout: the monthly average of daily closes. 1987-01 to 2016-02 from Shiller; 2016-03 to 2026-01 recomputed from the FRED daily closes archived in the repository; 2026-02 to 2026-09 taken from the mirror's own monthly rows (commit 07b81e6, 2026-10-01), because the archived daily file in the repository stops at 2026-02-11 and FRED itself cannot be read from here.",
+    check: "Shiller's monthly values equal the average of FRED daily closes to the cent in 88 of 89 overlapping months (2016-03 to 2023-06); August 2016 differs by 6.53 points (0.3%) and uses the FRED-based value. Recomputing 2024-11 to 2026-01 from the archived daily closes on 2026-10-22 reproduced all 15 values in this array exactly. The 2026-02 to 2026-09 rows were each written by the mirror's run on the first of the following month, after the month closed, and the mirror's git history shows the earlier partial values being replaced by the full-month figures; the only independent check available was multpl.com's statement that the highest monthly average to date is October 2026 at 7,766.95, which is consistent with August 2026 (7,711.32) being the highest complete month here."
   },
   "history.incomeTaxShares": {
     title: "Summary of the Latest Federal Income Tax Data, Tax Year 2023 (Table 1)",
@@ -672,8 +794,9 @@ EFA.data.sources = Object.assign(EFA.data.sources || {}, {
     url: "https://www.irs.gov/pub/irs-soi/02inpetr.pdf",
     publisher: "IRS Statistics of Income (Robert A. Wilson, SOI Bulletin, Spring 2002) for 1913-2002; IRS SOI Historical Table 23 via FRED (IITTRLB, IITTILB, IITTRHB) for 2003-2018; IRS inflation-adjustment news releases IR-2018-222, IR-2019-180, IR-2020-245, IR-2021-219, IR-2022-182, IR-2023-208, IR-2024-273, IR-2025-103 (Rev. Proc. 2025-32) for 2019-2026",
     retrieved: "2026-10-21",
-    note: "Top-bracket thresholds 2003-2018 from the Tax Foundation's married-filing-jointly tables (taxfoundation.org/data/all/federal/historical-income-tax-rates-brackets/), equal to the NTU Foundation table (JCT/CRS) and, for 2014-2018, to FRED IITTIHB (IRS); the full IITTIHB series could not be read (FRED data pages were down for maintenance). Three years differ between IRS editions or sources and carry a note: 1981 lowest rate 13.825% (after the 1.25% credit; the current IRS table shows 14.0%), 1993 top threshold $250,000 (the 2002 IRS table prints $89,150, which is where the 31% bracket began), 2001 lowest threshold $12,000 for joint returns (the current IRS table shows $6,000).",
-    check: "1913-2002 top rate and threshold transcribed twice from the IRS release, identical. Lowest rate and threshold equal FRED IITTRLB / IITTILB (current IRS Table 23, fetched twice) in every year except 1981 and 2001 (above). Top rates equal history.topMarginalRate in all 114 years. 1987-2002 top thresholds equal the NTU Foundation table except 1993; 2019-2026 IRS release values equal the NTU table (NTU shows $693,751 for 2023, a typo for $693,750)."
+    retrieved2: "2026-10-22",
+    note: "Top-bracket thresholds 2003-2018 from the Tax Foundation's married-filing-jointly tables (taxfoundation.org/data/all/federal/historical-income-tax-rates-brackets/), equal to the NTU Foundation table (JCT/CRS) and, for 2014-2018, to FRED IITTIHB (IRS); the full IITTIHB series still could not be read (FRED data pages were in maintenance again on 2026-10-22). Three years differ between IRS editions or sources and carry a note: 1981 lowest rate 13.825% (after the 1.25% credit; the current IRS table shows 14.0%), 1993 top threshold $250,000 (the 2002 IRS table prints $89,150, which is where the 31% bracket began), 2001 lowest threshold $12,000 for joint returns (the current IRS table shows $6,000). On 2001 the Congressional Research Service presents the statutory schedule instead, 15% up to $45,200, with the 10% bracket for 2001 delivered as a rate reduction credit; the two readings describe the same law.",
+    check: "1913-2002 top rate and threshold transcribed twice from the IRS release, identical. Lowest rate and threshold equal FRED IITTRLB / IITTILB (current IRS Table 23, fetched twice) in every year except 1981 and 2001 (above). Top rates equal history.topMarginalRate in all 114 years. 1987-2002 top thresholds equal the NTU Foundation table except 1993; 2019-2026 IRS release values equal the NTU table (NTU shows $693,751 for 2023, a typo for $693,750). New on 2026-10-22: CRS report RL34498 (February 1, 2013) independently confirms the married-filing-jointly lowest threshold and top threshold for all 14 years 1993-2000 and 2002-2006, including the flagged 1993 top threshold of $250,000, and the top rates 39.6%, 39.1%, 38.6% and 35% for those years. 2007-2018 top thresholds still rest on the Tax Foundation and NTU tables alone, because RL34498's text stops at the 2007 table."
   },
   "history.safeWithdrawal": {
     title: "What's a Safe Retirement Withdrawal Rate for 2026? / What's a Safe Retirement Spending Rate for 2025?",

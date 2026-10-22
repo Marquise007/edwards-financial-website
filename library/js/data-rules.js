@@ -591,10 +591,92 @@ EFA.data = EFA.data || {};
   };
   var limits = Object.assign({}, limits2026, { byYear: { 2025: limits2025, 2026: limits2026 } });
 
+  /* ---------- College prices, academic year 2025-26 (College Board, Trends in College Pricing and
+     Student Aid 2025, published November 2025). The 2026 edition was not out when this was written:
+     College Board's Trends highlights page still showed 2025-26 on October 22, 2026, so 2025-26 is
+     the latest published academic year. Enrollment-weighted averages for full-time undergraduates.
+     coa = the full estimated student budget (tuition and fees + housing and food + books and course
+     materials, transportation and other expenses), which is what the cp3 family math needs. */
+  var college = {
+    year: '2025-26',
+    awardYear: '2025-26',
+    edition: 'Trends in College Pricing and Student Aid 2025',
+    title: 'Trends in College Pricing and Student Aid 2025',
+    publisher: 'College Board',
+    source: 'College Board',
+    src: ['cbTrends2025', 'cbTrendsHighlights', 'cbTrendsRelease2025'],
+    /* Figure CP-1: average estimated full-time undergraduate budgets, 2025-26 */
+    coa: { publicTwoYearInDistrict: 21320, publicInState: 30990, publicOutOfState: 50920, privateNonprofit: 65470 },
+    /* Table CP-1: average published prices, 2025-26 */
+    tuitionFees: { publicTwoYearInDistrict: 4150, publicInState: 11950, publicOutOfState: 31880, privateNonprofit: 45000 },
+    housingFood: { publicTwoYearInDistrict: 10850, publicInState: 13900, publicOutOfState: 13900, privateNonprofit: 15920 },
+    tuitionFeesHousingFood: { publicTwoYearInDistrict: 15000, publicInState: 25850, publicOutOfState: 45780, privateNonprofit: 60920 },
+    /* coa minus tuitionFeesHousingFood: books and course materials, supplies and equipment,
+       transportation and other expenses, combined as Figure CP-1 reports them for the sector */
+    otherExpenses: { publicTwoYearInDistrict: 6320, publicInState: 5140, publicOutOfState: 5140, privateNonprofit: 4550 },
+    priorYear: {
+      year: '2024-25',
+      tuitionFees: { publicTwoYearInDistrict: 4040, publicInState: 11610, publicOutOfState: 30820, privateNonprofit: 43250 },
+      housingFood: { publicTwoYearInDistrict: 10390, publicInState: 13310, publicOutOfState: 13310, privateNonprofit: 15250 },
+      tuitionFeesHousingFood: { publicTwoYearInDistrict: 14430, publicInState: 24920, publicOutOfState: 44130, privateNonprofit: 58500 }
+    },
+    /* One-year change in average published tuition and fees, 2024-25 to 2025-26, before adjusting for
+       inflation, exactly as College Board states it. `all` is the range across the three four-year
+       sectors (in-state 2.9%, out-of-state 3.4%, private nonprofit 4.0%). This is the latest one-year
+       change, not a long-run average: College Board's ten-year inflation-adjusted changes are
+       negative for the public sectors. */
+    growth: {
+      basis: 'one-year change in average published tuition and fees, 2024-25 to 2025-26, before adjusting for inflation',
+      all: [0.029, 0.040],
+      publicTwoYearInDistrict: 0.027,
+      publicInState: 0.029,
+      publicOutOfState: 0.034,
+      privateNonprofit: 0.040
+    },
+    note: 'Published (sticker) prices, not net prices after grant aid. Enrollment-weighted averages ' +
+      'for full-time undergraduates; public figures are for students living on campus (two-year ' +
+      'figures are for commuter students).'
+  };
+
+  /* ---------- Federal Direct Loan limits (William D. Ford Federal Direct Loan Program).
+     Fixed by statute and regulation, not indexed: 34 CFR 685.203, current eCFR text including the
+     amendment published at 91 FR 23883 (May 1, 2026). Annual limits are per academic year; the
+     dependent-undergraduate figures are the combined subsidized and unsubsidized total, with the
+     subsidized portion capped separately. */
+  var studentLoans = {
+    year: 2026,
+    program: 'William D. Ford Federal Direct Loan Program',
+    src: ['ecfr34_685_203', 'edFsaHandbookV8C4'],
+    annual: {
+      dependentUndergrad: { year1: 5500, year2: 6500, year3plus: 7500 },
+      independentUndergrad: { year1: 9500, year2: 10500, year3plus: 12500 },
+      maxSubsidized: { year1: 3500, year2: 4500, year3plus: 5500 },
+      graduate: 20500
+    },
+    aggregate: {
+      dependentUndergrad: 31000,
+      independentUndergrad: 57500,
+      maxSubsidizedUndergrad: 23000,
+      graduate: 138500,
+      maxSubsidizedGraduate: 65500
+    },
+    /* the figure cp10 reads */
+    dependentUndergradAggregate: 31000,
+    /* 34 CFR 685.203(e)(3) states the $138,500 graduate aggregate for periods of enrollment
+       beginning before July 1, 2026. The replacement limits under Public Law 119-21 were not
+       retrieved, so they are left null rather than guessed (see open items). */
+    graduateAggregateFromJul2026: null,
+    note: 'Direct Subsidized and Unsubsidized Loans are made by the U.S. Department of Education to ' +
+      'eligible students and must be repaid. A dependent undergraduate whose parents cannot obtain a ' +
+      'Direct PLUS Loan borrows at the independent-undergraduate limits. Aggregate limits are ' +
+      'outstanding principal, so repaid amounts restore borrowing room.'
+  };
+
   /* ---------- HECM (FHA reverse mortgage) */
   var hecm = {
     year: 2026,
-    src: ['hudPr25_145', 'cfmHecm2026', 'hudMl2017_12', 'hudFhaInfo17_43', 'hwMip2026', 'nrmlaHecmMath', 'myhecmPlf'],
+    src: ['hudPr25_145', 'cfmHecm2026', 'hudMl2017_12', 'hudFhaInfo17_43', 'hwMip2026', 'nrmlaHecmMath',
+      'myhecmPlf', 'hudHecmLenders', 'hudMl2014_12', 'fhaPlfPremiumSlides', 'nrmlaNewHecmMath2017'],
     /* National maximum claim amount (FHA mortgage limit for HECMs), case numbers assigned on or
        after January 1, 2026 (Mortgagee Letter 2025-22). 2025: $1,209,750. */
     maxClaimAmount: 1249125,
@@ -605,27 +687,48 @@ EFA.data = EFA.data || {};
     mipAnnual: 0.005,
     expectedRateFloor: 0.03,
     plf: null,
-    /* HUD's download for case numbers on or after Oct. 2, 2017 (link as listed by myhecm.com; the file
-       itself could not be opened from this environment). */
-    plfTableUrl: 'https://www.hud.gov/sites/dfiles/SFH/documents/PLF_on_after_10_2_17.xls',
+    /* HUD's own download link for case numbers on or after Oct. 2, 2017, read from HUD's HECM page
+       (hud.gov/stat/sfh/hecm) on 2026-10-22. The file is a legacy .xls binary: it cannot be opened
+       from this environment, so plf stays null. Mortgagee Letters 2014-12 and 2017-12 both state the
+       tables are published only on that page and print none of the factors themselves. */
+    plfTableUrl: 'https://www.hud.gov/sites/dfiles/SFH/documents/FY%202018%20PLF%20Tables-Rvsd%20Introduction.xls',
+    plfTableFile: 'FY 2018 PLF Tables-Rvsd Introduction.xls',
     plfNote: 'Principal limit factors come from HUD\'s HECM PLF tables (current version effective ' +
       'for case numbers assigned on or after October 2, 2017, Mortgagee Letter 2017-12), published ' +
       'as downloadable tables on HUD\'s HECM page (hud.gov, Single Family Housing, HECM for lenders). ' +
       'Rows are the age of the youngest borrower or eligible non-borrowing spouse (18 to 99); columns ' +
       'are the expected interest rate from 3.000% in 0.125% steps (3.000% is the floor). The full ' +
       'table is not reproduced here until it can be copied exactly; see the open items.',
+    /* Sampled factors from two industry reproductions of HUD's October 2, 2017 table. HUD states
+       PLFs to three decimals, so these are exact cells of that table, not rounded approximations.
+       They are spot checks for whoever loads the real HUD file, not a substitute for it: never read
+       a client figure from here without saying it is an illustration. */
     plfSpotChecks: {
-      /* From NRMLA "HECM Math" (published examples, rounded to 0.1 percentage point) */
-      rate0600: { 62: 0.357, 72: 0.416, 82: 0.511 },
+      /* NRMLA "HECM Math" (2024) examples */
       rate0550: { 62: 0.382, 72: 0.441, 82: 0.533 },
-      rate0650: { 62: 0.334, 72: 0.393, 82: 0.491 }
+      rate0650: { 62: 0.334, 72: 0.393, 82: 0.491 },
+      /* "HECM PLF and Premium Slides" (August 2017), row labelled 10/2/2017, ages 62/72/82/92.
+         Ages 62, 72 and 82 at 6.000% agree with the NRMLA examples to the thousandth. */
+      rate0300: { 62: 0.524, 72: 0.588, 82: 0.658, 92: 0.750 },
+      rate0400: { 62: 0.470, 70: 0.522, 71: 0.522, 72: 0.524, 73: 0.532, 74: 0.539, 75: 0.547,
+        76: 0.553, 77: 0.562, 78: 0.571, 79: 0.576, 80: 0.585, 82: 0.605, 92: 0.715 },
+      rate0500: { 62: 0.410, 72: 0.467, 82: 0.556, 92: 0.682 },
+      rate0600: { 62: 0.357, 72: 0.416, 82: 0.511, 92: 0.650 },
+      rate0700: { 62: 0.312, 72: 0.372, 82: 0.471, 92: 0.620 },
+      rate0800: { 62: 0.272, 72: 0.332, 82: 0.434, 92: 0.592 },
+      /* NRMLA "New HECM Math" (October 2017), slide 6 "PLF Table - Sample", ages 70-80 */
+      rate0412: { 70: 0.515, 71: 0.515, 72: 0.516, 73: 0.524, 74: 0.531, 75: 0.540, 76: 0.546, 77: 0.555, 78: 0.564, 79: 0.569, 80: 0.578 },
+      rate0425: { 70: 0.507, 71: 0.507, 72: 0.509, 73: 0.517, 74: 0.524, 75: 0.533, 76: 0.539, 77: 0.548, 78: 0.557, 79: 0.562, 80: 0.572 },
+      rate0437: { 70: 0.500, 71: 0.500, 72: 0.502, 73: 0.510, 74: 0.517, 75: 0.526, 76: 0.532, 77: 0.541, 78: 0.550, 79: 0.555, 80: 0.565 },
+      rate0450: { 70: 0.493, 71: 0.493, 72: 0.494, 73: 0.503, 74: 0.510, 75: 0.519, 76: 0.525, 77: 0.534, 78: 0.544, 79: 0.549, 80: 0.559 }
     }
   };
 
   /* [year, basic exclusion amount] pairs, derived from fed.estateHistory */
   fed.estateByYear = fed.estateHistory.map(function (r) { return [r.year, r.exclusion]; });
 
-  Object.assign(EFA.data, { fed: fed, ss: ss, medicare: medicare, rmd: rmd, limits: limits, hecm: hecm });
+  Object.assign(EFA.data, { fed: fed, ss: ss, medicare: medicare, rmd: rmd, limits: limits, hecm: hecm,
+    college: college, studentLoans: studentLoans });
 })();
 
 EFA.data.sources = Object.assign(EFA.data.sources || {}, {
@@ -779,5 +882,41 @@ EFA.data.sources = Object.assign(EFA.data.sources || {}, {
     publisher: 'myHECM.com (secondary)', retrieved: '2026-10-21', note: 'Lists HUD\'s Excel PLF files by case-number date; current: PLF_on_after_10_2_17.xls (on or after 10/2/2017).',
     check: 'Effective date matches ML 2017-12 and FHA INFO 17-43; the HUD file itself was not readable here.' },
   nrmlaHecmMath: { title: 'HECM Math (training deck)', url: 'https://www.nrmlaonline.org/wp-content/uploads/2024/08/HECM-Math.pdf', publisher: 'National Reverse Mortgage Lenders Association (secondary)',
-    retrieved: '2026-10-21', note: 'PLF examples at 5.5%, 6.0% and 6.5% for ages 62, 72, 82; 3.0% rate floor; PLFs last changed October 2017.', check: 'Secondary; used for spot checks only.' }
+    retrieved: '2026-10-21', note: 'PLF examples at 5.5%, 6.0% and 6.5% for ages 62, 72, 82; 3.0% rate floor; PLFs last changed October 2017.', check: 'Secondary; used for spot checks only.' },
+  hudHecmLenders: { title: 'Home Equity Conversion Mortgages (HECM) for lenders: Origination downloads', url: 'https://www.hud.gov/stat/sfh/hecm',
+    publisher: 'U.S. Department of Housing and Urban Development', retrieved: '2026-10-22',
+    note: 'HUD\'s own page listing the three PLF table downloads by case-number date. Current (on or after 10/2/17): "FY 2018 PLF Tables-Rvsd Introduction.xls". Superseded: plf_tables_18-99.xls (8/4/14 to 10/1/17) and hecm_plf_2013.xls (9/30/13 to 8/3/14).',
+    check: 'Effective dates match Mortgagee Letters 2014-12 and 2017-12. Corrects the file name guessed from myhecm.com. The .xls itself returns binary content that cannot be parsed here, so hecm.plf stays null.' },
+  hudMl2014_12: { title: 'Mortgagee Letter 2014-12: HECM Program: New Principal Limit Factors', url: 'https://www.hud.gov/sites/documents/14-12ml.pdf',
+    publisher: 'U.S. Department of Housing and Urban Development', retrieved: '2026-10-22',
+    note: 'June 27, 2014. Read to test whether HUD prints the PLF tables in a mortgagee letter: it does not. It states the tables are accessible only from HUD\'s web site.',
+    check: 'ML 2017-12 says the same thing and names the same page.' },
+  fhaPlfPremiumSlides: { title: 'HECM PLF and Premium Slides (selected principal limit factors by age and expected rate; premiums effective 10/2/2017)',
+    url: 'https://housingwire.com/wp-content/uploads/2017/08/HECM-PLF-and-Premium-Slides.pdf', publisher: 'Industry briefing deck hosted by HousingWire (secondary; the deck does not name its author)',
+    retrieved: '2026-10-22', note: 'Two rows per age, "10/2/2017" (the new table) and "Current" (the then-current 8/4/2014 table), for ages 62, 72, 82, 92 at expected rates 3% through 8%. Only the 10/2/2017 row is used.',
+    check: 'Its 10/2/2017 factors for ages 62, 72 and 82 at 6.000% equal the NRMLA HECM Math examples exactly (0.357, 0.416, 0.511), and its 72 at 4.000% (0.524) equals the NRMLA "New HECM Math" sample table.' },
+  nrmlaNewHecmMath2017: { title: 'New HECM Math (Craig Barnes), slide 6 "PLF Table - Sample"', url: 'https://www.nrmlaonline.org/wp-content/uploads/2017/10/Craig-Barnes-New-HECM-Math.pdf',
+    publisher: 'National Reverse Mortgage Lenders Association (secondary)', retrieved: '2026-10-22',
+    note: 'October 2017. Ages 70-80 at expected rates 4.000%, 4.125%, 4.250%, 4.375% and 4.500%, three decimals, as HUD publishes them. The deck does not print the table\'s effective date.',
+    check: 'Age 72 at 4.000% (0.524) and age 82-adjacent values are consistent with the HECM PLF and Premium Slides 10/2/2017 row, which is how the effective date was established.' },
+  cbTrends2025: { title: 'Trends in College Pricing and Student Aid 2025 (Table CP-1, Figure CP-1, Figures CP-3 and CP-4)',
+    url: 'https://research.collegeboard.org/media/pdf/Trends-in-College-Pricing-and-Student-Aid-2025-final_0.pdf', publisher: 'College Board (November 2025)', retrieved: '2026-10-22',
+    note: 'Enrollment-weighted average published prices for full-time undergraduates, 2024-25 and 2025-26 (Table CP-1), and average estimated full-time undergraduate budgets for 2025-26 (Figure CP-1). The 2026 edition was not published yet.',
+    check: 'The PDF was read twice with differently worded requests; the 2025-26 tuition and fees, housing and food, and totals were identical both times. Totals also equal the figures in College Board\'s own November 6, 2025 news release and the Trends highlights page.' },
+  cbTrendsHighlights: { title: 'Trends in College Pricing: Highlights', url: 'https://research.collegeboard.org/trends/college-pricing/highlights',
+    publisher: 'College Board', retrieved: '2026-10-22',
+    note: 'Still showing 2025-26 on October 22, 2026, which is how 2025-26 was established as the latest published academic year. Gives the one-year published tuition and fee increases: public two-year in-district 2.7%, public four-year in-state 2.9%, public four-year out-of-state 3.4%, private nonprofit four-year 4.0%, all before adjusting for inflation.',
+    check: 'Tuition and fee levels and the percentage increases match Table CP-1 and the news release.' },
+  cbTrendsRelease2025: { title: 'Trends in College Pricing and Student Aid report: published tuition prices at public institutions (news release)',
+    url: 'https://newsroom.collegeboard.org/trends-college-pricing-and-student-aid-report-published-tuition-prices-public-institutions-and', publisher: 'College Board (November 6, 2025)', retrieved: '2026-10-22',
+    note: 'Gives the 2025-26 total undergraduate budgets: $21,320 public two-year in-district, $30,990 public four-year in-state, $50,920 public four-year out-of-state, $65,470 private nonprofit four-year.',
+    check: 'All four totals equal Figure CP-1 in the report PDF.' },
+  ecfr34_685_203: { title: '34 CFR 685.203, Loan limits (William D. Ford Federal Direct Loan Program)', url: 'https://www.ecfr.gov/current/title-34/subtitle-B/chapter-VI/part-685/subpart-B/section-685.203',
+    publisher: 'Office of the Federal Register / Government Publishing Office (eCFR, current text)', retrieved: '2026-10-22',
+    note: 'Annual subsidized limits $3,500 / $4,500 / $5,500 by year level; the additional unsubsidized amount for a full academic year brings the dependent-undergraduate totals to $5,500 / $6,500 / $7,500. Aggregates: $23,000 subsidized for an undergraduate, $31,000 for a dependent undergraduate, $57,500 for an independent undergraduate, $138,500 for a graduate or professional student for enrollment periods beginning before July 1, 2026. Amendments listed through 91 FR 23883 (May 1, 2026).',
+    check: 'Every figure equals the Federal Student Aid Handbook annual and aggregate loan limit tables. The undergraduate limits are unchanged in the current eCFR text, which already carries the May 2026 amendment.' },
+  edFsaHandbookV8C4: { title: 'Federal Student Aid Handbook, Volume 8, Chapter 4: Annual and Aggregate Loan Limits',
+    url: 'https://fsapartners.ed.gov/knowledge-center/fsa-handbook/2024-2025/vol8/ch4-annual-and-aggregate-loan-limits', publisher: 'U.S. Department of Education, Office of Federal Student Aid', retrieved: '2026-10-22',
+    note: 'Prints the annual limit table (dependent and independent undergraduate totals and maximum subsidized amounts, graduate $20,500) and the aggregate table ($31,000 / $57,500 / $138,500, subsidized $23,000 / $65,500). The 2026-2027 edition of this chapter returned an error from ed.gov, so the 2024-2025 edition was read.',
+    check: 'Identical to the current eCFR text of 34 CFR 685.203 on every figure used.' }
 });

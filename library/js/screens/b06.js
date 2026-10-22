@@ -2938,6 +2938,20 @@
     f_ptype: 'Policy Type', ptLife: 'Term Life', ptDis: 'Disability', ptLtc: 'Long Term Care', ptPc: 'Property/Casualty', ptUmb: 'Umbrella', f_premInfl: 'Premium Inflate', f_benefit: 'Benefit or Limit', f_cola: 'Benefit COLA',
     illHead: 'Illustration', illYear: 'Age', illPrem: 'Premium', illContrib: 'Contribution', illWd: 'Withdrawal', illCV: 'Contract Value', illSV: 'Surrender Value', illAV: 'Accumulation', illCSV: 'Cash Surrender', illDB: 'Death Benefit',
     illInterp: 'Interpolate Missing Values', illSave: 'Save Changes', illNote: 'Values come from the carrier illustration; non-guaranteed columns are not guarantees.',
+    /* privacy mode and the contact identifiers it hides */
+    privacy: 'Hide Personal Details', privacyNote2: 'Birth dates, phone numbers, addresses, email and occupation are hidden while this is on.',
+    mobilePhone: 'Mobile Phone', altPhone: 'Alternate Phone', workPhone: 'Work Phone', street: 'Street', city: 'City', stateL: 'State', zip: 'ZIP',
+    email: 'Primary Email', email2: 'Alternate Email', dob: 'Date of Birth', position: 'Occupation', employer: 'Employer',
+    /* advanced per-account actions */
+    advOpts: 'Advanced Options', actHead: 'Schedule Changes', actAdd: 'Add a Change', actAmount: 'Amount', actGrow: 'Inflate @', actRate: 'Rate %',
+    actStart: 'Starting at Age', actYears: 'Years', actMod: 'Applies as', actDesc: 'Description', actNone: 'No schedule changes on this account.',
+    actMulti: 'Multiple values, one per year', actPaste: 'Values, one per year',
+    mdSet: 'Set', mdAdd: 'Add', mdSub: 'Subtract',
+    ac_contribution: 'Contribution', ac_withdrawal: 'Withdrawal', ac_fee: 'Annual Fee', ac_ror: 'Modify ROR', ac_inflow: 'Modify Inflow',
+    ac_creditLine: 'Credit Line Change', ac_draw: 'Line of Credit Draw', ac_paydown: 'Principal Paydown',
+    /* illustration paste helper */
+    pasteHead: 'Paste a Column of Values', pasteBody: 'Paste one value per line. They fill downward from the cell you picked.',
+    pasteMode: 'Applies as', pasteZero: 'Zero the remaining years', pasteGo: 'Apply', pasteCell: 'Paste values from this cell down',
     /* scenario editor and hazards */
     scnLabel: 'FGPS Scenario', scnEdit: 'Scenario', scnDel: 'Delete This Scenario', scnRen: 'Rename This Scenario', scnNew: 'Add New Empty Scenario', scnClone: 'Clone This Scenario', scnName: 'Scenario Name', newScn: 'New Scenario', copyOf: 'Copy of',
     hzTitle: 'Significant Life Events / Hazards', hzEvent: 'Event', hzPick: 'Select an event', hzClear: 'Clear Hazard', hazards: 'Hazards',
@@ -2982,6 +2996,8 @@
   const pctTxt = (v) => F.pct(v || 0, 2);
 
   /* ---------- account editor (dialogs 2 to 6, fgps23's Save More "Add") ---------- */
+  /** the Advanced Options checkbox, remembered for the session */
+  let advOn = false;
   function acctBody(ctx, G, rec) {
     const t = rec.type, f = (k, lab, ty, o) => fld(ctx, rec, k, lab, ty, o), s = (k, lab, o) => swf(ctx, rec, k, lab, o), d = (k, lab, opts, o) => ddf(ctx, rec, k, lab, opts, o), st = (k, lab) => stratf(ctx, rec, k, lab);
     const own = [['client', ctx.t('ownClient')]].concat(G.useSpouse ? [['spouse', ctx.t('ownSpouse')], ['joint', ctx.t('ownJoint')]] : []);
@@ -3024,7 +3040,7 @@
     if (t === 'expense') b += g(4, f('amount', 'f_amount', 'money') + f('infl', 'f_infl', 'pct') + st('iStart', 'f_iStart') + st('iEnd', 'f_iEnd')) + g(3, d('usage', 'f_usage', [['itemized', ctx.t('usItem')], ['taxes', ctx.t('usTaxes')]]) + s('deductible', 'f_ded') + s('mcp', 'f_mcp'));
     if (t === 'term') b += g(4, d('policyType', 'f_ptype', [['life', ctx.t('ptLife')], ['disability', ctx.t('ptDis')], ['ltc', ctx.t('ptLtc')], ['pc', ctx.t('ptPc')], ['umbrella', ctx.t('ptUmb')]]) + f('premium', 'f_premium', 'money') + f('premInfl', 'f_premInfl', 'pct') + f('benefit', 'f_benefit', 'money'))
       + g(4, (rec.policyType === 'disability' ? f('cola', 'f_cola', 'pct') : '') + st('iStart', 'f_iStart') + st('iEnd', 'f_iEnd'));
-    if (rec.actions && rec.actions.length) b += `<p class="b06-note">${ctx.t('advNote')}</p>`;
+    if (rec.actions && rec.actions.length && !(advOn && ACTM[t])) b += `<p class="b06-note">${ctx.t('advNote')}</p>`;
     return b;
   }
   /** open the editor for rec (a copy is edited); onSave(rec) on Save */
@@ -3035,12 +3051,33 @@
     if (r.type === 'term' && r.cola == null) r.cola = G.inflationRate;
     const ov = gdlg(ctx, {
       title: `<span>${ctx.t(isNew ? "addNew" : "edit")} ${ctx.t("ty_" + r.type)}</span>`, w,
-      body: '', foot: `<span></span><div class="grp"><button type="button" class="st-pill ghost cx">${ctx.t('cancel')}</button><button type="button" class="st-pill sv">${ctx.t('save')}</button></div>`
+      body: '', foot: `${ACTM[r.type] ? `<div class="b06-sw"><button type="button" class="b06-switch advb" role="switch" aria-checked="${advOn}"></button>${ctx.t('advOpts')}</div>` : '<span></span>'}<div class="grp"><button type="button" class="st-pill ghost cx">${ctx.t('cancel')}</button><button type="button" class="st-pill sv">${ctx.t('save')}</button></div>`
     });
+    const adv = ov.querySelector('.advb');
+    if (adv) adv.addEventListener('click', () => { if (EFA.edit && EFA.edit.on) return; advOn = !advOn; adv.setAttribute('aria-checked', advOn); draw(); });
     const host = ov.querySelector('.b06-gdb');
     const draw = () => {
-      host.innerHTML = `<div style="display:grid;gap:14px">${acctBody(ctx, G, r)}</div>`;
+      host.innerHTML = `<div style="display:grid;gap:14px">${acctBody(ctx, G, r)}${advOn && ACTM[r.type] ? actionsHTML(ctx, r) : ''}</div>`;
       const inner = host.firstElementChild;
+      if (advOn && ACTM[r.type]) {
+        const menu = inner.querySelector('.amenu'), am = inner.querySelector('.aadd');
+        const acts = () => (r.actions = r.actions || []);
+        if (am) am.addEventListener('click', (e) => { if (EFA.edit && EFA.edit.on) return; e.stopPropagation(); menu.hidden = !menu.hidden; });
+        inner.addEventListener('click', () => { if (menu) menu.hidden = true; });
+        inner.querySelectorAll('[data-amode]').forEach((b) => b.addEventListener('click', (e) => {
+          if (EFA.edit && EFA.edit.on) return;
+          e.stopPropagation(); menu.hidden = true;
+          openAction(ctx, G, r, { mode: b.dataset.amode }, true, (ac) => { acts().push(ac); draw(); });
+        }));
+        inner.querySelectorAll('[data-aed]').forEach((b) => b.addEventListener('click', () => {
+          if (EFA.edit && EFA.edit.on) return;
+          const i = +b.dataset.aed;
+          openAction(ctx, G, r, acts()[i], false, (ac) => { acts()[i] = ac; draw(); });
+        }));
+        inner.querySelectorAll('[data-adl]').forEach((b) => b.addEventListener('click', () => { if (EFA.edit && EFA.edit.on) return; acts().splice(+b.dataset.adl, 1); draw(); }));
+        inner.querySelectorAll('[data-aup]').forEach((b) => b.addEventListener('click', () => { if (EFA.edit && EFA.edit.on) return; const i = +b.dataset.aup, a = acts(); a.splice(i - 1, 0, a.splice(i, 1)[0]); draw(); }));
+        inner.querySelectorAll('[data-adn]').forEach((b) => b.addEventListener('click', () => { if (EFA.edit && EFA.edit.on) return; const i = +b.dataset.adn, a = acts(); a.splice(i + 1, 0, a.splice(i, 1)[0]); draw(); }));
+      }
       bindForm(ctx, inner, r, (k) => { if (typeof r[k] === 'boolean' || (r[k] && typeof r[k] === 'object' && !Array.isArray(r[k])) || ['owner', 'policyType', 'risk'].indexOf(k) >= 0) draw(); });
       const ib = inner.querySelector('[data-ill]');
       if (ib) ib.addEventListener('click', () => { if (EFA.edit && EFA.edit.on) return; openIll(ctx, G, r); });
@@ -3077,12 +3114,35 @@
     const ov = gdlg(ctx, {
       title: ctx.t('illHead'), w: 1100,
       body: `<div class="scroll" style="max-height:520px"><table class="b06-grid"><thead><tr><th>${ctx.t('illYear')}</th>${cols.map(([, k]) => `<th>${ctx.t(k)}</th>`).join('')}</tr></thead><tbody>${rows.map((x, i) => `<tr><td class="y num">${a0 + i}</td>${cols.map(([k]) => `<td><input data-r="${i}" data-c="${k}" value="${cell(x[k])}"></td>`).join('')}</tr>`).join('')}</tbody></table></div><p class="b06-note">${ctx.t('illNote')}</p>`,
-      foot: `<button type="button" class="st-pill ghost ip">${ctx.t('illInterp')}</button><div class="grp"><button type="button" class="st-pill ghost cx">${ctx.t('cancel')}</button><button type="button" class="st-pill sv">${ctx.t('illSave')}</button></div>`
+      foot: `<div class="grp"><button type="button" class="st-pill ghost ip">${ctx.t('illInterp')}</button><button type="button" class="st-pill ghost pb">${ctx.t('pasteHead')}</button></div><div class="grp"><button type="button" class="st-pill ghost cx">${ctx.t('cancel')}</button><button type="button" class="st-pill sv">${ctx.t('illSave')}</button></div>`
     });
+    const refresh = () => ov.querySelectorAll('input[data-r]').forEach((i2) => { i2.value = cell(rows[+i2.dataset.r][i2.dataset.c]); });
+    const sel = { r: 0, c: cols[0][0] };
+    const mark = (inp) => { ov.querySelectorAll('td.sel').forEach((td) => td.classList.remove('sel')); if (inp) inp.closest('td').classList.add('sel'); };
     ov.querySelectorAll('input[data-r]').forEach((inp) => {
       inp.addEventListener('keydown', (e) => e.stopPropagation());
+      inp.addEventListener('focus', () => { sel.r = +inp.dataset.r; sel.c = inp.dataset.c; mark(inp); });
+      inp.setAttribute('title', ctx.text('pasteCell'));
+      inp.addEventListener('contextmenu', (e) => {
+        if (EFA.edit && EFA.edit.on) return;
+        e.preventDefault(); sel.r = +inp.dataset.r; sel.c = inp.dataset.c; mark(inp);
+        openPaste(ctx, applyPaste);
+      });
       inp.addEventListener('blur', () => { const v = inp.value.trim() === '' ? null : Math.round(F.parse(inp.value) * 100) / 100; rows[+inp.dataset.r][inp.dataset.c] = v; inp.value = cell(v); });
     });
+    /** the copy and paste helper: a column of values from the selected cell down */
+    function applyPaste(vals, mode, zero) {
+      const c = sel.c, r0 = Math.max(0, Math.min(n - 1, sel.r));
+      vals.forEach((v, k) => {
+        const i = r0 + k;
+        if (i >= n) return;
+        const cur = +rows[i][c] || 0;
+        rows[i][c] = mode === 'add' ? Math.round((cur + v) * 100) / 100 : mode === 'subtract' ? Math.round((cur - v) * 100) / 100 : v;
+      });
+      if (zero) for (let i = r0 + vals.length; i < n; i++) rows[i][c] = 0;
+      refresh();
+    }
+    ov.querySelector('.pb').addEventListener('click', () => { if (!(EFA.edit && EFA.edit.on)) openPaste(ctx, applyPaste); });
     ov.querySelector('.ip').addEventListener('click', () => {
       if (EFA.edit && EFA.edit.on) return;
       cols.forEach(([k]) => {
@@ -3093,7 +3153,7 @@
           last = i;
         }
       });
-      ov.querySelectorAll('input[data-r]').forEach((inp) => { inp.value = cell(rows[+inp.dataset.r][inp.dataset.c]); });
+      refresh();
     });
     ov.querySelector('.cx').addEventListener('click', () => { if (!(EFA.edit && EFA.edit.on)) ov.close(); });
     ov.querySelector('.sv').addEventListener('click', () => {
@@ -3180,23 +3240,36 @@
       if (g.useMarketHistory && m && !g.globalMarket) g.globalMarket = m.key;
       const avg = m ? GPS.averageReturn(m.key, g.mhStartYear, g.mhEndYear) : null;
       const fsOpts = [['single', ctx.t('fsSingle')], ['mfj', ctx.t('fsMfj')], ['mfs', ctx.t('fsMfs')], ['hoh', ctx.t('fsHoh')]];
-      const contact = gg(3, f('contactName', 'contactName', 'text', { req: true }) + (has ? '' : `<button type="button" class="st-pill addc" style="align-self:end" ${String(g.contactName || '').trim() ? '' : 'disabled'}>${ctx.t('addContact')}</button>`)) + `<p class="b06-note" style="margin-top:10px">${ctx.t('privacyNote')}</p>`;
+      const priv = privacyOn();
+      const contact = gg(3, f('contactName', 'contactName', 'text', { req: true }) + (has ? '' : `<button type="button" class="st-pill addc" style="align-self:end" ${String(g.contactName || '').trim() ? '' : 'disabled'}>${ctx.t('addContact')}</button>`))
+        + (priv ? '' : gg(3, f('mobilePhone', 'mobilePhone', 'phone') + f('altPhone', 'altPhone', 'phone') + f('email', 'email', 'text'))
+          + gg(4, f('street', 'street', 'text') + f('city', 'city', 'text') + f('state', 'stateL', 'text', { maxlen: 2 }) + f('zip', 'zip', 'text'))
+          + gg(3, f('email2', 'email2', 'text')))
+        + `<div style="display:flex;align-items:center;gap:16px;margin-top:12px;flex-wrap:wrap"><div class="b06-sw"><button type="button" class="b06-switch privb" role="switch" aria-checked="${priv}"></button>${ctx.t('privacy')}</div><p class="b06-note" style="margin:0;max-width:430px">${ctx.t(priv ? 'privacyNote' : 'privacyNote2')}</p></div>`;
       const fin = gg(4, f('inflationRate', 'inflationRate', 'pct', { extra: `<button type="button" class="b06-mag" data-inf>${IC.mag}</button>` })
         + (g.autoTaxRate ? ddf(ctx, g, 'filingStatus', 'filing', fsOpts, { cls: g.filingStatus === 'mfj' && !g.useSpouse ? 'b06-warnt' : '' }) + f('stateTaxRate', 'stateTax', 'pct') + s('itemize', 'itemize')
           : f('taxAccumulation', 'accTax', 'pct', { extra: `<button type="button" class="b06-mag" data-tax>${IC.mag}</button>` }) + f('taxDistribution', 'distTax', 'pct') + f('taxCapGains', 'cgTax', 'pct')))
         + (g.autoTaxRate ? gg(4, g.itemize ? f('deductions', 'deductions', 'money') : s('clientBlind', 'cb') + (g.useSpouse ? s('spouseBlind', 'sb') : '')) + (g.filingStatus === 'mfj' && !g.useSpouse ? `<p class="b06-note" style="color:#b3402e">${ctx.t('jointNoSpouse')}</p>` : '') : '')
-        + gg(4, s('autoTaxRate', 'autoTax') + s('useMarketHistory', 'useMH') + f('creditScore', 'creditScore', 'int'))
+        + gg(4, s('autoTaxRate', 'autoTax') + s('useMarketHistory', 'useMH') + (priv ? '' : f('creditScore', 'creditScore', 'int')))
         + (g.useMarketHistory ? (m ? gg(4, ddf(ctx, g, 'globalMarket', 'market', mk.map((x) => [x.key, EFA.util.esc(x.label)])) + f('mhStartYear', 'startYear', 'num') + f('mhEndYear', 'endYear', 'num') + `<div class="b06-f"><span class="l">${ctx.t('avgRor')}</span><input class="num" readonly value="${avg == null ? '' : F.pct(avg, 2)}"></div>`) : `<p class="b06-note">${ctx.t('noMarkets')}</p>`) : '');
       const leBtn = (who) => `<button type="button" class="b06-mag" data-le="${who}">${IC.mag}</button>`;
-      const client = gg(4, f('clientName', 'clientName', 'text') + f('clientAge', 'age', 'int', { min: 0, max: 100 }) + f('clientRetireAge', 'retireAge', 'int', { min: 0, max: 100 }) + f('clientLE', 'le', 'int', { min: 0, max: 120, extra: leBtn('client') }));
-      const spouse = gg(4, s('useSpouse', 'useSpouse')) + (g.useSpouse ? gg(4, f('spouseName', 'clientName', 'text') + f('spouseAge', 'age', 'int', { min: 0, max: 100 }) + f('spouseRetireAge', 'retireAge', 'int', { min: 0, max: 100 }) + f('spouseLE', 'le', 'int', { min: 0, max: 120, extra: leBtn('spouse') })) : '');
-      const kids = `<table class="tbl"><thead><tr><th>${ctx.t('kidName')}</th><th class="r">${ctx.t('kidAge')}</th><th></th></tr></thead><tbody>${(g.children || []).length ? g.children.map((c, i) => `<tr><td><input class="kid" data-i="${i}" data-k="name" value="${EFA.util.esc(c.name || '')}" style="width:100%;height:34px;border:1px solid #cbd5e3;border-radius:7px;padding:0 8px;font:600 16px DM Sans,sans-serif"></td><td class="r"><input class="kid num" data-i="${i}" data-k="age" value="${c.age == null ? '' : c.age}" style="width:80px;height:34px;border:1px solid #cbd5e3;border-radius:7px;text-align:right;padding:0 8px;font:600 16px DM Sans,sans-serif"></td><td class="r"><button type="button" class="b06-mag" data-kdel="${i}">&times;</button></td></tr>`).join('') : `<tr class="empty"><td colspan="3">${ctx.t('noKids')}</td></tr>`}</tbody></table><button type="button" class="st-pill ghost kadd" style="margin-top:10px">${ctx.t('addChild')}</button>`;
+      const occ = (who) => (priv ? '' : gg(4, f(who + 'DOB', 'dob', 'date') + f(who + 'Position', 'position', 'text') + f(who + 'Employer', 'employer', 'text') + f(who + 'WorkPhone', 'workPhone', 'phone')));
+      const client = gg(4, f('clientName', 'clientName', 'text') + f('clientAge', 'age', 'int', { min: 0, max: 100 }) + f('clientRetireAge', 'retireAge', 'int', { min: 0, max: 100 }) + f('clientLE', 'le', 'int', { min: 0, max: 120, extra: leBtn('client') })) + occ('client');
+      const spouse = gg(4, s('useSpouse', 'useSpouse')) + (g.useSpouse ? gg(4, f('spouseName', 'clientName', 'text') + f('spouseAge', 'age', 'int', { min: 0, max: 100 }) + f('spouseRetireAge', 'retireAge', 'int', { min: 0, max: 100 }) + f('spouseLE', 'le', 'int', { min: 0, max: 120, extra: leBtn('spouse') })) + occ('spouse') : '');
+      const kids = `<table class="tbl"><thead><tr><th>${ctx.t('kidName')}</th>${priv ? '' : `<th>${ctx.t('dob')}</th>`}<th class="r">${ctx.t('kidAge')}</th><th></th></tr></thead><tbody>${(g.children || []).length ? g.children.map((c, i) => `<tr><td><input class="kid" data-i="${i}" data-k="name" value="${EFA.util.esc(c.name || '')}" style="width:100%;height:34px;border:1px solid #cbd5e3;border-radius:7px;padding:0 8px;font:600 16px DM Sans,sans-serif"></td>${priv ? '' : `<td><input class="kid" type="date" data-i="${i}" data-k="dob" value="${EFA.util.esc(c.dob || '')}" style="height:34px;border:1px solid #cbd5e3;border-radius:7px;padding:0 8px;font:600 15px DM Sans,sans-serif"></td>`}<td class="r"><input class="kid num" data-i="${i}" data-k="age" value="${c.age == null ? '' : c.age}" style="width:80px;height:34px;border:1px solid #cbd5e3;border-radius:7px;text-align:right;padding:0 8px;font:600 16px DM Sans,sans-serif"></td><td class="r"><button type="button" class="b06-mag" data-kdel="${i}">&times;</button></td></tr>`).join('') : `<tr class="empty"><td colspan="${priv ? 3 : 4}">${ctx.t('noKids')}</td></tr>`}</tbody></table><button type="button" class="st-pill ghost kadd" style="margin-top:10px">${ctx.t('addChild')}</button>`;
       host.innerHTML = `<div style="display:grid;gap:8px">${sec('secContact', 'contact', contact)}${sec('secFin', 'fin', fin, !has)}${sec('secClient', 'client', client, !has)}${sec('secSpouse', 'spouse', spouse, !has)}${sec('secKids', 'kids', kids, !has)}</div>`;
       const inner = host.firstElementChild;
       ov.querySelector('.okb').disabled = !has;
+      /* a redraw asked for by a blur has to wait for the blur to finish, or innerHTML throws */
+      const redraw = () => ctx.timeout(draw, 0);
       bindForm(ctx, inner, g, (k) => {
         if (k === 'clientAge') ageChanged = true;
-        if (['autoTaxRate', 'useMarketHistory', 'itemize', 'useSpouse', 'filingStatus', 'globalMarket', 'mhStartYear', 'mhEndYear', 'contactName'].indexOf(k) >= 0) draw();
+        if (k === 'clientDOB' || k === 'spouseDOB') {
+          const y = g[k] ? +String(g[k]).slice(0, 4) : null;
+          if (y) { const who = k === 'clientDOB' ? 'clientAge' : 'spouseAge'; g[who] = new Date().getFullYear() - y; if (who === 'clientAge') ageChanged = true; }
+          return redraw();
+        }
+        if (['autoTaxRate', 'useMarketHistory', 'itemize', 'useSpouse', 'filingStatus', 'globalMarket', 'mhStartYear', 'mhEndYear', 'contactName'].indexOf(k) >= 0) redraw();
       });
       inner.querySelectorAll('.b06-acc > .hd').forEach((h) => h.addEventListener('click', () => { if (EFA.edit && EFA.edit.on) return; const id = h.parentNode.dataset.sec; open[id] = !open[id]; h.parentNode.classList.toggle('open', open[id]); }));
       const nameIn = inner.querySelector('[data-fk="contactName"]'), addc = inner.querySelector('.addc');
@@ -3216,7 +3289,17 @@
         const sp = b.dataset.le === 'spouse';
         L.open(ctx, { age: sp ? g.spouseAge : g.clientAge, spouseAge: sp ? g.clientAge : g.spouseAge, freshAges: true, onUse: (a) => { g[sp ? 'spouseLE' : 'clientLE'] = a; draw(); } });
       }));
-      inner.querySelectorAll('input.kid').forEach((inp) => { inp.addEventListener('keydown', (e) => e.stopPropagation()); inp.addEventListener('blur', () => { const c = g.children[+inp.dataset.i]; if (inp.dataset.k === 'age') { const v = Math.round(F.parse(inp.value)); c.age = isFinite(v) ? v : null; } else c.name = inp.value; }); });
+      inner.querySelectorAll('input.kid').forEach((inp) => {
+        inp.addEventListener('keydown', (e) => e.stopPropagation());
+        inp.addEventListener('blur', () => {
+          const c = g.children[+inp.dataset.i], k = inp.dataset.k;
+          if (k === 'age') { const v = Math.round(F.parse(inp.value)); c.age = isFinite(v) ? v : null; }
+          else if (k === 'dob') { c.dob = inp.value || null; const y = c.dob ? +String(c.dob).slice(0, 4) : null; if (y) { c.age = new Date().getFullYear() - y; ctx.timeout(draw, 0); } }
+          else c.name = inp.value;
+        });
+      });
+      const pb = inner.querySelector('.privb');
+      if (pb) pb.addEventListener('click', () => { if (EFA.edit && EFA.edit.on) return; setPrivacy(!privacyOn()); draw(); });
       inner.querySelectorAll('[data-kdel]').forEach((b) => b.addEventListener('click', () => { if (EFA.edit && EFA.edit.on) return; g.children.splice(+b.dataset.kdel, 1); draw(); }));
       const ka = inner.querySelector('.kadd'); if (ka) ka.addEventListener('click', () => { if (EFA.edit && EFA.edit.on) return; (g.children = g.children || []).push({ name: '', age: null }); open.kids = true; draw(); });
       EFA.numify(host); if (EFA.edit && EFA.edit.on) EFA.edit.arm(host);
@@ -3557,6 +3640,110 @@
       wYear: 'Year', wReq: 'Required Spendable Income', wActPV: 'Actual Lifestyle PV', wDue: 'Taxes Due From Lifestyle', wNdb: 'Net Death Benefit', wNw: 'Net Worth', wOrd: 'Ordinary Income', wGain: 'Gains Income', wROrd: 'Ordinary Rate', wRCg: 'Gains Rate', wRPO: 'Potential Ordinary Rate', wRPG: 'Potential Gains Rate', wPot: 'Potential Taxes', wCum: 'Cumulative Spendable',
       wInc: 'Income', wDep: 'Deposits', wQP: 'Qualified Deposits', wWd: 'Withdrawals', wSale: 'Sale Proceeds', wBorrow: 'Borrowed Cash', wEnd: 'End Balances', wRisk: 'Risk Tank', wSafe: 'Safe Tank', wHouse: 'House Tank', wDebt: 'Borrowed Funds', wCredit: 'Credit Remaining', wLiq: 'Liquidity', wAssets: 'Assets', wLiab: 'Liabilities', wDb: 'Death Benefit', wEst: 'Estate Value', wMarg: 'Marginal Rate',
       wsBal: 'Account balances', wsWd: 'Account withdrawals', wsSp: 'Account spendable income',
+      /* documents chooser */
+      docRep: 'Reports', dr1: 'Four-questions results report', dr2: 'Financial fact check', dr3: 'Retirement roadmap', dr4: 'Edit the roadmap closing section',
+      docFile: 'Scenario File', df1: 'Save this scenario to a file', fileQ: 'Save the scenario to a file for later viewing?', fileOk: 'Scenario file saved.', noFile: 'A file cannot be created here.',
+      cpSG: 'Copy the scenario to the spending game', cpSGQ: 'Copy the active scenario to the spending game?', cpSGOk: 'Scenario copied.', cpSGLv: 'Scenario copied, including the lever changes now applied.',
+      /* report shell */
+      rpBrand: 'Edwards Financial & Associates', rpCred: 'Life & Annuities · Retirement Consulting · Estate Strategy', rpEyebrow: 'Retirement Consulting',
+      rpPrepared: 'Prepared for', rpPage: 'Page', rpDisc: 'Disclosure', rpDl: 'Download the report', rpDlX: 'Download the table', rpDlC: 'Table as CSV',
+      rpNote: 'Read it here, or save a copy to open and print from your browser.',
+      rpSupH: 'Supporting Documentation', rpSupLead: 'Every figure in this report comes from the plan data below, as it was entered for this household.',
+      rtPersonal: 'The People in This Plan', rtAssume: 'Financial Assumptions', rtKids: 'Children', rtStart: 'Starts at Age', rtEnd: 'Ends at Age',
+      rtIncome: 'Income Sources', rtInvest: 'Investments and Savings', rtNotes: 'Notes Receivable', rtPli: 'Cash Value Life Insurance',
+      rtLoans: 'Loans and Credit', rtProp: 'Residences and Property', rtIns: 'Insurance Coverage', rtExp: 'Itemized Expenses',
+      rtTaxes: 'Taxes', rtAccum: 'Accumulation', rtDist: 'Distribution', rtCg: 'Capital Gains', rtStd: 'Standard', rtInfl: 'Inflation', rtCola: 'plus a cost of living adjustment',
+      rtDesired: 'Desired Lifestyle', rtLegacy: 'Desired Legacy', rtAssets: 'Assets', rtLiab: 'Liabilities', rtNW: 'Net Worth', rtLiq: 'Liquidity',
+      rtDbProt: 'Death Benefit Protection', rtLasts: 'Lifestyle Lasts Until Age',
+      rtOpin: 'What This Household Expects Ahead', rtOpInfl: 'Inflation ahead', rtOpRet: 'Returns ahead', rtOpTax: 'Taxes ahead',
+      rtBenRev: 'Beneficiaries last reviewed', rtEstRev: 'Estate plan last reviewed',
+      rsPresent: 'Present Plan', rsLasts: 'What You Have Now',
+      /* R1 the four questions */
+      r1Title: 'The Answers to Four Key Questions', r1Sub: 'What your own numbers say about the return, the saving, the timing and the lifestyle ahead', r1File: 'Four Questions Results Report',
+      r1iH: 'Four Questions, One Route',
+      r1i1: 'Think of this plan as a route on a map. You know roughly where you want to arrive and when. From there only four things can change: how fast you travel, what the trip costs you each year, when you expect to arrive, and where you are willing to reroute. Every retirement decision you will make sits inside one of those four.',
+      r1i2: 'The first question is speed: the average return your savings would need to earn to fund the lifestyle you described.',
+      r1i3: 'The second is the cost of the trip: what you would set aside each year to fund that same lifestyle.',
+      r1i4: 'The third is arrival time: how long you would keep working before retirement begins.',
+      r1i4r: 'The third is how long the lifestyle you have now can be funded from what you have already built.',
+      r1i5: 'The fourth is the reroute: the lifestyle this plan can fund if the other three stay where they are.',
+      r1i6: 'Each answer changes one thing and leaves everything else as you entered it. None of these pages is a product and none is a guarantee. They are four plain measurements of one plan.',
+      r1q1H: 'Question One: How Fast Would This Plan Need to Travel?', r1q1Q: 'What average return would my savings need to earn to fund the lifestyle I want?',
+      r1q1a: 'Funding the lifestyle you described, from retirement at age', r1q1b: 'through age', r1q1ar: 'Funding the lifestyle you described through age',
+      r1q1c: 'calls for an average return of about', r1q1d: 'across the accounts funding this plan.',
+      r1q1Up: 'That is higher than the average return this plan assumes today. A required return above what you are earning now generally means accepting more volatility along the way, and a plan that depends on it has less room for a poor stretch of years.',
+      r1q1Dn: 'That is at or below the average return this plan already assumes, so the lifestyle you described does not call for taking on more investment risk.',
+      r1cBar: 'Each column is the money available to you in that year, with this one change applied.',
+      r1cSplit: 'Columns up to your retirement age are navy. From retirement on they are red, where the money is being spent rather than built.',
+      r1cLines: 'The dark line is the plan exactly as it stands today. The green line is the plan with this one change applied.',
+      r1cPresent: 'The dark line is the plan exactly as it stands today.',
+      r1q2H: 'Question Two: What Would the Trip Cost Each Year?', r1q2Q: 'What would I set aside each year to fund the lifestyle I want?',
+      r1q2a: 'Funding that lifestyle calls for total saving of about', r1q2b: 'a year, which is', r1q2c: 'a year more than this plan sets aside now.',
+      r1q2d: 'One route is to raise your saving capacity by that amount out of income.',
+      r1q2e: 'The other route leaves your income where it is and funds the extra saving from spending: holding household spending near',
+      r1q2f: 'a year makes room for', r1q2g: 'of saving without earning another dollar.',
+      r1q2okH: 'The saving already scheduled funds the lifestyle you described.',
+      r1q2ok: 'On the figures you gave, nothing more needs to be added. That is worth saying plainly, and it holds as long as these assumptions hold.',
+      r1q2ok2: 'The scheduled premiums and contributions continue at', r1q2ok3: 'in the first year.',
+      r1q2ra: 'Funding that lifestyle from here calls for a starting balance of about', r1q2rb: 'which is', r1q2rc: 'more than these accounts hold today.',
+      r1q2rd: 'Where a gap like that cannot be closed with money, it is usually closed another way: a different order of withdrawals, an income floor under part of the portfolio, a lower fixed-cost base, or an asset that is sitting idle put to work.',
+      r1q2rok: 'What these accounts hold today funds the lifestyle you described.',
+      r1q2leg: 'That moves the conversation from whether the money lasts to what you want it to do: the legacy you want to create, and the protection that keeps it intact.',
+      r1q2cA: 'In this view the scheduled contributions stop at retirement.',
+      r1q2cUp: 'In this view the contributions are raised to', r1q2cDn: 'In this view the contributions are lowered to', r1q2cTail: 'a year, inflating at the rate you set until retirement.',
+      r1q3H: 'Question Three: What Would Change the Arrival Time?', r1q3Q: 'How long would I keep working to fund the lifestyle I have now?',
+      r1q3a: 'Keeping the lifestyle you have today, funded through age', r1q3b: 'points to working until age',
+      r1q3d: 'That is', r1q3later: 'years later than the age you planned on,', r1q3earlier: 'years earlier than the age you planned on,', r1q3same: 'That is the retirement age you already planned on,',
+      r1q3i: 'and it leaves', r1q3j: 'years of retirement ahead of you.',
+      r1q3Hr: 'Question Three: How Long Does What You Have Last?', r1q3Qr: 'How long will the lifestyle I have now last on what I have already built?',
+      r1q3ra: 'The lifestyle you have now is funded until age', r1q3rb: 'and these accounts still hold about', r1q3rc: 'at that age.',
+      r1q3rd: 'Assets that are not liquid today, a home among them, can often add liquidity later. That is a conversation worth having before it is needed rather than after.',
+      r1q4H: 'Question Four: Where Would You Reroute?', r1q4Q: 'What could I spend each year without running out?',
+      r1q4a: 'Leaving the return, the saving and the retirement age exactly as they are, this plan funds about', r1q4b: 'a year from age', r1q4c: 'through age',
+      r1q4ar: 'Leaving everything else as it is, this plan funds about', r1q4br: 'a year through age',
+      r1q4Red: 'That is a reduction of', r1q4RedB: 'against the lifestyle you asked for.', r1q4Inc: 'That is', r1q4IncB: 'more than the lifestyle you asked for.',
+      r1q4Pv: 'In today\'s dollars, at the inflation rate you set, that is', r1q4PvB: 'a year.',
+      r1sH: 'Putting the Four Together',
+      r1s1: 'No one moves a single lever all the way. In practice a plan closes a gap with a small move on each of the four, which is why it helps to see all four measured the same way.',
+      r1s2: 'Return is the lever with the least control attached to it. You can choose how much risk to carry, but not what the market pays, so leaning on return alone is the least reliable way to close a gap.',
+      r1s3: 'Working longer looks simple on paper and often is not. Health, employers and families all get a vote in it.',
+      r1s4: 'Spending less in retirement assumes retirement costs less. For many households the first years cost more rather than less.',
+      r1s5: 'Saving more is the lever you control outright, and it is the one that gets harder the longer it waits.',
+      r1s6: 'Before taking on more risk, it is worth looking at where money is already leaking out of the plan. Five places are worth checking first: housing payments, taxes, retirement plan contributions and distributions, education costs, and major purchases.',
+      r1sEm: 'Our work starts with the efficiency of what you already have, before anything new is added.',
+      r1s7: 'Of these four, which one feels most within your control? That is where the next conversation starts.',
+      r1o1: 'On the assumptions you gave, this plan funds the lifestyle you described. What is left is maintenance rather than rescue: small course corrections as the years actually unfold.',
+      r1o2: 'Returns, retirement timing and retirement costs move together. Looking at all three at once, rather than one at a time, is what keeps a funded plan funded.',
+      r1o3: 'A funded plan also lets you look at risk you no longer need to carry. Risk you are not paid to take is worth removing.',
+      r1o4: 'The rules change in the distribution years. The order you draw from accounts, the tax treatment of each one and the timing of each decision matter more then than they did while you were building.',
+      r1o5: 'Let us put a date on the calendar and walk through it together.',
+      /* R2 the fact check */
+      r2Title: 'Financial Fact Check', r2File: 'Financial Fact Check', r2SumH: 'Summary Values',
+      r2Lead: 'A plan is only as good as the facts underneath it. Please read each line and tell us what has changed.',
+      /* R3 the roadmap */
+      r3Title: 'Your Retirement Roadmap', r3Sub: 'A personal guide to the journey toward the lifestyle you described', r3File: 'Retirement Roadmap',
+      r3ExecH: 'Where This Goes',
+      r3Exec: 'What follows rests on the assumptions you gave us, and those will change. That is not a weakness of the plan. Knowing where you want to arrive, and seeing a path that gets there, is worth having even while the details move.',
+      r3ChartH: 'The Funding Path, Year by Year',
+      r3ChartCap: 'The columns show which account each year\'s withdrawals come from. The lines show taxes paid, itemized expenses, the lifestyle you asked for and the lifestyle the plan funds.',
+      r3MileH: 'Milestones', mYear: 'Year', mEstate: 'Estate Value', mSpendC: 'Cumulative Spendable Income', mLifeC: 'Cumulative Lifestyle',
+      r3WrapH: 'What This Means',
+      r3lTax: 'Taxes paid', r3lItem: 'Itemized expenses', r3lDes: 'Desired lifestyle', r3lAct: 'Actual lifestyle',
+      r3w1: 'The chart maps a funding path that holds a lifestyle of', r3w2: 'in today\'s dollars', r3w2b: 'adjusted for inflation,', r3w3: 'through age', r3w4: ', on four assumptions:',
+      r3b1: 'A weighted average return of', r3b1u: 'an increase of', r3b1d: 'a decrease of', r3b1e: 'percentage points from the original assumptions',
+      r3b2a: 'Contributions as planned at', r3b2b: 'a year', r3b2c: 'Contributions changed to',
+      r3b3a: 'Working until age', r3b3b: 'which is', r3b3later: 'years later than planned', r3b3earlier: 'years earlier than planned',
+      r3b4a: 'Keeping the estimated lifestyle of', r3b4b: 'at retirement', r3b4c: 'A changed lifestyle of', r3b4d: 'in today\'s dollars',
+      /* the wrap-up editor */
+      rteTitle: 'The Roadmap Closing Section', rteApply: 'Apply Changes',
+      rteNote: 'What you write here replaces the closing section the roadmap writes for itself.',
+      rteB: 'Bold', rteI: 'Italic', rteU: 'Underline', rteLink: 'Add a link', rteUnlink: 'Remove the link', rteAddr: 'Address', rteLinkT: 'Link Title', rteIns: 'Insert',
+      rteColor: 'Text color', rteBg: 'Highlight color', rteStyle: 'Paragraph style', rteSize: 'Text size', rteIndent: 'Indent',
+      rteAlL: 'Align left', rteAlC: 'Center', rteAlR: 'Align right', rteUndo: 'Undo', rteRedo: 'Redo', rteUl: 'Bulleted list', rteOl: 'Numbered list',
+      stP: 'Paragraph', stH1: 'Heading 1', stH2: 'Heading 2', stH3: 'Heading 3', stCover: 'Cover Page Title', stTitle: 'Title', stSub: 'Subtitle', stBasic: 'Basic Text',
+      szXxs: 'Smallest', szXs: 'Smaller', szS: 'Small', szM: 'Normal', szL: 'Large', szXl: 'Larger', szXxl: 'Largest',
+      inNone: 'No indent', in1: 'Indent 1', in2: 'Indent 2',
+      busyTitle: 'A calculation is in progress', busyBody: 'Give it a few seconds while the numbers are crunched.',
       _notes: 'Four levers, one destination. Change one and watch the revised side move against the baseline.\n\n- Each lever: type a value, or let the plan solve for it.\n- The round button answers all four at once.\n- Ask: Of these four, which lever feels most within your control?\nPAUSE'
     }),
     render(ctx) {
@@ -3583,7 +3770,8 @@
       const revLabel = () => (used.length ? ' - ' + used.map((k) => ctx.text({ ror: 'lv1', save: 'lv2', work: 'lv3', spend: 'lv4' }[k])).join(' + ') : '') + (hz ? ' - ' + ctx.text('hz_' + hz.type) : '');
       const nameA = (GX.get(aId) || {}).name || '', nameB = (GX.get(bId) || {}).name || '';
       /* notices */
-      let ntc = '';
+      let ntc = '', saveTxt = null, lifeTxt = null;
+      const plain = (h) => String(h).replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim();
       if (lv.used.ror && lv.points) {
         const P = lv.points * 100, orig = Ab.avgReturn * 100, X = orig > 0 ? P / orig * 100 : 100;
         ntc += `<div class="b06-ntc ntr" style="left:24px">${lv.rorForm === 'a' ? `${ctx.t(P >= 0 ? 'nRorUp' : 'nRorDn')} <span class="num">${F.num(Math.abs(P), 2)}</span> ${ctx.t('nPts')}` : `${ctx.t('nReqA')} <span class="num">${F.num(Math.abs(X), 2)}%</span> ${ctx.t(P >= 0 ? 'nHigher' : 'nLower')}`}</div>`;
@@ -3591,11 +3779,16 @@
       if (lv.used.save) {
         const d = A.find[0].dep - B.find[0].dep;
         const txt = lv.lump && lv.lumpBal != null ? `${m(lv.lumpBal)} ${ctx.t('initBal')}` : retired ? `${m(d + A.find[0].bal0)} ${ctx.t('initBal')}` : `${m(Math.abs(d))}${ctx.t('perY')} (${m(Math.abs(d) / 12)}${ctx.t('perM')}) ${ctx.t(d >= 0 ? 'nInc' : 'nDec')}`;
+        saveTxt = plain(txt);
         ntc += `<div class="b06-ntc nts" style="left:456px">${txt}</div>`;
       }
       if (lv.used.spend) {
         const n = B.find[Math.max(0, Math.min(B.Y - 1, R - a0))].desired;
-        if (n > 0) ntc += `<div class="b06-ntc" style="right:48px">${n >= W ? `<span class="num">${F.num((1 - W / n) * 100, 2)}%</span> ${ctx.t('nRed')}` : `<span class="num">${F.num((W / n - 1) * 100, 2)}%</span> ${ctx.t('nIncr')}`}</div>`;
+        if (n > 0) {
+          const txt = n >= W ? `<span class="num">${F.num((1 - W / n) * 100, 2)}%</span> ${ctx.t('nRed')}` : `<span class="num">${F.num((W / n - 1) * 100, 2)}%</span> ${ctx.t('nIncr')}`;
+          lifeTxt = plain(txt);
+          ntc += `<div class="b06-ntc" style="right:48px">${txt}</div>`;
+        }
       }
       const lever = (k, idx, val) => `<div class="b06-lv" style="left:${xs[idx]}px;width:360px">${ans[k] ? `<div class="ans">${ans[k]}</div>` : ''}<div class="val">${val}</div><button type="button" class="st-pill ${lv.used[k] ? 'used' : ''}" data-lv="${k}" ${k === 'work' && retired ? 'disabled' : ''}>${ctx.t({ ror: 'lv1', save: 'lv2', work: 'lv3', spend: 'lv4' }[k])}</button></div>`;
       const retShown = (Ab.avgReturn + (lv.points || 0));
@@ -3626,13 +3819,13 @@
         ${st.pemView ? `<div class="b06-pv2"><div class="pb">${ctx.t('present', { cls: 'cap' })}</div><div class="pa">${ctx.t('revisedW', { cls: 'cap' })}</div></div>` : grid}
         <div class="b06-gb"><div class="hzw"><button type="button" class="b06-rbtn hzb ${hz ? 'on' : ''}">${IC.warn}</button><span class="b06-hzd">${hazardHTML(ctx, hz)}</span>${dbBtn}</div>
           <button type="button" class="st-pill ghost rst">${ctx.t('reset')}</button>
-          <div class="rt"><button type="button" class="b06-rbtn tgv">${IC.calc}</button><button type="button" class="b06-rbtn cpy"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V4H4v12h4"/></svg></button><button type="button" class="b06-rbtn dcs"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M6 3h9l4 4v14H6z"/><path d="M9 12h7M9 16h7"/></svg></button></div></div>
+          <div class="rt"><button type="button" class="b06-rbtn tgv">${IC.calc}</button><button type="button" class="b06-rbtn cpy"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V4H4v12h4"/></svg></button><button type="button" class="b06-rbtn sgb"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linejoin="round"><rect x="3.5" y="3.5" width="17" height="17" rx="4"/><circle cx="9" cy="9" r="1.5" fill="currentColor" stroke="none"/><circle cx="15" cy="15" r="1.5" fill="currentColor" stroke="none"/></svg></button><button type="button" class="b06-rbtn dcs"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M6 3h9l4 4v14H6z"/><path d="M9 12h7M9 16h7"/></svg></button></div></div>
         ${st.pemView ? tankControls(ctx, A).replace('class="b06-gctl"', 'class="b06-gctl" style="left:40px;bottom:auto;top:704px;transform:scale(.74);transform-origin:left top"') : ''}
         <p class="st-disclaimer" style="position:absolute;left:${st.pemView ? 520 : 40}px;right:40px;top:762px;margin:0;font-size:12px;text-align:center">${ctx.t('gpsDisc')}</p>`;
       /* hovers (titles carry editable text) */
       const tip = (sel, key, extra) => { const n = ctx.$(sel); if (n) n.setAttribute('title', ctx.text(key) + (extra ? ': ' + extra : '')); };
       ['ror', 'save', 'work', 'spend'].forEach((k, j) => tip(`[data-lv="${k}"]`, k === 'work' && retired ? 'retiredTip' : 'h' + (j + 1), ans[k] ? ans[k].replace(/<[^>]+>/g, '') : ''));
-      tip('.b06-a4', 'a4'); tip('.hzb', 'hazards'); tip('.dbb', 'dbBtn'); tip('.tgv', 'togView'); tip('.cpy', 'copyPlan'); tip('.dcs', 'docs'); tip('.cmpb', 'cmpTip');
+      tip('.b06-a4', 'a4'); tip('.hzb', 'hazards'); tip('.dbb', 'dbBtn'); tip('.tgv', 'togView'); tip('.cpy', 'copyPlan'); tip('.sgb', 'cpSG'); tip('.dcs', 'docs'); tip('.cmpb', 'cmpTip');
       /* PEM pair */
       if (st.pemView) {
         const P = lib('pem');
@@ -3667,7 +3860,11 @@
       ctx.on(ctx.$('.hzb'), 'click', () => openHazards(ctx, () => { const keep = null; Object.assign(lv, LV0()); lv.answers = keep; rerender(); }));
       ctx.on(ctx.$('.tgv'), 'click', () => { st.pemView = !st.pemView; rerender(); });
       ctx.on(ctx.$('.cpy'), 'click', () => gconfirm(ctx, ctx.t('copyQ'), 'copy', () => { copyPlan(GX.get(aId)); ctx.toast(ctx.text('copied')); }));
-      ctx.on(ctx.$('.dcs'), 'click', () => openDocs(ctx, A, B, G, nameA + revLabel(), nameB));
+      ctx.on(ctx.$('.sgb'), 'click', () => gconfirm(ctx, ctx.t('cpSGQ'), 'copy', () => { copyToSpendingGame(GX.get(aId)); ctx.toast(ctx.text(used.length ? 'cpSGLv' : 'cpSGOk')); }));
+      /* the values the roadmap's closing section quotes (C9 R3) */
+      const who = G.useSpouse && (G.spouseName || '').trim() ? `${G.clientName || G.contactName || ''} & ${G.spouseName}` : (G.clientName || G.contactName || '');
+      const Kr = { retShown, points: lv.points || 0, S, R, W, WPV: A.find[wRow].actualPV, saveNotice: saveTxt, lifeNotice: lifeTxt, cola: !!(GX.get(aId) || {}).inflateLifestyle || !!(GX.get(aId) || {}).maintainCurrentLifestyle };
+      ctx.on(ctx.$('.dcs'), 'click', () => openDocs(ctx, { A, B, G, nameA: nameA + revLabel(), nameB, sc: GX.get(aId), scList: L, who, K: Kr, after: rerender }));
       const needTarget = () => { if (!((Ab.T0 || 0) + (G.desiredLegacy || 0) > 0.0049)) { ctx.toast(ctx.text('noIncome')); return false; } return true; };
       const noConv = (s) => { if (s && s.conv === false) ctx.toast(ctx.text('noSol')); };
       const setFund = (age) => { const g = GX.G(); g.projectToAge = Math.min(100, Math.max(g.clientAge, age)); EFA.clients.set('fgps', 'globals', g); GX.invalidate(); };
@@ -3793,9 +3990,35 @@
     if (cd && cd.set) { cd.set('gps_plan_data', out); }
   }
   /** documents chooser: the seven worksheets (C8) */
-  function openDocs(ctx, A, B, G, nameA, nameB) {
+  function openDocs(ctx, o) {
+    const A = o.A, B = o.B, G = o.G, nameA = o.nameA, nameB = o.nameB;
     const W = lib('worksheet');
-    const ov = gdlg(ctx, { title: ctx.t('docTitle'), w: 640, body: `<div style="display:grid;gap:10px"><span class="b06-f"><span class="l">${ctx.t('docWs')}</span></span>${[1, 2, 3, 4, 5, 6, 7].map((n) => `<button type="button" class="st-pill ghost" data-ws="${n}" style="justify-content:flex-start">${ctx.t('ws' + n)}</button>`).join('')}</div>` });
+    const ov = gdlg(ctx, { title: ctx.t('docTitle'), w: 680, body: `<div class="b06-dlist">
+      <p class="sec">${ctx.t('docRep')}</p>${[1, 2, 3, 4].map((n) => `<button type="button" class="st-pill ghost" data-rep="${n}" style="justify-content:flex-start">${ctx.t('dr' + n)}</button>`).join('')}
+      <p class="sec">${ctx.t('docWs')}</p>${[1, 2, 3, 4, 5, 6, 7].map((n) => `<button type="button" class="st-pill ghost" data-ws="${n}" style="justify-content:flex-start">${ctx.t('ws' + n)}</button>`).join('')}
+      <p class="sec">${ctx.t('docFile')}</p><button type="button" class="st-pill ghost" data-file style="justify-content:flex-start">${ctx.t('df1')}</button></div>` });
+    ov.querySelectorAll('[data-rep]').forEach((b) => b.addEventListener('click', () => {
+      if (EFA.edit && EFA.edit.on) return;
+      const n = +b.dataset.rep, sc = o.sc;
+      if (!sc) return;
+      ov.close();
+      if (n === 4) return openWrapEditor(ctx, sc, o.after);
+      if (n === 2) return reportFactCheck(ctx, G, sc, o.who, A);
+      if (n === 3) return reportRoadmap(ctx, G, sc, o.who, A, o.K);
+      const bz = rpBusy(ctx);
+      ctx.timeout(() => {
+        let D = null;
+        try { D = r1Data(G, sc); } catch (e) { console.error(e); }
+        bz.close();
+        if (D) reportResults(ctx, G, sc, o.who, D); else ctx.toast(ctx.text('engineErr'));
+      }, 90);
+    }));
+    const fb = ov.querySelector('[data-file]');
+    if (fb) fb.addEventListener('click', () => {
+      if (EFA.edit && EFA.edit.on) return;
+      ov.close();
+      gconfirm(ctx, ctx.t('fileQ'), 'save', () => saveScenarioFile(ctx, G, o.scList || []));
+    });
     const sp = G.useSpouse, ageCol = { field: 'age', header: ctx.t('wAge'), type: 'text', align: 'center', width: 90 };
     const ageTxt = (f) => (sp ? `${f.age}/${f.sage}` : String(f.age));
     const proj = (R, title) => ({ heading: `${EFA.util.esc(title)} ${ctx.t('wsWorksheet')}`, size: 'full', filter: false,
@@ -3825,4 +4048,785 @@
       ov.close(); W.open(ctx, d);
     }));
   }
+
+  /* =====================================================================
+     fgps23 reports (C9): the four-questions results report, the financial
+     fact check and the retirement roadmap. This app has no print path, so
+     each report is read in an in-stage overlay and saved through the app's
+     downloads capability: the page as HTML, its table through
+     EFA.lib.worksheet (the same spreadsheet and CSV writers the worksheet
+     overlay uses).
+     ===================================================================== */
+  const RPTCSS = `
+  .b06-rpt { display: grid; gap: 26px; justify-items: center; background: #e7e3db; padding: 26px 0 32px; }
+  .b06-rpt .pg { width: 816px; box-sizing: border-box; background: #fffdf8; border: 1px solid #d6cfc4; border-radius: 4px; box-shadow: 0 10px 26px rgba(13,30,58,.12); padding: 54px 54px 48px; position: relative; overflow: hidden; color: #0d1e3a; font: 400 15px/1.55 "DM Sans", system-ui, sans-serif; }
+  .b06-rpt .num { font-family: "DM Sans", system-ui, sans-serif; font-variant-numeric: tabular-nums lining-nums; font-feature-settings: "lnum" 1, "tnum" 1; }
+  .b06-rpt h1, .b06-rpt h2, .b06-rpt h3 { font-family: "Cormorant Garamond", Georgia, serif; font-weight: 600; color: #0d1e3a; margin: 0 0 12px; }
+  .b06-rpt h1 { font-size: 40px; line-height: 1.1; }
+  .b06-rpt h2 { font-size: 29px; line-height: 1.15; }
+  .b06-rpt h3 { font-size: 21px; line-height: 1.2; }
+  .b06-rpt p { margin: 0 0 12px; }
+  .b06-rpt .q { font-style: italic; color: #2b4c80; font-size: 16px; }
+  .b06-rpt .eyebrow { font: 700 11px/1 "DM Sans", sans-serif; letter-spacing: .18em; text-transform: uppercase; color: #8a6e22; margin: 0 0 10px; }
+  .b06-rpt .rule { height: 3px; width: 86px; background: #b8972e; border-radius: 2px; margin: 0 0 20px; }
+  .b06-rpt .cap { font-size: 12.5px; line-height: 1.5; color: #667389; margin: 0 0 6px; }
+  .b06-rpt .pgf { position: absolute; left: 54px; right: 54px; bottom: 18px; display: flex; justify-content: space-between; font: 600 10px/1 "DM Sans", sans-serif; letter-spacing: .14em; text-transform: uppercase; color: #a9a195; }
+  .b06-rpt .cover { min-height: 1000px; display: grid; align-content: center; justify-items: center; text-align: center; gap: 10px; }
+  .b06-rpt .cover .wm { position: absolute; left: 50%; top: 46%; transform: translate(-50%,-50%); opacity: .05; pointer-events: none; }
+  .b06-rpt .cover .mk { position: absolute; width: 150px; height: 3px; background: #b8972e; }
+  .b06-rpt .cover h1 { font-size: 50px; max-width: 620px; }
+  .b06-rpt .cover .sub { font-size: 17px; color: #2b4c80; max-width: 560px; }
+  .b06-rpt .cover .for { margin-top: 34px; font: 700 12px/1.6 "DM Sans", sans-serif; letter-spacing: .18em; text-transform: uppercase; color: #8a6e22; }
+  .b06-rpt .cover .who { font-family: "Cormorant Garamond", Georgia, serif; font-size: 30px; }
+  .b06-rpt .cover .cred { margin-top: 26px; font: 600 11.5px/1.6 "DM Sans", sans-serif; letter-spacing: .1em; text-transform: uppercase; color: #667389; }
+  .b06-rpt table.rt { width: 100%; border-collapse: collapse; margin: 0 0 16px; font: 500 12px/1.3 "DM Sans", sans-serif; }
+  .b06-rpt table.rt caption { caption-side: top; text-align: left; font: 700 11px/1 "DM Sans", sans-serif; letter-spacing: .16em; text-transform: uppercase; padding: 0 0 7px; color: #0d1e3a; }
+  .b06-rpt table.rt th { text-align: left; font: 700 10px/1.25 "DM Sans", sans-serif; letter-spacing: .07em; text-transform: uppercase; padding: 7px 7px; color: #f7f5f1; background: #0d1e3a; }
+  .b06-rpt table.rt td { padding: 6px 7px; border-bottom: 1px solid rgba(13,30,58,.1); vertical-align: top; font-variant-numeric: tabular-nums lining-nums; }
+  .b06-rpt table.rt tbody tr:nth-child(even) td { background: rgba(227,232,240,.4); }
+  .b06-rpt table.rt td.r, .b06-rpt table.rt th.r { text-align: right; }
+  .b06-rpt table.rt td.c, .b06-rpt table.rt th.c { text-align: center; }
+  .b06-rpt table.rt.gold th { background: #8a6e22; }
+  .b06-rpt table.rt.rust th { background: #8c4a2a; }
+  .b06-rpt table.rt.goldPale th { background: #b8972e; color: #0d1e3a; }
+  .b06-rpt table.rt.steel th { background: #2b4c80; }
+  .b06-rpt table.rt.rose th { background: #99413a; }
+  .b06-rpt .tiles { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px 14px; margin: 0 0 18px; }
+  .b06-rpt .tile { border-left: 3px solid #b8972e; padding: 2px 0 2px 10px; }
+  .b06-rpt .tile .l { display: block; font: 700 9.5px/1.2 "DM Sans", sans-serif; letter-spacing: .12em; text-transform: uppercase; color: #8a6e22; }
+  .b06-rpt .tile .v { display: block; font: 600 16px/1.3 "DM Sans", sans-serif; color: #0d1e3a; font-variant-numeric: tabular-nums lining-nums; }
+  .b06-rpt .ch { margin: 4px 0 14px; }
+  .b06-rpt .ch svg { width: 100%; height: auto; display: block; }
+  .b06-rpt .lg { display: flex; flex-wrap: wrap; gap: 6px 16px; margin: 0 0 12px; font: 600 11.5px/1 "DM Sans", sans-serif; color: #0d1e3a; }
+  .b06-rpt .lg span { display: inline-flex; align-items: center; gap: 6px; }
+  .b06-rpt .lg i { width: 13px; height: 13px; border-radius: 3px; display: inline-block; }
+  .b06-rpt .big { font: 700 25px/1.2 "DM Sans", sans-serif; color: #0d1e3a; margin: 0 0 14px; font-variant-numeric: tabular-nums lining-nums; }
+  .b06-rpt .em { background: #f0e6c4; border-left: 3px solid #b8972e; padding: 11px 14px; margin: 0 0 14px; }
+  .b06-rpt .disc { font-size: 11.5px; line-height: 1.5; color: #667389; }
+  .b06-rpt ul, .b06-rpt ol { margin: 0 0 12px; padding-left: 22px; }
+  .b06-rpt li { margin: 0 0 6px; }
+  .b06-rpt .wu .in1 { padding-left: 26px; } .b06-rpt .wu .in2 { padding-left: 52px; }
+  .b06-rpt .wu .st-cover { font-family: "Cormorant Garamond", Georgia, serif; font-size: 40px; line-height: 1.1; margin: 0 0 14px; }
+  .b06-rpt .wu .st-title { font-family: "Cormorant Garamond", Georgia, serif; font-size: 29px; line-height: 1.15; margin: 0 0 12px; }
+  .b06-rpt .wu .st-sub { font-family: "Cormorant Garamond", Georgia, serif; font-size: 21px; color: #2b4c80; margin: 0 0 12px; }
+  .b06-rpt .wu .st-basic { font-size: 14px; }
+  `;
+  EFA.css('b06rpt', RPTCSS);
+  EFA.css('b06rpt2', `
+  .stage .b06-rptd .st-overlay-b { padding: 0; display: block; }
+  .stage .b06-rptd .b06-gdb { padding: 0; }
+  .stage .b06-rptd .foot { position: sticky; bottom: 0; z-index: 6; display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 12px 26px 14px; background: #fffdf8; border-top: 1px solid #d6cfc4; }
+  .b06-rptd .b06-rpt { margin: 0; }
+  .b06-rptd .foot .grp { display: flex; gap: 10px; align-items: center; }
+  .b06-dlist { display: grid; gap: 9px; }
+  .b06-dlist .sec { font: 700 11px/1 "DM Sans", sans-serif; letter-spacing: .16em; text-transform: uppercase; color: #8a6e22; margin: 6px 0 0; }
+  .b06-busy { display: grid; gap: 10px; justify-items: center; text-align: center; padding: 10px 0 4px; }
+  .b06-busy .dot { width: 30px; height: 30px; border-radius: 50%; border: 4px solid #e3e8f0; border-top-color: #b8972e; animation: b06spin 1s linear infinite; }
+  /* rich text wrap-up editor */
+  .b06-rte { display: grid; gap: 12px; }
+  .b06-rte .tb { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; background: #f1eee7; border: 1px solid #d6cfc4; border-radius: 10px; padding: 7px 9px; }
+  .b06-rte .tb .gp { display: flex; gap: 4px; align-items: center; }
+  .b06-rte .tb .sp { width: 1px; height: 26px; background: #d6cfc4; margin: 0 4px; }
+  .b06-rte .tb button.tbb { min-width: 32px; height: 32px; border: 1px solid #cbd5e3; border-radius: 7px; background: #fff; color: #0d1e3a; font: 600 15px/1 "DM Sans", sans-serif; display: grid; place-items: center; padding: 0 7px; }
+  .b06-rte .tb button.tbb:hover { background: #0d1e3a; color: #f7f5f1; }
+  .b06-rte .tb button.sw { width: 24px; height: 24px; border-radius: 5px; border: 1px solid rgba(13,30,58,.25); }
+  .b06-rte .tb select { height: 32px; border: 1px solid #cbd5e3; border-radius: 7px; background: #fff; font: 600 13px/1 "DM Sans", sans-serif; color: #0d1e3a; padding: 0 6px; }
+  .b06-rte .ed { width: 1000px; max-width: 100%; height: 440px; overflow: auto; background: #fff; border: 1px solid #cbd5e3; border-radius: 10px; padding: 22px 26px; font: 400 15px/1.55 "DM Sans", sans-serif; color: #0d1e3a; }
+  .b06-rte .ed:focus { outline: 2px solid #b8972e; outline-offset: 1px; }
+  .b06-rte .lk { display: flex; gap: 8px; align-items: flex-end; }
+  .b06-rte .lk input { height: 34px; border: 1.5px solid #cbd5e3; border-radius: 8px; padding: 0 9px; font: 600 14px/1 "DM Sans", sans-serif; }
+  .b06-grid { width: 100%; border-collapse: collapse; font: 600 15px/1 "DM Sans", sans-serif; }
+  .b06-grid th { position: sticky; top: 0; z-index: 1; background: #0d1e3a; color: #f7f5f1; font: 700 11px/1.2 "DM Sans", sans-serif; letter-spacing: .1em; text-transform: uppercase; padding: 8px 8px; }
+  .b06-grid td { padding: 2px 4px; border-bottom: 1px solid rgba(13,30,58,.07); }
+  .b06-grid td.y { text-align: center; width: 64px; font-weight: 700; }
+  .b06-grid td.sel input { outline: 2px solid #b8972e; }
+  .b06-grid input { width: 100%; box-sizing: border-box; height: 30px; border: 1px solid #e3e8f0; border-radius: 6px; text-align: right; padding: 0 6px; font: 600 14px/1 "DM Sans", sans-serif; color: #0d1e3a; font-variant-numeric: tabular-nums lining-nums; }
+  .b06-acts { border: 1px solid #cbd5e3; border-radius: 10px; overflow: hidden; }
+  .b06-acts .row { display: flex; align-items: center; gap: 10px; padding: 7px 10px; border-bottom: 1px solid rgba(13,30,58,.08); font: 600 15px/1.3 "DM Sans", sans-serif; }
+  .b06-acts .row:last-child { border-bottom: 0; }
+  .b06-acts .row .g { flex: 1 1 auto; }
+  .b06-acts .row .s { font: 500 13px/1.3 "DM Sans", sans-serif; color: #667389; }
+  .b06-acts .none { padding: 14px; text-align: center; color: #8a93a3; font: 500 15px/1 "DM Sans", sans-serif; }
+  `);
+
+  /* ---------- small helpers shared by the reports ---------- */
+  const rpM = (v) => `<span class="num">${F.money(Math.round(v || 0))}</span>`;
+  const rpC = (v) => `<span class="num">${F.money(v || 0, { dp: 2 })}</span>`;
+  const rpN = (v, dp) => `<span class="num">${F.num(v || 0, dp == null ? 2 : dp)}</span>`;
+  const rpP = (v, dp) => `<span class="num">${F.pct(v || 0, dp == null ? 2 : dp)}</span>`;
+  const rpI = (v) => `<span class="num">${v == null ? '' : F.int(v)}</span>`;
+  /** the age an age-strategy field resolves to on this record */
+  function stratAge(G, rec, k) {
+    const s = rec[k] || {}, a0 = ownerAge(G, rec);
+    if (s.s === 'age') return s.age == null ? a0 : s.age;
+    if (s.s === 'retire') return rec.owner === 'spouse' && G.useSpouse ? G.spouseRetireAge : G.clientRetireAge;
+    if (s.s === 'le') return rec.owner === 'spouse' && G.useSpouse ? G.spouseLE : G.clientLE;
+    return a0;
+  }
+  const mktLabel = (rec, G) => { const key = rec.useGlobalMH ? G.globalMarket : rec.market, m = GPS.markets().find((x) => x.key === key); return m ? m.label : ''; };
+  /** the combined life expectancy age, in the client's years */
+  const combLE = (G) => Math.min(100, G.useSpouse ? Math.max(G.clientLE, G.spouseLE + G.clientAge - G.spouseAge) : G.clientLE);
+  const taxText = (ctx, G) => (G.autoTaxRate
+    ? `${ctx.text({ single: 'fsSingle', mfj: 'fsMfj', mfs: 'fsMfs', hoh: 'fsHoh' }[G.filingStatus] || 'fsMfj')}, ${G.itemize ? F.money(G.deductions || 0) : ctx.text('rtStd')}`
+    : `${ctx.text('rtAccum')} ${F.pct(G.taxAccumulation, 2)} · ${ctx.text('rtDist')} ${F.pct(G.taxDistribution, 2)} · ${ctx.text('rtCg')} ${F.pct(G.taxCapGains, 2)}`);
+
+  /** C9 shared block: the plan data tables. Each table is dropped when it has no rows. */
+  function planTables(ctx, G, sc, variant) {
+    const out = [], acc = (sc.accounts || []).filter((a) => a.type !== 'child');
+    const own = (a) => ctx.t(a.owner === 'spouse' ? 'ownSpouse' : a.owner === 'joint' ? 'ownJoint' : 'ownClient');
+    const risk = (a) => ctx.t({ low: 'rLow', med: 'rMed', high: 'rHigh' }[a.risk] || 'rMed');
+    const yn = (a) => ctx.t(a.accessible ? 'yes' : 'no');
+    const ag = (a, k) => rpI(stratAge(G, a, k));
+    const rate = (a) => (G.useMarketHistory && (a.useMH || a.useGlobalMH) && INVT[a.type] ? EFA.util.esc(mktLabel(a, G)) : rpP(a.ret != null ? a.ret : a.rate));
+    const add = (key, tone, cols, rows) => { if (rows.length) out.push({ key, tone, cols, rows }); };
+    const nm = (a) => EFA.util.esc(a.name || '');
+    const pick = (t) => acc.filter((a) => a.type === t);
+    add('rtIncome', 'navy', [['cName'], ['f_owner'], ['f_amount', 'r'], ['f_infl', 'r'], ['f_taxablePct', 'r'], ['f_dedAmt', 'r'], ['rtStart', 'c'], ['rtEnd', 'c']],
+      pick('income').map((a) => [nm(a), own(a), rpM(a.amount), rpP(a.infl == null ? G.inflationRate : a.infl), rpP(a.taxablePct), rpM(a.deductible), ag(a, 'iStart'), ag(a, 'iEnd')]));
+    add('rtInvest', 'gold', [['cName'], ['f_owner'], ['cType'], ['f_balance', 'r'], ['f_ret', 'r'], ['f_fee', 'r'], ['f_risk'], ['f_access', 'c'], ['f_contrib', 'r'], ['rtStart', 'c'], ['rtEnd', 'c']],
+      acc.filter((a) => INVT[a.type]).map((a) => [nm(a), own(a), tyS(ctx, a.type), rpM(a.balance), rate(a), rpP(a.fee), risk(a), yn(a),
+        rpM(a.contrib) + ((a.type === 'tdbt' || a.type === 'tdat') && a.match ? ' / ' + rpM(a.match) : ''), ag(a, 'cStart'), ag(a, 'cEnd')]));
+    add('rtNotes', 'gold', [['cName'], ['f_owner'], ['f_balance', 'r'], ['f_rate', 'r'], ['f_pmtCard', 'r']],
+      pick('note').map((a) => [nm(a), own(a), rpM(a.balance), rpP(a.rate), rpC(a.pmt)]));
+    add('rtPli', 'gold', [['cName'], ['f_owner'], ['f_av', 'r'], ['f_csv', 'r'], ['f_risk'], ['f_access', 'c'], ['f_premium', 'r'], ['f_db', 'r']],
+      pick('pli').map((a) => [nm(a), own(a), rpM(a.av), rpM(a.csv), ctx.t('rLow'), yn(a), rpM(a.premium), rpM(a.db)]));
+    add('rtLoans', 'rust', [['cName'], ['f_owner'], ['cType'], ['f_balance', 'r'], ['f_rate', 'r'], ['f_pmtCard', 'r'], ['f_line', 'r']],
+      acc.filter((a) => a.type === 'loan' || a.type === 'credit').map((a) => [nm(a), own(a), tyS(ctx, a.type), rpM(a.balance), rpP(a.rate), rpC(a.pmt), a.type === 'loan' ? rpM(a.creditLine) : '']));
+    add('rtProp', 'goldPale', [['cName'], ['f_owner'], ['f_value', 'r'], ['f_appr', 'r'], ['f_basis', 'r'], ['f_excl', 'r'], ['f_saleAge', 'c']],
+      pick('property').map((a) => [nm(a), own(a), rpM(a.value), rpP(a.appr), rpM(a.costBasis), rpM(a.exclusion), a.sell ? rpI(a.saleAge) : ctx.t('none')]));
+    add('rtIns', 'steel', [['cName'], ['f_owner'], ['f_ptype'], ['f_premium', 'r'], ['f_benefit', 'r'], ['rtStart', 'c'], ['rtEnd', 'c']],
+      pick('term').map((a) => [nm(a), own(a), ctx.t({ life: 'ptLife', disability: 'ptDis', ltc: 'ptLtc', pc: 'ptPc', umbrella: 'ptUmb' }[a.policyType] || 'ptLife'), rpM(a.premium), rpM(a.benefit), ag(a, 'iStart'), ag(a, 'iEnd')]));
+    add('rtExp', 'rose', [['cName'], ['f_owner'], ['f_usage'], ['f_amount', 'r'], ['f_infl', 'r'], ['rtStart', 'c'], ['rtEnd', 'c']],
+      pick('expense').map((a) => [nm(a), own(a), ctx.t(a.usage === 'taxes' ? 'usTaxes' : 'usItem'), rpM(a.amount), rpP(a.infl == null ? G.inflationRate : a.infl), ag(a, 'iStart'), ag(a, 'iEnd')]));
+    return out.map((t) => rtTable(ctx, t)).join('');
+  }
+  const rtTable = (ctx, t) => `<table class="rt ${t.tone}">${t.key ? `<caption>${ctx.t(t.key)}</caption>` : ''}<thead><tr>${t.cols.map(([k, c]) => `<th class="${c || ''}">${ctx.t(k)}</th>`).join('')}</tr></thead><tbody>${t.rows.map((r) => `<tr>${r.map((v, i) => `<td class="${t.cols[i][1] || ''}">${v}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
+  const rpTiles = (items) => `<div class="tiles">${items.map(([l, v]) => `<div class="tile"><span class="l">${l}</span><span class="v">${v || '&nbsp;'}</span></div>`).join('')}</div>`;
+  /** the people block: four tiles for the client, four for the spouse, then the plan assumptions (results and roadmap variant) */
+  function peopleBlock(ctx, G, A, sc, variant) {
+    const t = [[ctx.t('clientName'), EFA.util.esc(G.clientName || G.contactName || '')], [ctx.t('age'), rpI(G.clientAge)], [ctx.t('retireAge'), rpI(G.clientRetireAge)], [ctx.t('le'), rpI(G.clientLE)]];
+    const s = G.useSpouse ? [[ctx.t('clientName'), EFA.util.esc(G.spouseName || '')], [ctx.t('age'), rpI(G.spouseAge)], [ctx.t('retireAge'), rpI(G.spouseRetireAge)], [ctx.t('le'), rpI(G.spouseLE)]] : [];
+    let html = `<h3>${ctx.text('rtPersonal')}</h3>` + rpTiles(t.concat(s));
+    if (variant !== 'fact') {
+      html += rpTiles([[ctx.t('rtTaxes'), EFA.util.esc(taxText(ctx, G))], [ctx.t('rtInfl'), rpP(G.inflationRate)],
+        [ctx.t('rtDesired'), rpM(A.T0) + (sc.inflateLifestyle || sc.maintainCurrentLifestyle ? ' ' + ctx.text('rtCola') : '')], [ctx.t('rtLegacy'), rpM(G.desiredLegacy)]]);
+    }
+    return html;
+  }
+
+  /* ---------- report charts (drawn in code, no legend or tooltips unless asked) ---------- */
+  const RPTC = { bar: P.navy3, barLate: 'rgba(179,64,46,.55)', present: P.navy, revised: '#2f8a52', line3: P.gold, line4: P.navy4, line5: '#99413a' };
+  function chAxis(w, h, pad, max, cats, every) {
+    let g = '';
+    for (let i = 0; i <= 5; i++) {
+      const v = max * i / 5, y = pad.t + (h - pad.t - pad.b) * (1 - i / 5);
+      g += `<line x1="${pad.l}" x2="${w - pad.r}" y1="${y.toFixed(1)}" y2="${y.toFixed(1)}" stroke="${P.rule}" stroke-width="1"/>`;
+      g += `<text x="${pad.l - 10}" y="${(y + 5).toFixed(1)}" text-anchor="end" font-family="DM Sans, sans-serif" font-size="15" fill="#667389">${F.money(Math.round(v))}</text>`;
+    }
+    cats.forEach((c, i) => {
+      if (i % every && i !== cats.length - 1) return;
+      const x = pad.l + (i + 0.5) * (w - pad.l - pad.r) / cats.length;
+      g += `<text x="${x.toFixed(1)}" y="${h - pad.b + 24}" text-anchor="middle" font-family="DM Sans, sans-serif" font-size="15" fill="#667389">${c}</text>`;
+    });
+    return g;
+  }
+  /**
+   * One column per age plus up to two lines on the same scale.
+   * o: {cats, values, split (index where the late color starts), lines:[{values, color, width}], max, w, h}
+   */
+  function rptBars(o) {
+    const w = o.w || 1000, h = o.h || 500, pad = { l: 118, r: 24, t: 20, b: 44 };
+    const n = Math.max(1, o.cats.length), max = Math.max(1, o.max || 0);
+    const bw = (w - pad.l - pad.r) / n, gap = Math.min(5, bw * 0.22);
+    const Y = (v) => pad.t + (h - pad.t - pad.b) * (1 - Math.max(0, Math.min(max, v || 0)) / max);
+    const X = (i) => pad.l + (i + 0.5) * bw;
+    let g = chAxis(w, h, pad, max, o.cats, Math.max(1, Math.ceil(n / 14)));
+    (o.values || []).forEach((v, i) => {
+      const y = Y(v), bh = h - pad.b - y;
+      if (bh <= 0.4) return;
+      g += `<rect x="${(pad.l + i * bw + gap / 2).toFixed(1)}" y="${y.toFixed(1)}" width="${Math.max(1, bw - gap).toFixed(1)}" height="${bh.toFixed(1)}" fill="${o.split != null && i >= o.split ? RPTC.barLate : RPTC.bar}"/>`;
+    });
+    (o.lines || []).forEach((L) => {
+      const d = L.values.map((v, i) => `${i ? 'L' : 'M'}${X(i).toFixed(1)},${Y(v).toFixed(1)}`).join('');
+      g += `<path d="${d}" fill="none" stroke="${L.color}" stroke-width="${L.width || 4}" stroke-linejoin="round" stroke-linecap="round"/>`;
+    });
+    g += `<line x1="${pad.l}" x2="${w - pad.r}" y1="${h - pad.b}" y2="${h - pad.b}" stroke="${P.navy}" stroke-width="1.5"/>`;
+    return `<div class="ch"><svg viewBox="0 0 ${w} ${h}" width="${w}" height="${h}" role="img" aria-hidden="true">${g}</svg></div>`;
+  }
+  /** stacked columns (one series per account withdrawal) with lines over them; legend rendered as HTML */
+  function rptStack(ctx, o) {
+    const w = o.w || 1000, h = o.h || 450, pad = { l: 118, r: 24, t: 20, b: 44 };
+    const n = Math.max(1, o.cats.length);
+    const tot = o.cats.map((_, i) => (o.series || []).reduce((t, s) => t + Math.max(0, s.values[i] || 0), 0));
+    const max = Math.max(1, ...tot, ...(o.lines || []).flatMap((L) => L.values.map((v) => Math.max(0, v || 0))));
+    const bw = (w - pad.l - pad.r) / n, gap = Math.min(5, bw * 0.22);
+    const Y = (v) => pad.t + (h - pad.t - pad.b) * (1 - Math.max(0, Math.min(max, v || 0)) / max);
+    const X = (i) => pad.l + (i + 0.5) * bw;
+    let g = chAxis(w, h, pad, max, o.cats, Math.max(1, Math.ceil(n / 14)));
+    o.cats.forEach((_, i) => {
+      let acc = 0;
+      (o.series || []).forEach((s) => {
+        const v = Math.max(0, s.values[i] || 0); if (v <= 0) return;
+        const y0 = Y(acc), y1 = Y(acc + v); acc += v;
+        g += `<rect x="${(pad.l + i * bw + gap / 2).toFixed(1)}" y="${y1.toFixed(1)}" width="${Math.max(1, bw - gap).toFixed(1)}" height="${Math.max(0.5, y0 - y1).toFixed(1)}" fill="${s.color}"/>`;
+      });
+    });
+    (o.lines || []).forEach((L) => {
+      const d = L.values.map((v, i) => `${i ? 'L' : 'M'}${X(i).toFixed(1)},${Y(v).toFixed(1)}`).join('');
+      g += `<path d="${d}" fill="none" stroke="${L.color}" stroke-width="3" stroke-linejoin="round" ${L.dash ? `stroke-dasharray="${L.dash}"` : ''}/>`;
+    });
+    g += `<line x1="${pad.l}" x2="${w - pad.r}" y1="${h - pad.b}" y2="${h - pad.b}" stroke="${P.navy}" stroke-width="1.5"/>`;
+    const lg = (o.series || []).concat(o.lines || []).map((s) => `<span><i style="background:${s.color}"></i>${EFA.util.esc(s.label || '')}</span>`).join('');
+    return `<div class="ch"><svg viewBox="0 0 ${w} ${h}" width="${w}" height="${h}" role="img" aria-hidden="true">${g}</svg></div>${o.legend === false ? '' : `<div class="lg">${lg}</div>`}`;
+  }
+
+  /* ---------- the report viewer (in-stage overlay) and its downloads ---------- */
+  const rpPage = (inner, cls) => `<div class="pg ${cls || ''}">${inner}</div>`;
+  const rpFoot = (ctx, n) => `<div class="pgf"><span>${ctx.text('rpBrand')}</span><span>${ctx.text('rpPage')} ${n}</span></div>`;
+  function rpCover(ctx, o) {
+    return rpPage(`<div class="mk" style="left:54px;top:120px"></div><div class="mk" style="right:54px;bottom:120px"></div>
+      <div class="wm">${A.emblem({ size: 460 })}</div>
+      <div class="cover">${ctx.t('rpEyebrow', { tag: 'p', cls: 'eyebrow' })}${ctx.t(o.titleKey, { tag: 'h1' })}${ctx.t(o.subKey, { tag: 'p', cls: 'sub' })}
+        <p class="for">${ctx.t('rpPrepared')}</p><p class="who">${EFA.util.esc(o.who)}</p>
+        <p class="cred">${ctx.t('rpBrand')}<br>${ctx.t('rpCred')}</p></div>`, 'cover');
+  }
+  const rpDisclose = (ctx) => rpPage(`${ctx.t('rpDisc', { tag: 'h2' })}<div class="rule"></div><div class="disc">${discLine(['hypothetical', 'guarantees', 'tax', 'loans', 'notAdvice', 'past', 'license']) || ''}</div>`);
+  /** strip the wording-editor wrappers so a saved file holds plain markup */
+  function rpClean(html) {
+    const d = document.createElement('div');
+    d.innerHTML = html;
+    d.querySelectorAll('[data-k]').forEach((n) => { n.removeAttribute('data-k'); n.removeAttribute('data-s'); n.removeAttribute('contenteditable'); n.removeAttribute('tabindex'); n.classList.remove('ed-on'); });
+    return d.innerHTML;
+  }
+  const rpFile = (s) => String(s || 'report').replace(/[*?:\\/[\]<>|"]/g, '-').replace(/\s+/g, ' ').trim().slice(0, 110) || 'report';
+  /** o: {title, titleText, file, pages, sheet (worksheet data or null) } */
+  function openReport(ctx, o) {
+    const dlNow = () => (EFA.platform && EFA.platform.downloads) || null;
+    const ov = gdlg(ctx, {
+      title: o.title, w: 1240, cls: 'b06-rptd', body: `<div class="b06-rpt">${o.pages}${rpDisclose(ctx)}</div>`,
+      foot: `<span class="b06-note">${ctx.t('rpNote')}</span><div class="grp"><button type="button" class="st-pill ghost dlh" hidden>${ctx.t('rpDl')}</button>${o.sheet ? `<button type="button" class="st-pill ghost dlx" hidden>${ctx.t('rpDlX')}</button><button type="button" class="st-pill ghost dlc" hidden>${ctx.t('rpDlC')}</button>` : ''}<button type="button" class="st-pill okb">${ctx.t('ok')}</button></div>`
+    });
+    ov.classList.add('b06-rptd');
+    const sync = () => { const on = !!dlNow(); ['.dlh', '.dlx', '.dlc'].forEach((s) => { const b = ov.querySelector(s); if (b) b.hidden = !on; }); };
+    sync();
+    if (EFA.platform && !EFA.platform.known) { let k = 0; const t = setInterval(() => { k++; if (!ov.isConnected || k > 40 || EFA.platform.known) clearInterval(t); if (ov.isConnected) sync(); }, 500); }
+    const save = (filename, data) => { const dl = dlNow(); if (!dl) { sync(); return; } Promise.resolve().then(() => dl.save({ filename, data })).catch((e) => { if (e && e.code) sync(); else console.error(e); }); };
+    ov.querySelector('.dlh').addEventListener('click', () => {
+      if (EFA.edit && EFA.edit.on) return;
+      const body = rpClean(ov.querySelector('.b06-rpt').innerHTML);
+      save(rpFile(o.file) + '.html', `<!doctype html><html lang="en"><head><meta charset="utf-8"><title>${EFA.util.esc(o.titleText)}</title><style>body{margin:0;background:#e7e3db;font-family:"DM Sans",system-ui,sans-serif}${RPTCSS}.b06-rpt{margin:0;padding:26px 0 32px}@media print{body{background:#fff}.b06-rpt{display:block;padding:0}.b06-rpt .pg{box-shadow:none;border:0;border-radius:0;page-break-after:always;width:auto}}</style></head><body><div class="b06-rpt">${body}</div></body></html>`);
+    });
+    const W = lib('worksheet');
+    if (o.sheet && W) {
+      ov.querySelector('.dlx').addEventListener('click', () => { if (!(EFA.edit && EFA.edit.on)) save(rpFile(o.sheet.file || o.file) + '.xlsx', W.xlsx(o.sheet)); });
+      ov.querySelector('.dlc').addEventListener('click', () => { if (!(EFA.edit && EFA.edit.on)) save(rpFile(o.sheet.file || o.file) + '.csv', W.csv(o.sheet)); });
+    }
+    ov.querySelector('.okb').addEventListener('click', () => { if (!(EFA.edit && EFA.edit.on)) ov.close(); });
+    return ov;
+  }
+  /** the "a calculation is in progress" modal (C9 R1) */
+  function rpBusy(ctx) {
+    const ov = gdlg(ctx, { title: ctx.t('busyTitle'), w: 560, body: `<div class="b06-busy"><span class="dot"></span>${ctx.t('busyBody', { tag: 'p', attrs: 'style="margin:0;max-width:420px"' })}</div>` });
+    ov.querySelector('.st-overlay-x').style.display = 'none';
+    return ov;
+  }
+
+  /* ---------- R1: the four-questions results report ---------- */
+  /**
+   * C9 R1 data collection. Runs on a fresh baseline of the revised scenario with no hazard and no
+   * lever changes, so nothing on the screen has to be reset for it. Several solves: a few seconds.
+   */
+  function r1Data(G, sc) {
+    const retired = isRetiredHH(G), base = GPS.project(G, sc, {}), le = combLE(G), a0 = base.a0;
+    const upto = (res, field) => res.find.filter((f) => f.age <= le).map((f) => (field ? res.rows[f.idx][field] : f.funds));
+    const o = { retired, base, le, ages: base.find.filter((f) => f.age <= le).map((f) => f.age), present: upto(base) };
+    o.retRow = Math.max(0, Math.min(base.Y - 1, G.clientRetireAge - a0));
+    const s1 = GPS.solve(G, sc, 'ror', { base: {} });
+    o.P = s1.value; o.q1 = upto(s1.res); o.required = base.avgReturn + s1.value;
+    const mn = GPS.solve(G, sc, 'saveMin', { base: {}, efficiency: true });
+    if (mn.need) {
+      const inc = GPS.solve(G, sc, 'save', { base: {}, efficiency: false, once: retired });
+      o.Sinc = inc.res.find[0].dep; o.extra = o.Sinc - base.find[0].dep; o.ideal = upto(inc.res); o.q4inc = o.ideal;
+      if (retired) { o.q4 = o.ideal; o.reqStart = inc.res.find[0].bal0 + o.Sinc; o.Seff = o.Sinc; o.effLife = inc.res.find[0].actual; }
+      else { const eff = GPS.solve(G, sc, 'save', { base: {}, efficiency: true }); o.Seff = eff.res.find[0].dep; o.effLife = eff.res.find[0].actual; o.q4 = upto(eff.res); }
+    } else {
+      o.Seff = o.Sinc = mn.res.find[0].dep; o.effLife = mn.res.find[0].actual; o.extra = 0;
+      o.ideal = o.q4 = o.q4inc = upto(mn.res);
+      if (retired) o.reqStart = mn.res.find[0].bal0 + o.Seff;
+    }
+    if (retired) { o.q2ret = upto(base, 'endTotal'); o.lasts = base.moneyLasts; o.lastsAmount = base.moneyLastsAmount; }
+    else { const w = GPS.solve(G, sc, 'work', { base: {} }); o.Rw = w.value; o.q2 = upto(w.res); }
+    const sp = GPS.solve(G, sc, 'spend', { base: {} });
+    o.q3 = upto(sp.res); o.Wl = sp.res.find[Math.min(o.retRow, sp.res.Y - 1)].actual;
+    const was = base.find[o.retRow].actual;
+    o.reduction = was > 0 ? 100 * (1 - o.Wl / was) : -1000;
+    o.WlPV = o.Wl / Math.pow(1 + (base.infl || 0), Math.max(G.clientRetireAge - a0, 0));
+    o.baseDep = base.find[0].dep;
+    o.max = Math.max(1, ...[o.present, o.q1, o.ideal, o.q4, o.q4inc, o.q2, o.q2ret, o.q3].filter(Boolean).map((d) => Math.max(...d)));
+    return o;
+  }
+  function reportResults(ctx, G, sc, who, D) {
+    const retired = D.retired, pg = [];
+    const ch = (vals, lines) => rptBars({ cats: D.ages, values: vals, split: Math.max(0, G.clientRetireAge - G.clientAge), max: D.max, lines, w: 1000, h: 440 });
+    const caps = `${ctx.t('r1cBar', { tag: 'p', cls: 'cap' })}${ctx.t('r1cSplit', { tag: 'p', cls: 'cap' })}${ctx.t('r1cLines', { tag: 'p', cls: 'cap' })}`;
+    let n = 1;
+    pg.push(rpCover(ctx, { titleKey: 'r1Title', subKey: 'r1Sub', who }));
+    pg.push(rpPage(`${ctx.t('r1iH', { tag: 'h2' })}<div class="rule"></div>
+      ${ctx.t('r1i1', { tag: 'p' })}${ctx.t('r1i2', { tag: 'p' })}${ctx.t('r1i3', { tag: 'p' })}${ctx.t(retired ? 'r1i4r' : 'r1i4', { tag: 'p' })}${ctx.t('r1i5', { tag: 'p' })}${ctx.t('r1i6', { tag: 'p' })}${rpFoot(ctx, ++n)}`));
+    /* question 1: the return */
+    pg.push(rpPage(`${ctx.t('r1q1H', { tag: 'h2' })}<div class="rule"></div>${ctx.t('r1q1Q', { tag: 'p', cls: 'q' })}
+      <p class="big">${retired ? `${ctx.t('r1q1ar')} ${rpI(D.le)} ${ctx.t('r1q1c')} ${rpP(D.required)} ${ctx.t('r1q1d')}`
+        : `${ctx.t('r1q1a')} ${rpI(G.clientRetireAge)} ${ctx.t('r1q1b')} ${rpI(D.le)} ${ctx.t('r1q1c')} ${rpP(D.required)} ${ctx.t('r1q1d')}`}</p>
+      ${ctx.t(D.P > 0.00005 ? 'r1q1Up' : 'r1q1Dn', { tag: 'p' })}
+      ${ch(D.q1, [{ values: D.present, color: RPTC.present }, { values: D.q1, color: RPTC.revised }])}${caps}${rpFoot(ctx, ++n)}`));
+    /* question 2: the saving */
+    let q2 = `${ctx.t('r1q2H', { tag: 'h2' })}<div class="rule"></div>${ctx.t('r1q2Q', { tag: 'p', cls: 'q' })}`;
+    if (retired) {
+      q2 += D.extra > 0
+        ? `<p class="big">${ctx.t('r1q2ra')} ${rpM(D.reqStart)} ${ctx.t('r1q2rb')} ${rpM(D.extra)} ${ctx.t('r1q2rc')}</p>${ctx.t('r1q2rd', { tag: 'p' })}`
+        : `<p class="big">${ctx.t('r1q2rok')}</p>${ctx.t('r1q2ok', { tag: 'p' })}${ctx.t('r1q2leg', { tag: 'p' })}`;
+    } else if (D.extra > 0) {
+      q2 += `<p class="big">${ctx.t('r1q2a')} ${rpM(D.Sinc)} ${ctx.t('r1q2b')} ${rpM(D.extra)} ${ctx.t('r1q2c')}</p>
+        ${ctx.t('r1q2d', { tag: 'p' })}<p>${ctx.t('r1q2e')} ${rpM(D.effLife)} ${ctx.t('r1q2f')} ${rpM(D.Seff)} ${ctx.t('r1q2g')}</p>`;
+    } else {
+      q2 += `<p class="big">${ctx.t('r1q2okH')}</p>${ctx.t('r1q2ok', { tag: 'p' })}`
+        + (D.extra < 0 && D.Seff > 0 ? `<p>${ctx.t('r1q2ok2')} ${rpM(D.Seff)} ${ctx.t('r1q2ok3')}</p>` : '');
+    }
+    const cTail = D.Seff <= 0 ? ctx.t('r1q2cA') : `${ctx.t(D.Seff >= D.baseDep ? 'r1q2cUp' : 'r1q2cDn')} ${rpM(D.Seff)} ${ctx.t('r1q2cTail')}`;
+    q2 += ch(D.ideal, [{ values: D.present, color: RPTC.present }, { values: D.q4, color: RPTC.revised }]) + caps + `<p class="cap">${cTail}</p>` + rpFoot(ctx, ++n);
+    pg.push(rpPage(q2));
+    /* question 3: the arrival time, or how long what is built lasts */
+    let q3;
+    if (retired) {
+      q3 = `${ctx.t('r1q3Hr', { tag: 'h2' })}<div class="rule"></div>${ctx.t('r1q3Qr', { tag: 'p', cls: 'q' })}
+        <p class="big">${ctx.t('r1q3ra')} ${rpI(D.lasts)}, ${ctx.t('r1q3rb')} ${rpM(D.lastsAmount)} ${ctx.t('r1q3rc')}</p>${ctx.t('r1q3rd', { tag: 'p' })}
+        ${ch(D.q2ret, [{ values: D.present, color: RPTC.present }])}${ctx.t('r1cBar', { tag: 'p', cls: 'cap' })}${ctx.t('r1cSplit', { tag: 'p', cls: 'cap' })}${ctx.t('r1cPresent', { tag: 'p', cls: 'cap' })}`;
+    } else {
+      const more = D.Rw - G.clientRetireAge, left = Math.max(0, G.clientLE - D.Rw);
+      q3 = `${ctx.t('r1q3H', { tag: 'h2' })}<div class="rule"></div>${ctx.t('r1q3Q', { tag: 'p', cls: 'q' })}
+        <p class="big">${ctx.t('r1q3a')} ${rpI(D.le)}, ${ctx.t('r1q3b')} ${rpI(D.Rw)}.</p>
+        <p>${more === 0 ? ctx.t('r1q3same') : `${ctx.t('r1q3d')} ${rpI(Math.abs(more))} ${ctx.t(more > 0 ? 'r1q3later' : 'r1q3earlier')}`} ${ctx.t('r1q3i')} ${rpI(left)} ${ctx.t('r1q3j')}</p>
+        ${ch(D.q2, [{ values: D.present, color: RPTC.present }, { values: D.q2, color: RPTC.revised }])}${caps}`;
+    }
+    pg.push(rpPage(q3 + rpFoot(ctx, ++n)));
+    /* question 4: the reroute */
+    const red = D.reduction;
+    let q4 = `${ctx.t('r1q4H', { tag: 'h2' })}<div class="rule"></div>${ctx.t('r1q4Q', { tag: 'p', cls: 'q' })}
+      <p class="big">${retired ? `${ctx.t('r1q4ar')} ${rpM(D.Wl)} ${ctx.t('r1q4br')} ${rpI(D.le)}.` : `${ctx.t('r1q4a')} ${rpM(D.Wl)} ${ctx.t('r1q4b')} ${rpI(G.clientRetireAge)} ${ctx.t('r1q4c')} ${rpI(D.le)}.`}</p>`;
+    if (red > -999) q4 += `<p>${red >= 0 ? `${ctx.t('r1q4Red')} ${rpN(Math.abs(red))}% ${ctx.t('r1q4RedB')}` : `${ctx.t('r1q4Inc')} ${rpN(Math.abs(red))}% ${ctx.t('r1q4IncB')}`}</p>`;
+    if (!retired) q4 += `<p>${ctx.t('r1q4Pv')} ${rpM(D.WlPV)} ${ctx.t('r1q4PvB')}</p>`;
+    q4 += ch(D.q3, [{ values: D.present, color: RPTC.present }, { values: D.q3, color: RPTC.revised }]) + caps + rpFoot(ctx, ++n);
+    pg.push(rpPage(q4));
+    /* summary */
+    const sum = D.extra > 0
+      ? `${ctx.t('r1s1', { tag: 'p' })}${ctx.t('r1s2', { tag: 'p' })}${ctx.t('r1s3', { tag: 'p' })}${ctx.t('r1s4', { tag: 'p' })}${ctx.t('r1s5', { tag: 'p' })}${ctx.t('r1s6', { tag: 'p' })}<div class="em">${ctx.t('r1sEm')}</div>${ctx.t('r1s7', { tag: 'p' })}`
+      : `${ctx.t('r1o1', { tag: 'p' })}${ctx.t('r1o2', { tag: 'p' })}${ctx.t('r1o3', { tag: 'p' })}<div class="em">${ctx.t('r1sEm')}</div>${ctx.t('r1o4', { tag: 'p' })}${ctx.t('r1o5', { tag: 'p' })}`;
+    pg.push(rpPage(`${ctx.t('r1sH', { tag: 'h2' })}<div class="rule"></div>${sum}${rpFoot(ctx, ++n)}`));
+    pg.push(rpPage(`${ctx.t('rpSupH', { tag: 'h2' })}<div class="rule"></div>${ctx.t('rpSupLead', { tag: 'p' })}
+      ${peopleBlock(ctx, G, D.base, sc, 'results')}${planTables(ctx, G, sc, 'results')}${rpFoot(ctx, ++n)}`));
+    const sheet = {
+      heading: ctx.t('r1Title'), size: 'full', file: ctx.text('r1File') + ' - ' + who,
+      columns: [{ field: 'age', header: ctx.t('wAge'), type: 'age' }, { field: 'p', header: ctx.t('rsPresent'), type: 'money' }, { field: 'q1', header: ctx.t('lv1'), type: 'money' },
+        { field: 'q2', header: ctx.t('lv2'), type: 'money' }, { field: 'q3', header: ctx.t(retired ? 'rsLasts' : 'lv3'), type: 'money' }, { field: 'q4', header: ctx.t('lv4'), type: 'money' }],
+      rows: D.ages.map((age, i) => ({ age, p: D.present[i], q1: D.q1[i], q2: D.ideal[i], q3: (retired ? D.q2ret : D.q2)[i], q4: D.q3[i] })),
+      disclosures: ['hypothetical', 'license']
+    };
+    openReport(ctx, { title: ctx.t('r1Title'), titleText: ctx.text('r1Title'), file: ctx.text('r1File') + ' - ' + who, pages: pg.join(''), sheet });
+  }
+
+  /* ---------- R2: the financial fact check ---------- */
+  function reportFactCheck(ctx, G, sc, who, RA) {
+    const r0 = RA.rows[0];
+    const kids = (G.children || []).filter((c) => (c.name || '').trim() || c.age != null);
+    let kidsHTML = '';
+    if (kids.length) {
+      const pairs = [];
+      for (let i = 0; i < kids.length; i += 2) pairs.push(kids.slice(i, i + 2));
+      kidsHTML = `<table class="rt"><caption>${ctx.text('rtKids')}</caption><thead><tr><th>${ctx.t('kidName')}</th><th class="c">${ctx.t('kidAge')}</th><th>${ctx.t('kidName')}</th><th class="c">${ctx.t('kidAge')}</th></tr></thead><tbody>${pairs.map((p) => `<tr><td>${EFA.util.esc(p[0].name || '')}</td><td class="c">${rpI(p[0].age)}</td><td>${p[1] ? EFA.util.esc(p[1].name || '') : ''}</td><td class="c">${p[1] ? rpI(p[1].age) : ''}</td></tr>`).join('')}</tbody></table>`;
+    }
+    const fs = ctx.text({ single: 'fsSingle', mfj: 'fsMfj', mfs: 'fsMfs', hoh: 'fsHoh' }[G.filingStatus] || 'fsMfj');
+    const assume = rtTable(ctx, { key: 'rtAssume', tone: 'navy', cols: [['rtInfl', 'r'], [G.autoTaxRate ? 'filing' : 'rtTaxes'], [G.autoTaxRate ? 'deductions' : 'cgTax', 'r'], ['rtDesired', 'r'], ['rtLegacy', 'r']],
+      rows: [[rpP(G.inflationRate), G.autoTaxRate ? EFA.util.esc(fs) : `${ctx.text('rtAccum')} ${F.pct(G.taxAccumulation, 2)} / ${ctx.text('rtDist')} ${F.pct(G.taxDistribution, 2)}`,
+        G.autoTaxRate ? (G.itemize ? rpM(G.deductions) : ctx.t('rtStd')) : rpP(G.taxCapGains), rpM(RA.T0), rpM(G.desiredLegacy)]] });
+    const op = [['rtOpInfl', cget('gps_opinion_inflation', null)], ['rtOpRet', cget('gps_opinion_returns', null)], ['rtOpTax', cget('gps_opinion_taxes', null)],
+      ['rtBenRev', cget('gps_beneficiary_review', null)], ['rtEstRev', cget('gps_estate_plan', false) ? cget('gps_estate_review', null) : null]].filter(([, v]) => v != null && v !== '');
+    const opHTML = op.length ? rtTable(ctx, { key: 'rtOpin', tone: 'steel', cols: op.map(([k]) => [k]), rows: [op.map(([, v]) => EFA.util.esc(String(v)))] }) : '';
+    const sumCols = [['rtAssets', 'r'], ['rtLiab', 'r'], ['rtNW', 'r'], ['rtLiq', 'r'], ['rtDbProt', 'r'], ['rtLasts', 'c']];
+    const sumRow = [rpM(r0.assets), rpM(r0.liab), rpM(r0.nw), rpM(r0.liquidity), rpM(r0.db), rpI(RA.moneyLasts)];
+    const pages = rpPage(`${ctx.t('r2Title', { tag: 'h1' })}<p class="who" style="font:600 22px/1.2 'Cormorant Garamond',Georgia,serif;margin:0 0 6px">${EFA.util.esc(who)}</p><div class="rule"></div>
+      ${ctx.t('r2Lead', { tag: 'p' })}${peopleBlock(ctx, G, RA, sc, 'fact')}${kidsHTML}${assume}${opHTML}
+      ${rtTable(ctx, { key: 'r2SumH', tone: 'gold', cols: sumCols, rows: [sumRow] })}
+      ${planTables(ctx, G, sc, 'fact')}${rpFoot(ctx, 1)}`);
+    const sheet = { heading: ctx.t('r2SumH'), size: 'medium', filter: false, file: ctx.text('r2File') + ' - ' + who,
+      columns: sumCols.map(([k], i) => ({ field: 'c' + i, header: ctx.t(k), type: i === 5 ? 'age' : 'money' })),
+      rows: [{ c0: r0.assets, c1: r0.liab, c2: r0.nw, c3: r0.liquidity, c4: r0.db, c5: RA.moneyLasts }], disclosures: ['hypothetical', 'license'] };
+    openReport(ctx, { title: ctx.t('r2Title'), titleText: ctx.text('r2Title'), file: ctx.text('r2File') + ' - ' + who, pages, sheet });
+  }
+
+  /* ---------- R3: the retirement roadmap ---------- */
+  function reportRoadmap(ctx, G, sc, who, RA, K) {
+    const to = GPS.projectTo(G), a0 = RA.a0, last = Math.max(0, Math.min(RA.Y - 1, to - a0));
+    const rows = RA.find.slice(0, last + 1);
+    const cats = rows.map((f) => String(f.age));
+    const ids = RA.find.length ? Object.keys(RA.find[0].per || {}) : [];
+    const tone = [P.navy3, P.gold, P.navy4, P.goldLt, P.steel, P.goldDeep, P.navy2, P.mist2];
+    const series = ids.map((id, i) => ({ label: (RA.find[0].per[id] || {}).name || '', color: tone[i % tone.length], values: rows.map((f) => (f.per[id] || {}).wd || 0) }))
+      .filter((s) => s.values.some((v) => Math.abs(v) > 0.5));
+    const lines = [{ label: ctx.text('r3lTax'), color: RPTC.line5, values: rows.map((f) => f.taxes) }, { label: ctx.text('r3lItem'), color: P.steel, values: rows.map((f) => f.item) },
+      { label: ctx.text('r3lDes'), color: RPTC.present, values: rows.map((f) => f.desired), dash: '8 6' }, { label: ctx.text('r3lAct'), color: RPTC.revised, values: rows.map((f) => f.actual) }]
+      .filter((L) => L.values.some((v) => Math.abs(v) > 0.5));
+    const mileIdx = [0];
+    for (let r = 10; r < last; r += 10) mileIdx.push(r);
+    if (last > 0) mileIdx.push(last);
+    const mcols = [['mYear', 'c'], ['wAge', 'c'], ['rtAssets', 'r'], ['rtLiab', 'r'], ['rtNW', 'r'], ['mEstate', 'r'], ['mSpendC', 'r'], ['mLifeC', 'r']];
+    const mrows = mileIdx.map((r) => { const s = RA.rows[r], f = RA.find[r];
+      return [rpI(r + 1), `<span class="num">${f.age}${RA.sp ? '/' + f.sage : ''}</span>`, rpM(s.assets), rpM(s.liab), rpM(s.nw), rpM(s.estate), rpM(s.spendC), rpM(f.lifeC)]; });
+    const wrap = hasWrapUp(sc) ? `<div class="wu">${renderBlocks(sc.wrapUp)}</div>` : generatedWrapUp(ctx, G, RA, K);
+    const pages = rpCover(ctx, { titleKey: 'r3Title', subKey: 'r3Sub', who })
+      + rpPage(`${ctx.t('r3ExecH', { tag: 'h2' })}<div class="rule"></div>${ctx.t('r3Exec', { tag: 'p' })}
+        ${ctx.t('r3ChartH', { tag: 'h3' })}${rptStack(ctx, { cats, series, lines, w: 1000, h: 450 })}${ctx.t('r3ChartCap', { tag: 'p', cls: 'cap' })}${rpFoot(ctx, 2)}`)
+      + rpPage(`${ctx.t('r3MileH', { tag: 'h2' })}<div class="rule"></div>${rtTable(ctx, { key: '', tone: 'navy', cols: mcols, rows: mrows })}
+        ${ctx.t('r3WrapH', { tag: 'h3' })}${wrap}${rpFoot(ctx, 3)}`)
+      + rpPage(`${ctx.t('rpSupH', { tag: 'h2' })}<div class="rule"></div>${ctx.t('rpSupLead', { tag: 'p' })}
+        ${peopleBlock(ctx, G, RA, sc, 'results')}${planTables(ctx, G, sc, 'results')}${rpFoot(ctx, 4)}`);
+    const sheet = { heading: ctx.t('r3MileH'), size: 'full', filter: false, file: ctx.text('r3File') + ' - ' + who,
+      columns: [{ field: 'y', header: ctx.t('mYear'), type: 'int' }, { field: 'age', header: ctx.t('wAge'), type: 'text', align: 'center' },
+        { field: 'as', header: ctx.t('rtAssets'), type: 'money' }, { field: 'li', header: ctx.t('rtLiab'), type: 'money' }, { field: 'nw', header: ctx.t('rtNW'), type: 'money' },
+        { field: 'es', header: ctx.t('mEstate'), type: 'money' }, { field: 'sp', header: ctx.t('mSpendC'), type: 'money' }, { field: 'lf', header: ctx.t('mLifeC'), type: 'money' }],
+      rows: mileIdx.map((r) => { const s = RA.rows[r], f = RA.find[r]; return { y: r + 1, age: RA.sp ? `${f.age}/${f.sage}` : String(f.age), as: s.assets, li: s.liab, nw: s.nw, es: s.estate, sp: s.spendC, lf: f.lifeC }; }),
+      disclosures: ['hypothetical', 'license'] };
+    openReport(ctx, { title: ctx.t('r3Title'), titleText: ctx.text('r3Title'), file: ctx.text('r3File') + ' - ' + who, pages, sheet });
+  }
+  /** the generated wrap-up (C9 R3) when the scenario has no custom content */
+  function generatedWrapUp(ctx, G, RA, K) {
+    const to = GPS.projectTo(G);
+    const b = [];
+    b.push(`${ctx.t('r3b1')} ${rpP(K.retShown)}${K.points ? `, ${ctx.t(K.points > 0 ? 'r3b1u' : 'r3b1d')} ${rpN(Math.abs(K.points * 100))} ${ctx.t('r3b1e')}` : ''}`);
+    b.push(K.saveNotice ? `${ctx.t('r3b2c')} ${rpM(K.S)} ${ctx.t('r3b2b')} (${K.saveNotice})` : `${ctx.t('r3b2a')} ${rpM(K.S)} ${ctx.t('r3b2b')}`);
+    const dR = K.R - G.clientRetireAge;
+    b.push(`${ctx.t('r3b3a')} ${rpI(K.R)}${dR ? `, ${ctx.t('r3b3b')} ${rpI(Math.abs(dR))} ${ctx.t(dR > 0 ? 'r3b3later' : 'r3b3earlier')}` : ''}`);
+    b.push(K.lifeNotice ? `${ctx.t('r3b4c')} ${rpM(K.W)} ${ctx.t('r3b4b')} (${K.lifeNotice})` : `${ctx.t('r3b4a')} ${rpM(K.W)} ${ctx.t('r3b4b')}, ${rpM(K.WPV)} ${ctx.t('r3b4d')}`);
+    return `<p>${ctx.t('r3w1')} ${rpM(RA.T0)} ${ctx.t('r3w2')}${K.cola ? ' ' + ctx.text('r3w2b') : ''} ${ctx.t('r3w3')} ${rpI(to)}${ctx.t('r3w4')}</p><ul>${b.map((x) => `<li>${x}</li>`).join('')}</ul>`;
+  }
+
+  /* ---------- the roadmap wrap-up: structured blocks, printed by the report and edited in the rich-text editor ---------- */
+  const WSTY = [['p', 'stP'], ['h1', 'stH1'], ['h2', 'stH2'], ['h3', 'stH3'], ['cover', 'stCover'], ['title', 'stTitle'], ['sub', 'stSub'], ['basic', 'stBasic']];
+  const WSIZE = [11, 12.5, 15, 17, 21, 26, 34];
+  const hasWrapUp = (sc) => {
+    const b = sc && sc.wrapUp;
+    if (!Array.isArray(b) || !b.length) return false;
+    if (b.length > 1) return true;
+    return (b[0].runs || []).map((r) => r.t || '').join('').trim() !== '';
+  };
+  const wStyleTag = (s) => (s === 'h1' || s === 'h2' || s === 'h3' ? s : 'p');
+  const wStyleCls = (s) => (s === 'cover' ? 'st-cover' : s === 'title' ? 'st-title' : s === 'sub' ? 'st-sub' : s === 'basic' ? 'st-basic' : '');
+  function runHTML(r) {
+    const st = [];
+    if (r.color) st.push('color:' + r.color);
+    if (r.bg) st.push('background-color:' + r.bg);
+    if (r.size) st.push('font-size:' + WSIZE[Math.max(1, Math.min(7, r.size)) - 1] + 'px');
+    else if (r.sizePx) st.push('font-size:' + r.sizePx);
+    let h = EFA.util.esc(r.t == null ? '' : r.t).replace(/\n/g, '<br>');
+    if (r.b) h = `<b>${h}</b>`;
+    if (r.i) h = `<i>${h}</i>`;
+    if (r.u) h = `<u>${h}</u>`;
+    if (r.href) h = `<a href="${EFA.util.esc(r.href)}"${r.title ? ` title="${EFA.util.esc(r.title)}"` : ''}>${h}</a>`;
+    return st.length ? `<span style="${st.join(';')}">${h}</span>` : h;
+  }
+  /** blocks -> report HTML (consecutive list blocks are grouped) */
+  function renderBlocks(blocks, forEditor) {
+    const out = [];
+    let openList = null;
+    const inner = (b) => (b.runs || []).map(runHTML).join('') || (forEditor ? '<br>' : '&nbsp;');
+    const attrs = (b) => {
+      const cls = [wStyleCls(b.style)];
+      if (b.indent) cls.push('in' + b.indent);
+      const st = b.align ? ` style="text-align:${b.align}"` : '';
+      return `${cls.filter(Boolean).length ? ` class="${cls.filter(Boolean).join(' ')}"` : ''}${forEditor ? ` data-st="${b.style || 'p'}"` : ''}${st}`;
+    };
+    (blocks || []).forEach((b) => {
+      if (b.list) {
+        if (openList !== b.list) { if (openList) out.push(`</${openList}>`); out.push(`<${b.list}>`); openList = b.list; }
+        out.push(`<li${attrs(b)}>${inner(b)}</li>`);
+        return;
+      }
+      if (openList) { out.push(`</${openList}>`); openList = null; }
+      const tag = forEditor ? 'div' : wStyleTag(b.style);
+      out.push(`<${tag}${attrs(b)}>${inner(b)}</${tag}>`);
+    });
+    if (openList) out.push(`</${openList}>`);
+    return out.join('');
+  }
+  /** one editable block element -> {style, align, indent, list, runs} */
+  function blockRuns(block) {
+    const runs = [], w = document.createTreeWalker(block, NodeFilter.SHOW_TEXT, null);
+    let node;
+    while ((node = w.nextNode())) {
+      const t = node.nodeValue;
+      if (t == null || t === '') continue;
+      const r = { t };
+      let p = node.parentNode;
+      while (p && p !== block) {
+        const tg = p.tagName;
+        if (tg === 'B' || tg === 'STRONG') r.b = 1;
+        if (tg === 'I' || tg === 'EM') r.i = 1;
+        if (tg === 'U') r.u = 1;
+        if (tg === 'A' && p.getAttribute('href')) { if (!r.href) r.href = p.getAttribute('href'); if (!r.title && p.getAttribute('title')) r.title = p.getAttribute('title'); }
+        if (tg === 'FONT') {
+          const c = p.getAttribute('color'), s = p.getAttribute('size');
+          if (c && !r.color) r.color = c;
+          if (s && !r.size) r.size = +s;
+        }
+        if (p.style) {
+          if (p.style.color && !r.color) r.color = p.style.color;
+          if (p.style.backgroundColor && !r.bg) r.bg = p.style.backgroundColor;
+          if (p.style.fontWeight === 'bold' || +p.style.fontWeight >= 600) r.b = 1;
+          if (p.style.fontStyle === 'italic') r.i = 1;
+          if ((p.style.textDecoration || '').indexOf('underline') >= 0) r.u = 1;
+          if (p.style.fontSize && !r.size && !r.sizePx) r.sizePx = p.style.fontSize;
+        }
+        p = p.parentNode;
+      }
+      runs.push(r);
+    }
+    if (!runs.length) runs.push({ t: '' });
+    return { style: block.dataset && block.dataset.st ? block.dataset.st : 'p', align: block.style.textAlign || '', indent: block.classList.contains('in2') ? 2 : block.classList.contains('in1') ? 1 : 0, runs };
+  }
+  function parseBlocks(root) {
+    const out = [];
+    const walk = (el, listType) => {
+      const tag = el.tagName;
+      if (tag === 'UL' || tag === 'OL') { Array.from(el.children).forEach((li) => walk(li, tag === 'UL' ? 'ul' : 'ol')); return; }
+      const nested = Array.from(el.children || []).filter((c) => c.tagName === 'UL' || c.tagName === 'OL');
+      if (nested.length) {
+        /* a list the browser nested inside its host block: the host's own text is one block, then the list */
+        const copy = el.cloneNode(true);
+        Array.from(copy.children).forEach((c) => { if (c.tagName === 'UL' || c.tagName === 'OL') c.remove(); });
+        if ((copy.textContent || '').trim()) { const b = blockRuns(copy); if (listType) b.list = listType; out.push(b); }
+        nested.forEach((c) => walk(c));
+        return;
+      }
+      const b = blockRuns(el);
+      if (listType) b.list = listType;
+      out.push(b);
+    };
+    Array.from(root.children).forEach((el) => walk(el));
+    return out.length ? out : [{ style: 'p', runs: [{ t: '' }] }];
+  }
+  const RTEC = [['#0d1e3a', 'navy'], ['#b8972e', 'gold'], ['#8a6e22', 'goldDeep'], ['#2f8a52', 'green'], ['#b3402e', 'red'], ['#667389', 'muted'], ['#ffffff', 'white']];
+  /** app-rpt-editor: the rich-text editor for the roadmap wrap-up (modal, no x) */
+  function openWrapEditor(ctx, sc, then) {
+    const blocks = hasWrapUp(sc) ? JSON.parse(JSON.stringify(sc.wrapUp)) : [{ style: 'p', runs: [{ t: '' }] }];
+    const bt = (k, html, cls) => `<button type="button" class="tbb ${cls || ''}" data-cmd="${k}" title="">${html}</button>`;
+    const sw = (c, kind) => `<button type="button" class="sw" data-sw="${kind}" data-c="${c}" style="background:${c}" title=""></button>`;
+    const ov = gdlg(ctx, {
+      title: ctx.t('rteTitle'), w: 1120, body: `<div class="b06-rte">
+        <div class="tb">
+          <div class="gp">${bt('bold', '<b>B</b>')}${bt('italic', '<i>I</i>')}${bt('underline', '<u>U</u>')}${bt('link', '&#128279;')}${bt('unlink', '&#8856;')}</div>
+          <div class="sp"></div><div class="gp" data-g="fg">${RTEC.map(([c]) => sw(c, 'fore')).join('')}</div>
+          <div class="sp"></div><div class="gp" data-g="bg">${RTEC.map(([c]) => sw(c, 'back')).join('')}</div>
+          <div class="sp"></div><div class="gp"><select class="styl" title="">${WSTY.map(([v, k]) => `<option value="${v}">${EFA.util.esc(ctx.text(k))}</option>`).join('')}</select>
+            <select class="size" title="">${['szXxs', 'szXs', 'szS', 'szM', 'szL', 'szXl', 'szXxl'].map((k, i) => `<option value="${i + 1}" ${i === 2 ? 'selected' : ''}>${EFA.util.esc(ctx.text(k))}</option>`).join('')}</select>
+            <select class="ind" title="">${['inNone', 'in1', 'in2'].map((k, i) => `<option value="${i}">${EFA.util.esc(ctx.text(k))}</option>`).join('')}</select></div>
+          <div class="sp"></div><div class="gp">${bt('left', '&#8676;')}${bt('center', '&#8596;')}${bt('right', '&#8677;')}</div>
+          <div class="sp"></div><div class="gp">${bt('undo', '&#8630;')}${bt('redo', '&#8631;')}</div>
+          <div class="sp"></div><div class="gp">${bt('ul', '&bull;&nbsp;&equiv;')}${bt('ol', '1.&nbsp;&equiv;')}</div>
+        </div>
+        <div class="lk" hidden>${fld(ctx, { href: '', title: '' }, 'href', 'rteAddr', 'text')}${fld(ctx, { href: '', title: '' }, 'title', 'rteLinkT', 'text')}<button type="button" class="st-pill ghost lkgo">${ctx.t('rteIns')}</button></div>
+        <div class="ed" contenteditable="true" spellcheck="true">${renderBlocks(blocks, true)}</div>
+        ${ctx.t('rteNote', { tag: 'p', cls: 'b06-note' })}</div>`,
+      foot: `<span></span><div class="grp"><button type="button" class="st-pill ghost cx">${ctx.t('cancel')}</button><button type="button" class="st-pill sv">${ctx.t('rteApply')}</button></div>`
+    });
+    ov.querySelector('.st-overlay-x').style.display = 'none';
+    const ed = ov.querySelector('.ed'), tb = ov.querySelector('.tb'), lk = ov.querySelector('.lk');
+    const lkv = { href: '', title: '' };
+    bindForm(ctx, lk, lkv);
+    try { document.execCommand('defaultParagraphSeparator', false, 'div'); } catch (e) { /* older engines */ }
+    ed.addEventListener('keydown', (e) => e.stopPropagation());
+    const tip = (sel, key) => { const n = ov.querySelector(sel); if (n) n.setAttribute('title', ctx.text(key)); };
+    [['[data-cmd="bold"]', 'rteB'], ['[data-cmd="italic"]', 'rteI'], ['[data-cmd="underline"]', 'rteU'], ['[data-cmd="link"]', 'rteLink'], ['[data-cmd="unlink"]', 'rteUnlink'],
+      ['[data-cmd="left"]', 'rteAlL'], ['[data-cmd="center"]', 'rteAlC'], ['[data-cmd="right"]', 'rteAlR'], ['[data-cmd="undo"]', 'rteUndo'], ['[data-cmd="redo"]', 'rteRedo'],
+      ['[data-cmd="ul"]', 'rteUl'], ['[data-cmd="ol"]', 'rteOl'], ['.styl', 'rteStyle'], ['.size', 'rteSize'], ['.ind', 'rteIndent']].forEach(([s, k]) => tip(s, k));
+    ov.querySelectorAll('[data-g="fg"] .sw').forEach((b) => b.setAttribute('title', ctx.text('rteColor')));
+    ov.querySelectorAll('[data-g="bg"] .sw').forEach((b) => b.setAttribute('title', ctx.text('rteBg')));
+    /* keep the caret while a toolbar control is used */
+    tb.addEventListener('mousedown', (e) => { if (e.target.closest('select')) return; e.preventDefault(); });
+    const blocksIn = () => {
+      const all = [];
+      Array.from(ed.children).forEach((el) => { if (el.tagName === 'UL' || el.tagName === 'OL') Array.from(el.children).forEach((li) => all.push(li)); else all.push(el); });
+      const s = window.getSelection();
+      if (!s || !s.rangeCount || !ed.contains(s.anchorNode)) return all.slice(0, 1);
+      const r = s.getRangeAt(0);
+      const hit = all.filter((el) => { try { return r.intersectsNode(el); } catch (e) { return false; } });
+      return hit.length ? hit : all.slice(0, 1);
+    };
+    const cmd = (c, v) => { try { document.execCommand(c, false, v); } catch (e) { /* unsupported */ } };
+    tb.addEventListener('click', (e) => {
+      if (EFA.edit && EFA.edit.on) return;
+      const b = e.target.closest('[data-cmd]');
+      if (b) {
+        const k = b.dataset.cmd;
+        if (k === 'link') { lk.hidden = !lk.hidden; return; }
+        if (k === 'unlink') return cmd('unlink');
+        if (k === 'ul') return cmd('insertUnorderedList');
+        if (k === 'ol') return cmd('insertOrderedList');
+        if (k === 'left' || k === 'center' || k === 'right') { blocksIn().forEach((el) => { el.style.textAlign = k === 'left' ? '' : k; }); return; }
+        return cmd(k);
+      }
+      const s = e.target.closest('[data-sw]');
+      if (s) cmd(s.dataset.sw === 'fore' ? 'foreColor' : 'backColor', s.dataset.c);
+    });
+    ov.querySelector('.lkgo').addEventListener('click', () => {
+      if (EFA.edit && EFA.edit.on) return;
+      const href = String(lkv.href || '').trim();
+      if (!href) { lk.hidden = true; return; }
+      cmd('createLink', href);
+      if (lkv.title) ed.querySelectorAll(`a[href="${href.replace(/"/g, '')}"]`).forEach((a) => a.setAttribute('title', lkv.title));
+      lk.hidden = true;
+    });
+    ov.querySelector('.styl').addEventListener('change', (e) => { const v = e.target.value; blocksIn().forEach((el) => { el.dataset.st = v; el.className = (el.className.replace(/st-\S+/g, '').trim() + ' ' + wStyleCls(v)).trim(); }); });
+    ov.querySelector('.size').addEventListener('change', (e) => cmd('fontSize', e.target.value));
+    ov.querySelector('.ind').addEventListener('change', (e) => { const v = +e.target.value; blocksIn().forEach((el) => { el.classList.remove('in1', 'in2'); if (v) el.classList.add('in' + v); }); });
+    ov.querySelector('.cx').addEventListener('click', () => { if (!(EFA.edit && EFA.edit.on)) ov.close(); });
+    ov.querySelector('.sv').addEventListener('click', () => {
+      if (EFA.edit && EFA.edit.on) return;
+      const out = parseBlocks(ed);
+      const s2 = GX.get(sc.id);
+      if (s2) { s2.wrapUp = out; GX.put(s2); }
+      ov.close();
+      if (then) then();
+    });
+    return ov;
+  }
+
+  EFA.css('b06rpt3', `
+  .b06-rte .ed div, .b06-rte .ed li { margin: 0 0 10px; }
+  .b06-rte .ed .in1 { padding-left: 26px; } .b06-rte .ed .in2 { padding-left: 52px; }
+  .b06-rte .ed .st-cover { font-family: "Cormorant Garamond", Georgia, serif; font-size: 36px; line-height: 1.1; }
+  .b06-rte .ed .st-title { font-family: "Cormorant Garamond", Georgia, serif; font-size: 27px; line-height: 1.15; }
+  .b06-rte .ed .st-sub { font-family: "Cormorant Garamond", Georgia, serif; font-size: 20px; color: #2b4c80; }
+  .b06-rte .ed .st-basic { font-size: 14px; }
+  .b06-rte .ed [data-st="h1"] { font-family: "Cormorant Garamond", Georgia, serif; font-size: 34px; line-height: 1.1; }
+  .b06-rte .ed [data-st="h2"] { font-family: "Cormorant Garamond", Georgia, serif; font-size: 26px; line-height: 1.15; }
+  .b06-rte .ed [data-st="h3"] { font-family: "Cormorant Garamond", Georgia, serif; font-size: 20px; line-height: 1.2; }
+  .b06-pst { display: grid; gap: 12px; }
+  .b06-pst textarea { width: 100%; box-sizing: border-box; height: 180px; border: 1.5px solid #cbd5e3; border-radius: 10px; padding: 10px 12px; font: 600 15px/1.45 "DM Sans", sans-serif; color: #0d1e3a; resize: vertical; }
+  `);
+
+  /* ---------- advanced per-account actions (schedule changes the engine applies in list order) ---------- */
+  const ACTM = {
+    taxable: ['contribution', 'withdrawal', 'fee', 'ror'], tdbt: ['contribution', 'withdrawal', 'fee', 'ror'], tdat: ['contribution', 'withdrawal', 'fee', 'ror'],
+    taxfree: ['contribution', 'withdrawal', 'fee', 'ror'], annuity: ['contribution', 'withdrawal', 'ror'], income: ['inflow'], loan: ['creditLine', 'draw', 'paydown']
+  };
+  const actIsRate = (m) => m === 'ror' || m === 'fee';
+  const actHasMod = (m) => m === 'contribution' || m === 'withdrawal' || m === 'inflow';
+  /** one line of plain description under an action's name */
+  function actSummary(ctx, ac) {
+    const bits = [];
+    if (actIsRate(ac.mode)) bits.push(ctx.text('actRate') + ' ' + F.pct(ac.rate || 0, 2));
+    else if (Array.isArray(ac.amounts) && ac.amounts.length) bits.push(ctx.text('actMulti'));
+    else {
+      bits.push(F.money(ac.amount || 0));
+      if (ac.growth) bits.push(ctx.text('actGrow') + ' ' + F.pct(ac.growth, 2));
+    }
+    bits.push(ctx.text('actStart') + ' ' + F.int(ac.startAge || 0));
+    bits.push(F.int(ac.years || 1) + ' ' + ctx.text('actYears'));
+    if (actHasMod(ac.mode)) bits.push(ctx.text({ add: 'mdAdd', subtract: 'mdSub' }[ac.modifier] || 'mdSet'));
+    return EFA.util.esc(bits.join(' · '));
+  }
+  function actionsHTML(ctx, rec) {
+    const list = rec.actions || [];
+    return `<div class="b06-fg" style="--c:1"><span class="l" style="font:700 11px/1 'DM Sans',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#8a6e22">${ctx.t('actHead')}</span></div>
+      <div class="b06-acts">${list.length ? list.map((ac, i) => `<div class="row"><span class="g">${ctx.t('ac_' + ac.mode)}${ac.description ? ' <span class="s">' + EFA.util.esc(ac.description) + '</span>' : ''}<br><span class="s">${actSummary(ctx, ac)}</span></span>
+        <button type="button" class="b06-mag" data-aup="${i}" ${i ? '' : 'disabled'}>&uarr;</button><button type="button" class="b06-mag" data-adn="${i}" ${i === list.length - 1 ? 'disabled' : ''}>&darr;</button>
+        <button type="button" class="b06-mag" data-aed="${i}">${IC.pencil}</button><button type="button" class="b06-mag" data-adl="${i}">&times;</button></div>`).join('') : `<div class="none">${ctx.t('actNone')}</div>`}</div>
+      <div class="b06-fg" style="--c:1"><div style="position:relative;justify-self:start"><button type="button" class="st-pill ghost aadd">${ctx.t('actAdd')} ${IC.up}</button>
+        <div class="b06-menu amenu" hidden>${(ACTM[rec.type] || []).map((m) => `<button type="button" data-amode="${m}">${ctx.t('ac_' + m)}</button>`).join('')}</div></div></div>`;
+  }
+  /** the action input wizard */
+  function openAction(ctx, G, rec, ac, isNew, then) {
+    const a = Object.assign({ mode: 'contribution', amount: 0, amounts: null, growth: 0, rate: 0, startAge: ownerAge(G, rec), years: 1, modifier: 'set', description: '' }, JSON.parse(JSON.stringify(ac || {})));
+    const st = { multi: Array.isArray(a.amounts) && a.amounts.length > 0, text: (a.amounts || []).join('\n') };
+    const ov = gdlg(ctx, {
+      title: `<span>${ctx.t(isNew ? 'addNew' : 'edit')} ${ctx.t('ac_' + a.mode)}</span>`, w: 720, body: '<div class="ab"></div>',
+      foot: `<span></span><div class="grp"><button type="button" class="st-pill ghost cx">${ctx.t('cancel')}</button><button type="button" class="st-pill sv">${ctx.t('save')}</button></div>`
+    });
+    const host = ov.querySelector('.ab');
+    const draw = () => {
+      const rate = actIsRate(a.mode);
+      host.innerHTML = `<div style="display:grid;gap:14px">
+        <div class="b06-fg" style="--c:3">${rate ? fld(ctx, a, 'rate', 'actRate', 'pct') : (st.multi ? '' : fld(ctx, a, 'amount', 'actAmount', 'money') + fld(ctx, a, 'growth', 'actGrow', 'pct'))}
+          ${fld(ctx, a, 'startAge', 'actStart', 'int', { min: 0, max: 100 })}${fld(ctx, a, 'years', 'actYears', 'int', { min: 1, max: 80 })}</div>
+        ${rate ? '' : swf(ctx, st, 'multi', 'actMulti')}
+        ${!rate && st.multi ? `<label class="b06-f"><span class="l">${ctx.t('actPaste')}</span><textarea class="amv" style="width:100%;box-sizing:border-box;height:140px;border:1.5px solid #cbd5e3;border-radius:10px;padding:9px 11px;font:600 15px/1.4 'DM Sans',sans-serif;color:#0d1e3a">${EFA.util.esc(st.text)}</textarea></label>` : ''}
+        ${actHasMod(a.mode) ? segf(ctx, a, 'modifier', 'actMod', [['set', 'mdSet'], ['add', 'mdAdd'], ['subtract', 'mdSub']]) : ''}
+        <div class="b06-fg" style="--c:1">${fld(ctx, a, 'description', 'actDesc', 'text')}</div></div>`;
+      const inner = host.firstElementChild;
+      bindForm(ctx, inner, a);
+      bindForm(ctx, inner, st, () => draw());
+      const ta = inner.querySelector('.amv');
+      if (ta) { ta.addEventListener('keydown', (e) => e.stopPropagation()); ta.addEventListener('blur', () => { st.text = ta.value; }); }
+      EFA.numify(host); if (EFA.edit && EFA.edit.on) EFA.edit.arm(host);
+    };
+    draw();
+    ov.querySelector('.cx').addEventListener('click', () => { if (!(EFA.edit && EFA.edit.on)) ov.close(); });
+    ov.querySelector('.sv').addEventListener('click', () => {
+      if (EFA.edit && EFA.edit.on) return;
+      const ta = host.querySelector('.amv');
+      if (ta) st.text = ta.value;
+      if (document.activeElement && host.contains(document.activeElement)) document.activeElement.blur();
+      a.amounts = st.multi && !actIsRate(a.mode) ? String(st.text || '').split(/[\r\n,;\t]+/).map((s) => F.parse(s)).filter((v) => isFinite(v)) : null;
+      if (a.amounts && !a.amounts.length) a.amounts = null;
+      if (a.amounts) a.years = Math.max(a.years || 1, a.amounts.length);
+      ov.close(); then(a);
+    });
+    return ov;
+  }
+
+  /* ---------- the illustration grid's copy and paste helper ---------- */
+  /** onApply(values, mode, zeroRest): paste a column of numbers from the selected row down */
+  function openPaste(ctx, onApply) {
+    const st = { mode: 'set', zero: false, text: '' };
+    const ov = gdlg(ctx, {
+      title: ctx.t('pasteHead'), w: 640,
+      body: `<div class="b06-pst">${ctx.t('pasteBody', { tag: 'p', attrs: 'style="margin:0"' })}<textarea class="pv"></textarea>
+        ${segf(ctx, st, 'mode', 'pasteMode', [['set', 'mdSet'], ['add', 'mdAdd'], ['subtract', 'mdSub']])}${swf(ctx, st, 'zero', 'pasteZero')}</div>`,
+      foot: `<span></span><div class="grp"><button type="button" class="st-pill ghost cx">${ctx.t('cancel')}</button><button type="button" class="st-pill sv">${ctx.t('pasteGo')}</button></div>`
+    });
+    const ta = ov.querySelector('.pv');
+    bindForm(ctx, ov.querySelector('.b06-pst'), st);
+    ta.addEventListener('keydown', (e) => e.stopPropagation());
+    ctx.timeout(() => ta.focus(), 60);
+    ov.querySelector('.cx').addEventListener('click', () => { if (!(EFA.edit && EFA.edit.on)) ov.close(); });
+    ov.querySelector('.sv').addEventListener('click', () => {
+      if (EFA.edit && EFA.edit.on) return;
+      const vals = String(ta.value || '').split(/[\r\n,;\t]+/).map((s) => s.replace(/[^0-9.\-]/g, '')).filter((s) => s !== '' && s !== '-' && s !== '.').map((s) => Math.round(parseFloat(s) * 100) / 100).filter((v) => isFinite(v));
+      ov.close(); onApply(vals, st.mode, !!st.zero);
+    });
+    return ov;
+  }
+
+  /* ---------- privacy mode (a device setting, on by default) ---------- */
+  const PRIVKEY = 'efa.fgps.privacy';
+  const privacyOn = () => { try { return EFA.util.LS.get(PRIVKEY, true) !== false; } catch (e) { return true; } };
+  const setPrivacy = (v) => { try { EFA.util.LS.set(PRIVKEY, !!v); } catch (e) { /* storage unavailable */ } };
+
+  /* ---------- the scenario hand-offs (C10 neighbours) ---------- */
+  /** copy the active scenario to the spending game's hand-off slot (the separate tool is not part of this app) */
+  function copyToSpendingGame(sc) {
+    if (!sc) return;
+    EFA.clients.set('fgps', 'spendingGame', { scenario: JSON.parse(JSON.stringify(sc)), copied: Date.now() });
+  }
+  /** save the scenario (and the baseline when comparing) to a .fgps file; identifiers are left out while privacy mode is on */
+  function saveScenarioFile(ctx, G, list) {
+    const dl = (EFA.platform && EFA.platform.downloads) || null;
+    if (!dl) { ctx.toast(ctx.text('noFile')); return; }
+    const g = JSON.parse(JSON.stringify(G));
+    if (privacyOn()) ['mobilePhone', 'altPhone', 'street', 'city', 'state', 'zip', 'email', 'email2', 'clientDOB', 'spouseDOB', 'clientPosition', 'spousePosition', 'clientEmployer', 'spouseEmployer', 'clientWorkPhone', 'spouseWorkPhone', 'creditScore'].forEach((k) => { delete g[k]; });
+    if (privacyOn() && Array.isArray(g.children)) g.children = g.children.map((c) => ({ name: c.name, age: c.age }));
+    const data = JSON.stringify({ format: 'fgps', version: 1, saved: new Date().toISOString(), globals: g, scenarios: list.map((s) => JSON.parse(JSON.stringify(s))) }, null, 2);
+    Promise.resolve().then(() => dl.save({ filename: rpFile(G.contactName || G.clientName || 'scenario') + '.fgps', data }))
+      .then(() => ctx.toast(ctx.text('fileOk'))).catch((e) => { if (e && e.code !== 'declined') ctx.toast(ctx.text('noFile')); });
+  }
+
 })();
