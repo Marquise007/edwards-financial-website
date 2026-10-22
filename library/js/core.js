@@ -315,7 +315,7 @@
     if (!loaded[name]) {
       loaded[name] = new Promise((res, rej) => {
         const s = document.createElement('script');
-        s.src = `js/screens/${name}.js`; s.onload = () => res(name); s.onerror = () => rej(new Error('Could not load ' + name));
+        s.src = `js/screens/${name}.js` + (window.EFA_BUILD ? '?v=' + window.EFA_BUILD : ''); s.onload = () => res(name); s.onerror = () => rej(new Error('Could not load ' + name));
         document.head.appendChild(s);
       });
     }
@@ -405,7 +405,7 @@
       head.innerHTML = `
         <a class="logo" href="#" id="logoHome" aria-label="Library home">
           <span class="logo-mark" aria-hidden="true">E<b>F</b>A</span>
-          <span class="logo-txt"><span class="logo-name">Edwards &amp; Associates</span><span class="logo-sub">Protect · Grow · Legacy</span></span>
+          <span class="logo-txt"><span class="logo-name">Edwards Financial &amp; Associates</span><span class="logo-sub">Protect · Grow · Legacy</span></span>
         </a>
         <div class="lib-tools">
           <label class="lib-search">${I.search}<span class="sr-only">Search presentations</span><input id="libQ" type="search" placeholder="Search presentations" value="${esc(this.q)}" autocomplete="off"></label>
