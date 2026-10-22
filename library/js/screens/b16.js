@@ -1424,7 +1424,7 @@
       b1: 'Your home equity becomes a working part of your retirement income plan.*',
       b2: 'Your required monthly mortgage payment becomes optional (property taxes, insurance and upkeep remain yours).',
       b3: 'Your monthly cash flow improves, and any unused line of credit grows over time.*',
-      b4: 'Money drawn from your home equity is loan proceeds, generally income-tax-free under current tax law, subject to applicable requirements.*',
+      b4: 'Money drawn from your home equity is loan proceeds, income-tax-free.*',
       foot: '* For education only; this is not tax or financial advice. Please seek personal advice from a qualified tax or financial professional. Line of credit growth applies to the unused portion of the line and is not an investment return.',
       _notes: 'This is the big picture before any numbers: the home you have already paid for can go to work for your retirement.\n\n- Ask: If the mortgage payment were no longer required, what would you do with that money each month?\nPAUSE\n\n- The next screens show your current mortgage first, then the same years with the HECM in place.'
     },
@@ -1637,7 +1637,7 @@
       b1: 'Tap the wealth in your home through a HECM line of credit.',
       b2: 'Strengthen your retirement cash flow.',
       b3: 'Keep money on hand for home projects, travel, surprises or opportunities.',
-      b4: 'Help keep your taxes in check: loan proceeds are generally income-tax-free under current tax law, subject to applicable requirements.*',
+      b4: 'Help keep your taxes in check: loan proceeds are income-tax-free.*',
       b5: 'Draw on a reserve instead of selling investments when markets fall.*',
       foot: '* For education only; this is not tax or financial advice. Please seek personal advice from a qualified tax or financial professional. A line of credit is a loan: amounts you draw accrue interest and mortgage insurance.',
       _notes: 'A HECM line of credit is a standby reserve: money you can reach when you choose, without a required monthly payment.\n\n- Ask: The last time the market dropped, what did you wish you had on hand?\nPAUSE\n\n- Next we will see how the unused line grows over the years.'

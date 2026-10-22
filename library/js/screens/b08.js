@@ -128,7 +128,7 @@
   const disc = (ctx, key, style, cls) => ctx.t(key, { tag: 'p', cls: 'st-disclaimer b08-disc ' + (cls || ''), attrs: `style="${style || ''}"` });
 
   /* the qualified tax phrase every tax statement uses */
-  const TXT = { taxfree: 'generally income-tax-free under current tax law, subject to applicable requirements' };
+  const TXT = { taxfree: 'income-tax-free' };
 
   /* ---------- shared components, called defensively (a missing library shows a quiet waiting state) ---------- */
   const LIB = (name) => (EFA.lib && EFA.lib[name]) || null;
@@ -1482,7 +1482,7 @@
     copy: {
       head: 'Your Reserve Account', head2: 'Ideal Characteristics and Benefits',
       note: 'Many kinds of accounts can serve as a reserve, but some serve better than others.',
-      discLead: 'Features vary by account type. For life insurance, loans and withdrawals are ' + TXT.taxfree + ', while the policy stays in force and is not a modified endowment contract (MEC).',
+      discLead: 'Features vary by account type. For life insurance, loans and withdrawals are ' + TXT.taxfree + '.',
       _notes: 'If you could design the perfect place to keep your reserve, this is the list you would build.\n\n- Ask: Which of these matter most to you?\nPAUSE\n\n- Next we will hold real accounts up against this list.'
     },
     render(ctx) {
@@ -1520,7 +1520,7 @@
     oLI: ['Riders are optional and may carry an added cost.', 'On participating whole life policies, dividends are not guaranteed, but once paid they can add guaranteed cash value.', 'Cash value grows tax-deferred.',
       'Policy loans are a contractual right. A loan reduces the cash value available to you by the amount borrowed.', 'The death benefit is ' + TXT.taxfree + ', and it is reduced by any unpaid loans or withdrawals.',
       'Cash value is lower in the early funding years.', 'A disability waiver rider can pay premiums if the insured cannot work.', 'When, and how much, you repay a policy loan is up to you.',
-      'Structured properly, money can generally be accessed income-tax-free under current tax law, subject to applicable requirements, while the policy stays in force and is not a modified endowment contract (MEC).',
+      'Structured properly, money can generally be accessed income-tax-free under current tax law, subject to applicable requirements.',
       'In many states cash values have some protection from creditors; the rules vary by state.',
       'Underfunding, when premiums, dividends or paid-up additions do not cover the base premium, can cause a lapse with tax consequences.',
       'The death benefit passes to your beneficiaries ' + TXT.taxfree + '.'],

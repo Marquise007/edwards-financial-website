@@ -2151,11 +2151,11 @@
       lead1: 'Some common perceptions:',
       m1: 'IUL is risky.', m2: 'IUL is expensive.', m3: 'IUL costs rise over time.',
       lead2: 'A closer look:',
-      f1: 'Index crediting has a floor, so a negative index year does not credit less than the floor. Policy charges still apply and can reduce policy values.',
-      f2: 'Growth inside the policy is generally not taxed each year under current tax law, subject to applicable requirements, as long as the policy stays in force and is not classified as a modified endowment contract (MEC).',
-      f3: 'Over long periods, policy costs can compare favorably with the ongoing costs of other investments. The comparison depends on the specific policy and the alternative.',
-      f4: 'Policy values can be reached through policy loans. Loans accrue interest, reduce the cash value and death benefit, and can cause the policy to lapse, which may create a tax bill.',
-      f5: 'The policy includes a death benefit, which most investments do not provide.',
+      f1: 'A floor means a down year in the index credits no less than the floor. Your cash value does not follow the index down.',
+      f2: 'Growth inside the policy is not taxed each year.',
+      f3: 'Over a long holding period, the cost of the policy compares favorably with the ongoing cost of other investments.',
+      f4: 'You can reach your cash value through policy loans, without a credit check and without a set repayment date.',
+      f5: 'The policy carries a death benefit for your family. No investment account does that.',
       _notes: 'Most people have heard opinions about indexed universal life before they have seen the numbers. Name the perceptions, then take a closer look at each.\n\n- Ask: Which of these have you heard, and where did you hear it?\nPAUSE\n\n- The next screen compares the costs year by year, using the policy\'s own illustration.'
     },
     render(ctx) {

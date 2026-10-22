@@ -277,8 +277,8 @@
   const FB = {
     'fb.hypothetical': 'Hypothetical illustration only. It is not a guarantee or a projection of any specific product, and actual results will vary.',
     'fb.guarantees': 'Guarantees are backed by the claims-paying ability of the issuing insurer.',
-    'fb.tax': 'Death benefits are generally income-tax-free under current tax law, subject to applicable requirements.',
-    'fb.loans': 'Policy loans and withdrawals reduce cash value and death benefit and may cause the policy to lapse; a policy classified as a modified endowment contract (MEC) changes the tax treatment of distributions.',
+    'fb.tax': 'Death benefits are income-tax-free.',
+    'fb.loans': 'Policy loans and withdrawals reduce cash value and death benefit and may cause the policy to lapse.',
     'x.wait': WAIT
   };
   /** every screen's copy starts with the fallback lines */
@@ -1580,7 +1580,7 @@
     'n.4': 'Option two: the same dollars fund a cash value life insurance policy.',
     'n.5': 'The policy\'s values, premiums plus any dividends credited, are projected out to age 100. Dividends and projected values are not guaranteed.',
     'n.6': 'That projected value is treated as the expected death benefit.',
-    'n.7': 'The death benefit can also be put to work during your lifetime. Policy loans can provide income that is generally income-tax-free under current tax law, subject to applicable requirements. Loans accrue interest and reduce the cash value and death benefit.',
+    'n.7': 'The death benefit can also be put to work during your lifetime. Policy loans can provide income that is income-tax-free. Loans accrue interest and reduce the cash value and death benefit.',
     'n.8': 'To compete, the investment has to deliver the same income after taxes.',
     'n.9': 'Would you board a flight if there were a real chance it would not land where it should? The withdrawal rate you choose sets your odds. Which rate are you comfortable with?',
     'n.10': 'The balance the investment needs, its Capital Equivalent Value, follows from a simple formula: the yearly income divided by the withdrawal rate.',
@@ -1612,7 +1612,7 @@
       'tv.lpv': 'Present Value', 'tv.lpmt': 'Contribution / Withdrawal', 'tv.ln': 'Number of Periods', 'tv.lrate': 'Annual Interest Rate', 'tv.lfv': 'Future Value',
       'tv.comp': 'Compounding', 'tv.a': 'Annually', 'tv.m': 'Monthly', 'tv.w': 'Weekly', 'tv.d': 'Daily', 'tv.time': 'Payment Timing', 'tv.beg': 'Beginning', 'tv.end': 'End',
       'tv.go': 'Continue', 'tv.copy': 'Copy', 'tv.copied': 'Copied.',
-      own: '*Policy loans are generally income-tax-free under current tax law, subject to applicable requirements, and accrue interest. Dividends and projected policy values are not guaranteed. Tax on Social Security is simplified to one flat rate on the full benefit.',
+      own: '*Policy loans are income-tax-free, and accrue interest. Dividends and projected policy values are not guaranteed. Tax on Social Security is simplified to one flat rate on the full benefit.',
       _notes: 'Walk the client from the same yearly dollars to two very different destinations.\n\n- Show Narration puts a short note for each step on the screen.\n- Ask: What return have you actually earned, year in and year out, over the last ten years?\nPAUSE\n\n- Reset goes back to the start of the comparison without touching the numbers.'
     }, N_COPY)),
     render(ctx) {

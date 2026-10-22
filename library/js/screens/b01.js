@@ -296,7 +296,7 @@
     qpd2t: 'Qualified plans do two things: they postpone the tax, and they postpone the tax calculation.\nAsk: Who decides what the tax rate will be when you take the money out?\nPAUSE',
     taxhist: 'Tax rates have moved a great deal over the last hundred years. History shows how wide the range can be.\nAsk: Do you expect tax rates to be higher or lower when you retire?\nPAUSE',
     nvsw: 'Needs come first, wants second. Protection planning starts with what must be covered.\nAsk: If your income stopped tomorrow, what would your family need first?\nPAUSE',
-    upl: 'A policy loan lets you use the policy\'s value while it keeps working. The insurer is the lender and the policy is the collateral.\nLoans reduce cash value and death benefit and may cause the policy to lapse, and a modified endowment contract (MEC) changes the tax treatment of distributions.\nAsk: How would access to your own capital, on your terms, change the way you buy things?\nPAUSE'
+    upl: 'A policy loan lets you use the policy\'s value while it keeps working. The insurer is the lender and the policy is the collateral.\nLoans reduce cash value and death benefit and may cause the policy to lapse,.\nAsk: How would access to your own capital, on your terms, change the way you buy things?\nPAUSE'
   };
   /** printable client forms shown on stage (the original opened separate files) */
   const FORMS = {
@@ -600,7 +600,7 @@
     term: 'Term', db: 'Death Benefit', incFace: 'Increasing Face', cvli: 'CVLI', deathB: 'Death Benefits', liveB: 'Living Benefits',
     range: 'An unlimited range of designs', coined: 'Max-Funded Policy', reset: 'Reset', showAll: 'Show All',
     capMax: 'Maximum premium', capCov: 'Coverage', capMin: 'Minimum premium',
-    disc: "Illustrative only. Benefits vary by policy, carrier and funding; guarantees rely on the issuing insurer's claims-paying ability. Loans and withdrawals reduce cash value and death benefit and may cause a lapse; a modified endowment contract (MEC) changes how distributions are taxed. Tax-free treatment generally applies under current tax law, subject to applicable requirements."
+    disc: "Illustrative only. Benefits vary by policy, carrier and funding; guarantees rely on the issuing insurer's claims-paying ability. Loans and withdrawals reduce cash value and death benefit and may cause a lapse. Tax-free treatment generally applies under current tax law, subject to applicable requirements."
   };
   BEN.forEach((b, i) => { COR_COPY['b' + (i + 1)] = b; });
   const NAR_COPY = {
@@ -617,7 +617,7 @@
     t8r3: 'Tax-deferred growth on both',
     t8r4a: 'Withdrawals taxed as ordinary income', t8r4b: 'Death benefit generally income-tax-free*',
     t8r5a: 'Penalties for early access', t8r5b: 'Access to values through policy loans*',
-    t8foot: '*Generally income-tax-free under current tax law, subject to applicable requirements. Policy loans and withdrawals reduce cash value and death benefit and may cause the policy to lapse. A policy classified as a modified endowment contract (MEC) changes the tax treatment of distributions.',
+    t8foot: '*Generally income-tax-free under current tax law, subject to applicable requirements. Policy loans and withdrawals reduce cash value and death benefit and may cause the policy to lapse.',
     n9: 'Pay in more than the federal maximum and the policy becomes a modified endowment contract, or MEC. Loans and withdrawals from a MEC are generally taxed gain-first, and early access may carry a penalty, much like a qualified plan.',
     n10: 'So what do qualified plans actually do?',
     n11: 'They postpone the tax.', n12: 'They also postpone the tax calculation.',
@@ -1037,7 +1037,7 @@
   });
 
   /* =====================================================================
-     Allocation Mix (am1 .. am7)
+     Allocation Mix (am1 . am7)
      ===================================================================== */
   EFA.css('b01-am', `
   .b01-seg2 { display: inline-flex; border: 1.5px solid #cbd5e3; border-radius: 999px; padding: 4px; gap: 4px; background: #fff; }
@@ -1420,7 +1420,7 @@
     return `<div class="b01-ctank ${click ? 'click' : ''}" ${click ? 'data-acct="1"' : ''}>${tankSVG({ w: 100, h: 142, open, liq, level: 0 })}<span class="b01-cval num">${label}</span></div>`;
   }
   function fillCells(ctx, cellsByKey) {
-    // cellsByKey: {'t.high': [ {kind, frac, label, click} ... ] }
+    // cellsByKey: {'t.high': [ {kind, frac, label, click} .. ] }
     GROWS.forEach((r) => GCOLS.forEach((c) => {
       const el = ctx.$(`[data-cell="${r}.${c}"]`), items = (cellsByKey[`${r}.${c}`] || []);
       const sig = items.map((x) => `${x.kind}:${x.show ? 1 : 0}`).join('|');
@@ -1962,7 +1962,7 @@
       ask: '???', noAns: 'No solution found',
       sumSale: 'Comparing a Sale of the Two', sumDeath: 'Comparing the Two at Death',
       sFV: 'Final Values Before Tax', sIOL: 'Balance of IOL', sOrd: 'Ordinary Tax', sCG: 'Capital Gain Tax', sAT: 'After Tax Proceeds', sIRR: 'IRR%',
-      chooseT: 'Please choose...', ch1: 'Condo interest-only loan schedule', ch2: '401(k) growth with tax at the end', ch3: 'Cash flows', ch4: 'Summary of a sale', ch5: 'Summary at death',
+      chooseT: 'Please choose..', ch1: 'Condo interest-only loan schedule', ch2: '401(k) growth with tax at the end', ch3: 'Cash flows', ch4: 'Summary of a sale', ch5: 'Summary at death',
       editA: 'Edit', editB: 'Item Description', cancel: 'Cancel', save: 'Save',
       ws1: 'Condo Interest-Only Loan', ws2: '401(k) Growth With Ordinary Tax at the End', ws3: 'Cash Flows',
       wMonth: 'Month', wYear: 'Year', wP: 'Payment Before Tax', wS: 'Monthly Income Tax', wCum: 'Cumulative Income Tax', wC: 'Payment After Tax', wL: 'Monthly Tax Advantage', wCF: 'Condo Cash Flow With CG Tax',
@@ -2194,7 +2194,7 @@
       autoOn: 'AutoStep - On', autoOff: 'AutoStep - Off',
       gHead: 'Equity Buying Power vs. House Market Value', gNoteNom: 'House market value is shown in nominal dollars.', gNoteToday: 'House market value is shown in today’s dollars.',
       sMV: 'House Market Value', sBP: 'Equity Buying Power', ret: 'Return', yearAx: 'Year',
-      chT: 'Please choose...', ch1: 'Equity Buying Power', ch2: 'House Market Value',
+      chT: 'Please choose..', ch1: 'Equity Buying Power', ch2: 'House Market Value',
       wsBP: 'Projected Buying Power of Current Equity', wsMVn: 'Projected House Market Value (Nominal Dollars)', wsMVt: 'Projected House Market Value (Today’s Dollars)',
       wYear: 'Year', wBpS: 'Buying Power at Start of Year', wBpL: 'Loss to Inflation', wBpE: 'Buying Power at End of Year', wMvS: 'Value at Start of Year', wMvG: 'Annual Appreciation', wMvE: 'Value at End of Year',
       disc: 'Hypothetical illustration. Appreciation and inflation rates are assumptions; home values can fall as well as rise. Not a projection of any specific property.',
@@ -2339,9 +2339,9 @@
       c5: 'Discussed whether collision coverage still makes sense on older vehicles.',
       c6: 'Reviewed liability limits and how they work with an umbrella policy.',
       c7: 'Reviewed medical payments coverage.',
-      c8: 'Made recommendations, and referred coverage changes to a licensed property and casualty agent.',
+      c8: 'Made recommendations, and noted the changes worth making.',
       wsT: 'Difference in Auto Premiums at Interest', wAge: 'Age', wDiff: 'Difference in Premiums', wStart: 'Balance at Start of Year', wInt: 'Interest', wEnd: 'Balance at End of Year', wYear: 'Year',
-      disc: 'Hypothetical illustration. The opportunity cost rate is an assumption, not a guarantee. State minimum limits vary by state; this checklist is a review aid. Auto coverage is placed through a licensed property and casualty agent.',
+      disc: 'Hypothetical illustration. The opportunity cost rate is an assumption, not a guarantee. State minimum limits vary by state; this checklist is a review aid.',
       _notes: 'Most people pay for a low deductible every year in case of a claim that rarely comes. Put the difference to work and see what it becomes.\n\n- Fill in both columns, then Calculate.\n- Ask: Would you rather prepay for a small claim every year, or keep that money working for you?\nPAUSE\n\n- The Checklist walks through the coverage review; Documentation shows the year-by-year growth.'
     },
     render(ctx) {

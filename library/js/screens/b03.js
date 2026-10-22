@@ -814,7 +814,7 @@
     title: 'College planning as easy as A-B-C-D',
     steps: 5,
     copy: {
-      heading: 'College Planning 101', easy: 'As easy as...',
+      heading: 'College Planning 101', easy: 'As easy as..',
       LA: 'A', LB: 'B', LC: 'C', LD: 'D',
       a_main: 'Apply for Financial Aid', a_sub: 'Do this first',
       b_main: 'Become Cash-Flow Efficient', b_sub: 'Stop unnecessary wealth transfers',
@@ -1027,7 +1027,7 @@
   const COMPLY_COPY = {
     c_state: 'Creditor protection varies by state law and federal bankruptcy rules.',
     c_rider: 'Guaranteed growth and disability protection for cash value life insurance depend on the policy type and riders, such as guaranteed cash values or a waiver-of-premium rider.',
-    c_tax: 'Cash value life insurance loans and withdrawals are generally income-tax-free under current tax law, subject to applicable requirements. 529 withdrawals are tax-free only for qualified education expenses. Aid treatment follows the current federal formula and each school\'s own rules.'
+    c_tax: 'Cash value life insurance loans and withdrawals are income-tax-free. 529 withdrawals are tax-free only for qualified education expenses. Aid treatment follows the current federal formula and each school\'s own rules.'
   };
   EFA.screen('cpb1', {
     title: 'Which account to save in',
@@ -1860,10 +1860,10 @@
     msg_type: 'That file type cannot be used for this account.', msg_access: 'That file could not be read. Please try again.', msg_proc: 'Processing',
     msg_solver: 'No solution was found in 100 tries. Please check that the assumptions are realistic.',
     pending: 'Being verified', 'l.choose': 'Choose a market', loading: 'Diagram loading',
-    disc: 'Hypothetical comparison using the flat tax rates and growth rates entered here; not tax advice. Tax-free values are generally income-tax-free under current tax law, subject to applicable requirements. Taxable estate values assume no tax on unrealized gains at death. Results using market history with floors, caps or participation rates are hypothetical back-tests of index crediting, not product illustrations.',
+    disc: 'Hypothetical comparison using the flat tax rates and growth rates entered here; not tax advice. Tax-free values are income-tax-free. Taxable estate values assume no tax on unrealized gains at death. Results using market history with floors, caps or participation rates are hypothetical back-tests of index crediting, not product illustrations.',
     'l.year': 'Year', 'l.step': 'Step', 'l.scale': 'Scale', 'l.shuffle': 'Shuffle Market', 'l.ord': 'Ordinary', 'l.cg': 'Cap Gains',
     'l.wdRates': 'Withdrawal Tax Rates', 'l.wdRate': 'Withdrawal Tax Rate', 'l.values': 'Values', 'l.diff': 'Difference', 'l.pick': 'Please choose',
-    'ph.acc': 'Select Account to View', 'ph.val': 'Select Value to View', 'ph.sel': 'Select...',
+    'ph.acc': 'Select Account to View', 'ph.val': 'Select Value to View', 'ph.sel': 'Select..',
     none: 'Add the accounts you want to compare on the setup screen, and they will appear here.', none_btn: 'Set Up Accounts',
     'sum.title': 'Summary for Year', 'sum.boy': 'Starting Balance', 'sum.contrib': 'Contributions', 'sum.growth': 'Growth', 'sum.wd': 'Withdrawals',
     'sum.tax': 'Taxes Paid', 'sum.eoy': 'End of Year Balance', 'sum.pot': 'Potential Taxes', 'sum.estate': 'Estate Value',

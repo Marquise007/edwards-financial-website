@@ -425,7 +425,7 @@
     people.forEach((p) => { t += p.scores[row] >= 50 ? 1 : -1; });
     return t;
   }
-  /** profile record -> {name, first, scores[4], reportId, paras[]} (DataFields: "reportId|s1|s2|s3|s4|para|para...") */
+  /** profile record -> {name, first, scores[4], reportId, paras[]} (DataFields: "reportId|s1|s2|s3|s4|para|para..") */
   function parseProfile(rec) {
     const parts = String(rec.fields || '').split('|');
     const scores = [1, 2, 3, 4].map((i) => { const v = parseInt(parts[i], 10); return isFinite(v) ? Math.max(0, Math.min(100, v)) : 50; });
@@ -2422,7 +2422,7 @@
       tAge: 'Age', tContrib: 'Contribution (After Tax)', tWd: 'Withdrawal (Before Tax)', tTerm: 'Term Premium', tBoy: 'Beginning Balance', tOrdG: 'Ordinary Growth', tTaxG: 'Tax on Growth', tCgG: 'Capital Gain Growth', tEoy: 'Ending Balance',
       tBasisOut: 'Basis Returned', tGainsOut: 'Gain Withdrawn', tBasis: 'Basis Remaining', tGains: 'Unrealized Gain', tTaxGain: 'Tax on Gain', tTaxWD: 'Tax on Withdrawal', tSpend: 'Spendable Income', tAnnual: 'Taxes This Year', tCum: 'Total Taxes', tYear: 'Year',
       dContrib: 'Contribution', dWd: 'Withdrawal', dGrowth: 'Tax-Deferred Growth', dDef: 'Deferred Growth Remaining',
-      disc: 'Hypothetical illustration using your assumptions and a fixed rate of return. The tax favored column assumes the income you want is delivered every year; distributions from a properly structured life insurance policy are generally income-tax-free under current tax law, subject to applicable requirements.',
+      disc: 'Hypothetical illustration using your assumptions and a fixed rate of return. The tax favored column assumes the income you want is delivered every year; distributions from a properly structured life insurance policy are income-tax-free.',
       wsWait: 'The worksheet is still being set up.',
       _notes: 'Same savings, three kinds of accounts. Watch the year each column runs dry: taxes on growth and withdrawals decide how long the money lasts.\n\n- Ask: Which column would you want your retirement income to come from?\nPAUSE\n\n- Flatten shows what each account pays if you only spend its after-tax growth.'
     },

@@ -15,7 +15,7 @@
   const m2 = (v) => F.money(v, { dp: 2 });
   const isNum = (v) => typeof v === 'number' && isFinite(v);
   const HYPO = 'Hypothetical illustration only. It is not a guarantee or a projection of any specific product, and actual results will vary.';
-  const LOANS = 'Policy loans and withdrawals reduce the cash value and death benefit, accrue interest, and may cause the policy to lapse. If a policy is classified as a modified endowment contract (MEC), the tax treatment of loans and withdrawals changes.';
+  const LOANS = 'Policy loans and withdrawals reduce the cash value and death benefit, accrue interest, and may cause the policy to lapse.';
 
   EFA.css('b15', `
   .b15-full { position: absolute; inset: 0; width: 1600px; height: 900px; overflow: visible; }
@@ -1856,7 +1856,7 @@
     exBack: 'Click to return to the list of benefits.',
     ast: 'Interest on a policy loan may be deductible when the borrowed money is invested, under the investment interest rules. Please confirm with your tax professional before relying on it.',
     ok: 'Ok',
-    distNote: 'Distributions from a properly structured policy are generally income-tax-free under current tax law, subject to applicable requirements.',
+    distNote: 'Distributions from a properly structured policy are income-tax-free.',
     _notes: 'A cash value policy can be collateral. The insurer lends against it, the money goes to work in an outside opportunity, and the difference between what it earns and what the loan costs is the spread.\n\n- Build it step by step: crediting rate, return, the loan, then the interest.\n- Ask: If your money could earn in two places at once, what would you do with the spread?\nPAUSE\n\n- Click the spread to show the after-tax view; Show All jumps to the full picture.'
   };
   UPL_BEN.forEach((b, i) => { uplCopy['b' + (i + 1)] = b; });

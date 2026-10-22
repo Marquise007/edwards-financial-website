@@ -297,7 +297,7 @@
       'd.trad': 'An individual retirement account. Contributions may be deductible up to an annual cap, and withdrawals are generally taxed as ordinary income.',
       'd.thrift': 'The federal Thrift Savings Plan, the retirement savings plan for federal employees and members of the uniformed services. It works much like a 401(k).',
       'd.keogh': 'A retirement plan for self-employed business owners, also known as an HR 10 plan. It can be set up as a defined benefit plan or as a defined contribution plan, such as profit sharing or money purchase, and contributions are deductible within legal limits.',
-      'd.roth': 'An individual account funded with dollars you have already paid tax on. Qualified withdrawals are generally income-tax-free under current tax law, subject to applicable requirements. Income limits apply to who may contribute.',
+      'd.roth': 'An individual account funded with dollars you have already paid tax on. Qualified withdrawals are income-tax-free. Income limits apply to who may contribute.',
       'd.esop': 'An Employee Stock Ownership Plan makes employees owners of company stock. The plan may borrow money to buy shares, and the employer can contribute shares instead of cash.',
       'd.profit': 'A flexible defined contribution plan. The employer decides each year whether to contribute, and your benefit is whatever your account is worth.',
       'd.simple': 'A SIMPLE IRA is a plan for small employers. Employees defer part of their salary, and the employer adds either a matching contribution or a flat contribution for every eligible employee.',
@@ -345,7 +345,7 @@
     steps: 4,
     copy: {
       head: 'Qualified Plans Do Two Things',
-      'r1.a': 'They', 'verb.defer': 'defer', 'verb.post': 'postpone', 'r1.b': 'the tax...',
+      'r1.a': 'They', 'verb.defer': 'defer', 'verb.post': 'postpone', 'r1.b': 'the tax..',
       'r1.c': '...and the', 'r1.em': 'calculation', 'r1.d': 'of the tax.',
       r2: 'What will your tax bracket be once you retire?',
       r3: 'Which deductions will remain when you withdraw?',
@@ -697,7 +697,7 @@
       'h.trad': 'Pre-tax In /\nTaxed Out', 'h.roth': 'After-tax In /\nTax-free Out',
       'o.eq': 'Equivalent Contribution', 'o.gross': 'Gross Withdrawal', 'o.irs': 'Amount Due IRS', 'o.net': 'Actual Net Withdrawal',
       note: 'These results include the effect of paying tax at one rate when the money goes in and a different rate when it comes out.',
-      foot: 'The after-tax column assumes qualified withdrawals, which are generally income-tax-free under current tax law, subject to applicable requirements.',
+      foot: 'The after-tax column assumes qualified withdrawals, which are income-tax-free.',
       calc: 'Calculate', choose: 'Please Choose', 'ch.td': 'Tax Deferred', 'ch.at': 'After Tax',
       'ws.td': 'Pre-tax Contributions, Taxable Withdrawal', 'ws.at': 'After-tax Contributions, Tax-free Withdrawal',
       'ws.year': 'Year', 'ws.c': 'Annual Contribution', 'ws.sb': 'Start-of-Year Balance', 'ws.int': 'Interest Earned', 'ws.eb': 'End-of-Year Balance', 'ws.tax': 'Tax Due on Withdrawal', 'ws.net': 'Net Withdrawal',
@@ -804,7 +804,7 @@
       'o.gross': 'Gross Withdrawal', 'o.irs': 'Amount Due IRS', 'o.net': 'Actual Net Withdrawal',
       'v.qp': 'Counting the time value of money, the qualified plan comes out ahead by', 'v.out': 'Counting the time value of money, the outside account comes out ahead by', 'v.same': 'Counting the time value of money, the two come out the same.',
       note: 'These results include the effect of paying tax at one rate when the money goes in and a different rate when it comes out.',
-      foot: 'Assumes a fully vested match. Tax-free growth assumes qualified distributions, generally income-tax-free under current tax law, subject to applicable requirements.',
+      foot: 'Assumes a fully vested match. Tax-free growth assumes qualified distributions, income-tax-free.',
       calc: 'Calculate', choose: 'Please Choose', bad: 'Please check the numbers entered (bad data).',
       'ws.qp': 'Qualified Plan', 'ws.tax': 'Taxable Investment', 'ws.free': 'Tax-Free Investment',
       'ws.year': 'Year', 'ws.pc': 'Personal Contribution', 'ws.m': 'Company Match', 'ws.sb': 'Start-of-Year Balance', 'ws.int': 'Interest Earned', 'ws.eb': 'End-of-Year Balance',
@@ -2253,7 +2253,7 @@
     return H.markets.filter((m) => Array.isArray(H[m.series]) && H[m.series].length);
   }
   function ripSeries(code) { const H = EFA.data.history; return (H[code] || []).slice().sort((a, b) => a[0] - b[0]); }
-  /** returns for start .. start + Y (clamped to the data), padded cyclically to Y + 1 values */
+  /** returns for start . start + Y (clamped to the data), padded cyclically to Y + 1 values */
   function ripSelect(code, start, Y) {
     const s = ripSeries(code); if (!s.length || !(Y >= 0)) return null;
     const a = Math.max(start, s[0][0]);

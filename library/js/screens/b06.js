@@ -361,7 +361,7 @@
     copy: {
       head: 'Interest: Yours or Theirs?',
       lAmt: 'Amount Financed', lRate: 'Interest Rate', lN: 'Number of Payments',
-      calc: 'Calculate', resHead: 'Your car payments will be...',
+      calc: 'Calculate', resHead: 'Your car payments will be..',
       rPay: 'Monthly Payments', rTot: 'Total Amount Paid', rInt: 'Total Interest Paid',
       disc: 'Hypothetical example for illustration only. Your actual loan terms, rate and payments will vary.',
       _notes: 'Every car payment carries interest. The question is whose pocket it lands in.\n\n- Enter the client\'s own loan, then Calculate.\n- Ask: If you could keep that interest in your own circle instead, what would it be worth to you?\nPAUSE'
@@ -403,7 +403,7 @@
       head: 'Why Car Makers Like to Finance',
       lRate: 'Enter your investment return',
       explain: 'We use it to measure the opportunity cost of your car payments.',
-      calc: 'Calculate', fvTitle: 'The future value of...',
+      calc: 'Calculate', fvTitle: 'The future value of..',
       lInt: 'Your loan interest paid', lComp: 'Compounded annually at',
       years: 'Years', total: 'Total',
       _notes: 'The interest on one car loan looks small. Invested instead, it grows for decades, and most families buy a car every few years.\n\n- Click any horizon to see the total if you bought a car every five years over that span.\n- Ask: How many cars do you expect to buy between now and retirement?\nPAUSE'
@@ -499,7 +499,7 @@
       head: 'What Is Economic Value Added?',
       p1: 'EVA measures the true economic profit a business creates from the decisions it makes.',
       p2a: 'To find it, take after-tax operating profit and subtract the', p2b: 'cost of capital', p2c: '.',
-      p3: 'Here is why that matters for your own money...',
+      p3: 'Here is why that matters for your own money..',
       tm: 'EVA is a registered trademark of Stern Stewart & Co.',
       _notes: 'Big companies learned to ask a simple question: what does our own money cost us? The answer changed how they invest.\n\n- Ask: When you use your own savings, do you think of that money as free?\nPAUSE'
     },
@@ -712,7 +712,7 @@
   const evaCopy = {
     head: 'An Example Investment Decision',
     debt: 'Debt', equity: 'Equity', at: '@', avg: 'Average Cost of Capital',
-    v1: 'In this setting, a', v2: 'investment opportunity appears...', ok: 'Acceptable', no: 'Unacceptable'
+    v1: 'In this setting, a', v2: 'investment opportunity appears..', ok: 'Acceptable', no: 'Unacceptable'
   };
   EFA.screen('eva3', {
     title: 'Example decision when equity is treated as free',
@@ -812,7 +812,7 @@
   EFA.screen('estplan2', {
     title: 'Estate taxes, federal history and state map',
     copy: Object.assign({
-      head: 'One of your biggest wealth transfers may happen at your death.\nHere is where it comes from...',
+      head: 'One of your biggest wealth transfers may happen at your death.\nHere is where it comes from..',
       sub: 'Federal and State Estate Taxes',
       thYear: 'Year', thEx: 'Exclusion Amount', thRate: 'Top Tax Rate',
       repealed: 'Repealed', million: 'million',
@@ -1095,7 +1095,7 @@
     copy: {
       head: 'Every purchase you make is financed, one way or another.',
       r1: 'You can borrow from a lender and pay interest.',
-      or: 'or...',
+      or: 'or..',
       r3: 'You can pay cash and save the interest, but you give up the interest you would have earned had you not emptied your tank.',
       r4: 'Borrowing means borrowing from your own future lifestyle.',
       _notes: 'Whether you borrow or pay cash, you are financing the purchase. The only question is whose interest you give up.\n\n- Ask: When you paid cash for something big, did anyone show you what that money would have earned?\nPAUSE'
@@ -1274,7 +1274,7 @@
     tp4a: 'What about extra payments?', tp4b: 'They do not change the total cost.', tp4c: 'They only shorten the payoff.',
     tp5a: 'What about a higher yield?', tp5b: 'Bigger gains in the tanks.', tp5c: 'More control.',
     tp6a: 'What about a lower yield?', tp6b: 'Smaller gains in the tanks.', tp6c: 'More control.',
-    tp7a: 'The cash payer dislikes paying interest...', tp7b: '...but likes earning it.', tp7c: 'Yet the tank must be emptied, ending compounding.',
+    tp7a: 'The cash payer dislikes paying interest..', tp7b: '...but likes earning it.', tp7c: 'Yet the tank must be emptied, ending compounding.',
     tp8a: 'The tank was emptied to buy.', tp8b: 'Control of those dollars is gone.', tp8c: 'So is the interest the account was earning.',
     tp10a: 'Now there is a payment to yourself.', tp10b: 'Compare the purchase\'s cost versus the tank\'s future value.', tp10c: 'Which option gives you the most control?'
   };
@@ -1283,7 +1283,7 @@
     tp2a: 'Compare these:', tp2b: 'purchase cost versus the tank\'s future value.', tp2c: 'Which option gives you the most control?',
     tp3a: 'What about a higher yield?', tp3b: 'Bigger gains in the tanks.', tp3c: 'More control.',
     tp4a: 'What about a lower yield?', tp4b: 'Smaller gains in the tanks.', tp4c: 'More control.',
-    tp5a: 'The cash payer dislikes paying interest...', tp5b: '...but likes earning it.', tp5c: 'Yet the tank must be emptied, ending compounding.',
+    tp5a: 'The cash payer dislikes paying interest..', tp5b: '...but likes earning it.', tp5c: 'Yet the tank must be emptied, ending compounding.',
     tp6a: 'The tank was emptied to buy.', tp6b: 'Control of those dollars is gone.', tp6c: 'So is the interest the account was earning.',
     tp8a: 'Your payments rebuild the account to its earlier value.', tp8b: 'Which strategy gives you the most control?', tp8c: ''
   };

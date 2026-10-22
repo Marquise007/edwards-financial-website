@@ -916,12 +916,12 @@
     title: 'Imagine a product with these features',
     steps: 8,
     copy: {
-      head: 'Imagine a product that offered you all of this...',
+      head: 'Imagine a product that offered you all of this..',
       p1: 'A credit line secured by the equity in your home, with the amount set by your age, the home value and current rates.',
       p2: 'On an adjustable rate loan, the unused part of that credit line grows over time.',
       p3: 'No monthly payment is required on what you have drawn.',
       p4: 'Nothing is repaid until the home is sold or you leave it permanently.',
-      p5: 'Money you draw is a loan advance rather than income, so it is generally income-tax-free under current tax law, subject to applicable requirements.',
+      p5: 'Money you draw is a loan advance rather than income, so it is income-tax-free.',
       p6: 'Interest accrues only on the part you have actually drawn.',
       state: 'All of it insured by the Federal Housing Administration, a federal agency inside the Department of Housing and Urban Development.',
       ask: 'Would you want a product like that?',
@@ -951,7 +951,7 @@
   EFA.screen('rm3', {
     title: 'Name reveal with a switchable product term',
     copy: {
-      lead: 'What have you heard about a...',
+      lead: 'What have you heard about a..',
       full: 'Home Equity Conversion Mortgage?',
       short: 'Reverse Mortgage?',
       _notes: 'Now the name. Let them talk first, and write down the words they use.\n\n- Ask: What have you heard about these, and who did you hear it from?\nPAUSE\n\n- Click the name to switch between the full name and the common one, whichever lands better.'

@@ -1001,7 +1001,7 @@
   EFA.screen('sab1', {
     title: 'Safe account types compared',
     copy: {
-      pick: 'Select account type...', 'ty.cash': 'Cash', 'ty.cd': 'Certificate of Deposit', 'ty.fa': 'Fixed Annuities', 'ty.mm': 'Money Market', 'ty.cvli': 'Cash Value Life Insurance', 'ty.sav': 'Savings Account',
+      pick: 'Select account type..', 'ty.cash': 'Cash', 'ty.cd': 'Certificate of Deposit', 'ty.fa': 'Fixed Annuities', 'ty.mm': 'Money Market', 'ty.cvli': 'Cash Value Life Insurance', 'ty.sav': 'Savings Account',
       cons: 'Important Considerations', ben: 'Benefits',
       'b.tdg': 'Tax Deferred Growth', 'b.tfd': 'Tax Free Distribution', 'b.cr': 'Competitive Return', 'b.hc': 'High Contributions', 'b.ab': 'Additional Benefits', 'b.co': 'Collateral Opportunities', 'b.safe': 'Safe', 'b.nlp': 'No-Loss Provisions', 'b.glo': 'Guaranteed Loan Option', 'b.ulp': 'Unstructured Loan Payments', 'b.luc': 'Liquidity, Use and Control', 'b.dc': 'Deductible Contributions',
       'k.bank1': 'The return is usually modest.',
@@ -1025,7 +1025,7 @@
       'k.li6': 'Cash value trails the premiums paid during the early funding years.',
       'k.li7': 'A disability waiver rider can keep premiums paid during illness or disability.',
       'k.li8': 'You decide when, and how much, to repay on a policy loan.',
-      'k.li9': 'Funded and structured properly, money can generally be accessed income-tax-free under current tax law, as long as the policy stays in force and is not a modified endowment contract (MEC).',
+      'k.li9': 'Funded and structured properly, money can generally be accessed income-tax-free under current tax law.',
       'k.li10': 'Many states shield cash values from creditors to some degree; protection depends on your state.',
       'k.li11': 'Paying too little in premiums, or leaning too hard on dividends or paid-up additions, can cause a lapse and create a tax bill.',
       'k.li12': 'The death benefit is generally income-tax-free to your beneficiaries under current tax law, subject to applicable requirements.',
@@ -1204,7 +1204,7 @@
   `);
   const trashSvg = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 11v6M14 11v6"/></svg>';
   const SIS_DEF = (ctx) => [0.02, 0.04, 0.06, 0.08].map((r, i) => ({ d: `${ctx.text('blk')} ${i + 1}`, n: 5, r }));
-  /** unique block names: blanks become Block 1, Block 2...; duplicates get (2), (3)... */
+  /** unique block names: blanks become Block 1, Block 2...; duplicates get (2), (3).. */
   function blockNames(ctx, blocks) {
     let blank = 0; const seen = {};
     return blocks.map((b) => {
@@ -1225,7 +1225,7 @@
       ls1: 'An initial lump sum of', ls2: 'is needed to provide an inflation-adjusted monthly income of', ls3: ', beginning', ls4: 'years from now and lasting', lsN: 'over the next', ls5: 'years, for a cumulative income of', ls6: ', based on the hypothetical assumptions entered.',
       mx1: 'An inflation-adjusted monthly income of', mxN: 'for the next', mx5: 'years, can be funded with an initial lump sum of', mx6: ', producing a cumulative income of',
       noConv: 'A maximum income could not be found for these assumptions. Please check the blocks and rates.',
-      choose: 'Please choose...', optRep: 'Printed Report', optWs: 'Worksheet Data',
+      choose: 'Please choose..', optRep: 'Printed Report', optWs: 'Worksheet Data',
       wsTitle: 'Structured Income Stream Summary', wsYear: 'Year', wsMon: 'Monthly Income', wsAnn: 'Annual Income', wsCum: 'Cumulative Income', wsTot: 'Total Balance',
       repTitle: 'Structured Income Stream Summary Illustration', repBeg: 'Beginning Balances:', repInv: 'Total Invested:', repInc: 'Total Income:',
       repNote: 'This is a hypothetical illustration of a laddered income strategy based on the assumptions you entered. It is not guaranteed and does not represent any specific investment. Actual results will vary.',

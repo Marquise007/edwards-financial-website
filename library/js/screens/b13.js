@@ -917,7 +917,7 @@
       calc: 'Calculate',
       resLabel: 'Required Minimum Distribution',
       resHow: 'Balance divided by a life expectancy factor of',
-      errYoungA: 'This owner is too young for the Uniform Lifetime table. It begins at age', errYoungB: '.',
+      errYoungA: 'Required minimum distributions generally begin at age 73, or 75 for people born in 1960 or later. This owner is younger than the Uniform Lifetime table begins, at age', errYoungB: '.',
       errJoint: 'The Joint Life table does not apply here. Use it only when the spouse is more than 10 years younger; otherwise use the Uniform Life table.',
       wait: 'The IRS life expectancy figures for this table are being verified. The calculator will work as soon as they load.',
       irs: 'IRS Publication 590-B',
@@ -1192,7 +1192,7 @@
       cAge: 'Age', cContrib: 'Annual Contribution', cWd: 'Annual Withdrawal', cTax: 'Tax On Withdrawal', cNet: 'Net Spendable Withdrawal',
       cBoy: 'Beginning-of-Year Balance', cInt: 'Interest Earned', cITax: 'Tax On Interest Earned', cEoy: 'End-of-Year Balance', cCum: 'Cumulative Retirement Income', cYear: 'Year',
       bad: 'These numbers do not work together. Please check the ages and rates.',
-      note: 'Assumes the conversion tax is paid from money outside the IRA. Roth IRA withdrawals are shown as generally income-tax-free under current tax law, subject to applicable requirements. The five-year rule, early-withdrawal rules, required minimum distributions and state taxes are not modeled. This is not tax advice; please consult your tax professional.',
+      note: 'Assumes the conversion tax is paid from money outside the IRA. Roth IRA withdrawals are shown as income-tax-free. The five-year rule, early-withdrawal rules, required minimum distributions and state taxes are not modeled. This is not tax advice; please consult your tax professional.',
       _notes: 'We run both paths side by side: keep the Traditional IRA and invest the tax you would have paid, or convert and pay the tax from other money. Then we compare what you can spend.\n\n- Ask: If both paths gave you the same income, which would you rather have, more flexibility or fewer taxes later?\nPAUSE\n\n- Calculate, then toggle between income and account values.'
     }),
     render(ctx) {

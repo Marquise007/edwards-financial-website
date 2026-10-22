@@ -595,7 +595,7 @@
       buy: 'Major Purchases',
       inv: 'Investments',
       cap4: 'Use and Control',
-      bottom: 'Designed and used properly, a cash value policy can offer steady growth, collateral for borrowing, a contractual right to a policy loan, growth that is not taxed year by year, and a death benefit that is generally income-tax-free under current tax law, subject to applicable requirements. Riders can add even more.',
+      bottom: 'Designed and used properly, a cash value policy can offer steady growth, collateral for borrowing, a contractual right to a policy loan, growth that is not taxed year by year, and a death benefit that is income-tax-free. Riders can add even more.',
       btnOpp: 'Policy Loan Opportunities',
       btnTml: 'Ten-Minute Life Insurance Lesson',
       disc: 'Policy loans accrue interest, and unpaid interest is generally added to the loan; a lapse with a loan outstanding can create a taxable event.',
