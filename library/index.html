@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Edwards Presentation Library</title>
+<meta name="description" content="Edwards Financial &amp; Associates presentation library.">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#0d1e3a">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="stylesheet" href="css/fonts.css">
+<link rel="stylesheet" href="css/app.css">
+<style>:root{color-scheme:light}body{margin:0;background:#f7f5f1}[hidden]{display:none!important}</style>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="canonical" href="https://edwardsfinancialassociates.com/library/">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+/* Partner Access gate: the same signed-in check as the partner dashboard. Once verified on this
+   device, the installed app also opens offline. */
+(function () {
+  document.documentElement.style.visibility = 'hidden';
+  var show = function () { document.documentElement.style.visibility = ''; };
+  var toLogin = function () { location.replace('/portal-partner-login'); };
+  var seen = function () { try { return !!localStorage.getItem('efa.lib.ok'); } catch (e) { return false; } };
+  if (!navigator.onLine || !window.supabase) { seen() ? show() : toLogin(); return; }
+  try {
+    var sb = window.supabase.createClient('https://rybnzvlogmbjlgdziswj.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ5Ym56dmxvZ21iamxnZHppc3dqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0NjE3MjgsImV4cCI6MjA5NjAzNzcyOH0.m7oH-z4yI1AbchocncJU2TB7SawyijiXsTbcz3slwn0');
+    sb.auth.getSession().then(function (r) {
+      if (r && r.data && r.data.session) { try { localStorage.setItem('efa.lib.ok', String(Date.now())); } catch (e) {} show(); }
+      else toLogin();
+    }, function () { seen() ? show() : toLogin(); });
+  } catch (e) { seen() ? show() : toLogin(); }
+})();
+</script>
+</head><body>
+<div id="app"></div>
+<noscript><p style="padding:24px;font-family:Georgia,serif">This presentation library needs JavaScript turned on.</p></noscript>
+<script src="js/catalog.js"></script>
+<script src="js/data-rules.js"></script>
+<script src="js/data-history.js"></script>
+<script src="js/fmt.js"></script>
+<script src="js/art.js"></script>
+<script src="js/core.js"></script>
+<script src="js/lib/bullets.js"></script>
+<script src="js/lib/overlays.js"></script>
+<script src="js/lib/worksheet.js"></script>
+<script src="js/lib/life.js"></script>
+<script src="js/lib/pem.js"></script>
+<script>
+if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
+  window.addEventListener('load', function () { navigator.serviceWorker.register('sw.js', { scope: './' }).catch(function () {}); });
+}
+</script>
+</body></html>

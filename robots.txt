@@ -1,4 +1,5 @@
 User-agent: *
 Allow: /
+Disallow: /library/
 
 Sitemap: https://edwardsfinancialassociates.com/sitemap.xml
