@@ -431,4 +431,14 @@
       ctx.$('.ct-close').classList.toggle('is-off', n !== 1);
     }
   });
+  // Apply the presentation's visual layer after its original render; all financial
+  // geometry, wording, steps and branch destinations above stay authoritative.
+  for (let i = 1; i <= 12; i++) {
+    const def = EFA.screens['ct' + i];
+    const original = def.render;
+    def.render = function (ctx) {
+      original(ctx);
+      if (EFA.ctDesign) EFA.ctDesign.apply(ctx);
+    };
+  }
 })();
