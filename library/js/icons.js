@@ -86,7 +86,8 @@ EFA.topicIcons = (function () {
     checklist: '<rect class="s" x="9" y="6" width="30" height="37" rx="3"/><path class="s" d="M20 15h13M20 25h13M20 35h13"/><path class="a" d="M13 15l2 2 3-4M13 25l2 2 3-4M13 35l2 2 3-4"/>',
     housesTwo: '<path class="s" d="M3 27l9.5-8.5L22 27M6 25v14h13V25M26 27l9.5-8.5L45 27M29 25v14h13V25"/><path class="a" d="M19 12h10M26 9l3 3-3 3"/>',
     downsize: '<path class="s" d="M3 24 15 13l12 11M6 22v19h18V22"/><path class="a" d="M28 31h6M31 28l3 3-3 3"/><path class="s" d="M35 35l5-4.5 5 4.5M37 34v7h6v-7"/>',
-    upsize: '<path class="s" d="M2 35l5-4.5 5 4.5M4 34v7h6v-7"/><path class="a" d="M13 31h6M16 28l3 3-3 3"/><path class="s" d="M21 24 33 13l12 11M24 22v19h18V22"/>'
+    upsize: '<path class="s" d="M2 35l5-4.5 5 4.5M4 34v7h6v-7"/><path class="a" d="M13 31h6M16 28l3 3-3 3"/><path class="s" d="M21 24 33 13l12 11M24 22v19h18V22"/>',
+    legacyFloor: '<path class="f" d="M4 38h40v5H4z"/><circle class="s" cx="16" cy="13" r="4.6"/><path class="s" d="M8.5 34c0-7.6 3.3-12.6 7.5-12.6s7.5 5 7.5 12.6"/><circle class="s" cx="30" cy="20" r="3.6"/><path class="s" d="M24.5 34c0-5.6 2.4-9 5.5-9s5.5 3.4 5.5 9"/><path class="a" d="M40 24V7M35.5 11.5 40 7l4.5 4.5"/>'
   };
   // small badges, drawn on a 16 x 16 grid inside a gold disc (m = navy line, mf = navy fill)
   const M = {
@@ -152,7 +153,8 @@ EFA.topicIcons = (function () {
     UMBINS: ['umbrella', 'plus'], WIP: ['tree', 'up'], WB: ['easel'], WILLS: ['scroll'],
     FWP: ['reverse', 'flag'], EWP: ['reverse', 'flag'], FWP2: ['house', 'check'], EWP2: ['house', 'check'],
     FWP3: ['reverse', 'line'], EWP3: ['reverse', 'line'], FWP4: ['downsize'], EWP4: ['downsize'], FWP5: ['upsize'], EWP5: ['upsize'],
-    FWP6: ['housesTwo', 'line'], EWP6: ['housesTwo', 'line'], FWP7: ['housesTwo', 'uturn'], EWP7: ['housesTwo', 'uturn'], TTOM: ['clockCoin', 'house']
+    FWP6: ['housesTwo', 'line'], EWP6: ['housesTwo', 'line'], FWP7: ['housesTwo', 'uturn'], EWP7: ['housesTwo', 'uturn'], TTOM: ['clockCoin', 'house'],
+    NGF: ['legacyFloor']
   };
   const cls = (s) => s.replace(/class="(\w+)"/g, 'class="ei-$1"');
   function svg(key) {
