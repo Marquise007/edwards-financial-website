@@ -78,7 +78,7 @@
   .nx-form { padding: 14px 26px 16px; display: grid; align-content: start; }
   .nx-gt { font: 700 13px/1.2 var(--f-body); letter-spacing: .18em; text-transform: uppercase; color: var(--gold-deep); padding: 4px 0 4px; }
   .nx-gt.mt { margin-top: 10px; }
-  .stage .nx-fr .st-field { grid-template-columns: minmax(0, 1fr) 196px; align-items: center; gap: 16px; min-height: 40px; border-bottom: 1px solid rgba(13, 30, 58, .09); }
+  .stage .nx-fr .st-field { grid-template-columns: minmax(0, 1fr) 196px; align-items: center; gap: 16px; min-height: 39px; border-bottom: 1px solid rgba(13, 30, 58, .09); }
   .stage .nx-fr .st-field > label { font: 600 19px/1.2 var(--f-body); color: var(--navy); text-transform: none; letter-spacing: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .stage .nx-fr .st-input { height: 35px; font-size: 19px; text-align: right; border-radius: 8px; padding: 0 12px; }
   .nx-asm { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; margin-top: 14px; }
@@ -110,6 +110,18 @@
   .nx-leg i.gap { background: repeating-linear-gradient(135deg, var(--gold-pale) 0 3px, var(--gold-lt) 3px 6px); }
   .nx-leg b { font-weight: 700; font-variant-numeric: tabular-nums; margin-left: auto; }
   .nx-note { font: 400 13.5px/1.35 var(--f-body); color: var(--muted); margin: 0; }
+  .nx-chs.tight { gap: 22px; }
+  .stage .nx-chs.tight .st-seg-b { padding: 8px 13px; }
+  .nx-bar i.buy, .nx-leg2 i.buy { background: repeating-linear-gradient(135deg, var(--navy-3) 0 6px, var(--navy-4) 6px 12px); }
+  .nx-leg2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0 26px; margin-top: 2px; }
+  .nx-leg2 > div { display: grid; gap: 5px; align-content: start; }
+  .nx-leg2 span { display: flex; align-items: center; gap: 8px; font: 500 14.5px/1.25 var(--f-body); color: var(--navy); white-space: nowrap; }
+  .nx-leg2 em { font-style: normal; }
+  .nx-leg2 i { width: 14px; height: 14px; border-radius: 3px; flex: none; }
+  .nx-leg2 i.gap { background: repeating-linear-gradient(135deg, var(--gold-pale) 0 3px, var(--gold-lt) 3px 6px); }
+  .nx-leg2 b { font-weight: 700; font-variant-numeric: tabular-nums; margin-left: auto; }
+  .nx-say.sm { font-size: 26px; }
+  .stage .lib-link.nx-docs { font-size: 18px; }
   .nx-say { position: absolute; margin: 0; font: italic 500 28px/1.22 var(--f-display); color: var(--navy); text-wrap: balance; }
   .nx-say .nx-v { font: 700 25px/1 var(--f-body); font-style: normal; color: var(--gold-deep); font-variant-numeric: tabular-nums; }
   .nx-pl { padding: 18px 24px 20px; display: grid; gap: 12px; align-content: start; }
@@ -326,9 +338,9 @@
      17. calculator one: how much cash will the estate need?
      ===================================================================== */
   const PROFILES = {
-    biz: { biz: 35e6, re: 6e6, inv: 3e6, ret: 2e6, cash: 1e6, home: 4e6, debt: 3e6, other: 2e6, ins: 0 },
-    re: { biz: 0, re: 60e6, inv: 2e6, ret: 1e6, cash: 1.5e6, home: 5e6, debt: 18e6, other: 1e6, ins: 0 },
-    inv: { biz: 0, re: 5e6, inv: 30e6, ret: 4e6, cash: 2e6, home: 5e6, debt: 1e6, other: 0.5e6, ins: 0 }
+    biz: { biz: 35e6, re: 6e6, inv: 3e6, ret: 2e6, cash: 1e6, home: 4e6, debt: 3e6, other: 2e6, ins: 0, pshare: 35e6 },
+    re: { biz: 0, re: 60e6, inv: 2e6, ret: 1e6, cash: 1.5e6, home: 5e6, debt: 18e6, other: 1e6, ins: 0, pshare: 60e6 },
+    inv: { biz: 0, re: 5e6, inv: 30e6, ret: 4e6, cash: 2e6, home: 5e6, debt: 1e6, other: 0.5e6, ins: 0, pshare: 5e6 }
   };
   /** one statutory fee (personal representative, or attorney): California Probate Code 10800(a) and 10810(a).
       Computed on the gross value of the probate estate; above $25,000,000 the court sets a reasonable amount. */
@@ -338,26 +350,44 @@
     for (const [w, r] of bands) { const x = Math.min(left, w); fee += x * r; left -= x; if (left <= 0) break; }
     return { fee, over: Math.max(0, v - 25e6) };
   }
-  /** federal estate tax and liquidity, 2026 rules. v: field values (money in dollars, rates as fractions) */
+  /** federal estate tax, settlement, buyouts and liquidity, 2026 rules.
+      v: field values (money in dollars, rates as fractions; pp = partners to buy out, heirs = children or heirs).
+      Buyouts: partners at pp x each partner's share; heirs: one keeps the main holding (the largest of business,
+      investment real estate, home) and the others are bought out, so the cash is that holding x (heirs - 1) / heirs. */
   function estateCalc(v) {
     const exemption = D('fed.estate.exemption', 15000000), rate = D('fed.estate.topRate', 0.40);
     const num = (x) => (isFinite(x) ? Math.max(0, x) : 0);
     const biz = num(v.biz), re = num(v.re), inv = num(v.inv), ret = num(v.ret), cash = num(v.cash), home = num(v.home);
     const debt = num(v.debt), other = num(v.other), ins = num(v.ins), adm = num(v.adm), rtx = Math.min(1, num(v.rtx));
+    const pp = Math.max(0, Math.round(+v.pp || 0)), pshare = num(v.pshare), heirs = Math.max(1, Math.round(+v.heirs || 1));
     const gross = biz + re + inv + ret + cash + home;
     const excl = v.who === 'two' ? 2 * exemption : exemption;
     const admin = gross * adm;
+    const probBase = gross - ret;
     let prob = 0, over = 0;
-    if (v.pass === 'prob') { const p = probateFee(gross - ret); prob = 2 * p.fee; over = p.over; }
+    if (v.pass === 'prob') { const p = probateFee(probBase); prob = 2 * p.fee; over = p.over; }
     const settle = admin + prob;
     const taxable = Math.max(0, gross - debt - settle);
     const tax = rate * Math.max(0, taxable - excl);
-    const due = tax + settle + other;
+    const big = [['biz', biz], ['re', re], ['home', home]].sort((a, b) => b[1] - a[1])[0];
+    const keepKey = big[1] > 0 ? big[0] : 'home', keepValue = big[1];
+    const partnerBuy = pp * pshare;
+    const heirBuy = heirs > 1 ? keepValue * (heirs - 1) / heirs : 0;
+    const buyouts = partnerBuy + heirBuy;
+    const due = tax + settle + other + buyouts;
     const liquid = inv + cash + ret * (1 - rtx);
     const have = liquid + ins;
     const gap = Math.max(0, due - have);
-    const big = [['biz', biz], ['re', re], ['home', home]].sort((a, b) => b[1] - a[1])[0];
-    return { gross, excl, rate, admin, prob, over, settle, taxable, tax, due, liquid, ins, have, gap, sell: big[1] > 0 ? big[0] : 'home', share: have > 0 ? Math.min(1, due / have) : 1, reserve: Math.min(due, liquid) };
+    /* where the cash is needed, line by line: estate tax and settlement costs in proportion to value,
+       probate fees in proportion to the probate estate (retirement accounts pass by beneficiary designation) */
+    const lines = [['biz', biz, 0], ['re', re, 0], ['inv', inv, inv], ['ret', ret, ret * (1 - rtx)], ['cash', cash, cash], ['home', home, 0]].map(([k, value, ready]) => {
+      const t = gross > 0 ? tax * value / gross : 0;
+      const s = value * adm + (prob > 0 && k !== 'ret' && probBase > 0 ? prob * value / probBase : 0);
+      return { k, value, ready, tax: t, settle: s, need: t + s, net: ready - (t + s) };
+    });
+    return { gross, excl, rate, admin, prob, over, settle, taxable, tax, due, liquid, ins, have, gap, other, debt, adm, rtx,
+      pp, pshare, heirs, keepKey, keepValue, partnerBuy, heirBuy, buyouts, lines,
+      sell: keepKey, share: have > 0 ? Math.min(1, due / have) : 1, reserve: Math.min(due, liquid) };
   }
   EFA.estateLiquidity = { calc: estateCalc, probateFee, profiles: PROFILES };
 
@@ -367,38 +397,54 @@
     copy: {
       eb: 'Estate liquidity',
       h: 'How much cash will the estate need?',
-      lProf: 'Profile', oBiz: 'Business owner', oRe: 'Real estate investor', oInv: 'Investor',
+      lProf: 'Profile', oBiz: 'Business owner', oRe: 'Real estate', oInv: 'Investor',
       lWho: 'Planning for', oOne: 'One person', oTwo: 'Married couple',
       lPass: 'Assets pass through', oTrust: 'Living trust', oProb: 'Probate',
+      lPart: 'Partners to buy out', oP0: 'None', oP1: '1', oP2: '2', oP3: '3',
+      lHeirs: 'Children or heirs', oH1: '1', oH2: '2', oH3: '3', oH4: '4', oH5: '5',
       gHold: 'What the estate holds',
       fBiz: 'Business interests', fRe: 'Investment real estate', fInv: 'Stocks, bonds, and funds', fRet: 'Retirement accounts', fCash: 'Cash', fHome: 'Home and personal property', fDebt: 'Mortgages and other debts',
       gAlso: 'At death',
-      fOther: 'Other cash needs', fIns: 'Life insurance in a family trust',
+      fPshare: 'Each partner’s share', fOther: 'Other cash needs', fIns: 'Life insurance in a family trust',
       fAdm: 'Settlement costs, estimate', fRtx: 'Tax on retirement withdrawals',
       tWorth: 'What the estate is worth', tDue: 'Cash the estate will need', tHave: 'Cash ready for the family', tGap: 'The gap',
       bNeed: 'Cash needed', bHave: 'Cash ready',
-      kTax: 'Federal estate tax', kSet: 'Settlement costs', kProb: 'Probate fees', kOther: 'Other cash needs', kLiq: 'Liquid assets, after tax', kIns: 'Life insurance in trust', kGap: 'The gap',
+      kTax: 'Federal estate tax', kSet: 'Settlement costs', kSetP: 'Settlement and probate', kOther: 'Other cash needs', kBuy: 'Buyouts: partners and heirs',
+      kLiq: 'Liquid assets, after tax', kIns: 'Life insurance in trust', kGap: 'The gap',
       over: 'Probate fees shown through $25 million. Above that amount, the court sets the fee.',
-      sellBiz: 'Without new cash, the family may have to sell part of the business to pay the bill.',
-      sellRe: 'Without new cash, the family may have to sell real estate to pay the bill.',
-      sellHome: 'Without new cash, the family may have to sell the home to pay the bill.',
-      useA: 'No forced sale. Still, the bill would take', useB: 'of the cash ready for the family.',
-      src: '2026 federal rules: $15,000,000 exclusion per person (IRS, IR-2025-103) and a 40% top rate (26 U.S.C. 2001(c)); taxable estate after debts and settlement costs (26 U.S.C. 2053). Married couple: both exclusions, assuming the portability election is made at the first death (26 U.S.C. 2010(c)). Probate fees: California Probate Code 10800 and 10810. State estate and inheritance taxes are not included.',
-      _notes: 'Pick the profile that fits, then change any number. Every figure is hypothetical until it is theirs.\n\n- Estate tax: 40% of the taxable estate above the exclusion. 2026 exclusion: $15,000,000 per person. A married couple can use both exclusions when the portability election is made on a timely return at the first death; this models the second death. Assumes no taxable gifts during life.\n- Taxable estate: everything owned, less debts and settlement costs (26 U.S.C. 2053).\n- Probate: California statutory fees for the personal representative and for the attorney, each figured on the gross value of the probate estate, with debts not subtracted (Probate Code 10800, 10810). Above $25,000,000 the court sets the fee; that part is not included here. Retirement accounts pass by beneficiary designation and are left out of the probate base.\n- Settlement costs (estimate): appraisals, legal, accounting, and trustee costs. Change it to fit.\n- Retirement accounts count after income tax on withdrawals (estimate).\n- Life insurance owned by a properly structured family trust sits outside the taxable estate and is cash ready for the family.\n\n- Ask: Which of these numbers surprised you?\nPAUSE'
+      sellBiz: 'Without new cash, the family may have to sell part of the business to cover what comes due.',
+      sellRe: 'Without new cash, the family may have to sell real estate to cover what comes due.',
+      sellHome: 'Without new cash, the family may have to sell the home to cover what comes due.',
+      useA: 'No forced sale. Still, it would take', useB: 'of the cash ready for the family.',
+      src: '2026 federal rules: $15,000,000 exclusion per person (IRS, IR-2025-103), 40% top rate (26 U.S.C. 2001(c)), taxable estate after debts and settlement costs (26 U.S.C. 2053), married couple with the portability election (26 U.S.C. 2010(c)). Probate fees: California Probate Code 10800, 10810. State estate and inheritance taxes not included.',
+      wsHead: 'Where the cash is needed',
+      cItem: 'Line', cValue: 'Value', cReady: 'Cash it can provide', cTax: 'Estate tax share', cSet: 'Settlement and probate', cNeed: 'Cash this line needs', cNet: 'Short or spare',
+      rPart: 'Buying out partners', rHeirs: 'Buying out the other heirs', rTotal: 'Total',
+      aWho: 'Planning for', aPass: 'Assets pass through', aTax: 'Federal estate tax', aTaxable: 'Taxable estate', aSet: 'Settlement costs',
+      aRtx: 'Tax on retirement withdrawals', aPart: 'Partners to buy out', aHeirs: 'Children or heirs', aHow: 'Tax and cost shares',
+      vAbove: 'above', vOfEstate: 'of the estate, an estimate', vEstimate: 'an estimate', vAt: 'at', vEach: 'each',
+      vKeep_biz: 'one keeps the business', vKeep_re: 'one keeps the real estate', vKeep_home: 'one keeps the home',
+      vHow: 'By each line’s value',
+      _notes: 'Pick the profile that fits, then change any number. Every figure is hypothetical until it is theirs.\n\n- Estate tax: 40% of the taxable estate above the exclusion. 2026 exclusion: $15,000,000 per person. A married couple can use both exclusions when the portability election is made on a timely return at the first death; this models the second death. Assumes no taxable gifts during life.\n- Taxable estate: everything owned, less debts and settlement costs (26 U.S.C. 2053).\n- Probate: California statutory fees for the personal representative and for the attorney, each figured on the gross value of the probate estate, with debts not subtracted (Probate Code 10800, 10810). Above $25,000,000 the court sets the fee; that part is not included here. Retirement accounts pass by beneficiary designation and are left out of the probate base.\n- Partners to buy out: when a co-owner’s family needs their share bought out, or the family wants to keep control, someone needs cash equal to that share. Each partner’s share starts equal to yours; change it to fit. A funded buy-sell agreement puts that cash in place ahead of time.\n- Children or heirs: one heir keeps the business (or the property) and the others are bought out so each is treated alike. The cash is that holding times the others’ share: two thirds of it with three heirs. Life insurance can help equalize an estate among beneficiaries, often an issue with a family business that only some children run, or hard-to-divide assets such as real estate (John Hancock, LIFE-7299).\n- Settlement costs (estimate): appraisals, legal, accounting, and trustee costs. Retirement accounts count after income tax on withdrawals (estimate).\n- Life insurance owned by a properly structured family trust sits outside the taxable estate and is cash ready for the family.\n- Documentation shows each line: its value, the cash it can provide within nine months, its share of the estate tax and settlement costs, and where the shortfall sits.\n\n- Ask: Who else would need to be bought out if something happened to you tomorrow?\nPAUSE'
     },
     render(ctx) {
       const p0 = PROFILES.biz;
       const money = (id, label, value) => ctx.field({ id, label, type: 'money', value, min: 0 });
+      const W = EFA.lib && EFA.lib.worksheet;
+      const docs = W ? W.button(ctx, { data: () => ng17Sheet(ctx, estateCalc(ctx.values()), ctx.values()), cls: 'nx-docs', style: 'position:absolute;left:1336px;top:742px' }) : '';
       ctx.el.innerHTML = `${head(ctx, { eb: 'eb', h: 'h', sm: true })}
-        <div class="nx-chs">
+        <div class="nx-chs tight">
           ${ctx.choice({ id: 'prof', label: 'lProf', options: [{ value: 'biz', key: 'oBiz' }, { value: 're', key: 'oRe' }, { value: 'inv', key: 'oInv' }], value: 'biz' })}
           ${ctx.choice({ id: 'who', label: 'lWho', options: [{ value: 'one', key: 'oOne' }, { value: 'two', key: 'oTwo' }], value: 'two' })}
           ${ctx.choice({ id: 'pass', label: 'lPass', options: [{ value: 'trust', key: 'oTrust' }, { value: 'prob', key: 'oProb' }], value: 'trust' })}
+          ${ctx.choice({ id: 'pp', label: 'lPart', options: [0, 1, 2, 3].map((n) => ({ value: n, key: 'oP' + n })), value: 0 })}
+          ${ctx.choice({ id: 'heirs', label: 'lHeirs', options: [1, 2, 3, 4, 5].map((n) => ({ value: n, key: 'oH' + n })), value: 1 })}
         </div>
-        <div class="nx-card nx-form nx-fr" style="left:110px;top:238px;width:650px;height:560px">
+        <div class="nx-card nx-form nx-fr" style="left:110px;top:238px;width:650px;height:562px">
           ${ctx.t('gHold', { tag: 'div', cls: 'nx-gt' })}
           ${money('biz', 'fBiz', p0.biz)}${money('re', 'fRe', p0.re)}${money('inv', 'fInv', p0.inv)}${money('ret', 'fRet', p0.ret)}${money('cash', 'fCash', p0.cash)}${money('home', 'fHome', p0.home)}${money('debt', 'fDebt', p0.debt)}
           ${ctx.t('gAlso', { tag: 'div', cls: 'nx-gt mt' })}
+          <div data-show="pshare">${money('pshare', 'fPshare', p0.pshare)}</div>
           ${money('other', 'fOther', p0.other)}${money('ins', 'fIns', p0.ins)}
           <div class="nx-asm">
             ${ctx.field({ id: 'adm', label: 'fAdm', type: 'pct', value: 0.01, min: 0, max: 0.2, dp: 1 })}
@@ -411,31 +457,35 @@
           <div class="nx-tile nx-f" ${AT(1)}>${ctx.t('tHave', { tag: 'span', cls: 'k' })}<span class="v" data-nv="have"></span></div>
           <div class="nx-tile gold nx-f" ${AT(1)}>${ctx.t('tGap', { tag: 'span', cls: 'k' })}<span class="v" data-nv="gap"></span></div>
         </div>
-        <div class="nx-card nx-bars" style="left:790px;top:448px;width:700px;height:262px">
+        <div class="nx-card nx-bars" style="left:790px;top:448px;width:700px;height:276px">
           <div class="nx-bl">${ctx.t('bNeed')}<b data-nv="due2"></b></div>
-          <div class="nx-bar" data-bar="need"><i data-s="tax" style="background:${P.navy}"></i><i data-s="prob" style="background:${P.navy3}"></i><i data-s="set" style="background:${P.navy4}"></i><i data-s="other" style="background:${P.steel}"></i></div>
+          <div class="nx-bar" data-bar="need"><i data-s="tax" style="background:${P.navy}"></i><i data-s="set" style="background:${P.navy4}"></i><i data-s="other" style="background:${P.steel}"></i><i data-s="buy" class="buy"></i></div>
           <div class="nx-f" ${AT(1)} style="display:grid;gap:8px">
             <div class="nx-bl">${ctx.t('bHave')}<b data-nv="have2"></b></div>
             <div class="nx-bar" data-bar="have"><i data-s="liq" style="background:${P.water}"></i><i data-s="ins" style="background:${P.gold}"></i><i data-s="gap" class="gap"></i></div>
           </div>
-          <div class="nx-leg">
-            <span><i style="background:${P.navy}"></i>${ctx.t('kTax')}<b data-nv="tax"></b></span>
-            <span class="nx-f" ${AT(1)}><i style="background:${P.water}"></i>${ctx.t('kLiq')}<b data-nv="liq"></b></span>
-            <span><i style="background:${P.navy4}"></i>${ctx.t('kSet')}<b data-nv="set"></b></span>
-            <span class="nx-f" ${AT(1)}><i style="background:${P.gold}"></i>${ctx.t('kIns')}<b data-nv="ins"></b></span>
-            <span data-show="prob"><i style="background:${P.navy3}"></i>${ctx.t('kProb')}<b data-nv="prob"></b></span>
-            <span data-show="noprob"><i style="background:${P.steel}"></i>${ctx.t('kOther')}<b data-nv="other"></b></span>
-            <span data-show="prob"><i style="background:${P.steel}"></i>${ctx.t('kOther')}<b data-nv="other2"></b></span>
-            <span class="nx-f" ${AT(1)}><i class="gap"></i>${ctx.t('kGap')}<b data-nv="gap2"></b></span>
+          <div class="nx-leg2">
+            <div>
+              <span><i style="background:${P.navy}"></i>${ctx.t('kTax')}<b data-nv="tax"></b></span>
+              <span><i style="background:${P.navy4}"></i><em data-show="noprob">${ctx.t('kSet')}</em><em data-show="prob">${ctx.t('kSetP')}</em><b data-nv="set"></b></span>
+              <span><i style="background:${P.steel}"></i>${ctx.t('kOther')}<b data-nv="other"></b></span>
+              <span data-show="buy"><i class="buy"></i>${ctx.t('kBuy')}<b data-nv="buy"></b></span>
+            </div>
+            <div class="nx-f" ${AT(1)}>
+              <span><i style="background:${P.water}"></i>${ctx.t('kLiq')}<b data-nv="liq"></b></span>
+              <span><i style="background:${P.gold}"></i>${ctx.t('kIns')}<b data-nv="ins"></b></span>
+              <span><i class="gap"></i>${ctx.t('kGap')}<b data-nv="gap2"></b></span>
+            </div>
           </div>
           ${ctx.t('over', { tag: 'p', cls: 'nx-note', attrs: 'data-show="over"' })}
         </div>
         <div class="nx-f" ${AT(1)}>
-          ${ctx.t('sellBiz', { tag: 'p', cls: 'nx-say serif', attrs: 'data-say="biz" style="left:790px;top:716px;width:700px"' })}
-          ${ctx.t('sellRe', { tag: 'p', cls: 'nx-say serif', attrs: 'data-say="re" style="left:790px;top:716px;width:700px"' })}
-          ${ctx.t('sellHome', { tag: 'p', cls: 'nx-say serif', attrs: 'data-say="home" style="left:790px;top:716px;width:700px"' })}
-          <p class="nx-say serif" data-say="ok" style="left:790px;top:716px;width:700px">${ctx.t('useA', { tag: 'span' })} ${V('share')} ${ctx.t('useB', { tag: 'span' })}</p>
+          ${ctx.t('sellBiz', { tag: 'p', cls: 'nx-say sm serif', attrs: 'data-say="biz" style="left:790px;top:736px;width:530px"' })}
+          ${ctx.t('sellRe', { tag: 'p', cls: 'nx-say sm serif', attrs: 'data-say="re" style="left:790px;top:736px;width:530px"' })}
+          ${ctx.t('sellHome', { tag: 'p', cls: 'nx-say sm serif', attrs: 'data-say="home" style="left:790px;top:736px;width:530px"' })}
+          <p class="nx-say sm serif" data-say="ok" style="left:790px;top:736px;width:530px">${ctx.t('useA', { tag: 'span' })} ${V('share')} ${ctx.t('useB', { tag: 'span' })}</p>
         </div>
+        ${docs}
         ${src(ctx, 'src', 'up')}
         ${disc(['hypothetical', 'notAdvice'])}`;
 
@@ -445,18 +495,18 @@
         setV(ctx, 'worth', mny(r.gross)); setV(ctx, 'due', mny(r.due)); setV(ctx, 'due2', mny(r.due));
         setV(ctx, 'have', mny(r.have)); setV(ctx, 'have2', mny(r.have));
         setV(ctx, 'gap', mny(r.gap)); setV(ctx, 'gap2', mny(r.gap));
-        setV(ctx, 'tax', mny(r.tax)); setV(ctx, 'set', mny(r.admin)); setV(ctx, 'prob', mny(r.prob));
-        setV(ctx, 'other', mny(vals.other)); setV(ctx, 'other2', mny(vals.other));
+        setV(ctx, 'tax', mny(r.tax)); setV(ctx, 'set', mny(r.settle)); setV(ctx, 'other', mny(r.other)); setV(ctx, 'buy', mny(r.buyouts));
         setV(ctx, 'liq', mny(r.liquid)); setV(ctx, 'ins', mny(r.ins)); setV(ctx, 'share', pct0(r.share));
         const scale = 652 / Math.max(r.due, r.have, 1);
         const wpx = (x) => Math.max(0, x * scale).toFixed(1) + 'px';
         const set = (bar, s, x) => { const n = ctx.$(`[data-bar="${bar}"] [data-s="${s}"]`); if (n) n.style.width = wpx(x); };
-        set('need', 'tax', r.tax); set('need', 'prob', r.prob); set('need', 'set', r.admin); set('need', 'other', Math.max(0, vals.other || 0));
+        set('need', 'tax', r.tax); set('need', 'set', r.settle); set('need', 'other', r.other); set('need', 'buy', r.buyouts);
         set('have', 'liq', r.liquid); set('have', 'ins', r.ins); set('have', 'gap', r.gap);
         const isProb = vals.pass === 'prob';
-        ctx.$$('[data-show="prob"]').forEach((n) => n.classList.toggle('nx-hide', !isProb));
-        ctx.$$('[data-show="noprob"]').forEach((n) => n.classList.toggle('nx-hide', isProb));
-        ctx.$$('[data-show="over"]').forEach((n) => n.classList.toggle('nx-hide', !(isProb && r.over > 0)));
+        const showIf = (sel, on) => ctx.$$(sel).forEach((n) => n.classList.toggle('nx-hide', !on));
+        showIf('[data-show="prob"]', isProb); showIf('[data-show="noprob"]', !isProb);
+        showIf('[data-show="over"]', isProb && r.over > 0);
+        showIf('[data-show="buy"]', r.buyouts > 0); showIf('[data-show="pshare"]', r.pp > 0);
         const say = r.gap > 0 ? r.sell : 'ok';
         ctx.$$('[data-say]').forEach((n) => n.classList.toggle('nx-hide', n.dataset.say !== say));
         CD.set('ng.due', r.due); CD.set('ng.gap', r.gap); CD.set('ng.reserve', r.reserve);
@@ -473,6 +523,47 @@
     },
     step(ctx, n) { reveal(ctx, n); }
   });
+  /** the Documentation worksheet for ng17: every line, where the cash is needed, and the assumptions behind it */
+  function ng17Sheet(ctx, r, v) {
+    const T = (k) => ctx.text(k), M = (n) => EFA.fmt.money(n), Pc = (f, dp) => EFA.fmt.pct(f, dp);
+    const label = { biz: 'fBiz', re: 'fRe', inv: 'fInv', ret: 'fRet', cash: 'fCash', home: 'fHome' };
+    const rows = [];
+    r.lines.forEach((x) => {
+      rows.push({ item: ctx.t(label[x.k]), value: x.value, ready: x.ready, tax: x.tax, settle: x.settle, need: x.need, net: x.net });
+      if (x.k !== r.keepKey) return; // buyouts sit right under the holding they come from
+      if (r.partnerBuy > 0) rows.push({ item: ctx.t('rPart'), need: r.partnerBuy, net: -r.partnerBuy });
+      if (r.heirBuy > 0) rows.push({ item: ctx.t('rHeirs'), need: r.heirBuy, net: -r.heirBuy });
+    });
+    rows.push({ item: ctx.t('fDebt'), value: -r.debt });
+    if (r.other > 0) rows.push({ item: ctx.t('fOther'), need: r.other, net: -r.other });
+    if (r.ins > 0) rows.push({ item: ctx.t('fIns'), ready: r.ins, net: r.ins });
+    rows.push({ item: ctx.t('rTotal'), value: r.gross - r.debt, ready: r.have, tax: r.tax, settle: r.settle, need: r.due, net: r.have - r.due });
+    return {
+      heading: 'wsHead', size: 'full', highlight: 'net',
+      columns: [
+        { field: 'item', header: 'cItem', type: 'text', width: 300 },
+        { field: 'value', header: 'cValue', type: 'money' },
+        { field: 'ready', header: 'cReady', type: 'money' },
+        { field: 'tax', header: 'cTax', type: 'money' },
+        { field: 'settle', header: 'cSet', type: 'money' },
+        { field: 'need', header: 'cNeed', type: 'money' },
+        { field: 'net', header: 'cNet', type: 'money' }
+      ],
+      rows,
+      assumptions: [
+        { label: 'aWho', value: T(v.who === 'two' ? 'oTwo' : 'oOne') },
+        { label: 'aPass', value: T(v.pass === 'prob' ? 'oProb' : 'oTrust') },
+        { label: 'aTax', value: `${Pc(r.rate, 0)} ${T('vAbove')} ${M(r.excl)}` },
+        { label: 'aTaxable', value: M(r.taxable) },
+        { label: 'aSet', value: `${Pc(r.adm, 1)} ${T('vOfEstate')}` },
+        { label: 'aRtx', value: `${Pc(r.rtx, 0)}, ${T('vEstimate')}` },
+        { label: 'aPart', value: r.pp > 0 ? `${r.pp} ${T('vAt')} ${M(r.pshare)} ${T('vEach')}` : T('oP0') },
+        { label: 'aHeirs', value: r.heirs > 1 ? `${r.heirs}, ${T('vKeep_' + r.keepKey)}` : '1' },
+        { label: 'aHow', value: T('vHow') }
+      ],
+      disclosures: ['hypothetical', 'notAdvice']
+    };
+  }
 
   /* =====================================================================
      18. three ways to fill the gap
