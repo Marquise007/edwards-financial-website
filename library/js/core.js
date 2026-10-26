@@ -327,12 +327,87 @@
     }
     return loaded[name];
   }
-  function presReady(p) { return !!p && p.screens.length > 0 && p.screens.every((s) => catalog.modules[s.id]); }
+  function presReady(p) { return !!p && p.screens.length > 0 && p.screens.every((s) => catalog.modules[s.id] || EFA.screens[s.id]); }
   function ensureScreens(p) {
     const mods = new Set(p.screens.map((s) => catalog.modules[s.id]).filter(Boolean));
     return Promise.all(Array.from(mods).map(loadModule));
   }
   EFA.presReady = presReady;
+
+  /* ---------- arrangement: move, hide, add and remove screens in any presentation ----------
+     Saved with the wording (pseudo-screen '_arr', one key per presentation), so it follows the
+     active wording set, syncs to every device on the website copy, and only editors can change it. */
+  const ARR = '_arr';
+  const tplNotes = 'An added screen. Turn on editing (E) to change any line, including these notes.';
+  const TPL = {
+    title: {
+      label: 'Title', title: 'Added title screen',
+      copy: { eb: 'Section', h: 'A new section title', sub: 'A short line that sets up what comes next.', _notes: tplNotes },
+      render(ctx) {
+        ctx.el.innerHTML = `<div class="tpl-navy"></div><div class="tpl-title">${ctx.t('eb', { tag: 'span', cls: 'tpl-eb' })}${ctx.t('h', { tag: 'h1', cls: 'st-h1 tpl-h serif' })}<hr class="st-rule">${ctx.t('sub', { tag: 'p', cls: 'tpl-sub' })}</div>`;
+      }
+    },
+    statement: {
+      label: 'Statement', title: 'Added statement screen',
+      copy: { eb: 'Key idea', h: 'One clear statement, set large.', body: 'A sentence or two that explains why it matters to the family in front of you.', _notes: tplNotes },
+      render(ctx) {
+        ctx.el.innerHTML = `<div class="tpl-stmt">${ctx.t('eb', { tag: 'span', cls: 'st-eyebrow' })}${ctx.t('h', { tag: 'h1', cls: 'st-h1 tpl-big serif' })}<hr class="st-rule">${ctx.t('body', { tag: 'p', cls: 'st-body tpl-body' })}</div>`;
+      }
+    },
+    bullets: {
+      label: 'Bullet points', title: 'Added bullet screen', steps: 5,
+      copy: { eb: 'Points to cover', h: 'A heading for this list', b1: 'First point', b2: 'Second point', b3: 'Third point', b4: 'Fourth point', _notes: tplNotes },
+      render(ctx) {
+        const editing = document.body.classList.contains('editing');
+        const rows = ['b1', 'b2', 'b3', 'b4'].filter((k) => editing || ctx.text(k).trim()).map((k, i) => `<div class="tpl-row" data-at="${i + 1}"><span class="d"></span>${ctx.t(k, { tag: 'p' })}</div>`).join('');
+        ctx.el.innerHTML = `<div class="tpl-list">${ctx.t('eb', { tag: 'span', cls: 'st-eyebrow' })}${ctx.t('h', { tag: 'h1', cls: 'st-h1 serif' })}<hr class="st-rule"><div class="tpl-rows">${rows}</div></div>`;
+      },
+      step(ctx, n) { ctx.$$('.tpl-row[data-at]').forEach((r) => r.classList.toggle('is-off', +r.dataset.at > n)); }
+    },
+    question: {
+      label: 'Question', title: 'Added question screen',
+      copy: { eb: 'Ask', q: 'What would you like your family to be able to say about how you prepared them?', _notes: 'Ask, then let the silence work.\n\nPAUSE' },
+      render(ctx) {
+        ctx.el.innerHTML = `<div class="tpl-q">${ctx.t('eb', { tag: 'span', cls: 'st-eyebrow' })}${ctx.t('q', { tag: 'p', cls: 'tpl-qq serif' })}<hr class="st-rule"></div>`;
+      }
+    }
+  };
+  EFA.screenTemplates = TPL;
+  function ensureAdded(it) {
+    if (!it || !it.t || !TPL[it.t] || EFA.screens[it.id]) return;
+    const t = TPL[it.t];
+    EFA.screen(it.id, Object.assign({}, t, { copy: Object.assign({}, t.copy) }));
+  }
+  const Arrange = {
+    raw(key) { return Wording.get(ARR, key, ''); },
+    get(key) {
+      const s = this.raw(key); if (!s) return null;
+      try { const a = JSON.parse(s); return a && Array.isArray(a.items) ? a : null; } catch (e) { return null; }
+    },
+    /** the working list: [{id, v?, h?, t?}] (h = hidden, t = added template) */
+    items(key) {
+      const a = this.get(key), p = presByKey[key];
+      if (a) return a.items.map((x) => Object.assign({}, x));
+      return p ? p.screens.map((x) => (x.v ? { id: x.id, v: x.v } : { id: x.id })) : [];
+    },
+    isDefault(key, items) {
+      const p = presByKey[key]; if (!p || items.length !== p.screens.length) return false;
+      return items.every((it, i) => it.id === p.screens[i].id && (it.v || '') === (p.screens[i].v || '') && !it.h && !it.t);
+    },
+    rawFor(key, items) { return this.isDefault(key, items) ? '' : JSON.stringify({ v: 1, items }); },
+    save(key, items) { return Wording.put(ARR, key, this.rawFor(key, items), ''); },
+    /** the presentation as it plays: hidden screens skipped, added screens registered */
+    apply(p) {
+      if (!p) return p;
+      const a = this.get(p.key); if (!a) return p;
+      a.items.forEach(ensureAdded);
+      const screens = a.items
+        .filter((it) => !it.h && (EFA.screens[it.id] || catalog.modules[it.id] || (catalog.aliases && catalog.aliases[it.id])))
+        .map((it) => (it.v ? { id: it.id, v: it.v } : { id: it.id }));
+      return screens.length ? Object.assign({}, p, { screens, arranged: true }) : p;
+    }
+  };
+  EFA.arrange = Arrange;
 
   /* ---------- copy helpers shared by library and screens ---------- */
   const LIB = '_lib';
@@ -385,6 +460,7 @@
     search: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>',
     star: '<svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1 6.2L12 17.3 6.5 20.2l1-6.2L3 9.6l6.2-.9z"/></svg>'
   };
+  I.arrange = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6h11M9 12h11M9 18h11"/><path d="M4 5l1.5-1.5L7 5M5.5 3.5v5M4 19l1.5 1.5L7 19M5.5 20.5v-5"/></svg>';
   EFA.icons = I;
 
   /* ---------- library ---------- */
@@ -470,8 +546,8 @@
       else if (this.cat !== 'all') list = list.filter((p) => p.cats.includes(this.cat));
       if (q) list = list.filter((p) => (presName(p.key) + ' ' + p.kw).toLowerCase().includes(q));
       list = list.slice().sort((a, b) => (presReady(b) - presReady(a)) || presName(a.key).localeCompare(presName(b.key)));
-      g.innerHTML = list.length ? list.map((p) => {
-        const ready = presReady(p);
+      g.innerHTML = list.length ? list.map((p0) => {
+        const p = Arrange.apply(p0), ready = presReady(p);
         const cat = p.cats.filter((c) => c !== 'calc').map((c) => CAT_LABEL[c]).slice(0, 2).join(' · ') || 'Concept';
         return `<div class="card ${ready ? '' : 'is-pending'}" role="button" tabindex="0" data-key="${p.key}" aria-disabled="${!ready}">
           <span class="card-ic">${EFA.topicIcons ? EFA.topicIcons.svg(p.key) : ''}</span>
@@ -482,7 +558,7 @@
         </div>`;
       }).join('') : '<p class="empty">No presentations match that search.</p>';
       $$('.card', g).forEach((c) => {
-        const open = () => { if (Edit.on) return; const p = presByKey[c.dataset.key]; if (presReady(p)) Player.open(p.key); else toast(`${presName(p.key)} is still being rebuilt.`); };
+        const open = () => { if (Edit.on) return; const p = presByKey[c.dataset.key]; if (presReady(Arrange.apply(p))) Player.open(p.key); else toast(`${presName(p.key)} is still being rebuilt.`); };
         c.addEventListener('click', (e) => { if (e.target.closest('[data-fav]') || e.target.closest('[data-cp]') && Edit.on) return; open(); });
         c.addEventListener('keydown', (e) => { if ((e.key === 'Enter' || e.key === ' ') && e.target === c) { e.preventDefault(); open(); } });
       });
@@ -511,15 +587,32 @@
   const Player = {
     el: null, stage: null, pres: null, idx: 0, step: 0, stack: [], ctx: null, def: null, open_: false, pen: false, notes: LS.get('efa.notes', false),
     async open(key, idx, step, opts) {
-      const p = presByKey[key];
-      if (!p) { toast('That presentation is not in the library.'); return; }
+      const p0 = presByKey[key];
+      if (!p0) { toast('That presentation is not in the library.'); return; }
       opts = opts || {};
       if (!opts.keepStack) this.stack = [];
+      const p = Arrange.apply(p0);
       try { await ensureScreens(p); } catch (e) { console.warn(e); }
-      this.pres = p; this.idx = Math.max(0, Math.min(idx || 0, p.screens.length - 1)); this.step = step || 0;
+      this.pres = p; this.arrSig = Arrange.raw(key); this.idx = Math.max(0, Math.min(idx || 0, p.screens.length - 1)); this.step = step || 0;
       if (!this.open_) this.mount();
       this.renderScreen({ instantStep: !!opts.instant });
       LS.set('efa.recent', key);
+    },
+    /** re-read the arrangement (after a move, a hide, an add, or a change on another device) */
+    reapplyIfChanged() { if (this.pres && Arrange.raw(this.pres.key) !== this.arrSig) this.reapply(); },
+    async reapply(focusId) {
+      if (!this.pres) return;
+      const key = this.pres.key, cur = focusId || (this.entry() && this.entry().id);
+      const p = Arrange.apply(presByKey[key]);
+      try { await ensureScreens(p); } catch (e) { console.warn(e); }
+      if (!this.pres || this.pres.key !== key) return;
+      this.pres = p; this.arrSig = Arrange.raw(key);
+      let i = p.screens.findIndex((x) => x.id === cur);
+      if (i < 0) { i = Math.min(this.idx, p.screens.length - 1); this.step = 0; }
+      else if (i !== this.idx || focusId) this.step = 0;
+      this.idx = Math.max(0, i);
+      this.renderScreen({ noFade: true });
+      if (ArrangePanel.el) ArrangePanel.render();
     },
     mount() {
       this.open_ = true;
@@ -552,6 +645,7 @@
           <button class="ctl" id="bClear" type="button" title="Clear drawing (C)" aria-label="Clear drawing" hidden>${I.clear}</button>
           <button class="ctl" id="bNotes" type="button" title="Presenter notes (N)" aria-label="Presenter notes" aria-pressed="${this.notes}">${I.notes}</button>
           <button class="ctl" id="bFull" type="button" title="Full screen (F)" aria-label="Full screen">${I.full}</button>
+          <button class="ctl ctl-subtle" id="bArr" type="button" title="Arrange screens (A)" aria-label="Arrange screens" ${Platform.canEdit ? '' : 'hidden'}>${I.arrange}</button>
           <button class="ctl ctl-subtle" id="bEdit" type="button" title="Edit wording (E)" aria-label="Edit wording" ${Platform.canEdit ? '' : 'hidden'}>${I.edit}</button>
         </nav>`;
       document.body.appendChild(el);
@@ -564,6 +658,7 @@
       $('#bNotes', el).addEventListener('click', () => this.toggleNotes());
       $('#bFull', el).addEventListener('click', () => this.fullscreen());
       $('#bEdit', el).addEventListener('click', () => Edit.toggle());
+      $('#bArr', el).addEventListener('click', () => ArrangePanel.toggle());
       $('#returnPill', el).addEventListener('click', () => this.back());
       $$('#penColors button', el).forEach((b) => b.addEventListener('click', () => { Pen.color = b.dataset.c; $$('#penColors button', el).forEach((x) => x.setAttribute('aria-pressed', x === b)); }));
       Pen.attach($('#penLayer', el), this.stage);
@@ -585,6 +680,7 @@
     },
     close() {
       if (Edit.on) Edit.toggle(false);
+      ArrangePanel.close();
       this.leaveScreen();
       if (this.el) { window.removeEventListener('resize', this.fit); this.el.remove(); }
       this.el = null; this.stage = null; this.open_ = false; this.stack = [];
@@ -653,8 +749,9 @@
     goStep(n) { if (this.def) this.applyStep(Math.max(0, Math.min(n, (this.def.steps || 1) - 1)), n > this.step ? 1 : -1); },
     goScreen(i) { if (!this.pres) return; this.idx = Math.max(0, Math.min(i, this.pres.screens.length - 1)); this.step = 0; this.renderScreen(); },
     jump(key, screenId, opts) {
-      const t = presByKey[key];
-      if (!t) { toast('That presentation is not in the library.'); return; }
+      const t0 = presByKey[key];
+      if (!t0) { toast('That presentation is not in the library.'); return; }
+      const t = Arrange.apply(t0);
       if (!presReady(t)) { toast(`${presName(key)} is still being rebuilt.`); return; }
       this.stack.push({ key: this.pres.key, idx: this.idx, step: this.step });
       let i = screenId ? t.screens.findIndex((s) => s.id === screenId && (!opts || !opts.v || s.v === opts.v)) : 0;
@@ -1038,6 +1135,154 @@
   };
 
   /* ---------- keyboard ---------- */
+  /* ---------- arrange panel: reorder, hide, add and remove screens ---------- */
+  const ArrangePanel = {
+    el: null, pick: null, q: '', open_key: null,
+    toggle(force) { const on = force == null ? !this.el : force; if (on) this.open(); else this.close(); },
+    open() {
+      if (!Player.open_ || !Platform.canEdit) return;
+      if (!this.el) { this.el = document.createElement('aside'); this.el.className = 'arr-panel'; this.el.setAttribute('aria-label', 'Arrange screens'); Player.el.appendChild(this.el); }
+      Player.el.classList.add('arranging'); Player.fit();
+      const b = $('#bArr', Player.el); if (b) b.setAttribute('aria-pressed', 'true');
+      this.render();
+    },
+    close() {
+      if (this.el) { this.el.remove(); this.el = null; }
+      this.pick = null;
+      if (Player.el) { Player.el.classList.remove('arranging'); Player.fit(); const b = $('#bArr', Player.el); if (b) b.setAttribute('aria-pressed', 'false'); }
+    },
+    key() { return Player.pres && Player.pres.key; },
+    label(it) {
+      const d = EFA.screens[it.id];
+      if (it.t && TPL[it.t]) {
+        const main = Wording.get(it.id, TPL[it.t].copy.h != null ? 'h' : 'q', TPL[it.t].copy.h != null ? TPL[it.t].copy.h : TPL[it.t].copy.q);
+        return TPL[it.t].label + ': ' + main.replace(/\n/g, ' ');
+      }
+      const own = presByKey[this.key()] && presByKey[this.key()].screens.some((x) => x.id === it.id);
+      const t = d ? d.title : it.id;
+      if (own) return t.charAt(0).toUpperCase() + t.slice(1);
+      const from = catalog.presentations.find((pp) => pp.screens.some((x) => x.id === it.id));
+      return (t.charAt(0).toUpperCase() + t.slice(1)) + (from ? ' · from ' + presName(from.key) : '');
+    },
+    save(items, focusId) {
+      const key = this.key(); if (!key) return;
+      Player.arrSig = Arrange.rawFor(key, items); // the change event that follows is ours; reapply once, below
+      const ok = Arrange.save(key, items);
+      Player.reapply(focusId);
+      Promise.resolve(ok).then((r) => { if (r === false) toast('This arrangement was kept on this device only.'); });
+    },
+    /** index in the working list of the screen on stage, so new screens land right after it */
+    curIndex(items) {
+      const id = Player.entry() && Player.entry().id;
+      const i = items.findIndex((it) => it.id === id && !it.h);
+      return i < 0 ? items.length - 1 : i;
+    },
+    insert(newItems) {
+      const items = Arrange.items(this.key()); const at = this.curIndex(items) + 1;
+      items.splice(at, 0, ...newItems);
+      this.save(items, newItems[0].id);
+    },
+    render() {
+      const el = this.el, key = this.key(); if (!el || !key) return;
+      const items = Arrange.items(key), curId = Player.entry() && Player.entry().id;
+      const setName = (Wording.sets[Wording.active] || { name: 'Standard' }).name;
+      let n = 0;
+      const rows = items.map((it, i) => {
+        const num = it.h ? '' : String(++n);
+        return `<li class="arr-row${it.h ? ' off' : ''}${it.id === curId && !it.h ? ' cur' : ''}" draggable="true" data-i="${i}">
+          <span class="grip" aria-hidden="true">⋮⋮</span><span class="n"><span class="num">${num}</span></span>
+          <button type="button" class="arr-go" data-go="${i}" ${it.h ? 'disabled' : ''}>${esc(this.label(it))}</button>
+          <span class="arr-tools">
+            <button type="button" class="ic" data-up="${i}" title="Move up" aria-label="Move up" ${i === 0 ? 'disabled' : ''}>↑</button>
+            <button type="button" class="ic" data-down="${i}" title="Move down" aria-label="Move down" ${i === items.length - 1 ? 'disabled' : ''}>↓</button>
+            <button type="button" class="ic" data-hide="${i}" title="${it.h ? 'Show when presenting' : 'Skip when presenting'}" aria-pressed="${!!it.h}">${it.h ? 'Show' : 'Hide'}</button>
+            <button type="button" class="ic del" data-del="${i}" title="Remove from this presentation" aria-label="Remove">×</button>
+          </span></li>`;
+      }).join('');
+      const tpls = Object.keys(TPL).map((t) => `<button type="button" class="arr-chip" data-tpl="${t}">+ ${esc(TPL[t].label)}</button>`).join('');
+      el.innerHTML = `<div class="arr-h"><div><span class="arr-k">Arrange</span><span class="arr-t">${esc(presName(key))}</span></div><button type="button" class="arr-x" aria-label="Close">×</button></div>
+        <p class="arr-note">Drag a screen, or use the arrows, to change the order. Hidden screens stay here but are skipped when you present. Changes save to the <b>${esc(setName)}</b> wording set${Wording.mode === 'db' ? ' and follow you to every device' : ' on this device'}.</p>
+        <ol class="arr-list">${rows}</ol>
+        <div class="arr-add"><span class="arr-k">Add after the screen on stage</span><div class="arr-chips">${tpls}</div>
+          <button type="button" class="arr-chip wide" data-lib>${this.pick ? 'Close the library' : '+ Screens from another presentation'}</button>
+          ${this.pick ? this.pickerHTML() : ''}</div>
+        <div class="arr-foot"><button type="button" class="arr-reset">Reset to the original order</button></div>`;
+      numify(el);
+      this.bind(items);
+    },
+    pickerHTML() {
+      const q = this.q.trim().toLowerCase(), cur = this.key();
+      const list = catalog.presentations.filter((p) => !p.hidden && p.key !== cur && presReady(p) && (!q || (presName(p.key) + ' ' + p.kw).toLowerCase().includes(q)))
+        .sort((a, b) => presName(a.key).localeCompare(presName(b.key))).slice(0, 40);
+      const open = this.open_key && presByKey[this.open_key];
+      const screens = open ? open.screens.map((x, i) => {
+        const d = EFA.screens[x.id];
+        return `<li><span class="n"><span class="num">${i + 1}</span></span><span class="t">${esc(d ? d.title.charAt(0).toUpperCase() + d.title.slice(1) : 'Screen ' + (i + 1))}</span><button type="button" class="arr-chip sm" data-addone="${i}">Add</button></li>`;
+      }).join('') : '';
+      return `<div class="arr-pick">
+        <input type="search" class="arr-q" placeholder="Search presentations" value="${esc(this.q)}" aria-label="Search presentations">
+        ${open ? `<div class="arr-pick-h"><button type="button" class="arr-chip sm" data-pback>‹ All</button><span>${esc(presName(open.key))}</span><button type="button" class="arr-chip sm" data-addall>Add all</button></div><ol class="arr-pick-s">${screens}</ol>`
+          : `<ul class="arr-pick-l">${list.map((p) => `<li><button type="button" data-pick="${esc(p.key)}">${esc(presName(p.key))}<span class="m"><span class="num">${p.screens.length}</span></span></button></li>`).join('') || '<li class="empty">No presentations match.</li>'}</ul>`}
+      </div>`;
+    },
+    bind(items) {
+      const el = this.el, key = this.key();
+      const mv = (from, to) => { if (to < 0 || to >= items.length || from === to) return; const [x] = items.splice(from, 1); items.splice(to, 0, x); this.save(items); };
+      $('.arr-x', el).addEventListener('click', () => this.close());
+      $$('[data-go]', el).forEach((b) => b.addEventListener('click', () => {
+        const it = items[+b.dataset.go]; const i = Player.pres.screens.findIndex((x) => x.id === it.id);
+        if (i >= 0) Player.goScreen(i);
+        this.render();
+      }));
+      $$('[data-up]', el).forEach((b) => b.addEventListener('click', () => mv(+b.dataset.up, +b.dataset.up - 1)));
+      $$('[data-down]', el).forEach((b) => b.addEventListener('click', () => mv(+b.dataset.down, +b.dataset.down + 1)));
+      $$('[data-hide]', el).forEach((b) => b.addEventListener('click', () => {
+        const it = items[+b.dataset.hide];
+        if (!it.h && items.filter((x) => !x.h).length <= 1) { toast('At least one screen has to stay in the presentation.'); return; }
+        if (it.h) delete it.h; else it.h = 1; this.save(items);
+      }));
+      $$('[data-del]', el).forEach((b) => b.addEventListener('click', () => {
+        const i = +b.dataset.del, it = items[i];
+        if (items.filter((x) => !x.h).length <= 1 && !it.h) { toast('At least one screen has to stay in the presentation.'); return; }
+        if (b.dataset.armed !== '1') { b.dataset.armed = '1'; b.textContent = 'Remove?'; b.classList.add('armed'); setTimeout(() => { if (b.isConnected) { b.dataset.armed = ''; b.textContent = '×'; b.classList.remove('armed'); } }, 3500); return; }
+        items.splice(i, 1); this.save(items);
+      }));
+      $$('[data-tpl]', el).forEach((b) => b.addEventListener('click', () => this.insert([{ id: 'cx' + uid(), t: b.dataset.tpl }])));
+      $('[data-lib]', el).addEventListener('click', () => { this.pick = this.pick ? null : 'list'; this.open_key = null; this.render(); const q = $('.arr-q', el); if (q) q.focus(); });
+      const q = $('.arr-q', el);
+      if (q) {
+        q.addEventListener('keydown', (e) => e.stopPropagation());
+        q.addEventListener('input', debounce(() => { this.q = q.value; const pos = q.selectionStart; this.render(); const q2 = $('.arr-q', this.el); if (q2) { q2.focus(); try { q2.setSelectionRange(pos, pos); } catch (err) { /* search inputs */ } } }, 200));
+      }
+      $$('[data-pick]', el).forEach((b) => b.addEventListener('click', async () => {
+        const p = presByKey[b.dataset.pick]; if (!p) return;
+        try { await ensureScreens(p); } catch (e) { console.warn(e); }
+        this.open_key = p.key; this.render();
+      }));
+      const back = $('[data-pback]', el); if (back) back.addEventListener('click', () => { this.open_key = null; this.render(); });
+      const src = this.open_key && presByKey[this.open_key];
+      const addAll = $('[data-addall]', el);
+      if (addAll && src) addAll.addEventListener('click', () => this.insert(src.screens.map((x) => (x.v ? { id: x.id, v: x.v } : { id: x.id }))));
+      $$('[data-addone]', el).forEach((b) => b.addEventListener('click', () => { const x = src.screens[+b.dataset.addone]; this.insert([x.v ? { id: x.id, v: x.v } : { id: x.id }]); }));
+      $('.arr-reset', el).addEventListener('click', (e) => {
+        const b = e.currentTarget;
+        if (b.dataset.armed !== '1') { b.dataset.armed = '1'; b.textContent = 'Click again to reset the order'; setTimeout(() => { if (b.isConnected) { b.dataset.armed = ''; b.textContent = 'Reset to the original order'; } }, 4000); return; }
+        Player.arrSig = '';
+        Wording.put(ARR, key, '', '');
+        Player.reapply();
+      });
+      // drag and drop
+      let from = null;
+      $$('.arr-row', el).forEach((row) => {
+        row.addEventListener('dragstart', (e) => { from = +row.dataset.i; row.classList.add('drag'); try { e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', String(from)); } catch (err) { /* older browsers */ } });
+        row.addEventListener('dragend', () => { row.classList.remove('drag'); $$('.arr-row.over', el).forEach((r) => r.classList.remove('over')); });
+        row.addEventListener('dragover', (e) => { e.preventDefault(); $$('.arr-row.over', el).forEach((r) => r !== row && r.classList.remove('over')); row.classList.add('over'); });
+        row.addEventListener('drop', (e) => { e.preventDefault(); const to = +row.dataset.i; if (from != null) mv(from, to); from = null; });
+      });
+    }
+  };
+  EFA.arrangePanel = ArrangePanel;
+
   function onKey(e) {
     const tgt = e.target;
     if (tgt && (tgt.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(tgt.tagName))) return;
@@ -1053,8 +1298,10 @@
       case 'c': case 'C': Pen.clear(); break;
       case 'n': case 'N': Player.toggleNotes(); break;
       case 'f': case 'F': Player.fullscreen(); break;
+      case 'a': case 'A': if (Platform.canEdit) { e.preventDefault(); ArrangePanel.toggle(); } break;
       case 'Escape':
-        if (Edit.on) Edit.toggle(false);
+        if (ArrangePanel.el) ArrangePanel.close();
+        else if (Edit.on) Edit.toggle(false);
         else if (Player.pen) Player.togglePen(false);
         else if (Player.stack.length) Player.back();
         else Player.close();
@@ -1070,13 +1317,14 @@
     Library.mount(app);
     document.addEventListener('keydown', onKey);
     Wording.on((kind) => {
+      if ((kind === 'copy' || kind === 'active') && Player.open_) Player.reapplyIfChanged();
       if (kind === 'sets' && Edit.on) { Edit.fillSets(); if (Edit.panel) Edit.renderPanel(); }
       if (kind === 'copy' || kind === 'active') { if (Edit.on) refreshCopyRaw(document.body); else refreshCopy(document.body); if (Player.open_) { Player.updateBar(); if (!Edit.on) Player.updateNotes(); } }
     });
     Platform.init().then(() => {
       if (Platform.db) { Wording.attachDb(Platform.db); if (Platform.canEdit) Clients.attachDb(Platform.db); }
       Library.renderHeader();
-      if (Player.el) { const b = $('#bEdit', Player.el); if (b) b.hidden = !Platform.canEdit; }
+      if (Player.el) { const b = $('#bEdit', Player.el); if (b) b.hidden = !Platform.canEdit; const a = $('#bArr', Player.el); if (a) a.hidden = !Platform.canEdit; }
     });
     // deep link: #CT2 or #CT2-5
     const h = (location.hash || '').slice(1);
