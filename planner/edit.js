@@ -108,6 +108,24 @@ export const KINDS = {
     ],
     blank:()=>({id:'g'+Date.now().toString(36), name:'New goal', kind:'other', amount:0}) },
 
+  savings: { list:'savings', title:'Savings', icon:'&#128184;',
+    fields:[
+      {key:'name',label:'What it is',type:'text'},
+      {key:'owner',label:'Owner',type:'select',options:p=>p.household.people.map(x=>[x.id,x.name])},
+      {key:'accountId',label:'Goes into',type:'select',
+        options:p=>(p.household.accounts??[]).map(a=>[a.id,a.name])},
+      {key:'kind',label:'Measured as',type:'select',options:[
+        ['amount','A dollar amount each year'],['percentOfPay','A percent of pay']]},
+      {key:'amount',label:'Amount each year',type:'money',only:r=>r.kind!=='percentOfPay'},
+      {key:'amountPct',label:'Percent of pay',type:'pct',only:r=>r.kind==='percentOfPay'},
+      {key:'employerMatch',label:'Employer match, percent of pay',type:'pct'},
+      {key:'startAge',label:'Starts at age',type:'number'},
+      {key:'endAge',label:'Ends at age, blank to keep going',type:'number'},
+    ],
+    blank:p=>({id:'s'+Date.now().toString(36), name:'New contribution',
+      owner:p.household.people[0]?.id, accountId:p.household.accounts?.[0]?.id,
+      kind:'amount', amount:0}) },
+
   property: { list:'property', title:'Property', icon:'&#127968;',
     fields:[{key:'name',label:'Name',type:'text'},{key:'value',label:'Value',type:'money'}],
     blank:()=>({id:'pr'+Date.now().toString(36), name:'Property', value:0}) },
@@ -142,8 +160,9 @@ export function openDrawer({ kind, id, plan, onSave }) {
   const fields = K.fields.filter(f => !f.only || f.only(rec));
   const body = fields.map(f => {
     const opts = typeof f.options === 'function' ? f.options(plan) : f.options;
-    const v = f.key === 'startAge' ? rec.start?.value
-            : f.key === 'endAge'   ? rec.end?.value
+    const v = f.key === 'startAge'  ? rec.start?.value
+            : f.key === 'endAge'    ? rec.end?.value
+            : f.key === 'amountPct' ? rec.amount
             : rec[f.key];
     return `<label class="dw-f"><span>${esc(f.label)}</span>
       ${FIELD[f.type]({ ...f, options: opts }, v)}</label>`;
@@ -184,6 +203,7 @@ function commit() {
       if (v) rec.start = { type:'age', person: rec.owner ?? ownerFallback(plan), value: Number(v) };
       continue;
     }
+    if (f.key === 'amountPct') { rec.amount = v; continue; }
     if (f.key === 'endAge') {
       if (v) rec.end = { type:'age', person: rec.owner ?? ownerFallback(plan), value: Number(v) };
       else delete rec.end;

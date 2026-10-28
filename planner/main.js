@@ -9,6 +9,7 @@ import { SAMPLE } from './engine/sample-plan.js';
 import * as RC from './engine/rc-base.js';
 import * as EDIT from './edit.js';
 import * as HH from './households.js';
+import * as INTAKE from './intake.js';
 
 const FILES = ['medicare','social-security','federal-tax','rmd','state-tax','care-costs',
                'house-assumptions','capital-market'];
@@ -31,6 +32,8 @@ const money = RC.money, mm = RC.mm;
 // recomputed from it, so an edit anywhere changes everything downstream at once.
 let ROSTER = HH.loadRoster();
 let CURRENT = null;               // the open household record, or null on the roster
+let MODE = 'roster';              // roster | intake | plan
+let STEP = 'family';              // which intake step, when MODE is intake
 let PLAN = EDIT.load(SAMPLE);
 let PROJ, MC, BAND, PAGES;
 
@@ -49,6 +52,7 @@ function openHousehold(id) {
   PLAN = h.plan;
   h.lastOpened = new Date().toISOString();
   HH.setOpenId(id); HH.saveRoster(ROSTER);
+  MODE = 'plan';
   AT = { mod:'dashboard', sub:'Snapshot', view:{} };
   // nav() redraws the module band and the household name and then renders, which onEdited
   // does not: it only redraws the body.
@@ -63,7 +67,19 @@ function openHousehold(id) {
 
 function closeHousehold() {
   CURRENT = null; HH.setOpenId(null);
+  MODE = 'roster';
   measureRoster();
+  nav();
+}
+
+// The wizard writes into the same plan the modules read, so entering it is just a change
+// of view. Nothing is staged and nothing needs committing at the end.
+function openIntake(id, step) {
+  const h = ROSTER.find(x => x.id === id);
+  if (!h) return;
+  CURRENT = h; PLAN = h.plan; HH.setOpenId(id);
+  MODE = 'intake'; STEP = step || 'family';
+  try { recompute(); } catch (e) { /* a half-filled plan is expected here */ }
   nav();
 }
 
@@ -78,6 +94,13 @@ function recompute() {
 
 function onEdited() {
   if (CURRENT) { CURRENT.plan = PLAN; HH.saveRoster(ROSTER); }
+  if (MODE === 'intake') {
+    // A plan part way through intake will not run, and that is not an error worth
+    // showing. The wizard redraws either way.
+    try { recompute(); } catch (e) {}
+    render();
+    return;
+  }
   try { recompute(); }
   catch (e) {
     // An edit can make a plan the engine refuses to run. Say which and leave the drawer's
@@ -116,7 +139,15 @@ function nav() {
     return;
   }
   if (w1) w1.textContent = CURRENT.label;
-  if (w2) w2.textContent = CURRENT.segment || 'Household';
+  if (w2) w2.textContent = MODE === 'intake' ? 'Setting up' : (CURRENT.segment || 'Household');
+  // The wizard replaces the module bands rather than sitting inside one, so that nothing
+  // invites a jump to a page the plan cannot fill in yet.
+  if (MODE === 'intake') {
+    el('mods').innerHTML = '';
+    document.querySelector('.subs').style.display = 'none';
+    render();
+    return;
+  }
   const m = MAP.find(x => x.id === AT.mod);
   el('mods').innerHTML = MAP.map(x =>
     `<button type="button" data-mod="${x.id}" class="${x.id===AT.mod?'on':''}">${x.label}</button>`).join('');
@@ -128,18 +159,23 @@ function nav() {
   render();
 }
 document.body.addEventListener('click', e => {
+  const su = e.target.closest('[data-setup]');
+  if (su) { openIntake(su.dataset.setup); return; }
   const o = e.target.closest('[data-open]');
   if (o) { openHousehold(o.dataset.open); return; }
+  const stp = e.target.closest('[data-step]');
+  if (stp) { STEP = stp.dataset.step; render(); window.scrollTo(0,0); return; }
+  if (e.target.closest('#ikExit')) { closeHousehold(); return; }
+  if (e.target.closest('#ikDone')) { openHousehold(CURRENT.id); window.scrollTo(0,0); return; }
   if (e.target.closest('#whoBtn')) { closeHousehold(); return; }
   if (e.target.closest('#newHH')) {
     const name = prompt('Household name');
     if (!name) return;
     const h = HH.blankHousehold(name.trim());
     ROSTER = ROSTER.concat([h]); HH.saveRoster(ROSTER);
-    openHousehold(h.id);
-    // A new household starts empty, so the useful first screen is the one that fills it in.
-    AT = { mod:'profile', sub:'Family', view:{} };
-    nav();
+    // A new household has nothing in it, so it opens in the wizard rather than on a
+    // dashboard that would have nothing to show.
+    openIntake(h.id, 'family');
     return;
   }
   const m = e.target.closest('[data-mod]');
@@ -183,6 +219,11 @@ function editBar() {
 }
 
 function render() {
+  if (CURRENT && MODE === 'intake') {
+    el('pgHead').innerHTML = '';
+    el('body').innerHTML = INTAKE.render({ plan: PLAN, stepId: STEP, money, label: CURRENT.label });
+    return;
+  }
   if (!CURRENT) {
     el('pgHead').innerHTML = '';
     el('body').innerHTML = HH.render({ roster: ROSTER, measures: MEASURES, money });
@@ -249,7 +290,7 @@ function render() {
 
 (function start() {
   const s = document.createElement('style');
-  s.textContent = EDIT.CSS + HH.CSS;
+  s.textContent = EDIT.CSS + HH.CSS + INTAKE.CSS;
   document.head.appendChild(s);
   EDIT.wire({ getPlan: () => PLAN, onSave: onEdited });
   const was = HH.openId();

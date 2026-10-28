@@ -121,7 +121,7 @@ export function render(ctx) {
   const tile = h => {
     const m = measures[h.id] ?? {};
     const prob = m.ok ? m.probability : null;
-    return `<button type="button" class="hh" data-open="${esc(h.id)}">
+    return `<div class="hh-w"><button type="button" class="hh" data-open="${esc(h.id)}">
       <span class="hh-av">${esc(initials(h.label))}</span>
       <span class="hh-main">
         <b>${esc(h.label)}</b>
@@ -139,7 +139,9 @@ export function render(ctx) {
           : `<b class="pb">--</b><em>${m.ok ? '' : 'will not run'}</em>`}
       </span>
       <span class="hh-go">&#8250;</span>
-    </button>`;
+    </button>
+    <button type="button" class="hh-set" data-setup="${esc(h.id)}" title="Open the setup wizard">Set up</button>
+    </div>`;
   };
 
   return `
@@ -180,6 +182,14 @@ export const CSS = `
 .ro-t em{font-style:normal;font-size:10.5px;color:var(--muted);text-transform:uppercase;
   letter-spacing:.4px}
 .hh-list{display:flex;flex-direction:column}
+.hh-w{position:relative;border-bottom:1px solid var(--line)}
+.hh-w:last-child{border-bottom:0}
+.hh-w .hh{border-bottom:0}
+.hh-set{position:absolute;right:38px;top:50%;transform:translateY(-50%);background:none;
+  border:1px solid var(--line);border-radius:3px;font:inherit;font-size:11px;color:#5f6368;
+  padding:3px 9px;cursor:pointer;opacity:0;transition:opacity .12s}
+.hh-w:hover .hh-set,.hh-set:focus{opacity:1}
+.hh-set:hover{color:var(--blue);border-color:var(--blue)}
 .hh{display:flex;align-items:center;gap:14px;width:100%;text-align:left;background:none;
   border:0;border-bottom:1px solid var(--line);padding:13px 16px;cursor:pointer;font:inherit}
 .hh:last-child{border-bottom:0}
