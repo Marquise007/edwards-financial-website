@@ -4,3 +4,10 @@
   X-Content-Type-Options: nosniff
   Referrer-Policy: strict-origin-when-cross-origin
   Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()
+
+# The planner loads its engine as ES modules by stable filename. Without this a browser
+# can hold an old main.js against a new index.html, or a new module against stale ones,
+# which fails worse than simply showing the old build. no-cache means revalidate on every
+# request, not "never store", so the ETag still saves the transfer when nothing changed.
+/planner/*
+  Cache-Control: no-cache

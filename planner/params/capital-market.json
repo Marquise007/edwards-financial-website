@@ -12,7 +12,25 @@
     "nominal": true,
     "detail": "Exhibit 17, Average Survey Assumptions, page 16 of 20. Returns and standard deviations are the average across 43 investment advisors. The 10-year figures use all 43; the 20-year figures, recorded alongside, use the 29 who provided long-term assumptions, so the two horizons are not a like-for-like panel."
   },
-  "_transcriptionCaveat": "The publisher's host is blocked by this environment's egress policy, so the PDF could not be parsed locally. Exhibit 17 was read twice independently and agreed digit for digit on all 18 return rows and all 153 matrix cells, and a third-party summary matched on spot checks. Confirm against the published exhibit before any client-facing use.",
+  "_verification": {
+    "verifiedOn": "2026-10-27",
+    "against": "https://www.horizonactuarial.com/_files/ugd/f76a4b_a73ade7e6ba748f192d531c974bbea2a.pdf",
+    "method": "Exhibit 17 read from the published PDF and compared cell by cell against this file.",
+    "returnsAndVolatility": "All 17 asset classes agree with the published 10-year geometric return and standard deviation, digit for digit.",
+    "correlations": "All 153 lower-triangle cells agree with the published matrix, including the six negative entries printed in parentheses.",
+    "panel": "43 advisors in the 10-year panel, 29 in the 20-year panel, published August 2026.",
+    "surveyInflation": 0.0244,
+    "surveyInflationNote": "The survey's own inflation assumption is 2.44%. The house general inflation rate is 2.50%, which is a deliberate choice rather than a transcription of this survey. Holding expenses to the higher rate against nominal returns is the conservative direction.",
+    "unsplitClasses": [
+      "usSmallMidCap",
+      "hedgeFunds",
+      "commodities",
+      "infrastructure",
+      "privateEquity",
+      "privateDebt"
+    ],
+    "unsplitClassesNote": "These classes carry no sourced income split, so their whole return is modelled as appreciation. usSmallMidCap is the one that matters in practice: it appears in the sample allocations at 6 to 8 percent, and a small or mid cap index does pay a dividend, so a taxable account holding it is shown paying slightly less tax each year than it would. The others are not used in any current allocation. Sourcing a dividend yield for usSmallMidCap is the open item."
+  },
   "_spotYieldsForCrossCheck": {
     "_note": "Recorded as a sanity check on the survey, NOT as model inputs. Pairing a spot yield with a long-horizon expected return mixes two different measures.",
     "threeMonthTreasuryParYield": {
@@ -50,7 +68,8 @@
       "_sourceClass": "US Equity - Large Cap",
       "_geometric20Year": 0.0702,
       "_dividendSource": "S&P 500 dividend yield, Nareit REITWatch September 2026, data as of 2026-08-31",
-      "_capitalGainSource": "Broad US equity index funds and ETFs distributed no realised capital gain in the December 2025 cycle (Vanguard year-end distribution table, VTSAX / VTI / VFIAX / VOO all 0.00%). Appreciation is therefore the remainder and is taxed only on sale."
+      "_capitalGainSource": "Broad US equity index funds and ETFs distributed no realised capital gain in the December 2025 cycle (Vanguard year-end distribution table, VTSAX / VTI / VFIAX / VOO all 0.00%). Appreciation is therefore the remainder and is taxed only on sale.",
+      "source": "Horizon Actuarial Services, Survey of Capital Market Assumptions, 2026 Edition, Exhibit 17, verified against the published PDF on 2026-10-27."
     },
     "usSmallMidCap": {
       "interest": 0,
@@ -61,7 +80,9 @@
       "_sourceClass": "US Equity - Small/Mid Cap",
       "_geometric20Year": 0.0738,
       "_incomeSplitSource": null,
-      "_warning": "No published income yield was found for this class, so the whole return sits in appreciation. That understates the tax this class throws off. Do not use it in a taxable account projection until the split is sourced."
+      "_warning": "No published income yield was found for this class, so the whole return sits in appreciation. That understates the tax this class throws off. Do not use it in a taxable account projection until the split is sourced.",
+      "source": "Horizon Actuarial Services, Survey of Capital Market Assumptions, 2026 Edition, Exhibit 17, verified against the published PDF on 2026-10-27.",
+      "_incomeSplit": "Not split. The survey publishes a total return only, and no sourced income breakdown has been recorded for this class, so the whole return is treated as appreciation and taxed on sale. In a taxable account this understates the tax due each year."
     },
     "intlDeveloped": {
       "interest": 0,
@@ -72,7 +93,8 @@
       "_sourceClass": "Non-US Equity - Developed",
       "_geometric20Year": 0.0711,
       "_dividendSource": "MSCI EAFE Index factsheet, Dividend Yield, as of 2026-09-30",
-      "_capitalGainSource": "Broad US equity index funds and ETFs distributed no realised capital gain in the December 2025 cycle (Vanguard year-end distribution table, VTSAX / VTI / VFIAX / VOO all 0.00%). Appreciation is therefore the remainder and is taxed only on sale."
+      "_capitalGainSource": "Broad US equity index funds and ETFs distributed no realised capital gain in the December 2025 cycle (Vanguard year-end distribution table, VTSAX / VTI / VFIAX / VOO all 0.00%). Appreciation is therefore the remainder and is taxed only on sale.",
+      "source": "Horizon Actuarial Services, Survey of Capital Market Assumptions, 2026 Edition, Exhibit 17, verified against the published PDF on 2026-10-27."
     },
     "emergingMarkets": {
       "interest": 0,
@@ -83,7 +105,8 @@
       "_sourceClass": "Non-US Equity - Emerging",
       "_geometric20Year": 0.075,
       "_dividendSource": "MSCI Emerging Markets Index factsheet, Dividend Yield, as of 2026-09-30",
-      "_capitalGainSource": "Broad US equity index funds and ETFs distributed no realised capital gain in the December 2025 cycle (Vanguard year-end distribution table, VTSAX / VTI / VFIAX / VOO all 0.00%). Appreciation is therefore the remainder and is taxed only on sale."
+      "_capitalGainSource": "Broad US equity index funds and ETFs distributed no realised capital gain in the December 2025 cycle (Vanguard year-end distribution table, VTSAX / VTI / VFIAX / VOO all 0.00%). Appreciation is therefore the remainder and is taxed only on sale.",
+      "source": "Horizon Actuarial Services, Survey of Capital Market Assumptions, 2026 Edition, Exhibit 17, verified against the published PDF on 2026-10-27."
     },
     "usCoreBond": {
       "interest": 0.049,
@@ -93,7 +116,8 @@
       "volatility": 0.0603,
       "_sourceClass": "US Corporate Bonds - Core",
       "_geometric20Year": 0.051,
-      "_incomeSplit": "All of a bond's long-horizon return is income, so interest carries the whole expected total."
+      "_incomeSplit": "All of a bond's long-horizon return is income, so interest carries the whole expected total.",
+      "source": "Horizon Actuarial Services, Survey of Capital Market Assumptions, 2026 Edition, Exhibit 17, verified against the published PDF on 2026-10-27."
     },
     "usLongBond": {
       "interest": 0.0506,
@@ -103,7 +127,8 @@
       "volatility": 0.1069,
       "_sourceClass": "US Corporate Bonds - Long Duration",
       "_geometric20Year": 0.0535,
-      "_incomeSplit": "All of a bond's long-horizon return is income, so interest carries the whole expected total."
+      "_incomeSplit": "All of a bond's long-horizon return is income, so interest carries the whole expected total.",
+      "source": "Horizon Actuarial Services, Survey of Capital Market Assumptions, 2026 Edition, Exhibit 17, verified against the published PDF on 2026-10-27."
     },
     "highYield": {
       "interest": 0.0575,
@@ -113,7 +138,8 @@
       "volatility": 0.0953,
       "_sourceClass": "US Corporate Bonds - High Yield",
       "_geometric20Year": 0.0624,
-      "_incomeSplit": "All of a bond's long-horizon return is income, so interest carries the whole expected total."
+      "_incomeSplit": "All of a bond's long-horizon return is income, so interest carries the whole expected total.",
+      "source": "Horizon Actuarial Services, Survey of Capital Market Assumptions, 2026 Edition, Exhibit 17, verified against the published PDF on 2026-10-27."
     },
     "intlBond": {
       "interest": 0.0406,
@@ -123,7 +149,8 @@
       "volatility": 0.0736,
       "_sourceClass": "Non-US Debt - Developed",
       "_geometric20Year": 0.0414,
-      "_incomeSplit": "All of a bond's long-horizon return is income, so interest carries the whole expected total."
+      "_incomeSplit": "All of a bond's long-horizon return is income, so interest carries the whole expected total.",
+      "source": "Horizon Actuarial Services, Survey of Capital Market Assumptions, 2026 Edition, Exhibit 17, verified against the published PDF on 2026-10-27."
     },
     "emergingDebt": {
       "interest": 0.0572,
@@ -133,7 +160,8 @@
       "volatility": 0.0996,
       "_sourceClass": "Non-US Debt - Emerging",
       "_geometric20Year": 0.0597,
-      "_incomeSplit": "All of a bond's long-horizon return is income, so interest carries the whole expected total."
+      "_incomeSplit": "All of a bond's long-horizon return is income, so interest carries the whole expected total.",
+      "source": "Horizon Actuarial Services, Survey of Capital Market Assumptions, 2026 Edition, Exhibit 17, verified against the published PDF on 2026-10-27."
     },
     "cash": {
       "interest": 0.0346,
@@ -143,7 +171,8 @@
       "volatility": 0.0156,
       "_sourceClass": "US Treasuries (Cash Equivalents)",
       "_geometric20Year": 0.0354,
-      "_incomeSplit": "All of a bond's long-horizon return is income, so interest carries the whole expected total."
+      "_incomeSplit": "All of a bond's long-horizon return is income, so interest carries the whole expected total.",
+      "source": "Horizon Actuarial Services, Survey of Capital Market Assumptions, 2026 Edition, Exhibit 17, verified against the published PDF on 2026-10-27."
     },
     "tips": {
       "interest": 0.0447,
@@ -153,7 +182,8 @@
       "volatility": 0.0605,
       "_sourceClass": "TIPS (Inflation-Protected)",
       "_geometric20Year": 0.0454,
-      "_incomeSplit": "All of a bond's long-horizon return is income, so interest carries the whole expected total."
+      "_incomeSplit": "All of a bond's long-horizon return is income, so interest carries the whole expected total.",
+      "source": "Horizon Actuarial Services, Survey of Capital Market Assumptions, 2026 Edition, Exhibit 17, verified against the published PDF on 2026-10-27."
     },
     "realEstate": {
       "interest": 0,
@@ -165,7 +195,8 @@
       "_geometric20Year": 0.0663,
       "_dividendSource": "FTSE Nareit All Equity REITs dividend yield, Nareit REIT Industry Financial Snapshot, as of 2026-09-30",
       "_capitalGainSource": "Broad US equity index funds and ETFs distributed no realised capital gain in the December 2025 cycle (Vanguard year-end distribution table, VTSAX / VTI / VFIAX / VOO all 0.00%). Appreciation is therefore the remainder and is taxed only on sale.",
-      "_caveat": "A REIT distribution splits into ordinary income, Section 199A income and return of capital, and that split was not verified. The whole yield is modelled as a dividend, which is an approximation."
+      "_caveat": "A REIT distribution splits into ordinary income, Section 199A income and return of capital, and that split was not verified. The whole yield is modelled as a dividend, which is an approximation.",
+      "source": "Horizon Actuarial Services, Survey of Capital Market Assumptions, 2026 Edition, Exhibit 17, verified against the published PDF on 2026-10-27."
     },
     "hedgeFunds": {
       "interest": 0,
@@ -176,7 +207,9 @@
       "_sourceClass": "Hedge Funds",
       "_geometric20Year": 0.0634,
       "_incomeSplitSource": null,
-      "_warning": "No published income yield was found for this class, so the whole return sits in appreciation. That understates the tax this class throws off. Do not use it in a taxable account projection until the split is sourced."
+      "_warning": "No published income yield was found for this class, so the whole return sits in appreciation. That understates the tax this class throws off. Do not use it in a taxable account projection until the split is sourced.",
+      "source": "Horizon Actuarial Services, Survey of Capital Market Assumptions, 2026 Edition, Exhibit 17, verified against the published PDF on 2026-10-27.",
+      "_incomeSplit": "Not split. The survey publishes a total return only, and no sourced income breakdown has been recorded for this class, so the whole return is treated as appreciation and taxed on sale. In a taxable account this understates the tax due each year."
     },
     "commodities": {
       "interest": 0,
@@ -187,7 +220,9 @@
       "_sourceClass": "Commodities",
       "_geometric20Year": 0.0491,
       "_incomeSplitSource": null,
-      "_warning": "No published income yield was found for this class, so the whole return sits in appreciation. That understates the tax this class throws off. Do not use it in a taxable account projection until the split is sourced."
+      "_warning": "No published income yield was found for this class, so the whole return sits in appreciation. That understates the tax this class throws off. Do not use it in a taxable account projection until the split is sourced.",
+      "source": "Horizon Actuarial Services, Survey of Capital Market Assumptions, 2026 Edition, Exhibit 17, verified against the published PDF on 2026-10-27.",
+      "_incomeSplit": "Not split. The survey publishes a total return only, and no sourced income breakdown has been recorded for this class, so the whole return is treated as appreciation and taxed on sale. In a taxable account this understates the tax due each year."
     },
     "infrastructure": {
       "interest": 0,
@@ -198,7 +233,9 @@
       "_sourceClass": "Infrastructure",
       "_geometric20Year": 0.0716,
       "_incomeSplitSource": null,
-      "_warning": "No published income yield was found for this class, so the whole return sits in appreciation. That understates the tax this class throws off. Do not use it in a taxable account projection until the split is sourced."
+      "_warning": "No published income yield was found for this class, so the whole return sits in appreciation. That understates the tax this class throws off. Do not use it in a taxable account projection until the split is sourced.",
+      "source": "Horizon Actuarial Services, Survey of Capital Market Assumptions, 2026 Edition, Exhibit 17, verified against the published PDF on 2026-10-27.",
+      "_incomeSplit": "Not split. The survey publishes a total return only, and no sourced income breakdown has been recorded for this class, so the whole return is treated as appreciation and taxed on sale. In a taxable account this understates the tax due each year."
     },
     "privateEquity": {
       "interest": 0,
@@ -209,7 +246,9 @@
       "_sourceClass": "Private Equity",
       "_geometric20Year": 0.0971,
       "_incomeSplitSource": null,
-      "_warning": "No published income yield was found for this class, so the whole return sits in appreciation. That understates the tax this class throws off. Do not use it in a taxable account projection until the split is sourced."
+      "_warning": "No published income yield was found for this class, so the whole return sits in appreciation. That understates the tax this class throws off. Do not use it in a taxable account projection until the split is sourced.",
+      "source": "Horizon Actuarial Services, Survey of Capital Market Assumptions, 2026 Edition, Exhibit 17, verified against the published PDF on 2026-10-27.",
+      "_incomeSplit": "Not split. The survey publishes a total return only, and no sourced income breakdown has been recorded for this class, so the whole return is treated as appreciation and taxed on sale. In a taxable account this understates the tax due each year."
     },
     "privateDebt": {
       "interest": 0,
@@ -220,7 +259,9 @@
       "_sourceClass": "Private Debt",
       "_geometric20Year": 0.078,
       "_incomeSplitSource": null,
-      "_warning": "No published income yield was found for this class, so the whole return sits in appreciation. That understates the tax this class throws off. Do not use it in a taxable account projection until the split is sourced."
+      "_warning": "No published income yield was found for this class, so the whole return sits in appreciation. That understates the tax this class throws off. Do not use it in a taxable account projection until the split is sourced.",
+      "source": "Horizon Actuarial Services, Survey of Capital Market Assumptions, 2026 Edition, Exhibit 17, verified against the published PDF on 2026-10-27.",
+      "_incomeSplit": "Not split. The survey publishes a total return only, and no sourced income breakdown has been recorded for this class, so the whole return is treated as appreciation and taxed on sale. In a taxable account this understates the tax due each year."
     }
   },
   "correlation": {
