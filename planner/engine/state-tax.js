@@ -7,7 +7,7 @@
 //
 // Every state table lives in params/state-tax.json with its own citation.
 
-import { bracketTax, marginalRate } from './tax.js';
+import { bracketTax, marginalRate } from './tax.js?v=29308b88c5';
 
 // A state definition looks like:
 // {

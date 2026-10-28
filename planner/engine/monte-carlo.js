@@ -7,7 +7,7 @@
 // Returns are drawn lognormally, so a year can lose a great deal and still not lose more
 // than everything, which a normal draw will happily do.
 
-import { project } from './ledger.js';
+import { project } from './ledger.js?v=29308b88c5';
 
 // Seeded so a client sees the same number twice. A plan whose probability moves when you
 // refresh the page is not a plan.

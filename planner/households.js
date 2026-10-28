@@ -4,8 +4,8 @@
 // dashboard about nobody, so the first question the screen answers is which client this is.
 // Picking one loads that plan and every module becomes a view of it.
 
-import { CASES, planOf } from './engine/cases.js';
-import * as RC from './engine/rc-base.js';
+import { CASES, planOf } from './engine/cases.js?v=29308b88c5';
+import * as RC from './engine/rc-base.js?v=29308b88c5';
 
 const KEY = 'efa.planner.roster.v1';
 const OPEN = 'efa.planner.openId.v1';

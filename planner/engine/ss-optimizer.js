@@ -8,9 +8,9 @@
 // The named strategies exist because a client asks "what about just taking it at 62" and
 // deserves the number, not a lecture.
 
-import { claimFactor, fraMonths } from './social-security.js';
-import { project } from './ledger.js';
-import { apply as applyLevers } from './levers.js';
+import { claimFactor, fraMonths } from './social-security.js?v=29308b88c5';
+import { project } from './ledger.js?v=29308b88c5';
+import { apply as applyLevers } from './levers.js?v=29308b88c5';
 
 export const NAMED = {
   asEarlyAsPossible: p => p.earliestClaimAgeMonths,

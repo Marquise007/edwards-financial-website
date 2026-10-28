@@ -5,9 +5,9 @@
   Referrer-Policy: strict-origin-when-cross-origin
   Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()
 
-# The planner loads its engine as ES modules by stable filename. Without this a browser
-# can hold an old main.js against a new index.html, or a new module against stale ones,
-# which fails worse than simply showing the old build. no-cache means revalidate on every
-# request, not "never store", so the ETag still saves the transfer when nothing changed.
+# This takes effect on the planner's HTML and not on its .js, which Cloudflare serves at
+# max-age=14400 regardless. The HTML revalidating is what matters: it carries versioned
+# module URLs (see stamp-build.py in the engine repo), so a new deploy hands the browser
+# new import URLs and it cannot pair a new page with modules it already had.
 /planner/*
   Cache-Control: no-cache
