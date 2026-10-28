@@ -5,8 +5,8 @@
 // survives a decade of bad markets but not your spouse living to 100." That sentence is
 // what changes a decision.
 
-import { run as monteCarlo } from './monte-carlo.js?v=29308b88c5';
-import { project } from './ledger.js?v=29308b88c5';
+import { run as monteCarlo } from './monte-carlo.js?v=19c30bf6d8';
+import { project } from './ledger.js?v=19c30bf6d8';
 
 export const STRESSES = {
   baseline: {

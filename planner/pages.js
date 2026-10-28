@@ -3,17 +3,17 @@
 // its inner tabs, and a render function per view. Nothing here invents a chart for data
 // the plan does not have: where a page has nothing behind it, it says so in the words the
 // reference uses.
-import * as RC from './engine/rc-base.js?v=29308b88c5';
-import { project } from './engine/ledger.js?v=29308b88c5';
-import { run as monteCarlo, confidenceBands } from './engine/monte-carlo.js?v=29308b88c5';
-import { runAll as stressAll } from './engine/stress.js?v=29308b88c5';
-import { waterfall, incomeStack, effectiveTaxSeries } from './engine/views.js?v=29308b88c5';
-import { namedStrategies } from './engine/ss-optimizer.js?v=29308b88c5';
-import { estateFlow, terminalFromProjection, CHECKLIST, exclusionFor } from './engine/estate.js?v=29308b88c5';
-import { annualCost } from './engine/medicare.js?v=29308b88c5';
-import { calibrationSeries } from './engine/roth.js?v=29308b88c5';
-import { survivorSolve } from './engine/life-insurance.js?v=29308b88c5';
-import { describePortfolio, glidepath, equityShare } from './engine/portfolios.js?v=29308b88c5';
+import * as RC from './engine/rc-base.js?v=19c30bf6d8';
+import { project } from './engine/ledger.js?v=19c30bf6d8';
+import { run as monteCarlo, confidenceBands } from './engine/monte-carlo.js?v=19c30bf6d8';
+import { runAll as stressAll } from './engine/stress.js?v=19c30bf6d8';
+import { waterfall, incomeStack, effectiveTaxSeries } from './engine/views.js?v=19c30bf6d8';
+import { namedStrategies } from './engine/ss-optimizer.js?v=19c30bf6d8';
+import { estateFlow, terminalFromProjection, CHECKLIST, exclusionFor } from './engine/estate.js?v=19c30bf6d8';
+import { annualCost } from './engine/medicare.js?v=19c30bf6d8';
+import { calibrationSeries } from './engine/roth.js?v=19c30bf6d8';
+import { survivorSolve } from './engine/life-insurance.js?v=19c30bf6d8';
+import { describePortfolio, glidepath, equityShare } from './engine/portfolios.js?v=19c30bf6d8';
 
 const $ = (s, o) => String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;'), _ = $;
 

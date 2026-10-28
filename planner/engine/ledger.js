@@ -3,14 +3,14 @@
 // Every dollar that moves is written down, because the cash flow waterfall, the income
 // stack, the tax chart and the net worth line are all just views of this record.
 
-import { isActive, triggerYear } from './triggers.js?v=29308b88c5';
-import { inflate } from './inflation.js?v=29308b88c5';
-import { blendReturn, growAccount, withdraw, rmd, taxClassOf } from './accounts.js?v=29308b88c5';
-import { federalTax } from './tax.js?v=29308b88c5';
-import { stateTax as computeStateTax } from './state-tax.js?v=29308b88c5';
-import { annualCost as medicareCost } from './medicare.js?v=29308b88c5';
-import { STRATEGIES as SPENDING } from './spending.js?v=29308b88c5';
-import { claimFactor, fraMonths, earningsTestWithholding } from './social-security.js?v=29308b88c5';
+import { isActive, triggerYear } from './triggers.js?v=19c30bf6d8';
+import { inflate } from './inflation.js?v=19c30bf6d8';
+import { blendReturn, growAccount, withdraw, rmd, taxClassOf } from './accounts.js?v=19c30bf6d8';
+import { federalTax } from './tax.js?v=19c30bf6d8';
+import { stateTax as computeStateTax } from './state-tax.js?v=19c30bf6d8';
+import { annualCost as medicareCost } from './medicare.js?v=19c30bf6d8';
+import { STRATEGIES as SPENDING } from './spending.js?v=19c30bf6d8';
+import { claimFactor, fraMonths, earningsTestWithholding } from './social-security.js?v=19c30bf6d8';
 
 // project(plan, params)                      one set of assumptions for the whole run
 // project(plan, params, paramsForYearIndex)   a different set each year, which is how a

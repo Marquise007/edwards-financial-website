@@ -5,7 +5,7 @@
 // does this portfolio expect to earn, how much does it move, and how does that change as a
 // household moves toward and through retirement.
 
-import { blendReturn } from './accounts.js?v=29308b88c5';
+import { blendReturn } from './accounts.js?v=19c30bf6d8';
 
 // The expected return of a blend IS the weighted average of the parts. Volatility is NOT,
 // and treating it as though it were is one of the most common errors in this work. Mixing

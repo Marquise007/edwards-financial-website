@@ -3,8 +3,8 @@
 // actually looks at. If a view needs a number the ledger did not record, the fix is in
 // the ledger, never here.
 
-import { project } from './ledger.js?v=29308b88c5';
-import { SCENARIOS, scenarioParams } from './scenarios.js?v=29308b88c5';
+import { project } from './ledger.js?v=19c30bf6d8';
+import { SCENARIOS, scenarioParams } from './scenarios.js?v=19c30bf6d8';
 
 // The cash flow waterfall for one year: inflows, then everything that leaves, then what
 // is left. Same shape a client reads on a bank statement, which is the point.

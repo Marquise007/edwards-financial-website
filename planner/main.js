@@ -1,15 +1,20 @@
 // The base build. Same engine, laid out to match the reference so every later change is
 // one we chose rather than a difference nobody can account for.
-import { project } from './engine/ledger.js?v=29308b88c5';
-import { run as monteCarlo, confidenceBands } from './engine/monte-carlo.js?v=29308b88c5';
-import { apply as applyLevers } from './engine/levers.js?v=29308b88c5';
-import { assemble } from './engine/load-params.js?v=29308b88c5';
-import { PLACEHOLDER } from './engine/placeholder-params.js?v=29308b88c5';
-import { SAMPLE } from './engine/sample-plan.js?v=29308b88c5';
-import * as RC from './engine/rc-base.js?v=29308b88c5';
-import * as EDIT from './edit.js?v=29308b88c5';
-import * as HH from './households.js?v=29308b88c5';
-import * as INTAKE from './intake.js?v=29308b88c5';
+import { project } from './engine/ledger.js?v=19c30bf6d8';
+import { run as monteCarlo, confidenceBands } from './engine/monte-carlo.js?v=19c30bf6d8';
+import { apply as applyLevers } from './engine/levers.js?v=19c30bf6d8';
+import { assemble } from './engine/load-params.js?v=19c30bf6d8';
+import { PLACEHOLDER } from './engine/placeholder-params.js?v=19c30bf6d8';
+import { SAMPLE } from './engine/sample-plan.js?v=19c30bf6d8';
+import * as RC from './engine/rc-base.js?v=19c30bf6d8';
+import * as EDIT from './edit.js?v=19c30bf6d8';
+import * as HH from './households.js?v=19c30bf6d8';
+import * as INTAKE from './intake.js?v=19c30bf6d8';
+import { requirePartner } from './gate.js?v=19c30bf6d8';
+
+// Nothing below runs until the viewer is a signed in partner. On a failed check this
+// never resolves, so no parameter is fetched and no plan is read.
+await requirePartner();
 
 const FILES = ['medicare','social-security','federal-tax','rmd','state-tax','care-costs',
                'house-assumptions','capital-market'];
@@ -114,7 +119,7 @@ function onEdited() {
 
 
 /* ---------------------------------------------------------------- navigation */
-import { build } from './pages.js?v=29308b88c5';
+import { build } from './pages.js?v=19c30bf6d8';
 
 const MAP = [
   { id:'dashboard',  label:'Dashboard',  subs:['Snapshot','Balance Sheet','Liquidity','Budget','Tasks'] },

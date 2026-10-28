@@ -3,8 +3,8 @@
 // bracket ceilings, and shade the room left in the bracket. Then show the same line with
 // a conversion filling that room. Everything else is bookkeeping.
 
-import { bracketTax, roomInBracket, marginalRate } from './tax.js?v=29308b88c5';
-import { irmaaCliff, LOOKBACK_YEARS } from './medicare.js?v=29308b88c5';
+import { bracketTax, roomInBracket, marginalRate } from './tax.js?v=19c30bf6d8';
+import { irmaaCliff, LOOKBACK_YEARS } from './medicare.js?v=19c30bf6d8';
 
 // How much can be converted this year before crossing out of `throughRate`.
 export function conversionRoom(taxableIncome, filingStatus, throughRate, params) {

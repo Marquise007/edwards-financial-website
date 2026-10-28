@@ -9,5 +9,11 @@
 # max-age=14400 regardless. The HTML revalidating is what matters: it carries versioned
 # module URLs (see stamp-build.py in the engine repo), so a new deploy hands the browser
 # new import URLs and it cannot pair a new page with modules it already had.
+#
+# X-Robots-Tag covers what the meta tag cannot: the module files and any direct asset
+# request, neither of which a crawler reads as HTML. robots.txt is deliberately NOT used
+# to disallow /planner/, because a disallowed URL is never fetched and so the noindex is
+# never seen, and the URL can still surface with limited information.
 /planner/*
   Cache-Control: no-cache
+  X-Robots-Tag: noindex, nofollow
