@@ -9,7 +9,7 @@ import { run as monteCarlo, confidenceBands } from './engine/monte-carlo.js';
 import { runAll as stressAll } from './engine/stress.js';
 import { waterfall, incomeStack, effectiveTaxSeries } from './engine/views.js';
 import { namedStrategies } from './engine/ss-optimizer.js';
-import { estateFlow, terminalFromProjection, CHECKLIST } from './engine/estate.js';
+import { estateFlow, terminalFromProjection, CHECKLIST, exclusionFor } from './engine/estate.js';
 import { annualCost } from './engine/medicare.js';
 import { calibrationSeries } from './engine/roth.js';
 import { survivorSolve } from './engine/life-insurance.js';
@@ -583,10 +583,10 @@ export function build(ctx) {
     render() {
       const items = (CHECKLIST ?? ['Will','Power of Attorney','Living Will','Health Care Proxy',
         'Beneficiary Designations','Living Trust']).map(x => typeof x === 'string' ? x : (x.label ?? x.name));
-      return `<table class="rc-chklist"><thead><tr><th></th>${names.map(n=>`<th>${n}</th>`).join('')}</tr></thead>
+      return `<div class="tblwrap"><table class="rc-chklist"><thead><tr><th></th>${names.map(n=>`<th>${n}</th>`).join('')}</tr></thead>
         <tbody>${items.map(it=>`<tr class="grp"><td colspan="${names.length+1}">${it}</td></tr>
           <tr><td class="l">${/Beneficiary/.test(it)?'Created and reviewed':'Document created'}</td>
-            ${names.map(()=>'<td><input type="checkbox"></td>').join('')}</tr>`).join('')}</tbody></table>`;
+            ${names.map(()=>'<td><input type="checkbox"></td>').join('')}</tr>`).join('')}</tbody></table></div>`;
     }
   };
 
@@ -594,7 +594,7 @@ export function build(ctx) {
     title:'Beneficiaries', action:'ACTION ITEMS',
     intro:'Life changes. It is important to review your beneficiaries periodically to ensure your money will go where you intended.',
     render() {
-      let html = `<table class="rc-tbl bene"><thead><tr><th class="l"></th><th>Account Balance</th>
+      let html = `<div class="tblwrap"><table class="rc-tbl bene"><thead><tr><th class="l"></th><th>Account Balance</th>
         <th>Death Benefit</th><th>Primary Beneficiary</th><th>Contingent Beneficiary</th></tr></thead><tbody>`;
       html += `<tr class="band"><td colspan="5">Invested Assets</td></tr>`;
       for (const p of people) {
@@ -606,7 +606,7 @@ export function build(ctx) {
       }
       html += `<tr class="band"><td colspan="5">Life Insurance</td></tr>
         <tr><td class="l ind" colspan="5" style="color:#9aa0a6">No life insurance policy is recorded.</td></tr>`;
-      return html + '</tbody></table>';
+      return html + '</tbody></table></div>';
     }
   };
 
@@ -616,8 +616,12 @@ export function build(ctx) {
     planPick:()=>['Proposed plan','Current plan'],
     intro:'Effective use of living trust strategies can reduce taxes and expenses so that more of your assets are passed on to heirs or charity.',
     render(v) {
-      let flow = null;
-      try { flow = estateFlow(terminalFromProjection(PROJ, PLAN), PARAMS); } catch(e) {}
+      let flow = null, excl = null, term = null;
+      try {
+        excl = exclusionFor(PLAN.household, PARAMS);
+        term = terminalFromProjection(PROJ, PLAN.household, PLAN.estateExtras ?? {});
+        flow = estateFlow(term, PARAMS, { portedExclusion: excl.ported });
+      } catch(e) {}
       if (!flow) return RC.empty('The estate flow could not be computed for this plan.');
       const last = years[years.length-1];
       const box = (name, val, cls) => `<div class="ebox ${cls}"><p>${name}</p><b>${money(val)}</b></div>`;
@@ -625,19 +629,21 @@ export function build(ctx) {
         <div class="eband"><span>Estate</span></div><div class="eband"><span>Out of Estate</span></div>
         <div class="ecols">
           <div class="ecol">${people.map(p=>box(p.name+"'s net worth", last.netWorth/people.length,'grey')).join('')}
-            ${box('Life Insurance',0,'grey')}</div>
+            ${box('Life Insurance', flow.outOfEstate ?? 0,'grey')}</div>
           <div class="ecol">${people.map(p=>box(p.name+"'s estate", last.netWorth/people.length,'grey')).join('')}
-            ${box('Taxes and fees', flow.taxesAndFees ?? 0,'dark')}${box('Settlement fees',0,'orange')}</div>
-          <div class="ecol">${box('Estate to heirs', flow.toHeirs ?? last.netWorth,'blue')}</div>
+            ${box('Taxes and fees', flow.totalTaxAndFees ?? 0,'dark')}${box('Settlement fees',0,'orange')}</div>
+          <div class="ecol">${box('Estate to heirs',
+              Math.max(0, (flow.toHeirs ?? last.netWorth) - (flow.outOfEstate ?? 0)),'blue')}</div>
         </div>
         <div class="ecols out">
-          <div class="ecol">${box("Heirs' assets",0,'blue')}${box('Trust to heirs',0,'blue')}
-            ${box('Gift to heirs',0,'blue')}${box('Other insurance',0,'blue')}</div>
-          <div class="ecol">${box('Gift to charity',0,'green')}${box('Trust to charity',0,'green')}
-            ${box('DAF to charity',0,'green')}</div>
+          <div class="ecol">${box("Heirs' assets",0,'blue')}${box('Trust to heirs', term.trustAssets ?? 0,'blue')}
+            ${box('Gift to heirs',0,'blue')}${box('Other insurance', term.lifeInsuranceOutOfEstate ?? 0,'blue')}</div>
+          <div class="ecol">${box('Gift to charity', term.charitableBequests ?? 0,'green')}${box('Trust to charity',0,'green')}
+            ${box('DAF to charity', term.daf ?? 0,'green')}</div>
         </div>
         <div class="etotals">${box('Total to heirs', flow.toHeirs ?? last.netWorth,'blue wide')}
-          ${box('Total to charity',0,'green wide')}</div>
+          ${box('Total to charity', flow.toCharity ?? 0,'green wide')}</div>
+        <p class="e-assume">Federal exclusion applied: ${money(excl.amount)}. ${excl.note}</p>
       </div>`;
     }
   };

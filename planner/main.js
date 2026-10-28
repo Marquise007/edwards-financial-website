@@ -8,6 +8,7 @@ import { PLACEHOLDER } from './engine/placeholder-params.js';
 import { SAMPLE } from './engine/sample-plan.js';
 import * as RC from './engine/rc-base.js';
 import * as EDIT from './edit.js';
+import * as HH from './households.js';
 
 const FILES = ['medicare','social-security','federal-tax','rmd','state-tax','care-costs',
                'house-assumptions','capital-market'];
@@ -28,8 +29,43 @@ const money = RC.money, mm = RC.mm;
 
 // The plan is editable and lives in this browser only. Every figure on every page is
 // recomputed from it, so an edit anywhere changes everything downstream at once.
+let ROSTER = HH.loadRoster();
+let CURRENT = null;               // the open household record, or null on the roster
 let PLAN = EDIT.load(SAMPLE);
 let PROJ, MC, BAND, PAGES;
+
+// The roster's tiles are measured by the engine, so an edited household shows what it is
+// now rather than what it was when it was saved.
+let MEASURES = {};
+function measureRoster() {
+  MEASURES = {};
+  for (const h of ROSTER) MEASURES[h.id] = HH.measure(h, { project, monteCarlo, params: PARAMS });
+}
+
+function openHousehold(id) {
+  const h = ROSTER.find(x => x.id === id);
+  if (!h) return;
+  CURRENT = h;
+  PLAN = h.plan;
+  h.lastOpened = new Date().toISOString();
+  HH.setOpenId(id); HH.saveRoster(ROSTER);
+  AT = { mod:'dashboard', sub:'Snapshot', view:{} };
+  // nav() redraws the module band and the household name and then renders, which onEdited
+  // does not: it only redraws the body.
+  try { recompute(); }
+  catch (e) {
+    el('body').innerHTML = `<section class="card">${RC.empty(
+      'This household is in a state the engine will not run.', e.message)}</section>`;
+    return;
+  }
+  nav();
+}
+
+function closeHousehold() {
+  CURRENT = null; HH.setOpenId(null);
+  measureRoster();
+  nav();
+}
 
 function recompute() {
   PROJ = project(PLAN, PARAMS);
@@ -41,6 +77,7 @@ function recompute() {
 }
 
 function onEdited() {
+  if (CURRENT) { CURRENT.plan = PLAN; HH.saveRoster(ROSTER); }
   try { recompute(); }
   catch (e) {
     // An edit can make a plan the engine refuses to run. Say which and leave the drawer's
@@ -69,6 +106,17 @@ const MAP = [
 let AT = { mod:'dashboard', sub:'Snapshot', view:{} };
 
 function nav() {
+  const w1 = el('who1'), w2 = el('who2');
+  if (!CURRENT) {
+    el('mods').innerHTML = '';
+    document.querySelector('.subs').style.display = 'none';
+    if (w1) w1.textContent = 'Households';
+    if (w2) w2.textContent = ROSTER.length + ' on file';
+    render();
+    return;
+  }
+  if (w1) w1.textContent = CURRENT.label;
+  if (w2) w2.textContent = CURRENT.segment || 'Household';
   const m = MAP.find(x => x.id === AT.mod);
   el('mods').innerHTML = MAP.map(x =>
     `<button type="button" data-mod="${x.id}" class="${x.id===AT.mod?'on':''}">${x.label}</button>`).join('');
@@ -80,6 +128,20 @@ function nav() {
   render();
 }
 document.body.addEventListener('click', e => {
+  const o = e.target.closest('[data-open]');
+  if (o) { openHousehold(o.dataset.open); return; }
+  if (e.target.closest('#whoBtn')) { closeHousehold(); return; }
+  if (e.target.closest('#newHH')) {
+    const name = prompt('Household name');
+    if (!name) return;
+    const h = HH.blankHousehold(name.trim());
+    ROSTER = ROSTER.concat([h]); HH.saveRoster(ROSTER);
+    openHousehold(h.id);
+    // A new household starts empty, so the useful first screen is the one that fills it in.
+    AT = { mod:'profile', sub:'Family', view:{} };
+    nav();
+    return;
+  }
   const m = e.target.closest('[data-mod]');
   if (m) { AT.mod = m.dataset.mod; AT.sub = MAP.find(x=>x.id===AT.mod).subs[0] ?? ''; nav(); return; }
   const s = e.target.closest('[data-sub]');
@@ -121,6 +183,11 @@ function editBar() {
 }
 
 function render() {
+  if (!CURRENT) {
+    el('pgHead').innerHTML = '';
+    el('body').innerHTML = HH.render({ roster: ROSTER, measures: MEASURES, money });
+    return;
+  }
   const key = AT.mod + '/' + AT.sub;
   const page = PAGES[key];
   const head = el('pgHead'), body = el('body');
@@ -181,9 +248,12 @@ function render() {
 
 
 (function start() {
-  const s = document.createElement('style'); s.textContent = EDIT.CSS;
+  const s = document.createElement('style');
+  s.textContent = EDIT.CSS + HH.CSS;
   document.head.appendChild(s);
   EDIT.wire({ getPlan: () => PLAN, onSave: onEdited });
-  recompute();
+  const was = HH.openId();
+  if (was && ROSTER.some(h => h.id === was)) { openHousehold(was); return; }
+  measureRoster();
   nav();
 })();

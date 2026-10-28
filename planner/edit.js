@@ -40,6 +40,10 @@ const FIELD = {
 // ---- the record kinds, and what each one can edit -------------------------
 // Each entry says where the record lives in the plan, what its fields are, and what a new
 // one starts as. Adding a kind here is the only thing needed to make it editable.
+// A goal is not owned by one person, but an age trigger has to be an age of somebody.
+// The first participant is who the plan ages against.
+function ownerFallback(plan) { return plan?.household?.people?.[0]?.id; }
+
 export const KINDS = {
   person: { list:'people', title:'Participant', icon:'&#128100;',
     fields:[
@@ -57,8 +61,11 @@ export const KINDS = {
       {key:'owner',label:'Owner',type:'select',options:p=>p.household.people.map(x=>[x.id,x.name])},
       {key:'type',label:'Type',type:'select',options:[
         ['taxable','Taxable brokerage'],['bank','Bank'],['traditionalIRA','Traditional IRA'],
-        ['traditional401k','401(k)'],['rothIRA','Roth IRA'],['roth401k','Roth 401(k)'],
-        ['hsa','HSA'],['sep','SEP'],['simple','SIMPLE']]},
+        ['traditional401k','401(k)'],['four03b','403(b)'],['four57b','457(b)'],
+        ['rothIRA','Roth IRA'],['roth401k','Roth 401(k)'],
+        ['hsa','HSA'],['sep','SEP'],['simple','SIMPLE'],['fiveTwoNine','529'],
+        ['annuityQualified','Annuity, qualified'],
+        ['annuityNonQualified','Annuity, non-qualified']]},
       {key:'balance',label:'Balance',type:'money'},
       {key:'basis',label:'Cost basis',type:'money'},
     ],
@@ -94,9 +101,10 @@ export const KINDS = {
       {key:'name',label:'Goal name',type:'text'},
       {key:'kind',label:'Kind',type:'select',options:[
         ['property','Property'],['vacation','Vacation'],['wedding','Wedding'],
-        ['gift','Gift'],['legacy','Legacy'],['other','Other']]},
+        ['gift','Gift'],['other','Other']]},
       {key:'amount',label:'Amount',type:'money'},
       {key:'startAge',label:'Starts at age',type:'number'},
+      {key:'endAge',label:'Ends at age, blank to repeat',type:'number'},
     ],
     blank:()=>({id:'g'+Date.now().toString(36), name:'New goal', kind:'other', amount:0}) },
 
@@ -134,7 +142,9 @@ export function openDrawer({ kind, id, plan, onSave }) {
   const fields = K.fields.filter(f => !f.only || f.only(rec));
   const body = fields.map(f => {
     const opts = typeof f.options === 'function' ? f.options(plan) : f.options;
-    const v = f.key === 'startAge' ? rec.start?.value : rec[f.key];
+    const v = f.key === 'startAge' ? rec.start?.value
+            : f.key === 'endAge'   ? rec.end?.value
+            : rec[f.key];
     return `<label class="dw-f"><span>${esc(f.label)}</span>
       ${FIELD[f.type]({ ...f, options: opts }, v)}</label>`;
   }).join('');
@@ -171,7 +181,12 @@ function commit() {
     if (f.type === 'money' || f.type === 'number' || f.type === 'year') v = Number(v) || 0;
     if (f.type === 'pct') v = (Number(v) || 0) / 100;
     if (f.key === 'startAge') {
-      if (v) rec.start = { type:'age', person: rec.owner, value: Number(v) };
+      if (v) rec.start = { type:'age', person: rec.owner ?? ownerFallback(plan), value: Number(v) };
+      continue;
+    }
+    if (f.key === 'endAge') {
+      if (v) rec.end = { type:'age', person: rec.owner ?? ownerFallback(plan), value: Number(v) };
+      else delete rec.end;
       continue;
     }
     rec[f.key] = v;

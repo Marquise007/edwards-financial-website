@@ -69,6 +69,25 @@ export function estateFlow(terminal, params, options = {}) {
   };
 }
 
+// The federal exclusion is per person. A surviving spouse may also use whatever the first
+// spouse to die did not, but only if the first estate elected to port it on a timely filed
+// Form 706. That election is a real step somebody has to take, so it is modelled as a
+// visible assumption rather than applied silently.
+export function exclusionFor(household, params, options = {}) {
+  const basic = params.federal?.estate?.basicExclusionAmount ?? 0;
+  const married = (household?.people?.length ?? 0) > 1
+    || household?.filingStatus === 'marriedFilingJointly';
+  const assumePortability = options.assumePortability ?? true;
+  if (married && assumePortability) {
+    return { amount: basic * 2, perPerson: basic, ported: basic, married: true,
+      note: 'Assumes the first estate elects portability of the unused exclusion on a timely filed Form 706.' };
+  }
+  return { amount: basic, perPerson: basic, ported: 0, married,
+    note: married
+      ? 'Assumes no portability election, so only one exclusion is available.'
+      : 'One exclusion, no spousal portability available.' };
+}
+
 // Current versus proposed, side by side, with the difference named.
 export function compareEstate(currentTerminal, proposedTerminal, params, options) {
   const current = estateFlow(currentTerminal, params, options);

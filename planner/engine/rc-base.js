@@ -236,13 +236,15 @@ export function stackedArea({ series, labels, width = 560, height = 230, colors,
 
 // --- 8. a plain data table ---------------------------------------------------
 export function table({ columns, rows, striped = true }) {
-  return `<table class="rc-tbl${striped ? ' striped' : ''}">
+  // The wrapper is what scrolls. A wide table then slides sideways inside the card
+  // instead of widening the page.
+  return `<div class="tblwrap"><table class="rc-tbl${striped ? ' striped' : ''}">
     <thead><tr>${columns.map(c =>
       `<th class="${c.align ?? 'r'}">${esc(c.label)}</th>`).join('')}</tr></thead>
     <tbody>${rows.map(r => `<tr>${columns.map(c => {
       const v = r[c.key];
       return `<td class="${c.align ?? 'r'}">${c.format ? c.format(v, r) : esc(v ?? '')}</td>`;
-    }).join('')}</tr>`).join('')}</tbody></table>`;
+    }).join('')}</tr>`).join('')}</tbody></table></div>`;
 }
 
 // --- 9. the record card ------------------------------------------------------

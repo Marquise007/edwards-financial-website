@@ -32,7 +32,10 @@ body{background:var(--page);color:var(--ink);
 .brand{display:flex;align-items:center;gap:5px;padding:5px 0;flex:0 0 auto}
 .brand b{font-size:16px;font-weight:700;letter-spacing:-.2px;color:#2b2b2b}
 .brand svg{color:var(--blue)}
-.who{display:flex;flex-direction:column;justify-content:center;margin-left:14px;flex:0 0 auto}
+.who{display:flex;flex-direction:column;justify-content:center;margin-left:14px;flex:0 0 auto;
+  background:none;border:0;font:inherit;text-align:left;cursor:pointer;padding:4px 6px;border-radius:3px}
+.who:hover{background:#f5f5f5}
+.who #who1{font-weight:600;color:#202124}
 .who span{font-size:10.5px;color:#6b6b6b;line-height:1.3}
 .mods{display:flex;align-items:stretch;margin-left:26px;flex:1 1 auto}
 .mods button{background:none;border:0;font:inherit;font-size:12.5px;color:#5f6368;
@@ -42,6 +45,8 @@ body{background:var(--page);color:var(--ink);
 .icons{display:flex;align-items:center;gap:12px;margin-left:8px;color:#5f6368;flex:0 0 auto}
 .icons span{cursor:pointer;line-height:1}
 .icons .dots{letter-spacing:1px;font-size:15px}
+
+.e-assume{font-size:11px;color:var(--muted);margin:14px 16px 2px;line-height:1.5}
 
 /* ---------- sub nav ---------- */
 .subs{background:var(--band);border-bottom:1px solid var(--line)}
@@ -325,6 +330,81 @@ body{background:var(--page);color:var(--ink);
   .subs-in{padding-left:14px}
   .mods{overflow-x:auto;margin-left:12px}
 }
+
+/* ---------- narrower than a laptop ---------- */
+@media (max-width:980px){
+  /* Every two and three column arrangement becomes one column. The content order is
+     already the reading order, so nothing needs reflowing beyond the collapse. */
+  .pair,.halves,.prefs,.legend.cols,.bp-cols{grid-template-columns:1fr}
+  .withcall{grid-template-columns:1fr}
+  .allocwrap,.taxwrap,.pcwrap{grid-template-columns:1fr;justify-items:stretch}
+  .sank{grid-template-columns:1fr;gap:10px}
+  .bp-cols{gap:18px}
+  /* The estate flow put its out-of-estate column beside the first by pulling it up a
+     hundred pixels. Stacked, that overlaps the column above it. */
+  .ecols.out{width:100%;margin-left:0;margin-top:8px}
+}
+
+/* ---------- phone ---------- */
+@media (max-width:640px){
+  body{font-size:13.5px}
+  .page{padding:14px 14px 36px}
+  .brand b{font-size:15px}
+  .brand{padding-left:10px}
+  .who{margin-left:10px;max-width:46vw}
+  .who span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+  /* The brand, the household name and the icons already fill the width, so the module
+     band gets a row of its own rather than being squeezed under them. */
+  .nav-in{flex-wrap:wrap;padding:0}
+  .icons{gap:9px;margin-left:auto;padding-right:10px}
+  .mods{flex:1 1 100%;order:5;margin-left:0;padding:0 10px;
+    border-top:1px solid var(--line);overflow-x:auto;
+    -webkit-overflow-scrolling:touch;scrollbar-width:none}
+  .mods button{padding:8px 11px;border-radius:0}
+  .mods::-webkit-scrollbar,.subs-in::-webkit-scrollbar{display:none}
+  .subs-in{overflow-x:auto;scrollbar-width:none;padding:0 10px}
+
+  /* A chart with a width attribute will not shrink on its own. */
+  svg{max-width:100%;height:auto}
+
+  /* A table is the one thing that should scroll sideways rather than be squeezed. */
+  .tblwrap{overflow-x:auto;-webkit-overflow-scrolling:touch;max-width:100%}
+  .tblwrap .rc-tbl{min-width:max-content}
+
+  /* The blueprint legend is pinned to the top left of the card and the net worth pill is
+     centred. On a narrow card they land on each other, so the legend returns to the flow. */
+  .bp-leg{position:static;flex-direction:row;flex-wrap:wrap;gap:4px 12px;margin:0 0 10px}
+  .bp-nw{display:block}
+
+  /* Any row of filters or buttons wraps rather than running off the side. */
+  .card-top,.hold-top,.editbar,.ro-tiles,.tabs,.foot,.cd-act{flex-wrap:wrap}
+  .card-top{gap:6px 10px}
+  .hold-top{gap:4px 8px}
+  .hold-top .pick{margin:0}
+  .tblwrap .rc-chklist,.tblwrap .bene{min-width:max-content}
+  .card-top .pick,.card-top .pick select{max-width:100%}
+  .cardbtns{flex-wrap:wrap}
+
+  .ecols,.etotals{grid-template-columns:1fr}
+  .ecols.out{grid-template-columns:1fr}
+  .nwlist,.accs{width:100%}
+  .recs{grid-template-columns:1fr}
+  .cardrow{grid-template-columns:1fr}
+  #drawer{width:100%;max-width:100%}
+
+  /* The whole row is the target on a phone, so the chevron earns nothing and the
+     avatar reads better beside the name than floating against a three line block. */
+  .hh{flex-wrap:wrap;gap:6px 12px;padding:13px 14px;align-items:flex-start}
+  .hh-av{order:0;margin-top:1px}
+  .hh-main{order:1;flex:1 1 0;min-width:0}
+  .hh-go{display:none}
+  .hh-fig{order:2;flex:0 0 auto;width:auto;text-align:left;min-width:96px;margin-top:2px}
+  .ro-head{flex-direction:column;gap:10px}
+  .ro-head .btn{align-self:flex-start}
+  .ro-t{flex:1 1 92px;min-width:92px;padding:9px 11px}
+  .editbar{flex-wrap:wrap;gap:6px}
+}
 </style>
 </head>
 <body>
@@ -337,10 +417,10 @@ body{background:var(--page);color:var(--ink);
     </svg>
     <b id="brandName">Edwards Financial</b>
   </div>
-  <div class="who"><span id="who1">Sample household</span><span id="who2">Partner Access</span></div>
+  <button type="button" class="who" id="whoBtn" title="Switch household"><span id="who1">Households</span><span id="who2">No household open</span></button>
   <nav class="mods" id="mods"></nav>
-  <a class="backlink" href="/portal-partner-dashboard.html">&lsaquo; Partner Access</a>
   <div class="icons"><span class="dots">&#8943;</span><span>&#128193;</span><span>&#9881;</span></div>
+  <a class="backlink" href="/portal-partner-dashboard.html">&lsaquo; Partner Access</a>
 </div></header>
 <div class="subs"><div class="subs-in" id="subs"></div></div>
 
