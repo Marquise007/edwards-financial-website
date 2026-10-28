@@ -1,0 +1,24 @@
+{
+  "_note": "House assumptions. These are Edwards Financial's own choices, not facts, and every client-facing output that uses them has to say so. They are not sourced because there is nothing to source: they are a position.",
+  "_setBy": "pending Joshua's sign-off",
+  "inflation": {
+    "general": 0.025,
+    "health": 0.05,
+    "education": 0.05,
+    "socialSecurity": 0.025,
+    "tax": 0.025
+  },
+  "settings": {
+    "portfolioTurnover": 0.10,
+    "qualifiedDividendShare": 0.85,
+    "longTermGainShare": 0.90,
+    "advisoryFee": 0.0,
+    "realEstatePurchaseCost": 0.001,
+    "realEstateSaleCost": 0.06,
+    "survivorExpenseAdjustment": 0.15
+  },
+  "monteCarlo": {
+    "runs": 1000,
+    "compounding": "geometric"
+  }
+}

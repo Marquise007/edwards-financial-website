@@ -1,0 +1,443 @@
+{
+  "_about": "Social Security rules and parameters. Every value was read in an SSA page fetched on 2026-10-27 and carries its own citation. The percentages are statutory and permanent; the dollar amounts are published each October and must be refreshed then.",
+  "effectiveYear": 2026,
+  "capturedOn": "2026-10-27",
+  "earliestClaimAgeMonths": 744,
+  "delayedCreditStopsAgeMonths": 840,
+  "fullRetirementAge": [
+    {
+      "birthYearThrough": 1937,
+      "months": 780
+    },
+    {
+      "birthYearThrough": 1938,
+      "months": 782
+    },
+    {
+      "birthYearThrough": 1939,
+      "months": 784
+    },
+    {
+      "birthYearThrough": 1940,
+      "months": 786
+    },
+    {
+      "birthYearThrough": 1941,
+      "months": 788
+    },
+    {
+      "birthYearThrough": 1942,
+      "months": 790
+    },
+    {
+      "birthYearThrough": 1954,
+      "months": 792
+    },
+    {
+      "birthYearThrough": 1955,
+      "months": 794
+    },
+    {
+      "birthYearThrough": 1956,
+      "months": 796
+    },
+    {
+      "birthYearThrough": 1957,
+      "months": 798
+    },
+    {
+      "birthYearThrough": 1958,
+      "months": 800
+    },
+    {
+      "birthYearThrough": 1959,
+      "months": 802
+    },
+    {
+      "birthYearThrough": 9999,
+      "months": 804
+    }
+  ],
+  "_januaryFirstRule": "A person born on January 1 of any year uses the full retirement age for the previous year.",
+  "_fullRetirementAgeSource": {
+    "url": "https://www.ssa.gov/oact/progdata/nra.html",
+    "title": "Normal Retirement Age (NRA), SSA Office of the Chief Actuary",
+    "corroborating": "https://www.ssa.gov/benefits/retirement/planner/agereduction.html"
+  },
+  "earlyReduction": {
+    "firstMonthsCount": 36,
+    "firstMonthsRate": 0.005555555555555556,
+    "firstMonthsRateExact": "5/9 of 1 percent per month",
+    "laterMonthsRate": 0.004166666666666667,
+    "laterMonthsRateExact": "5/12 of 1 percent per month",
+    "reductionAtSixtyTwoWithFRA67": 0.3,
+    "_published": {
+      "1954": 0.25,
+      "1955": 0.2583,
+      "1956": 0.2667,
+      "1957": 0.275,
+      "1958": 0.2833,
+      "1959": 0.2917,
+      "1960andLater": 0.3
+    },
+    "source": {
+      "url": "https://www.ssa.gov/oact/quickcalc/earlyretire.html",
+      "title": "Benefit Reduction for Early Retirement, SSA Office of the Chief Actuary",
+      "corroborating": "https://www.ssa.gov/oact/quickcalc/early_late.html"
+    }
+  },
+  "delayedRetirementCredit": [
+    {
+      "birthYearThrough": 1924,
+      "annualRate": 0.03
+    },
+    {
+      "birthYearThrough": 1926,
+      "annualRate": 0.035
+    },
+    {
+      "birthYearThrough": 1928,
+      "annualRate": 0.04
+    },
+    {
+      "birthYearThrough": 1930,
+      "annualRate": 0.045
+    },
+    {
+      "birthYearThrough": 1932,
+      "annualRate": 0.05
+    },
+    {
+      "birthYearThrough": 1934,
+      "annualRate": 0.055
+    },
+    {
+      "birthYearThrough": 1936,
+      "annualRate": 0.06
+    },
+    {
+      "birthYearThrough": 1938,
+      "annualRate": 0.065
+    },
+    {
+      "birthYearThrough": 1940,
+      "annualRate": 0.07
+    },
+    {
+      "birthYearThrough": 1942,
+      "annualRate": 0.075
+    },
+    {
+      "birthYearThrough": 9999,
+      "annualRate": 0.08
+    }
+  ],
+  "_delayedCredit": {
+    "monthlyRateForBirth1943AndLater": "2/3 of 1 percent per month",
+    "maximumAtSeventyWithFRA67": 1.24,
+    "stopsAccruing": "No credit is given after age 69; the increase stops at age 70.",
+    "timing": "Credits earned in the year benefits begin are not applied until the January after benefits start.",
+    "januaryFirstRule": "A person born on January 1 uses the credit percentage for the previous year.",
+    "appliesTo": "the worker's own old-age benefit only",
+    "source": {
+      "url": "https://www.ssa.gov/benefits/retirement/planner/1960-delay.html",
+      "title": "Delayed Retirement, Born in 1960, SSA",
+      "corroborating": [
+        "https://www.ssa.gov/oact/quickcalc/early_late.html",
+        "https://www.ssa.gov/benefits/retirement/planner/delayret.html",
+        "https://secure.ssa.gov/POMS.NSF/lnx/0300615693"
+      ],
+      "statute": "https://www.ssa.gov/OP_Home/ssact/title02/0202.htm (Social Security Act section 202(w))"
+    }
+  },
+  "pia": {
+    "factors": [
+      0.9,
+      0.32,
+      0.15
+    ],
+    "_factorsNote": "Fixed by law. Only the dollar bend points move.",
+    "bendPointsByEligibilityYear": {
+      "2024": [
+        1174,
+        7078
+      ],
+      "2025": [
+        1226,
+        7391
+      ],
+      "2026": [
+        1286,
+        7749
+      ],
+      "2027": [
+        1340,
+        8077
+      ]
+    },
+    "eligibilityYear": "the year the worker reaches age 62, becomes disabled before 62, or dies before reaching 62",
+    "rounding": "down to the next lower multiple of $0.10",
+    "indexing": {
+      "baseYear": 1979,
+      "baseBendPoints": [
+        180,
+        1085
+      ],
+      "method": "Each base bend point is scaled by the ratio of the national average wage index two years before the eligibility year to the 1977 index of 9,779.44.",
+      "awi2025": 72800.33,
+      "awi2024": 69846.57,
+      "awi1977": 9779.44
+    },
+    "aime": {
+      "yearsUsed": 35,
+      "rule": "Up to 35 years of earnings are used, choosing the years with the highest indexed earnings. The indexed amounts are summed, divided by the months in those years, and rounded down to the next lower dollar.",
+      "indexingYear": "the second year before the year of eligibility; earnings in or after that year count at face value"
+    },
+    "source": {
+      "url": "https://www.ssa.gov/oact/cola/piaformula.html",
+      "title": "Primary Insurance Amount, SSA Office of the Chief Actuary",
+      "corroborating": [
+        "https://www.ssa.gov/oact/cola/bendpoints.html",
+        "https://www.ssa.gov/oact/COLA/Benefits.html",
+        "https://www.ssa.gov/oact/progdata/retirebenefit2.html"
+      ]
+    }
+  },
+  "cola": {
+    "latest": {
+      "rate": 0.036,
+      "appliesToYear": 2027,
+      "announced": "2026-10-14",
+      "benefitsPayableFrom": "January 2027",
+      "ssiPaymentsFrom": "2026-12-31"
+    },
+    "source": {
+      "url": "https://www.ssa.gov/news/en/press/releases/2026-10-14.html",
+      "title": "Social Security Announces 3.6 Percent Benefit Increase for 2027",
+      "corroborating": "https://www.ssa.gov/cola/"
+    }
+  },
+  "earningsTest": {
+    "byYear": {
+      "2023": {
+        "underFRAExempt": 21240,
+        "yearOfFRAExempt": 56520
+      },
+      "2024": {
+        "underFRAExempt": 22320,
+        "yearOfFRAExempt": 59520
+      },
+      "2025": {
+        "underFRAExempt": 23400,
+        "yearOfFRAExempt": 62160
+      },
+      "2026": {
+        "underFRAExempt": 24480,
+        "yearOfFRAExempt": 65160
+      },
+      "2027": {
+        "underFRAExempt": 25560,
+        "yearOfFRAExempt": 67920
+      }
+    },
+    "underFRAExempt": 24480,
+    "yearOfFRAExempt": 65160,
+    "underFRAWithholdRatio": 0.5,
+    "yearOfFRAWithholdRatio": 0.3333333333333333,
+    "_rules": "One dollar withheld for every two above the lower amount while below full retirement age all year. In the year of reaching full retirement age, one dollar for every three above the higher amount, counting only earnings in the months before the month of full retirement age. No limit once full retirement age or older for the whole year. Withheld amounts are restored through a recomputation at full retirement age.",
+    "source": {
+      "url": "https://www.ssa.gov/oact/cola/rtea.html",
+      "title": "Exempt Amounts Under the Earnings Test, SSA Office of the Chief Actuary",
+      "corroborating": "https://www.ssa.gov/cola/"
+    }
+  },
+  "spousal": {
+    "shareOfWorkerPIA": 0.5,
+    "earlyReduction": {
+      "firstMonthsCount": 36,
+      "firstMonthsRate": 0.006944444444444444,
+      "firstMonthsRateExact": "25/36 of 1 percent per month",
+      "laterMonthsRate": 0.004166666666666667,
+      "laterMonthsRateExact": "5/12 of 1 percent per month"
+    },
+    "reductionAtSixtyTwoWithFRA67": 0.35,
+    "shareOfPIAAtSixtyTwoWithFRA67": 0.325,
+    "earliestClaimAgeMonths": 744,
+    "delayedCreditsApply": false,
+    "_delayedCreditsNote": "Delayed retirement credits increase the worker's own benefit only. POMS RS 00615.695: the increase does not affect other family benefits, and the auxiliary rate is figured from the primary insurance amount before the credits.",
+    "childInCareExemption": "A spouse caring for a qualifying child of the worker may claim at any age and the benefit is not reduced for age.",
+    "source": {
+      "url": "https://www.ssa.gov/oact/quickcalc/spouse.html",
+      "title": "Benefits for Spouses, SSA Office of the Chief Actuary",
+      "corroborating": [
+        "https://www.ssa.gov/oact/quickcalc/earlyretire.html",
+        "https://secure.ssa.gov/poms.nsf/lnx/0300615201",
+        "https://secure.ssa.gov/poms.nsf/lnx/0300615695"
+      ],
+      "statute": "Social Security Act sections 202(b)(2) and 202(c)(2)"
+    }
+  },
+  "survivor": {
+    "maximumShareOfDeceasedBenefit": 1.0,
+    "minimumShareAtEarliest": 0.715,
+    "maximumReduction": 0.285,
+    "earliestAgeMonths": 720,
+    "earliestAgeWithDisabilityMonths": 600,
+    "floorShareOfPIA": 0,
+    "delayedCreditsApply": true,
+    "_delayedCreditsNote": "Credits the deceased worker earned do flow to the survivor. POMS RS 00615.702 and RS 00615.320: apply the credits as though the worker had remained alive. Section 202(e)(2)(C) carries subsection (w) increases to widow's benefits; there is no parallel reference for spouses.",
+    "ribLimCap": "Where the worker had already claimed a reduced retirement or disability benefit before death, the survivor benefit is limited to the larger of 82.5 percent of the worker's death primary insurance amount, or the reduced benefit the worker would have received if alive.",
+    "waypoints": {
+      "_about": "What SSA publishes as the share a survivor receives at each age.",
+      "60": 0.715,
+      "61": 0.75,
+      "63": 0.8,
+      "65": 0.9,
+      "fullRetirementAge": 1.0,
+      "source": {
+        "url": "https://www.ssa.gov/survivor/amount",
+        "title": "What you could get from Survivor benefits, SSA"
+      }
+    },
+    "fullRetirementAgeChart": [
+      {
+        "birthThrough": "1940-01-01",
+        "fraMonths": 780,
+        "reductionFraction": "19/40"
+      },
+      {
+        "birthThrough": "1941-01-01",
+        "fraMonths": 782,
+        "reductionFraction": "57/124"
+      },
+      {
+        "birthThrough": "1942-01-01",
+        "fraMonths": 784,
+        "reductionFraction": "57/128"
+      },
+      {
+        "birthThrough": "1943-01-01",
+        "fraMonths": 786,
+        "reductionFraction": "19/44"
+      },
+      {
+        "birthThrough": "1944-01-01",
+        "fraMonths": 788,
+        "reductionFraction": "57/136"
+      },
+      {
+        "birthThrough": "1945-01-01",
+        "fraMonths": 790,
+        "reductionFraction": "57/140"
+      },
+      {
+        "birthThrough": "1957-01-01",
+        "fraMonths": 792,
+        "reductionFraction": "19/48"
+      },
+      {
+        "birthThrough": "1958-01-01",
+        "fraMonths": 794,
+        "reductionFraction": "57/148"
+      },
+      {
+        "birthThrough": "1959-01-01",
+        "fraMonths": 796,
+        "reductionFraction": "57/152"
+      },
+      {
+        "birthThrough": "1960-01-01",
+        "fraMonths": 798,
+        "reductionFraction": "19/52"
+      },
+      {
+        "birthThrough": "1961-01-01",
+        "fraMonths": 800,
+        "reductionFraction": "57/160"
+      },
+      {
+        "birthThrough": "1962-01-01",
+        "fraMonths": 802,
+        "reductionFraction": "57/164"
+      },
+      {
+        "birthThrough": "9999-12-31",
+        "fraMonths": 804,
+        "reductionFraction": "19/56"
+      }
+    ],
+    "childInCareException": "A surviving spouse caring for the deceased person's child may qualify regardless of age.",
+    "source": {
+      "url": "https://www.ssa.gov/survivor/amount",
+      "title": "What you could get from Survivor benefits, SSA",
+      "corroborating": [
+        "https://www.ssa.gov/survivor/eligibility",
+        "https://secure.ssa.gov/poms.nsf/lnx/0300615301",
+        "https://secure.ssa.gov/poms.nsf/lnx/0300615702"
+      ],
+      "statute": "Social Security Act sections 202(e)(2)(A), 202(e)(2)(C), 202(f)(2)(A)"
+    }
+  },
+  "contributionAndBenefitBase": {
+    "2025": 176100,
+    "2026": 184500,
+    "2027": 192300,
+    "source": {
+      "url": "https://www.ssa.gov/oact/cola/cbb.html",
+      "title": "Contribution and Benefit Base, SSA Office of the Chief Actuary"
+    }
+  },
+  "maximumBenefitAtFullRetirementAge": {
+    "_basis": "A worker with steady earnings at the maximum taxable level since age 22, retiring in January of the year shown at exactly age 67.",
+    "2025": {
+      "aime": 11017,
+      "monthlyAtSixtySeven": 4043
+    },
+    "2026": {
+      "aime": 11463,
+      "monthlyAtSixtySeven": 4207,
+      "monthlyAtSeventy": 5181,
+      "monthlyAtSixtyTwo": 2969
+    },
+    "2027": {
+      "aime": 11848,
+      "monthlyAtSixtySeven": 4188,
+      "monthlyAtSeventy": 5358,
+      "monthlyAtSixtyTwo": 3094
+    },
+    "source": {
+      "url": "https://www.ssa.gov/oact/cola/examplemax.html",
+      "title": "Workers with Maximum-Taxable Earnings, SSA Office of the Chief Actuary",
+      "certified": "2026-10-16"
+    }
+  },
+  "windfallEliminationProvision": {
+    "status": "repealed",
+    "governmentPensionOffset": "repealed",
+    "law": "Public Law 118-273, H.R. 82, 118th Congress, the Social Security Fairness Act of 2023",
+    "approved": "2025-01-05",
+    "effective": "Applies to monthly insurance benefits payable for months after December 2023. December 2023 is the last month either provision applies.",
+    "mechanics": "Section 2(a) strikes paragraph (5) of Social Security Act section 202(k), repealing the Government Pension Offset. Section 3(a) strikes paragraph (7) of section 215(a) and paragraph (9) of section 215(f), repealing the Windfall Elimination Provision.",
+    "backPayments": "People already receiving reduced benefits may receive back payments starting with January 2024. The Act did not change retroactivity rules for new applications.",
+    "_warning": "The SSA planner page for government employees still carries legacy Windfall Elimination Provision and Government Pension Offset language and only links to the update. That is the page a public-pension client is most likely to find on their own, so expect the question.",
+    "source": {
+      "url": "https://www.govinfo.gov/content/pkg/PLAW-118publ273/html/PLAW-118publ273.htm",
+      "title": "Public Law 118-273, U.S. Government Publishing Office",
+      "agencyStatement": "https://www.ssa.gov/benefits/retirement/social-security-fairness-act.html",
+      "legacyPage": "https://www.ssa.gov/benefits/retirement/planner/gpo-wep.html"
+    }
+  },
+  "_openItems": [
+    "Reduction-month counts for birth years 1938 through 1942 are not printed on the SSA pages fetched.",
+    "Per-row reduction-month counts in the survivor chart are arithmetic from full retirement age minus 60, not published values.",
+    "The 2026 cost-of-living adjustment percentage was not fetched and is not recorded here.",
+    "The SSA cost-of-living fact sheet PDFs for 2026 and 2027 returned errors; all figures came from the actuary's HTML pages instead.",
+    "Quarter of coverage amount, FICA rates and SSI federal benefit rates were not gathered."
+  ],
+  "source": {
+    "url": "https://www.ssa.gov/oact/progdata/nra.html",
+    "title": "Normal Retirement Age, SSA Office of the Chief Actuary, with the per-rule sources recorded on each block below",
+    "corroborating": "https://www.ssa.gov/benefits/retirement/planner/agereduction.html",
+    "year": 2026
+  }
+}

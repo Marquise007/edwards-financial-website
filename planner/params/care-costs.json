@@ -1,0 +1,57 @@
+{
+  "_about": "Long-term care and retiree health cost benchmarks. National medians from a named survey, plus two published lifetime estimates that are models rather than rules. Anything built on these says so on the face of the output.",
+  "effectiveYear": 2025,
+  "capturedOn": "2026-10-27",
+
+  "longTermCare": {
+    "source": {
+      "url": "https://assets.carescout.com/x/8fcb50422f/282102.pdf",
+      "title": "Cost of Care Survey 2025",
+      "publisher": "CareScout Holdings, Inc., a Genworth Financial subsidiary",
+      "releaseUrl": "https://investor.genworth.com/news-events/press-releases/detail/1054",
+      "releaseTitle": "CareScout Releases 2025 Cost of Care Survey Results",
+      "released": "2026-03-02",
+      "dataYear": 2025,
+      "collected": "July through November 2025, at the Metropolitan Statistical Area level",
+      "statistic": "national median, not mean"
+    },
+    "nonMedicalCaregiver": { "hourly": 35, "daily": 220, "monthly": 6673, "annual": 80080, "yearOverYear": 0.03,
+      "_note": "CareScout merged homemaker services and home health aide into one category for 2025 because the two rates converged. There is no standalone home health aide median in this survey year. The annual equivalent assumes 44 hours a week." },
+    "adultDayHealthCare": { "daily": 95, "monthly": 2058, "annual": 24700, "yearOverYear": -0.05,
+      "_note": "The annual equivalent assumes five days a week." },
+    "assistedLivingCommunity": { "daily": 204, "monthly": 6200, "annual": 74400, "yearOverYear": 0.05 },
+    "nursingHomeSemiPrivate": { "daily": 315, "monthly": 9581, "annual": 114975, "yearOverYear": 0.02 },
+    "nursingHomePrivate": { "daily": 355, "monthly": 10798, "annual": 129575, "yearOverYear": 0.01 }
+  },
+
+  "retireeHealthEstimates": {
+    "_warning": "Private published projections, not government rules. Label them as estimates wherever they appear, and never blend the two: Fidelity models Original Medicare plus Part D with no Medigap, EBRI models Medigap Plan G plus Part B plus Part D.",
+    "fidelity": {
+      "lifetimeEstimate": 185500,
+      "basis": "a single person, age 65, retiring in 2026, net of taxes",
+      "yearOverYear": 0.075,
+      "composition": { "partBAndPartDPremiums": 0.45, "otherMedicalExpenses": 0.48, "outOfPocketPrescriptionDrugs": 0.07 },
+      "excludes": ["long-term care", "most dental services", "over-the-counter medications"],
+      "source": { "url": "https://alumni.fidelity.com/news/11553433",
+        "title": "Fidelity Investments Shares 25th Annual Retiree Health Care Cost Estimate",
+        "publisher": "Fidelity Investments", "released": "2026-07-21", "year": 2026 }
+    },
+    "ebri": {
+      "basis": "savings needed at age 65 in 2025, assuming the average Medigap Plan G premium; excludes long-term care and anything else Medicare does not cover",
+      "medianDrugSpending": { "fiftyPercentChance": { "man": 120000, "woman": 146000, "couple": 267000 },
+                              "ninetyPercentChance": { "man": 212000, "woman": 252000, "couple": 405000 } },
+      "maximumDrugSpending": { "fiftyPercentChance": { "man": 142000, "woman": 172000, "couple": 313000 },
+                               "ninetyPercentChance": { "man": 245000, "woman": 288000, "couple": 469000 } },
+      "source": { "url": "https://www.ebri.org/health/publications/fast-facts/content/full/projected-savings-medicare-beneficiaries-need-for-health-expenses-in-retirement-up-again-in-2025",
+        "title": "Projected Savings Medicare Beneficiaries Need for Health Expenses in Retirement up Again in 2025",
+        "citation": "EBRI Issue Brief No. 653, Jake Spiegel and Paul Fronstin",
+        "publisher": "Employee Benefit Research Institute", "released": "2026-03-05", "dataYear": 2025 }
+    }
+  },
+
+  "_openItems": [
+    "2027 Medicare Part A and Part B premiums and deductibles were not announced as of 2026-10-27. CMS publishes these in November, so this file needs a refresh hook then.",
+    "2027 Part D deductible and out-of-pocket threshold not published as of 2026-10-27.",
+    "No standalone home health aide median exists in the 2025 survey. Any engine coded against the older Genworth category structure breaks on this."
+  ]
+}

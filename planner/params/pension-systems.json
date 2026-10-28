@@ -1,0 +1,755 @@
+{
+  "_about": "California public pension systems. Every factor was read in a published CalSTRS or CalPERS document on 2026-10-27. One blocking gap is recorded under CalSTRS survivorOptions: the option factor tables are not published, so this engine does not compute a Modified Benefit.",
+  "capturedOn": "2026-10-27",
+  "CalSTRS": {
+    "name": "CalSTRS Defined Benefit Program",
+    "formula": "Service Credit x Age Factor x Final Compensation = Retirement Benefit",
+    "participatesInSocialSecurity": false,
+    "_socialSecurity": "Members do not pay into Social Security for CalSTRS-covered work and earn no benefit from that position. The Windfall Elimination Provision and Government Pension Offset were eliminated by H.R. 82, signed January 5, 2025, for benefits payable after December 2023. A CalSTRS retirement benefit is not affected by that legislation either way.",
+    "source": {
+      "formula": {
+        "url": "https://calstrs.com/retirement-benefits",
+        "title": "Retirement benefits, CalSTRS"
+      },
+      "ageFactors": {
+        "url": "https://www.calstrs.com/files/27c793b44/theagefactor.pdf",
+        "title": "The Benefit of a Lifetime: The age factor, publication RR 1994, revised 4/21",
+        "_currency": "Endpoints were re-confirmed against the live age factor page and against publication COM 1667 revised 10/25, and all four match. The intermediate month rows were read only in the 2021 publication."
+      },
+      "tiers": {
+        "url": "https://calstrs.com/two-benefit-structures",
+        "title": "Two benefit structures, CalSTRS"
+      },
+      "finalCompensation": {
+        "url": "https://calstrs.com/final-compensation",
+        "title": "Final compensation, CalSTRS"
+      },
+      "enhancements": {
+        "url": "https://calstrs.com/benefit-enhancements",
+        "title": "Benefit enhancements, CalSTRS"
+      },
+      "adjustment": {
+        "url": "https://calstrs.com/inflation-protection",
+        "title": "Inflation protection, CalSTRS"
+      },
+      "options": {
+        "url": "https://calstrs.com/electing-an-option",
+        "title": "Electing an option, CalSTRS"
+      },
+      "contributions": {
+        "url": "https://www.calstrs.com/files/97665cb5f/DB-Valuation-2025.pdf",
+        "title": "Milliman Actuarial Valuation, CalSTRS Defined Benefit Program, valuation date June 30, 2025, issued April 28, 2026"
+      },
+      "socialSecurity": {
+        "url": "https://calstrs.com/social-security",
+        "title": "Social Security, CalSTRS"
+      }
+    },
+    "ageFactorMeasuredOn": "the last day of the month the retirement is effective, not the birthday and not the retirement date",
+    "serviceCreditCapPerYear": 1.0,
+    "tiers": [
+      {
+        "key": "2at60",
+        "label": "CalSTRS 2% at 60",
+        "membership": "hired to perform creditable activities on or before December 31, 2012",
+        "normalRetirementAge": 60,
+        "earliestRetirement": "age 55 with 5 years of service credit, or age 50 with at least 30 years",
+        "minimumServiceYears": 5,
+        "ageFactorsByMonth": {
+          "63": [
+            0.024,
+            0.024,
+            0.024,
+            0.024,
+            0.024,
+            0.024,
+            0.024,
+            0.024,
+            0.024,
+            0.024,
+            0.024,
+            0.024
+          ],
+          "62": [
+            0.02267,
+            0.02267,
+            0.02267,
+            0.023,
+            0.023,
+            0.023,
+            0.023330000000000004,
+            0.023330000000000004,
+            0.023330000000000004,
+            0.02367,
+            0.02367,
+            0.02367
+          ],
+          "61": [
+            0.021330000000000002,
+            0.021330000000000002,
+            0.021330000000000002,
+            0.02167,
+            0.02167,
+            0.02167,
+            0.022000000000000002,
+            0.022000000000000002,
+            0.022000000000000002,
+            0.022330000000000003,
+            0.022330000000000003,
+            0.022330000000000003
+          ],
+          "60": [
+            0.02,
+            0.02,
+            0.02,
+            0.02033,
+            0.02033,
+            0.02033,
+            0.02067,
+            0.02067,
+            0.02067,
+            0.021,
+            0.021,
+            0.021
+          ],
+          "59": [
+            0.018799999999999997,
+            0.0189,
+            0.019,
+            0.0191,
+            0.0192,
+            0.019299999999999998,
+            0.0194,
+            0.0195,
+            0.0196,
+            0.0197,
+            0.019799999999999998,
+            0.0199
+          ],
+          "58": [
+            0.0176,
+            0.0177,
+            0.0178,
+            0.0179,
+            0.018000000000000002,
+            0.0181,
+            0.0182,
+            0.0183,
+            0.0184,
+            0.018500000000000003,
+            0.018600000000000002,
+            0.0187
+          ],
+          "57": [
+            0.016399999999999998,
+            0.0165,
+            0.0166,
+            0.0167,
+            0.0168,
+            0.0169,
+            0.017,
+            0.0171,
+            0.0172,
+            0.0173,
+            0.0174,
+            0.0175
+          ],
+          "56": [
+            0.0152,
+            0.015300000000000001,
+            0.0154,
+            0.0155,
+            0.015600000000000001,
+            0.015700000000000002,
+            0.0158,
+            0.0159,
+            0.016,
+            0.0161,
+            0.016200000000000003,
+            0.0163
+          ],
+          "55": [
+            0.013999999999999999,
+            0.0141,
+            0.014199999999999999,
+            0.0143,
+            0.0144,
+            0.014499999999999999,
+            0.0146,
+            0.0147,
+            0.0148,
+            0.0149,
+            0.015,
+            0.0151
+          ],
+          "54": [
+            0.0134,
+            0.01345,
+            0.013500000000000002,
+            0.01355,
+            0.013600000000000001,
+            0.01365,
+            0.0137,
+            0.01375,
+            0.0138,
+            0.01385,
+            0.0139,
+            0.01395
+          ],
+          "53": [
+            0.0128,
+            0.012849999999999999,
+            0.0129,
+            0.01295,
+            0.013000000000000001,
+            0.013049999999999999,
+            0.0131,
+            0.01315,
+            0.0132,
+            0.01325,
+            0.013300000000000001,
+            0.013349999999999999
+          ],
+          "52": [
+            0.012199999999999999,
+            0.01225,
+            0.0123,
+            0.012350000000000002,
+            0.0124,
+            0.012450000000000001,
+            0.0125,
+            0.012549999999999999,
+            0.0126,
+            0.01265,
+            0.0127,
+            0.01275
+          ],
+          "51": [
+            0.0116,
+            0.01165,
+            0.011699999999999999,
+            0.01175,
+            0.0118,
+            0.011850000000000001,
+            0.011899999999999999,
+            0.01195,
+            0.012,
+            0.01205,
+            0.0121,
+            0.012150000000000001
+          ],
+          "50": [
+            0.011000000000000001,
+            0.011049999999999999,
+            0.0111,
+            0.01115,
+            0.011200000000000002,
+            0.01125,
+            0.0113,
+            0.01135,
+            0.011399999999999999,
+            0.01145,
+            0.0115,
+            0.01155
+          ]
+        },
+        "finalCompensationYears": 3,
+        "finalCompensationMonths": 36,
+        "_finalCompensation": "Highest average annual compensation earnable over any 36 consecutive months. With 25 or more years of service credit it drops to any 12 consecutive months. Certain classroom teachers with fewer than 25 years may use the 12 month method under a qualifying collective bargaining agreement not entered into, extended, renewed or amended after January 1, 2014. Unused sick leave beyond two tenths of a year, nonqualified service credit and Retirement Incentive Program credit do not count toward the 25 years.",
+        "finalCompensationMonthsAt25Years": 12,
+        "_notHighestSingleYear": "CalSTRS never uses a highest single year. Both methods are averages over consecutive months, and a rolling 12 consecutive month average is not the member's best discrete year.",
+        "careerFactor": {
+          "minimumService": 30,
+          "addedFactor": 0.002,
+          "cap": 0.024,
+          "_note": "Earned service credit only. The combined age and career factor cannot exceed 2.4 percent, which the base factor alone reaches at age 61 and six months."
+        },
+        "longevityBonus": [
+          {
+            "minimumService": 32,
+            "annualAmount": 4800,
+            "monthlyAmount": 400
+          },
+          {
+            "minimumService": 31,
+            "annualAmount": 3600,
+            "monthlyAmount": 300
+          },
+          {
+            "minimumService": 30,
+            "annualAmount": 2400,
+            "monthlyAmount": 200
+          }
+        ],
+        "_longevityBonus": "Requires at least 30 years of qualified service credit earned on or before December 31, 2010. The window for accruing eligibility is closed but the bonus is still payable to those who qualified. Amounts shown are Member-Only; electing a beneficiary option reduces the bonus by the same option factor, which is not published.",
+        "memberContributionRate": {
+          "2025-26": 0.1025,
+          "2026-27": 0.1025
+        },
+        "postRetirementAdjustment": {
+          "type": "simple",
+          "rate": 0.02,
+          "ofInitialBenefit": true,
+          "_note": "Two percent of the initial benefit, not compounded and not tied to inflation. First applied September 1 following the first anniversary of retirement, appearing in the October 1 payment."
+        }
+      },
+      {
+        "key": "2at62",
+        "label": "CalSTRS 2% at 62 (PEPRA)",
+        "membership": "hired to perform creditable activities on or after January 1, 2013",
+        "normalRetirementAge": 62,
+        "earliestRetirement": "age 55 with at least 5 years of service credit",
+        "minimumServiceYears": 5,
+        "ageFactorsByMonth": {
+          "65": [
+            0.024,
+            0.024,
+            0.024,
+            0.024,
+            0.024,
+            0.024,
+            0.024,
+            0.024,
+            0.024,
+            0.024,
+            0.024,
+            0.024
+          ],
+          "64": [
+            0.02267,
+            0.02267,
+            0.02267,
+            0.023,
+            0.023,
+            0.023,
+            0.023330000000000004,
+            0.023330000000000004,
+            0.023330000000000004,
+            0.02367,
+            0.02367,
+            0.02367
+          ],
+          "63": [
+            0.021330000000000002,
+            0.021330000000000002,
+            0.021330000000000002,
+            0.02167,
+            0.02167,
+            0.02167,
+            0.022000000000000002,
+            0.022000000000000002,
+            0.022000000000000002,
+            0.022330000000000003,
+            0.022330000000000003,
+            0.022330000000000003
+          ],
+          "62": [
+            0.02,
+            0.02,
+            0.02,
+            0.02033,
+            0.02033,
+            0.02033,
+            0.02067,
+            0.02067,
+            0.02067,
+            0.021,
+            0.021,
+            0.021
+          ],
+          "61": [
+            0.018799999999999997,
+            0.0189,
+            0.019,
+            0.0191,
+            0.0192,
+            0.019299999999999998,
+            0.0194,
+            0.0195,
+            0.0196,
+            0.0197,
+            0.019799999999999998,
+            0.0199
+          ],
+          "60": [
+            0.0176,
+            0.0177,
+            0.0178,
+            0.0179,
+            0.018000000000000002,
+            0.0181,
+            0.0182,
+            0.0183,
+            0.0184,
+            0.018500000000000003,
+            0.018600000000000002,
+            0.0187
+          ],
+          "59": [
+            0.016399999999999998,
+            0.0165,
+            0.0166,
+            0.0167,
+            0.0168,
+            0.0169,
+            0.017,
+            0.0171,
+            0.0172,
+            0.0173,
+            0.0174,
+            0.0175
+          ],
+          "58": [
+            0.0152,
+            0.015300000000000001,
+            0.0154,
+            0.0155,
+            0.015600000000000001,
+            0.015700000000000002,
+            0.0158,
+            0.0159,
+            0.016,
+            0.0161,
+            0.016200000000000003,
+            0.0163
+          ],
+          "57": [
+            0.013999999999999999,
+            0.0141,
+            0.014199999999999999,
+            0.0143,
+            0.0144,
+            0.014499999999999999,
+            0.0146,
+            0.0147,
+            0.0148,
+            0.0149,
+            0.015,
+            0.0151
+          ],
+          "56": [
+            0.0128,
+            0.0129,
+            0.013000000000000001,
+            0.0131,
+            0.0132,
+            0.013300000000000001,
+            0.0134,
+            0.013500000000000002,
+            0.013600000000000001,
+            0.0137,
+            0.0138,
+            0.0139
+          ],
+          "55": [
+            0.0116,
+            0.011699999999999999,
+            0.0118,
+            0.011899999999999999,
+            0.012,
+            0.0121,
+            0.012199999999999999,
+            0.0123,
+            0.0124,
+            0.0125,
+            0.0126,
+            0.0127
+          ]
+        },
+        "finalCompensationYears": 3,
+        "finalCompensationMonths": 36,
+        "_finalCompensation": "Highest average annual compensation earnable over any 36 consecutive months, whatever the years of service. No 12 month route.",
+        "careerFactor": null,
+        "_careerFactor": "Not available to this tier.",
+        "longevityBonus": null,
+        "_longevityBonus": "Not available to this tier.",
+        "memberContributionRate": {
+          "2025-26": 0.10205,
+          "2026-27": 0.10205
+        },
+        "_contributionRate": "A 9.00 percent base rate plus a 1.205 percent additional rate under Education Code section 22901.7(b).",
+        "postRetirementAdjustment": {
+          "type": "simple",
+          "rate": 0.02,
+          "ofInitialBenefit": true
+        }
+      }
+    ],
+    "purchasingPowerFloor": {
+      "share": 0.85,
+      "_note": "Delivered through the Supplemental Benefit Maintenance Account as quarterly supplemental payments in October, January, April and July, separate from the monthly benefit. Restored when purchasing power falls below 85 percent of the initial benefit, measured on the All-Urban California Consumer Price Index and applied after the 2 percent annual adjustment. Not guaranteed; depends on available funds."
+    },
+    "employerContributionRate2026_27": 0.191,
+    "stateContributionRate2026_27": 0.10828,
+    "survivorOptions": [
+      {
+        "key": "memberOnly",
+        "label": "Member-Only Benefit",
+        "survivorShare": 0,
+        "reduction": 0,
+        "_note": "The unreduced baseline. Paid for the member's lifetime and stops at death. Remaining contributions go to the one-time death benefit recipient."
+      },
+      {
+        "key": "beneficiary100",
+        "label": "100% Beneficiary Option",
+        "survivorShare": 1.0,
+        "reduction": null
+      },
+      {
+        "key": "beneficiary75",
+        "label": "75% Beneficiary Option",
+        "survivorShare": 0.75,
+        "reduction": null,
+        "beneficiaryAgeLimit": "a nonspouse beneficiary cannot be more than exactly 19 years younger than the member"
+      },
+      {
+        "key": "beneficiary50",
+        "label": "50% Beneficiary Option",
+        "survivorShare": 0.5,
+        "reduction": null
+      },
+      {
+        "key": "compound",
+        "label": "Compound Option",
+        "survivorShare": null,
+        "reduction": null,
+        "_note": "Two or more option beneficiaries, each with an option choice. The member keeps part of the benefit as the Member-Only Benefit, or none of it."
+      }
+    ],
+    "_optionFactorsNotPublished": {
+      "status": "BLOCKING GAP",
+      "problem": "CalSTRS publishes no general option factor table. The factor depends on the option elected and on the ages of the member and the beneficiary, and the only published figures are a single worked example.",
+      "example": {
+        "memberAge": 60,
+        "beneficiaryAge": 57,
+        "memberOnlyMonthly": 3750,
+        "beneficiary100": 3311,
+        "beneficiary75": 3436,
+        "beneficiary50": 3545,
+        "_note": "One age pair only. The implied factors are arithmetic on two published dollar figures, not CalSTRS constants, and must never be used as engine values."
+      },
+      "resolution": "This engine refuses to compute a Modified Benefit rather than estimating one. Either load the real factor tables from the Teachers' Retirement Law, or send the member to the CalSTRS Retirement Benefits Calculator for option amounts.",
+      "popUp": "Under any option, if the beneficiary dies before the member, the member's benefit rises to the Member-Only amount."
+    }
+  },
+  "CalPERS": {
+    "name": "CalPERS, State Miscellaneous and Industrial",
+    "source": {
+      "factors": {
+        "url": "https://www.calpers.ca.gov/members/retirement-benefits/benefit-factor-charts",
+        "title": "Benefit Factor Charts, CalPERS",
+        "charts": [
+          "https://www.calpers.ca.gov/documents/state-miscellaneous-industrial-member-2-at-55-benefit-factors-pdf/download?inline=",
+          "https://www.calpers.ca.gov/documents/state-miscellaneous-industrial-member-2-at-60-benefit-factors-pdf/download?inline=",
+          "https://www.calpers.ca.gov/documents/state-miscellaneous-industrial-member-2-at-62-benefit-factors-pdf/download?inline="
+        ],
+        "_currency": "The charts are dated February 2021 and are what the live Benefit Factor Charts page currently links. No 2025 or 2026 reissue was located."
+      },
+      "options": {
+        "url": "https://www.calpers.ca.gov/documents/planning-service-retirement/download",
+        "title": "Your CalPERS Benefits: Planning Your Service Retirement, PUB 1, February 2025"
+      },
+      "cola": {
+        "url": "https://www.calpers.ca.gov/retirees/cost-of-living/cola",
+        "title": "Cost-of-Living Adjustment, CalPERS"
+      },
+      "pppa": {
+        "url": "https://www.calpers.ca.gov/retirees/cost-of-living/pppa",
+        "title": "Purchasing Power Protection Allowance, CalPERS"
+      },
+      "pepra": {
+        "url": "https://www.calpers.ca.gov/documents/summary-pension-act/download",
+        "title": "Summary of the Public Employees' Pension Reform Act"
+      },
+      "stateGuide": {
+        "url": "https://www.calpers.ca.gov/documents/state-ref-guide/download",
+        "title": "State Reference Guide, CalPERS, August 2026"
+      }
+    },
+    "_classicVsPepra": "Classic means a membership date of December 31, 2012 or earlier. A PEPRA new member is first brought into CalPERS membership on or after January 1, 2013 with no prior California public retirement system membership or reciprocity, or returned on or after that date to a different CalPERS employer after six months or more away.",
+    "tiers": [
+      {
+        "key": "2at55",
+        "label": "2% at 55",
+        "classification": "classic, First Tier",
+        "minimumRetirementAge": 50,
+        "factorEqualsFormulaAt": 55,
+        "maximumFactor": 0.025,
+        "maximumAt": 63,
+        "ageFactors": {
+          "50": 0.011000000000000001,
+          "51": 0.0128,
+          "52": 0.0146,
+          "53": 0.016399999999999998,
+          "54": 0.0182,
+          "55": 0.02,
+          "56": 0.020640000000000002,
+          "57": 0.021259999999999998,
+          "58": 0.02188,
+          "59": 0.0225,
+          "60": 0.02314,
+          "61": 0.02376,
+          "62": 0.024380000000000002,
+          "63": 0.025
+        },
+        "_membership": "State bargaining unit agreement determines First Tier placement. The hire-date cutoff separating this from 2% at 60 was not verified.",
+        "serviceMinimums": "age 50 with 5 years, age 55 with 10 years, or age 50 with 5 years credited before January 1, 1985"
+      },
+      {
+        "key": "2at60",
+        "label": "2% at 60",
+        "classification": "classic, First Tier",
+        "minimumRetirementAge": 50,
+        "factorEqualsFormulaAt": 60,
+        "maximumFactor": 0.02418,
+        "maximumAt": 63,
+        "ageFactors": {
+          "50": 0.010920000000000001,
+          "51": 0.011559999999999999,
+          "52": 0.01224,
+          "53": 0.012960000000000001,
+          "54": 0.01376,
+          "55": 0.0146,
+          "56": 0.01552,
+          "57": 0.0165,
+          "58": 0.01758,
+          "59": 0.01874,
+          "60": 0.02,
+          "61": 0.021339999999999998,
+          "62": 0.022719999999999997,
+          "63": 0.02418
+        },
+        "_membership": "First employed with the state January 15, 2011 through December 31, 2012 with no prior service, on three-year highest compensation."
+      },
+      {
+        "key": "2at62",
+        "label": "2% at 62",
+        "classification": "PEPRA, First Tier",
+        "minimumRetirementAge": 52,
+        "factorEqualsFormulaAt": 62,
+        "maximumFactor": 0.025,
+        "maximumAt": 67,
+        "ageFactors": {
+          "50": 0.00842,
+          "51": 0.009170000000000001,
+          "52": 0.01,
+          "53": 0.011000000000000001,
+          "54": 0.012,
+          "55": 0.013000000000000001,
+          "56": 0.013999999999999999,
+          "57": 0.015,
+          "58": 0.016,
+          "59": 0.017,
+          "60": 0.018000000000000002,
+          "61": 0.019,
+          "62": 0.02,
+          "63": 0.021,
+          "64": 0.022000000000000002,
+          "65": 0.023,
+          "66": 0.024,
+          "67": 0.025
+        },
+        "_membership": "Members enrolled by the state on or after January 1, 2013.",
+        "_minimumAge": "52, or 50 where the member has combined classic and PEPRA service. The chart carries ages 50 and 51 but they fall below the minimum.",
+        "serviceMinimums": "age 52 with 5 years, age 55 with 10 years, or age 52 with 5 years credited before January 1, 1985"
+      }
+    ],
+    "_secondTier": "The 1.25% at 65 and 1.25% at 67 formulas exist for Second Tier members. No factor table for either was read, so neither is in this file.",
+    "finalCompensation": {
+      "_rule": "Highest average annual compensation over any consecutive 12 month or 36 month period, set by employer and bargaining unit rather than by one statewide classic rule.",
+      "pepraMonths": 36,
+      "_pepra": "PEPRA new members use at least 36 consecutive months, or three school years. PEPRA also bars an employer from shortening the period for classic members already on three years.",
+      "_crossTier": "PEPRA salary cannot be applied to classic service, and classic salary cannot be applied to PEPRA service."
+    },
+    "postRetirementAdjustment": {
+      "type": "compound",
+      "rate": 0.02,
+      "cap": 0.02,
+      "_rule": "Most state and all school agencies contract for 2 percent a year. The contracted percentage compounds annually and is compared against cumulative CPI-U inflation measured from the index at retirement; CalPERS applies the lesser of the two to the base allowance. So the contract caps the rise when inflation runs hot, and cumulative inflation caps it when inflation runs cold.",
+      "_timing": "Begins the second calendar year after retirement, applied to the May 1 warrant.",
+      "_otherRates": "Public agencies may instead contract for 3, 4 or 5 percent. Across all retirees, 95.9 percent have a 2 percent provision."
+    },
+    "purchasingPowerFloor": {
+      "stateAndSchools": 0.75,
+      "localAndPublicAgencies": 0.8,
+      "_note": "The Purchasing Power Protection Allowance, determined after the annual adjustment and paid on the May 1 warrant. Not guaranteed each year. Retirees whose employers contract for 4 or 5 percent adjustments generally do not receive it."
+    },
+    "survivorOptions": [
+      {
+        "key": "unmodified",
+        "label": "Unmodified Allowance",
+        "survivorShare": 0,
+        "reduction": 0,
+        "_note": "The unreduced baseline. Nothing continues to a beneficiary and unused contributions are not returned."
+      },
+      {
+        "key": "option1",
+        "label": "Return of Remaining Contributions Option 1",
+        "survivorShare": 0,
+        "reduction": null,
+        "_note": "Only where the member paid contributions. No ongoing monthly benefit; remaining contributions are paid as a lump sum."
+      },
+      {
+        "key": "option2",
+        "label": "100 Percent Beneficiary Option 2",
+        "survivorShare": 1.0,
+        "reduction": null
+      },
+      {
+        "key": "option2w",
+        "label": "100 Percent Beneficiary Option 2 with Benefit Allowance Increase",
+        "survivorShare": 1.0,
+        "reduction": null,
+        "_note": "The member's benefit rises to the Unmodified Allowance if the beneficiary dies first."
+      },
+      {
+        "key": "option3",
+        "label": "50 Percent Beneficiary Option 3",
+        "survivorShare": 0.5,
+        "reduction": null
+      },
+      {
+        "key": "option3w",
+        "label": "50 Percent Beneficiary Option 3 with Benefit Allowance Increase",
+        "survivorShare": 0.5,
+        "reduction": null
+      },
+      {
+        "key": "option4",
+        "label": "Flexible Beneficiary Option 4",
+        "survivorShare": null,
+        "reduction": null,
+        "_note": "A specific percentage or dollar amount to one or more named beneficiaries."
+      }
+    ],
+    "_optionNaming": "PUB 1 does not use the labels Option 2W or Option 3W. Those are legacy nomenclature; the current names are the 'with Benefit Allowance Increase' forms.",
+    "survivorContinuance": {
+      "shares": [
+        0.25,
+        0.5
+      ],
+      "_note": "A separate benefit where the employer contracts for it. Not chosen by the member and not one of the options above."
+    },
+    "_optionFactorsNotPublished": {
+      "status": "BLOCKING GAP",
+      "problem": "No CalPERS option factor table was read this session. Option amounts depend on the ages of the member and the beneficiary.",
+      "resolution": "This engine refuses to compute an option amount rather than estimating one."
+    }
+  },
+  "_openItems": [
+    "CalSTRS option factor tables are not published and are the single largest gap. No Modified Benefit is computed.",
+    "The CalSTRS Member Handbook could not be read; every CalSTRS figure here comes from other CalSTRS sources.",
+    "CalSTRS month-level age factor rows were read in the 2021 publication; only the endpoints were re-confirmed against 2025 material.",
+    "The CalSTRS 2% at 62 creditable compensation cap amount for 2026 was not found.",
+    "The CalPERS hire-date cutoff separating 2% at 55 from 2% at 60 was not verified.",
+    "CalPERS Second Tier factor tables and contribution rates were not read.",
+    "CalPERS benefit factor charts are dated February 2021; confirm no reissue exists before treating them as current.",
+    "PEPRA pensionable compensation cap amounts for 2026 were not found; they are announced by Circular Letter."
+  ],
+  "_researchAccess": {
+    "_note": "Saves time on any future task against these systems.",
+    "calstrs": "Use https://calstrs.com/<slug> without the www; the www form redirect-loops. Member Handbook PDFs return undecodable. Working documents: theagefactor.pdf, UnderstandingTheFormula2025.pdf, YourRetirementGuide2024.pdf, DB-Valuation-2025.pdf.",
+    "calpers": "Use https://www.calpers.ca.gov/documents/<slug>/download?inline=.",
+    "both": "Raw curl to either domain is refused by the egress proxy. Fetch through the web fetch tool."
+  }
+}

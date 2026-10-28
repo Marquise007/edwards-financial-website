@@ -1,0 +1,149 @@
+{
+  "_about": "Medicare cost parameters. Every value was read in a primary source fetched on 2026-10-27 and carries its own citation. Replaced wholesale each year, never edited piecemeal.",
+  "effectiveYear": 2026,
+  "capturedOn": "2026-10-27",
+  "eligibilityAge": 65,
+
+  "source": {
+    "partBPremiumAndDeductible": {
+      "url": "https://www.federalregister.gov/documents/2025/11/19/2025-20251/medicare-program-medicare-part-b-monthly-actuarial-rates-premium-rates-and-annual-deductible",
+      "title": "Medicare Program; Medicare Part B Monthly Actuarial Rates, Premium Rates, and Annual Deductible Beginning January 1, 2026",
+      "citation": "90 FR 52063, document 2025-20251, published November 19, 2025",
+      "year": 2026
+    },
+    "partBCorroborating": {
+      "url": "https://www.cms.gov/newsroom/fact-sheets/2026-medicare-parts-b-premiums-deductibles",
+      "title": "2026 Medicare Parts A & B Premiums and Deductibles",
+      "publisher": "CMS", "released": "2025-11-14", "year": 2026
+    },
+    "partA": {
+      "url": "https://www.cms.gov/files/document/mm14279-medicare-deductible-coinsurance-premium-rates-cy-2026-update.pdf",
+      "title": "Medicare Deductible, Coinsurance & Premium Rates: CY 2026 Update",
+      "citation": "MLN Matters MM14279, Related CR 14279, dated December 5, 2025",
+      "year": 2026
+    },
+    "irmaaBasis": {
+      "url": "https://secure.ssa.gov/POMS.NSF/lnx/0601101031",
+      "title": "SSA POMS HI 01101.031, How IRMAA is Calculated and How IRMAA Affects the Total Medicare Premium",
+      "citation": "TN 36 (12-25), effective 12/02/2025",
+      "year": 2026
+    },
+    "partDStructure": {
+      "url": "https://www.cms.gov/newsroom/fact-sheets/final-cy-2026-part-d-redesign-program-instructions",
+      "title": "Final CY 2026 Part D Redesign Program Instructions",
+      "publisher": "CMS", "released": "2025-04-07", "year": 2026
+    },
+    "partDBasePremium": {
+      "url": "https://www.cms.gov/newsroom/fact-sheets/2026-medicare-part-d-bid-information-and-part-d-premium-stabilization-demonstration-parameters",
+      "title": "2026 Medicare Part D Bid Information and Part D Premium Stabilization Demonstration Parameters",
+      "publisher": "CMS", "released": "2025-07-28", "year": 2026
+    },
+    "lateEnrollment": {
+      "url": "https://www.medicare.gov/basics/costs/medicare-costs/avoid-penalties",
+      "title": "Avoid late enrollment penalties | Medicare",
+      "partDPenaltyUrl": "https://www.medicare.gov/publications/11222-part-d-late-enrollment-penalty.pdf",
+      "partDPenaltyTitle": "The Part D Late Enrollment Penalty, CMS Product No. 11222, July 2026",
+      "statuteUrl": "https://www.ssa.gov/OP_Home/ssact/title18/1839.htm",
+      "statuteTitle": "Social Security Act Sec. 1839, Amounts of Premiums (42 U.S.C. 1395r)",
+      "year": 2026
+    },
+    "enrollmentPeriods": {
+      "url": "https://www.medicare.gov/basics/get-started-with-medicare/sign-up/when-can-i-sign-up-for-medicare",
+      "title": "When can I sign up for Medicare? | Medicare",
+      "coverageStartUrl": "https://www.medicare.gov/basics/get-started-with-medicare/sign-up/when-does-medicare-coverage-start",
+      "year": 2026
+    }
+  },
+
+  "partB": { "standardMonthlyPremium": 202.90, "annualDeductible": 283.00 },
+
+  "partA": {
+    "inpatientDeductiblePerBenefitPeriod": 1736,
+    "coinsuranceDays61to90PerDay": 434,
+    "coinsuranceLifetimeReservePerDay": 868,
+    "skilledNursingDays21to100PerDay": 217,
+    "monthlyPremiumUnder30Quarters": 565,
+    "monthlyPremium30to39Quarters": 311,
+    "monthlyPremiumUnder30QuartersWithLatePenalty": 621.50,
+    "monthlyPremium30to39QuartersWithLatePenalty": 342.10
+  },
+
+  "irmaa": {
+    "_basis": "Tax year 2024 MAGI determines the 2026 surcharge; tax year 2023 is used when the 2024 return is unavailable. partB is the TOTAL monthly Part B premium at that tier, not the surcharge alone.",
+    "_lookbackYears": 2,
+    "single": [
+      { "label": "standard", "upTo": 109000, "partB": 202.90, "partBSurcharge": 0,      "partDSurcharge": 0,     "beneficiaryShare": 0.25 },
+      { "label": "tier 1",   "upTo": 137000, "partB": 284.10, "partBSurcharge": 81.20,  "partDSurcharge": 14.50, "beneficiaryShare": 0.35 },
+      { "label": "tier 2",   "upTo": 171000, "partB": 405.80, "partBSurcharge": 202.90, "partDSurcharge": 37.50, "beneficiaryShare": 0.50 },
+      { "label": "tier 3",   "upTo": 205000, "partB": 527.50, "partBSurcharge": 324.60, "partDSurcharge": 60.40, "beneficiaryShare": 0.65 },
+      { "label": "tier 4",   "upTo": 500000, "partB": 649.20, "partBSurcharge": 446.30, "partDSurcharge": 83.30, "beneficiaryShare": 0.80 },
+      { "label": "tier 5",   "upTo": null,   "partB": 689.90, "partBSurcharge": 487.00, "partDSurcharge": 91.00, "beneficiaryShare": 0.85 }
+    ],
+    "marriedFilingJointly": [
+      { "label": "standard", "upTo": 218000, "partB": 202.90, "partBSurcharge": 0,      "partDSurcharge": 0,     "beneficiaryShare": 0.25 },
+      { "label": "tier 1",   "upTo": 274000, "partB": 284.10, "partBSurcharge": 81.20,  "partDSurcharge": 14.50, "beneficiaryShare": 0.35 },
+      { "label": "tier 2",   "upTo": 342000, "partB": 405.80, "partBSurcharge": 202.90, "partDSurcharge": 37.50, "beneficiaryShare": 0.50 },
+      { "label": "tier 3",   "upTo": 410000, "partB": 527.50, "partBSurcharge": 324.60, "partDSurcharge": 60.40, "beneficiaryShare": 0.65 },
+      { "label": "tier 4",   "upTo": 750000, "partB": 649.20, "partBSurcharge": 446.30, "partDSurcharge": 83.30, "beneficiaryShare": 0.80 },
+      { "label": "tier 5",   "upTo": null,   "partB": 689.90, "partBSurcharge": 487.00, "partDSurcharge": 91.00, "beneficiaryShare": 0.85 }
+    ],
+    "marriedFilingSeparately": [
+      { "label": "standard", "upTo": 109000, "partB": 202.90, "partBSurcharge": 0,      "partDSurcharge": 0 },
+      { "label": "tier 4",   "upTo": 391000, "partB": 649.20, "partBSurcharge": 446.30, "partDSurcharge": 83.30 },
+      { "label": "tier 5",   "upTo": null,   "partB": 689.90, "partBSurcharge": 487.00, "partDSurcharge": 91.00 }
+    ],
+    "_conflict": {
+      "field": "marriedFilingSeparately top threshold",
+      "coded": 391000,
+      "disagreement": "The CMS 2026 fact sheet and SSA POMS HI 01101.031 both state $391,000. Federal Register 90 FR 52063 Section IV.C renders the same two dollar premiums against a $500,000 breakpoint. No CMS correction notice was found.",
+      "resolution": "Coded at 391000 on two-source agreement, including the SSA source that administers the determination. Confirm against the official Federal Register PDF before any client-facing use."
+    }
+  },
+
+  "partD": {
+    "baseBeneficiaryPremium": 38.99,
+    "nationalAverageMonthlyBidAmount": 239.27,
+    "definedStandardAnnualDeductible": 615,
+    "annualOutOfPocketThreshold": 2100,
+    "_note": "There is no separate dollar initial coverage limit for CY 2026; the initial coverage phase ends at the $2,100 out-of-pocket threshold.",
+    "announced2027": {
+      "nationalAverageMonthlyBidAmount": 296.05,
+      "baseBeneficiaryPremium": 41.33,
+      "source": {
+        "url": "https://cms.gov/newsroom/fact-sheets/medicare-part-d-2027-national-average-monthly-bid-amount-information",
+        "title": "Medicare Part D 2027 National Average Monthly Bid Amount Information",
+        "publisher": "CMS", "released": "2026-07-28"
+      },
+      "_note": "CMS will discontinue the Part D Premium Stabilization Demonstration at the end of CY 2026. The 2027 deductible and out-of-pocket threshold were not published as of 2026-10-27."
+    }
+  },
+
+  "lateEnrollment": {
+    "partB": {
+      "surchargePerFullTwelveMonths": 0.10,
+      "appliesTo": "the standard monthly premium",
+      "duration": "Charged for as long as the person has Part B. medicare.gov states 'usually charged for as long as you have that type of coverage'; the statute ties the increase to a continuous period of eligibility ending at death. The lifelong reading is an inference from Sec. 1839(d), not express text.",
+      "excludedMonths": "Months inside the Initial Enrollment Period, months before age 65, months covered by an employer group health plan based on current employment, months under State buy-in, and enrollment during the Exceptional Conditions Special Enrollment Period."
+    },
+    "partD": {
+      "formula": "1% x national base beneficiary premium x number of full months without Part D or creditable coverage",
+      "trigger": "63 or more days in a row without Part D or other creditable drug coverage after the Initial Enrollment Period ends",
+      "rounding": "nearest $0.10",
+      "duration": "Paid for as long as the person has Medicare drug coverage, including after switching plans or joining a zero-premium plan. The amount changes as the base beneficiary premium changes."
+    }
+  },
+
+  "enrollment": {
+    "initialEnrollmentPeriodMonths": 7,
+    "initialEnrollmentPeriod": "Begins three months before the month of the 65th birthday and ends three months after it.",
+    "generalEnrollmentPeriod": "January 1 through March 31 each year; coverage starts the month after sign-up.",
+    "specialEnrollmentPeriodMonths": 8,
+    "specialEnrollmentPeriods": [
+      "Own or spouse's job-based coverage: 8 months after work stops, or from when the coverage ends if that comes first.",
+      "Employer with fewer than 20 employees: any time while still working, or within 8 months after work stops or job coverage ends, whichever is first.",
+      "Family member's job-based coverage at an employer with 100 or more employees: 8 months after that family member stops working.",
+      "TRICARE tied to an active duty service member: 8 months after the service member retires."
+    ],
+    "underSixtyFivePathways": "Twenty-four months of Social Security or Railroad Retirement Board disability benefits, or immediately on benefit start for a person who has ALS."
+  }
+}

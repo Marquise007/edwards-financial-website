@@ -1,0 +1,449 @@
+{
+  "_about": "Federal tax parameters. Every value was read in a primary source fetched on 2026-10-27 and carries its own citation. Replaced wholesale each year when the IRS issues the new Revenue Procedure.",
+  "effectiveYear": 2026,
+  "capturedOn": "2026-10-27",
+  "source": {
+    "inflationAdjustedItems": {
+      "url": "https://www.irs.gov/pub/irs-drop/rp-25-32.pdf",
+      "title": "Rev. Proc. 2025-32, inflation-adjusted items for tax year 2026, modifying Rev. Proc. 2024-40",
+      "corroborating": "https://www.irs.gov/newsroom/irs-releases-tax-inflation-adjustments-for-tax-year-2026-including-amendments-from-the-one-big-beautiful-bill",
+      "year": 2026,
+      "_caution": "Paragraph numbers extracted from the PDF were inconsistent between passes. The dollar values were transcribed twice with identical results and recompute exactly from the published base amounts, but verify an exact subsection cite against the printed PDF before quoting one."
+    },
+    "retirementLimits": {
+      "url": "https://www.irs.gov/pub/irs-drop/n-25-67.pdf",
+      "title": "Notice 2025-67, 2026 Amounts Relating to Retirement Plans and IRAs, as Adjusted for Changes in Cost-of-Living",
+      "year": 2026
+    },
+    "hsa": {
+      "url": "https://www.irs.gov/pub/irs-drop/rp-25-19.pdf",
+      "title": "Rev. Proc. 2025-19, 2026 HSA and HDHP amounts",
+      "corroborating": "https://www.irs.gov/publications/p969",
+      "year": 2026
+    },
+    "netInvestmentIncomeTax": {
+      "url": "https://www.irs.gov/newsroom/questions-and-answers-on-the-net-investment-income-tax",
+      "title": "Questions and Answers on the Net Investment Income Tax",
+      "statute": "IRC section 1411"
+    },
+    "socialSecurityTaxation": {
+      "url": "https://www.govinfo.gov/content/pkg/USCODE-2023-title26/pdf/USCODE-2023-title26-subtitleA-chap1-subchapB-partII-sec86.pdf",
+      "title": "26 U.S.C. section 86, Social security and tier 1 railroad retirement benefits",
+      "corroborating": "https://www.irs.gov/publications/p915"
+    },
+    "rmd": {
+      "tableUrl": "https://www.govinfo.gov/content/pkg/FR-2020-11-12/pdf/2020-24723.pdf",
+      "tableTitle": "TD 9930, Updated Life Expectancy and Distribution Period Tables, 85 FR 72472, November 12, 2020, amending Treas. Reg. 1.401(a)(9)-9(c)",
+      "statuteUrl": "https://www.govinfo.gov/content/pkg/USCODE-2023-title26/pdf/USCODE-2023-title26-subtitleA-chap1-subchapD-partI-subpartA-sec401.pdf",
+      "statuteTitle": "26 U.S.C. section 401(a)(9)(C)(v)",
+      "regulationUrl": "https://www.govinfo.gov/content/pkg/FR-2024-07-19/pdf/2024-14542.pdf",
+      "regulationTitle": "TD 10001, Required Minimum Distributions, 89 FR 58886, July 19, 2024",
+      "publication": "https://www.irs.gov/publications/p590b",
+      "applicability": "distribution calendar years beginning on or after January 1, 2022"
+    },
+    "estateAndGift": {
+      "url": "https://www.irs.gov/instructions/i706",
+      "title": "Instructions for Form 706, revised July 2026, Table A Unified Rate Schedule",
+      "corroborating": "https://www.irs.gov/pub/irs-drop/rp-25-32.pdf",
+      "year": 2026
+    },
+    "fica": {
+      "url": "https://www.irs.gov/taxtopics/tc751",
+      "title": "Topic no. 751, Social Security and Medicare withholding rates",
+      "wageBaseUrl": "https://www.ssa.gov/oact/cola/cbb.html",
+      "wageBaseTitle": "Contribution and Benefit Base, SSA Office of the Chief Actuary",
+      "additionalMedicareUrl": "https://www.irs.gov/businesses/small-businesses-self-employed/questions-and-answers-for-the-additional-medicare-tax",
+      "year": 2026
+    }
+  },
+  "brackets": {
+    "marriedFilingJointly": [
+      {
+        "upTo": 24800,
+        "rate": 0.1
+      },
+      {
+        "upTo": 100800,
+        "rate": 0.12
+      },
+      {
+        "upTo": 211400,
+        "rate": 0.22
+      },
+      {
+        "upTo": 403550,
+        "rate": 0.24
+      },
+      {
+        "upTo": 512450,
+        "rate": 0.32
+      },
+      {
+        "upTo": 768700,
+        "rate": 0.35
+      },
+      {
+        "upTo": null,
+        "rate": 0.37
+      }
+    ],
+    "headOfHousehold": [
+      {
+        "upTo": 17700,
+        "rate": 0.1
+      },
+      {
+        "upTo": 67450,
+        "rate": 0.12
+      },
+      {
+        "upTo": 105700,
+        "rate": 0.22
+      },
+      {
+        "upTo": 201750,
+        "rate": 0.24
+      },
+      {
+        "upTo": 256200,
+        "rate": 0.32
+      },
+      {
+        "upTo": 640600,
+        "rate": 0.35
+      },
+      {
+        "upTo": null,
+        "rate": 0.37
+      }
+    ],
+    "single": [
+      {
+        "upTo": 12400,
+        "rate": 0.1
+      },
+      {
+        "upTo": 50400,
+        "rate": 0.12
+      },
+      {
+        "upTo": 105700,
+        "rate": 0.22
+      },
+      {
+        "upTo": 201775,
+        "rate": 0.24
+      },
+      {
+        "upTo": 256225,
+        "rate": 0.32
+      },
+      {
+        "upTo": 640600,
+        "rate": 0.35
+      },
+      {
+        "upTo": null,
+        "rate": 0.37
+      }
+    ],
+    "marriedFilingSeparately": [
+      {
+        "upTo": 12400,
+        "rate": 0.1
+      },
+      {
+        "upTo": 50400,
+        "rate": 0.12
+      },
+      {
+        "upTo": 105700,
+        "rate": 0.22
+      },
+      {
+        "upTo": 201775,
+        "rate": 0.24
+      },
+      {
+        "upTo": 256225,
+        "rate": 0.32
+      },
+      {
+        "upTo": 384350,
+        "rate": 0.35
+      },
+      {
+        "upTo": null,
+        "rate": 0.37
+      }
+    ],
+    "_gotcha": "The head of household 24 percent ceiling is $201,750 while single and married filing separately are $201,775. A $25 divergence, confirmed verbatim in two independent reads. Do not normalize them."
+  },
+  "capitalGains": {
+    "marriedFilingJointly": [
+      {
+        "upTo": 98900,
+        "rate": 0
+      },
+      {
+        "upTo": 613700,
+        "rate": 0.15
+      },
+      {
+        "upTo": null,
+        "rate": 0.2
+      }
+    ],
+    "marriedFilingSeparately": [
+      {
+        "upTo": 49450,
+        "rate": 0
+      },
+      {
+        "upTo": 306850,
+        "rate": 0.15
+      },
+      {
+        "upTo": null,
+        "rate": 0.2
+      }
+    ],
+    "headOfHousehold": [
+      {
+        "upTo": 66200,
+        "rate": 0
+      },
+      {
+        "upTo": 579600,
+        "rate": 0.15
+      },
+      {
+        "upTo": null,
+        "rate": 0.2
+      }
+    ],
+    "single": [
+      {
+        "upTo": 49450,
+        "rate": 0
+      },
+      {
+        "upTo": 545500,
+        "rate": 0.15
+      },
+      {
+        "upTo": null,
+        "rate": 0.2
+      }
+    ]
+  },
+  "deduction": {
+    "standard": {
+      "marriedFilingJointly": 32200,
+      "headOfHousehold": 24150,
+      "single": 16100,
+      "marriedFilingSeparately": 16100
+    },
+    "additionalOver65": {
+      "marriedFilingJointly": 1650,
+      "marriedFilingSeparately": 1650,
+      "headOfHousehold": 2050,
+      "single": 2050
+    },
+    "_rule": "Section 63(f): $1,650 for each of age 65 and blindness, raised to $2,050 where the individual is also unmarried and not a surviving spouse. The amounts stack, so a single filer who is both 65 or older and blind takes $2,050 twice.",
+    "dependentStandardDeduction": {
+      "floor": 1350,
+      "earnedIncomePlus": 450
+    }
+  },
+  "socialSecurityTaxation": {
+    "marriedFilingJointly": {
+      "base1": 32000,
+      "base2": 44000
+    },
+    "single": {
+      "base1": 25000,
+      "base2": 34000
+    },
+    "headOfHousehold": {
+      "base1": 25000,
+      "base2": 34000
+    },
+    "marriedFilingSeparately": {
+      "base1": 0,
+      "base2": 0
+    },
+    "_note": "Section 86(c). The married-filing-separately figures are zero only where the spouses did not live apart for the entire year; where they did live apart all year, the $25,000 and $34,000 amounts apply.",
+    "_indexing": "NOT INDEXED. Section 86 fixes these dollar amounts and contains no cost-of-living provision, which is why a rising share of every retiree's benefit becomes taxable over time. Never apply an adjustment."
+  },
+  "niit": {
+    "rate": 0.038,
+    "threshold": {
+      "marriedFilingJointly": 250000,
+      "marriedFilingSeparately": 125000,
+      "single": 200000,
+      "headOfHousehold": 200000,
+      "qualifyingSurvivingSpouse": 250000
+    },
+    "_indexing": "NOT INDEXED. The IRS states these threshold amounts are not indexed for inflation."
+  },
+  "fica": {
+    "wageBase": 184500,
+    "oasdiRateEmployee": 0.062,
+    "oasdiRateEmployer": 0.062,
+    "oasdiRateSelfEmployed": 0.124,
+    "medicareRateEmployee": 0.0145,
+    "medicareRateEmployer": 0.0145,
+    "medicareRateSelfEmployed": 0.029,
+    "additionalMedicareRate": 0.009,
+    "additionalMedicareThreshold": 200000,
+    "additionalMedicareThresholdByStatus": {
+      "marriedFilingJointly": 250000,
+      "marriedFilingSeparately": 125000,
+      "single": 200000,
+      "headOfHousehold": 200000,
+      "qualifyingSurvivingSpouse": 200000
+    },
+    "_gotcha": "The Additional Medicare Tax threshold for a qualifying surviving spouse is $200,000 while the net investment income tax threshold for that same status is $250,000. Two 3.8-percent-adjacent surtaxes, two different tables. Never share one lookup between them.",
+    "wageBase2027": 192300,
+    "_selfEmploymentBase": "Self-employment income is multiplied by 0.9235 before the rates apply.",
+    "_staleSource": "The IRS self-employment tax page still displays a 2024 wage base of $168,600. The rates on that page are current; the wage base is not. Take the base from SSA or Topic 751."
+  },
+  "estate": {
+    "basicExclusionAmount": 15000000,
+    "applicableCreditAmount": 5945800,
+    "annualGiftExclusion": 19000,
+    "annualGiftExclusionNonCitizenSpouse": 194000,
+    "topRate": 0.4,
+    "rateSchedule": [
+      {
+        "upTo": 10000,
+        "rate": 0.18
+      },
+      {
+        "upTo": 20000,
+        "rate": 0.2
+      },
+      {
+        "upTo": 40000,
+        "rate": 0.22
+      },
+      {
+        "upTo": 60000,
+        "rate": 0.24
+      },
+      {
+        "upTo": 80000,
+        "rate": 0.26
+      },
+      {
+        "upTo": 100000,
+        "rate": 0.28
+      },
+      {
+        "upTo": 150000,
+        "rate": 0.3
+      },
+      {
+        "upTo": 250000,
+        "rate": 0.32
+      },
+      {
+        "upTo": 500000,
+        "rate": 0.34
+      },
+      {
+        "upTo": 750000,
+        "rate": 0.37
+      },
+      {
+        "upTo": 1000000,
+        "rate": 0.39
+      },
+      {
+        "upTo": null,
+        "rate": 0.4
+      }
+    ],
+    "_note": "The basic exclusion amount of $15,000,000 for decedents dying in 2026 reflects section 2010(c)(3) as amended by the One, Big, Beautiful Bill. Table A is a fixed statutory schedule and is not indexed; only the exclusion is.",
+    "source": {
+      "url": "https://www.irs.gov/instructions/i706",
+      "title": "Instructions for Form 706, revised July 2026, Table A Unified Rate Schedule",
+      "corroborating": "https://www.irs.gov/pub/irs-drop/rp-25-32.pdf",
+      "year": 2026
+    }
+  },
+  "contributionLimits": {
+    "electiveDeferral401k403b457b": 24500,
+    "catchUpAge50": 8000,
+    "catchUpAges60to63": 11250,
+    "ira": 7500,
+    "iraCatchUpAge50": 1100,
+    "simpleDeferral": 17000,
+    "simpleDeferralCertainPlans": 18100,
+    "simpleCatchUpAge50": 4000,
+    "simpleCatchUpAges60to63": 5250,
+    "hsaSelfOnly": 4400,
+    "hsaFamily": 8750,
+    "hsaCatchUpAge55": 1000,
+    "definedContributionAnnualAdditions": 72000,
+    "definedBenefitAnnualBenefit": 290000,
+    "annualCompensation": 360000,
+    "hdhp": {
+      "minimumDeductibleSelfOnly": 1700,
+      "minimumDeductibleFamily": 3400,
+      "maximumOutOfPocketSelfOnly": 8500,
+      "maximumOutOfPocketFamily": 17000
+    },
+    "announced2027": {
+      "hsaSelfOnly": 4500,
+      "hsaFamily": 9000,
+      "hdhp": {
+        "minimumDeductibleSelfOnly": 1750,
+        "minimumDeductibleFamily": 3500,
+        "maximumOutOfPocketSelfOnly": 8700,
+        "maximumOutOfPocketFamily": 17400
+      },
+      "source": {
+        "url": "https://www.irs.gov/pub/irs-drop/rp-26-24.pdf",
+        "title": "Rev. Proc. 2026-24, 2027 HSA and HDHP amounts"
+      },
+      "_note": "No 2027 bracket, standard deduction, capital gain, estate or retirement deferral figures have been published. Anything circulating is a private projection."
+    }
+  },
+  "phaseOuts": {
+    "traditionalIRADeduction": {
+      "singleOrHeadOfHousehold": [
+        81000,
+        91000
+      ],
+      "marriedFilingJointlyContributorIsParticipant": [
+        129000,
+        149000
+      ],
+      "marriedFilingJointlySpouseIsParticipant": [
+        242000,
+        252000
+      ],
+      "marriedFilingSeparately": [
+        0,
+        10000
+      ]
+    },
+    "rothIRAContribution": {
+      "marriedFilingJointly": [
+        242000,
+        252000
+      ],
+      "singleOrHeadOfHousehold": [
+        153000,
+        168000
+      ],
+      "marriedFilingSeparately": [
+        0,
+        10000
+      ]
+    },
+    "_note": "The Roth single and head of household range spans $15,000 while the joint range spans $10,000. That asymmetry is as published."
+  }
+}

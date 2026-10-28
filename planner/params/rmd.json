@@ -1,0 +1,47 @@
+{
+  "_about": "Required minimum distribution rules and the Uniform Lifetime Table. Read from the regulation itself on 2026-10-27.",
+  "effectiveYear": 2026,
+  "capturedOn": "2026-10-27",
+  "source": {
+    "url": "https://www.govinfo.gov/content/pkg/FR-2020-11-12/pdf/2020-24723.pdf",
+    "title": "TD 9930, Updated Life Expectancy and Distribution Period Tables Used for Purposes of Determining Minimum Required Distributions, 85 FR 72472, November 12, 2020",
+    "regulation": "Treas. Reg. 1.401(a)(9)-9(c)",
+    "statute": "26 U.S.C. 401(a)(9)(C)(v)",
+    "statuteUrl": "https://www.govinfo.gov/content/pkg/USCODE-2023-title26/pdf/USCODE-2023-title26-subtitleA-chap1-subchapD-partI-subpartA-sec401.pdf",
+    "publication": "https://www.irs.gov/publications/p590b",
+    "applicability": "distribution calendar years beginning on or after January 1, 2022"
+  },
+
+  "beginAge": [
+    { "birthYearThrough": 1950, "age": 72, "_note": "prior-law regimes; clause (v) does not address these birth years" },
+    { "birthYearThrough": 1958, "age": 73 },
+    { "birthYearThrough": 1959, "age": 73, "_unsettled": true },
+    { "birthYearThrough": 9999, "age": 75 }
+  ],
+  "_beginAgeRule": "Section 401(a)(9)(C)(v) sets the applicable age by the age attained and when: 73 for a person who attains 72 after December 31, 2022 and 73 before January 1, 2033; 75 for a person who attains 74 after December 31, 2032.",
+  "_birthYear1959": {
+    "status": "unsettled",
+    "problem": "The statute gives two answers at once for a person born in 1959: both clauses are satisfied, yielding 73 and 75. Treasury acknowledged this in the TD 10001 preamble and reserved the paragraph that would define it.",
+    "proposedAnswer": 73,
+    "proposedRule": "Proposed Treas. Reg. 1.401(a)(9)-2(b)(2)(v), REG-103529-23, 89 FR 58644, July 19, 2024: 'In the case of an employee born in 1959, the applicable age is age 73.'",
+    "caution": "No final rule adopting that proposal was found. Coded at 73 on the proposed regulation only. Confirm the current status before any client-facing output turns on it."
+  },
+
+  "requiredBeginningDate": "April 1 of the year following the calendar year in which the owner reaches the applicable age. For an employer defined contribution plan, April 1 following the later of that year or the year of retirement, where the plan permits the delay. Each subsequent year's distribution is due December 31.",
+
+  "uniformLifetime": {
+    "72": 27.4, "73": 26.5, "74": 25.5, "75": 24.6, "76": 23.7, "77": 22.9, "78": 22.0,
+    "79": 21.1, "80": 20.2, "81": 19.4, "82": 18.5, "83": 17.7, "84": 16.8, "85": 16.0,
+    "86": 15.2, "87": 14.4, "88": 13.7, "89": 12.9, "90": 12.2, "91": 11.5, "92": 10.8,
+    "93": 10.1, "94": 9.5, "95": 8.9, "96": 8.4, "97": 7.8, "98": 7.3, "99": 6.8, "100": 6.4
+  },
+  "_uniformLifetimeNote": "The table begins at age 72. There are no entries for 70 or 71, and none should be invented. Entries for 101 through 119 exist in the regulation and were not transcribed; the final row is 120 and over at 2.0.",
+
+  "youngerSpouseTable": {
+    "name": "Joint and Last Survivor Life Expectancy",
+    "publishedAs": "IRS Publication 590-B, Appendix B, Table II",
+    "appliesWhen": "the sole designated beneficiary is the spouse and the spouse is more than 10 years younger than the owner",
+    "_caution": "The IRS topic page says 'ten or more years younger' in one passage and 'more than 10 years younger' in the Table II description. The regulation controls: more than 10 years younger.",
+    "_notLoaded": "The two-dimensional grid has not been transcribed. Any plan that needs it must load it before the projection runs, rather than falling back to the Uniform Lifetime Table."
+  }
+}

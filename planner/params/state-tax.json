@@ -1,0 +1,142 @@
+{
+  "_about": "State income tax. California is built from the Franchise Tax Board's own published schedules; the no-income-tax states are recorded as such. Every other state is absent rather than guessed, and the engine reports a state it does not have rather than returning zero.",
+  "effectiveYear": 2026,
+  "capturedOn": "2026-10-27",
+
+  "CA": {
+    "name": "California",
+    "effectiveYear": 2026,
+    "source": {
+      "url": "https://www.ftb.ca.gov/about-ftb/newsroom/tax-news/index.html",
+      "title": "Tax News, October 2026, section 2026 Indexing, Franchise Tax Board",
+      "updated": "2026-10-13",
+      "priorYearSchedule": "https://www.ftb.ca.gov/forms/2025/2025-540-tax-rate-schedules.pdf",
+      "treatmentSource": "https://www.ftb.ca.gov/forms/2025/2025-1005-publication.pdf",
+      "treatmentTitle": "FTB Publication 1005, 2025 Pension and Annuity Guidelines",
+      "adjustmentsSource": "https://www.ftb.ca.gov/forms/2025/2025-540-ca-instructions.html",
+      "year": 2026,
+      "_caution": "The complete 2026 rate and exemption tables post to the FTB site in late December 2026. The thresholds below come from the October 2026 indexing article, which is primary but not the final forms-level schedule. Re-pull in late December."
+    },
+    "indexing": {
+      "method": "California Consumer Price Index for all urban consumers, measured June of the prior year to June of the current year",
+      "factor2026": 0.034,
+      "factor2025": 0.030,
+      "_indexed": "rate schedule thresholds, both standard deduction amounts, the exemption credits, and the renter's credit limits",
+      "_notIndexed": "the statutory rates themselves, and the one million dollar Behavioral Health Services Tax threshold"
+    },
+    "brackets": {
+      "single": [
+        { "upTo": 11456,   "rate": 0.0100 },
+        { "upTo": 27157,   "rate": 0.0200 },
+        { "upTo": 42861,   "rate": 0.0400 },
+        { "upTo": 59498,   "rate": 0.0600 },
+        { "upTo": 75197,   "rate": 0.0800 },
+        { "upTo": 384109,  "rate": 0.0930 },
+        { "upTo": 460927,  "rate": 0.1030 },
+        { "upTo": 768213,  "rate": 0.1130 },
+        { "upTo": null,    "rate": 0.1230 }
+      ],
+      "marriedFilingSeparately": [
+        { "upTo": 11456,   "rate": 0.0100 },
+        { "upTo": 27157,   "rate": 0.0200 },
+        { "upTo": 42861,   "rate": 0.0400 },
+        { "upTo": 59498,   "rate": 0.0600 },
+        { "upTo": 75197,   "rate": 0.0800 },
+        { "upTo": 384109,  "rate": 0.0930 },
+        { "upTo": 460927,  "rate": 0.1030 },
+        { "upTo": 768213,  "rate": 0.1130 },
+        { "upTo": null,    "rate": 0.1230 }
+      ],
+      "marriedFilingJointly": [
+        { "upTo": 22912,   "rate": 0.0100 },
+        { "upTo": 54314,   "rate": 0.0200 },
+        { "upTo": 85722,   "rate": 0.0400 },
+        { "upTo": 118996,  "rate": 0.0600 },
+        { "upTo": 150394,  "rate": 0.0800 },
+        { "upTo": 768218,  "rate": 0.0930 },
+        { "upTo": 921854,  "rate": 0.1030 },
+        { "upTo": 1536426, "rate": 0.1130 },
+        { "upTo": null,    "rate": 0.1230 }
+      ],
+      "headOfHousehold": [
+        { "upTo": 22927,   "rate": 0.0100 },
+        { "upTo": 54316,   "rate": 0.0200 },
+        { "upTo": 70018,   "rate": 0.0400 },
+        { "upTo": 86654,   "rate": 0.0600 },
+        { "upTo": 102356,  "rate": 0.0800 },
+        { "upTo": 522385,  "rate": 0.0930 },
+        { "upTo": 626864,  "rate": 0.1030 },
+        { "upTo": 1044771, "rate": 0.1130 },
+        { "upTo": null,    "rate": 0.1230 }
+      ]
+    },
+    "standardDeduction": {
+      "single": 5900,
+      "marriedFilingSeparately": 5900,
+      "marriedFilingJointly": 11800,
+      "headOfHousehold": 11800
+    },
+    "exemptionCredit": {
+      "single": 158,
+      "marriedFilingSeparately": 158,
+      "headOfHousehold": 158,
+      "marriedFilingJointly": 316,
+      "perDependent": 491,
+      "_note": "Credits, not deductions. They come off the computed tax, not off income. The joint figure of $316 is published as a combined personal and senior credit.",
+      "phaseOut2025": {
+        "single": 252203, "marriedFilingSeparately": 252203,
+        "marriedFilingJointly": 504411, "headOfHousehold": 378310,
+        "reduction": "six dollars for every $2,500 of federal AGI over the threshold, or every $1,250 for married filing separately",
+        "_note": "2025 thresholds. The 2026 successors are not yet published."
+      }
+    },
+    "surcharges": [
+      { "label": "Behavioral Health Services Tax", "rate": 0.01, "threshold": 1000000,
+        "_note": "Form 540 line 62. Renamed from the Mental Health Services Tax for taxable years beginning on or after January 1, 2025; same one percent on taxable income above one million dollars. The threshold is statutory and not indexed." }
+    ],
+    "treatment": {
+      "socialSecurity": "exempt",
+      "pension": "ordinary",
+      "retirementDistributions": "ordinary",
+      "capitalGains": "ordinary",
+      "municipalInterest": "exemptInState",
+      "_socialSecurity": "California does not tax Social Security or equivalent Tier 1 railroad retirement benefits. Whatever the federal return includes under the 50 and 85 percent tests is subtracted in full on Schedule CA. Tier 2 railroad retirement is also subtracted. Foreign social security is different and is taxable by California as annuity income.",
+      "_pension": "Fully taxable to a California resident, including a pension for services performed in another state and including military pension. There is no California pension exclusion or reduced rate.",
+      "_retirementDistributions": "IRA and qualified plan distributions are taxable to the extent they are federally taxable, with an adjustment only where California basis differs from federal basis.",
+      "_rothConversion": "California conforms. The conversion is ordinary income at the full rate schedule, with no preferential rate, and it stacks on everything else. Above one million dollars of taxable income the Behavioral Health Services Tax applies on top.",
+      "_capitalGains": "No lower rate. All capital gains are taxed as ordinary income, with no holding period distinction.",
+      "_municipalInterest": "Interest on non-California state and local bonds is added back as California taxable income. California issuer bonds are not added back. A California municipal bond fund's exempt dividends are exempt only if at least half the fund's assets would be exempt from California tax if held directly."
+    },
+    "earlyDistributionAdditionalTax": {
+      "qualifiedPlansAndIRAs": 0.025,
+      "modifiedEndowmentContractsAndAnnuities": 0.025,
+      "coverdellAndABLE": 0.025,
+      "simpleIRAFirstTwoYears": 0.06,
+      "archerMSANonQualified": 0.125,
+      "_note": "On top of the federal additional tax, so a standard early qualified plan or IRA distribution carries 12.5 percent combined, separate from ordinary income tax at both levels.",
+      "source": { "url": "https://www.ftb.ca.gov/forms/2025/2025-3805p-instructions.html",
+                  "title": "2025 Instructions for Form FTB 3805P, Additional Taxes on Qualified Plans" }
+    },
+    "estate": null,
+    "_estate": "California imposes no estate tax for deaths on or after January 1, 2005, no inheritance tax for decedents who died on or after June 8, 1982, and no generation-skipping transfer tax for transfers after December 31, 2004.",
+    "_estateSource": { "url": "https://www.sco.ca.gov/ardtax_estate_tax.html",
+                       "title": "California Estate Tax, California State Controller's Office" },
+    "_taxTableNote": "California directs filers with taxable income at or below $100,000 to a Tax Table that rounds to bracketed midpoints rather than to these schedules. An engine computing exact marginal tax will differ slightly from an actual return below that figure.",
+    "_openItems": [
+      "2026 exemption credit phase-out thresholds are not yet published; the 2025 figures are recorded above.",
+      "The 2026 Behavioral Health Services Tax threshold is verified for 2025 only; nothing indicates it is indexed.",
+      "Per-person blind and senior credit amounts for 2026 are not published separately; they were $153 each for 2025.",
+      "No affirmative Franchise Tax Board sentence was found stating that direct interest on California issuer bonds is exempt. The rule here is inferred from the add-back reaching non-California issuers only, plus the mutual fund language in Publication 1001. Confirm against Revenue and Taxation Code section 17143 before relying on it."
+    ]
+  },
+
+  "TX": { "name": "Texas", "noIncomeTax": true,
+    "source": { "note": "No state personal income tax. Recorded as a fact about the state, not a rate table." } },
+  "FL": { "name": "Florida", "noIncomeTax": true,
+    "source": { "note": "No state personal income tax." } },
+  "NV": { "name": "Nevada", "noIncomeTax": true, "source": { "note": "No state personal income tax." } },
+  "WA": { "name": "Washington", "noIncomeTax": true,
+    "source": { "note": "No state personal income tax on wages. Washington does impose a capital gains excise tax, which is not modeled here." } },
+
+  "_absentStates": "Any state not listed here has no table in this engine. A projection for one of those states must report that rather than returning zero tax."
+}
